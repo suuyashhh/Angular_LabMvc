@@ -1,0 +1,44 @@
+import { Routes } from '@angular/router';
+
+export const lABADMIN_ROUTES: Routes = [
+ {
+    path:'casepaper',
+    loadComponent:()=> import('../labadmin/casepaper/casepaper.component')
+        .then(m => m.CasepaperComponent)
+ },
+ {
+    path:'add-test',
+    loadComponent:() => import('../labadmin/add-test/add-test.component')
+        .then(m => m.AddTestComponent)
+ },
+ {
+    path:'create-employee',
+    loadComponent: () => import('../labadmin/create-employee/create-employee.component')
+        .then(m =>m.CreateEmployeeComponent)
+ },
+ {
+    path:'doctor',
+    loadComponent: () => import('../labadmin/doctor/doctor.component')
+        .then(m => m.DoctorComponent)
+ },
+ {
+    path:'approve/casepaper',
+    loadComponent: () => import('../labadmin/approve/casepaper/casepaper.component')
+        .then(m => m.CasepaperComponent)
+ },
+ {
+    path:'approve/test',
+    loadComponent: () => import('../labadmin/approve/test/test.component')
+        .then(m => m.TestComponent)
+ }
+    //   {
+//     path: 'drr',
+//     loadComponent: () => import('../staff/drr/drr.component')
+//       .then(m => m.DrrComponent)  //Lazy-load DashboardHomeComponent
+//   },
+  // {
+  //   path: 'ic',
+  //   loadComponent: () => import('../pages/issued-certificate/issued-certificate.component')
+  //     .then(m => m.IssuedCertificateComponent) // Lazy-load DashboardSettingsComponent
+  // }
+];

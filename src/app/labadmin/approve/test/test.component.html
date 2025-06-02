@@ -1,0 +1,49 @@
+<p>test works!</p>
+
+
+<!-- <div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="card">
+            <div class="card overflow-hidden">
+                <h5 class="card-header">Test</h5>
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" [(ngModel)]="masterSelected" (change)="toggleAllSelection()" /></th>
+                                <th>Tr No</th>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Crt By</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let row of data | paginate: { itemsPerPage: rowsPerPage, currentPage: currentPage }">
+                                <td><input type="checkbox" [(ngModel)]="row.selected" (change)="checkIfAllSelected()"/></td>
+                                <td>{{ row.trNo }}</td>
+                                <td>{{row.date}}</td>
+                                <td><span class="badge rounded-pill bg-label-success me-1">{{ row.name }}</span></td>
+                                <td><span class="badge rounded-pill bg-label-gray me-1">{{ row.contact }}</span></td>
+                                <td><span class="badge rounded-pill bg-label-primary me-1">{{ row.createdBy }}</span>
+                                </td>
+                                <td><span class="badge rounded-pill bg-label-warning me-1">{{ row.status }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    
+                    <pagination-controls (pageChange)="currentPage = $event" previousLabel="«" nextLabel="»" [maxSize]="5"
+                        [directionLinks]="true" [autoHide]="false"
+                        class="mt-3 d-flex justify-content-center"></pagination-controls>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div> -->
