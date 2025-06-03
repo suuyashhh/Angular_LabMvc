@@ -1,8 +1,44 @@
-<div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
-        New
-    </button>
+<div class="container container-p-y">
+    <div class="row g-3">
+
+        <div class="col-12 col-sm-6 col-md-2">
+            <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+                <i class="ri-add-box-fill"></i> &nbsp; New
+            </button>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="form-floating form-floating-outline">
+               <input class="form-control" type="date" [(ngModel)]="startDate" id="start-date" />
+                <label for="start-date">Start Date</label>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <div class="form-floating form-floating-outline">
+                <input class="form-control" type="date" [(ngModel)]="endDate" id="end-date" />
+                <label for="end-date">End Date</label>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-2">
+            <button type="button" class="btn btn-primary m-1" (click)="filterByDate()">
+                Search by Date
+            </button>
+        </div>
+
+        <div class="d-none d-md-block col-md-1"></div>
+
+        <div class="col-12 col-md-3">
+            <div class="form-floating form-floating-outline">
+                <input class="form-control" type="search" placeholder="Search ..."  [(ngModel)]="searchTerm" id="html5-search-input" />
+                <label for="html5-search-input"><i class="ri-search-2-fill"></i> Search by Name</label>
+            </div>
+        </div>
+        
+    </div>
 </div>
+
 
 <div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -12,200 +48,214 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- modified one -->
- <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="col-xxl">
-        <div class="card mb-6">
-            <div class="card-header d-flex align-items-center justify-content-between mb-4 bg-light">
-                <h5 class="mb-0 text-dark">Case Paper</h5>
-            </div>
-            <div class="card-body">
-                <form>
-
-                    <!-- Date -->
-                    <div class="form-floating form-floating-outline mb-4">
-                        <input class="form-control" type="date" id="date-input" required />
-                        <label for="date-input">Date</label>
-                    </div>
-
-                    <!-- Home Collection -->
-                    <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="home-collection" />
-                        <label class="form-check-label" for="home-collection">Home collection</label>
-                    </div>
-
-                    <!-- Name -->
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="patient-name">Name</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-user-line ri-20px"></i></span>
-                                <input type="text" id="patient-name" class="form-control" placeholder="Atharv" required />
-                            </div>
+            <div class="container-xxl flex-grow-1 container-p-y">
+                <div class="col-xxl">
+                    <div class="card mb-6">
+                        <div class="card-header d-flex align-items-center justify-content-between mb-4 bg-light">
+                            <h5 class="mb-0 text-dark">Case Paper</h5>
                         </div>
-                    </div>
+                        <div class="card-body">
+                            <form>
 
-                    <!-- Gender and Phone -->
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label class="col-sm-4 col-form-label" for="gender">Gender</label>
-                                <div class="col-sm-8">
-                                    <select id="gender" class="form-select" required>
-                                        <option disabled selected>Select gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                <!-- Date -->
+                                <div class="form-floating form-floating-outline mb-4">
+                                    <input class="form-control" type="date" id="date-input" required />
+                                    <label for="date-input">Date</label>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label class="col-sm-3 col-form-label" for="phone">Phone No</label>
-                                <div class="col-sm-9">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="ri-phone-fill ri-20px"></i></span>
-                                        <input type="tel" id="phone" class="form-control" pattern="[0-9]{10}" placeholder="0000000000" required />
+                                <!-- Home Collection -->
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="home-collection" />
+                                    <label class="form-check-label" for="home-collection">Home collection</label>
+                                </div>
+
+                                <!-- Name -->
+                                <div class="row mb-4">
+                                    <label class="col-sm-2 col-form-label" for="patient-name">Name</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="ri-user-line ri-20px"></i></span>
+                                            <input type="text" id="patient-name" class="form-control"
+                                                placeholder="Atharv" required />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Address -->
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="address">Address</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-building-4-line ri-20px"></i></span>
-                                <input type="text" id="address" class="form-control" placeholder="Address (optional)" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Doctor Reference -->
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="doctor-reference">Doctor Reference</label>
-                        <div class="col-sm-10">
-                            <select id="doctor-reference" class="form-select" required>
-                                <option disabled selected>Select doctor</option>
-                                <option value="1">Dr. One</option>
-                                <option value="2">Dr. Two</option>
-                                <option value="3">Dr. Three</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Blood Tests -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Blood Tests</h4>
-                    <div class="table-responsive mb-4">
-                        <table class="table table-dark">
-                            <thead>
-                                <tr>
-                                    <th>Sr No</th>
-                                    <th>Test Name</th>
-                                    <th>Price (₹)</th>
-                                    <th>Lab Price (₹)</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngfor = "let data of matIs;">
-                                    <td>1</td>
-                                    <td>White blood cells</td>
-                                    <td>200</td>
-                                    <td><span class="badge bg-label-primary">150</span></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn p-0 dropdown-toggle" data-bs-toggle="dropdown">
-                                                <i class="ri-more-2-line"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#"><i class="ri-pencil-line me-1"></i>Edit</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="ri-delete-bin-6-line me-1"></i>Delete</a></li>
-                                            </ul>
+                                <!-- Gender and Phone -->
+                                <div class="row mb-4">
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <label class="col-sm-4 col-form-label" for="gender">Gender</label>
+                                            <div class="col-sm-8">
+                                                <select id="gender" class="form-select" required>
+                                                    <option disabled selected>Select gender</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
 
-                    <!-- Add Test -->
-                    <div class="row mb-4 align-items-end">
-                        <div class="col-sm-8">
-                            <label class="form-label" for="test-name">Test Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-test-tube-line"></i></span>
-                                <input type="text" id="test-name" class="form-control" placeholder="Test" />
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <button type="button" (click)="add(1)" class="btn btn-primary">ADD</button>
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <label class="col-sm-3 col-form-label" for="phone">Phone No</label>
+                                            <div class="col-sm-9">
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i
+                                                            class="ri-phone-fill ri-20px"></i></span>
+                                                    <input type="tel" id="phone" class="form-control"
+                                                        pattern="[0-9]{10}" placeholder="0000000000" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="row mb-4">
+                                    <label class="col-sm-2 col-form-label" for="address">Address</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i
+                                                    class="ri-building-4-line ri-20px"></i></span>
+                                            <input type="text" id="address" class="form-control"
+                                                placeholder="Address (optional)" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Doctor Reference -->
+                                <div class="row mb-4">
+                                    <label class="col-sm-2 col-form-label" for="doctor-reference">Doctor
+                                        Reference</label>
+                                    <div class="col-sm-10">
+                                        <select id="doctor-reference" class="form-select" required>
+                                            <option disabled selected>Select doctor</option>
+                                            <option value="1">Dr. One</option>
+                                            <option value="2">Dr. Two</option>
+                                            <option value="3">Dr. Three</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Blood Tests -->
+                                <h4 class="mb-4 bg-light text-dark p-3">Blood Tests</h4>
+                                <div class="table-responsive mb-4">
+                                    <table class="table table-dark">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr No</th>
+                                                <th>Test Name</th>
+                                                <th>Price (₹)</th>
+                                                <th>Lab Price (₹)</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngfor="let data of matIs;">
+                                                <td>1</td>
+                                                <td>White blood cells</td>
+                                                <td>200</td>
+                                                <td><span class="badge bg-label-primary">150</span></td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn p-0 dropdown-toggle"
+                                                            data-bs-toggle="dropdown">
+                                                            <i class="ri-more-2-line"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a class="dropdown-item" href="#"><i
+                                                                        class="ri-pencil-line me-1"></i>Edit</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i
+                                                                        class="ri-delete-bin-6-line me-1"></i>Delete</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Add Test -->
+                                <div class="row mb-4 align-items-end">
+                                    <div class="col-sm-8">
+                                        <label class="form-label" for="test-name">Test Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="ri-test-tube-line"></i></span>
+                                            <input type="text" id="test-name" class="form-control" placeholder="Test" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <button type="button" (click)="add(1)" class="btn btn-primary">ADD</button>
+                                    </div>
+                                </div>
+
+                                <!-- Discount -->
+                                <h4 class="mb-4 bg-light text-dark p-3">Discount (%)</h4>
+                                <div class="row mb-4">
+                                    <div class="col-sm-6">
+                                        <label class="form-label" for="discount">Discount (%)</label>
+                                        <input type="number" id="discount" class="form-control" placeholder="e.g. 10"
+                                            min="0" max="100" />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="form-label" for="discount-amount">Discount Amount</label>
+                                        <input type="number" id="discount-amount" class="form-control"
+                                            placeholder="e.g. ₹50" />
+                                    </div>
+                                </div>
+
+                                <!-- Collection -->
+                                <h4 class="mb-4 bg-light text-dark p-3">Collection</h4>
+                                <div class="row mb-4">
+                                    <div class="col-sm-6">
+                                        <label class="form-label" for="total-amount">Total Amount</label>
+                                        <input type="number" id="total-amount" class="form-control" placeholder="₹0" />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="form-label" for="lab-profit">Total Lab Profit</label>
+                                        <input type="number" id="lab-profit" class="form-control" placeholder="₹0" />
+                                    </div>
+                                </div>
+
+                                <!-- Payment Method -->
+                                <h4 class="mb-4 bg-light text-dark p-3">Payment Method</h4>
+                                <div class="mb-4">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="paymentMethod" id="cash" class="form-check-input"
+                                            required />
+                                        <label class="form-check-label" for="cash">Cash</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
+                                        <label class="form-check-label" for="online">Online</label>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Amount -->
+                                <div class="row mb-4">
+                                    <label class="col-sm-4 col-form-label" for="payment-amount">Payment Amount</label>
+                                    <div class="col-sm-8">
+                                        <input type="number" id="payment-amount" class="form-control" placeholder="₹0"
+                                            required />
+                                    </div>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="row justify-content-end">
+                                    <div class="col text-end">
+                                        <button type="submit" class="btn btn-primary me-2">Save</button>
+                                        <button type="reset" class="btn btn-danger">Cancel</button>
+                                    </div>
+                                </div>
+
+                            </form>
                         </div>
                     </div>
-
-                    <!-- Discount -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Discount (%)</h4>
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <label class="form-label" for="discount">Discount (%)</label>
-                            <input type="number" id="discount" class="form-control" placeholder="e.g. 10" min="0" max="100" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label" for="discount-amount">Discount Amount</label>
-                            <input type="number" id="discount-amount" class="form-control" placeholder="e.g. ₹50" />
-                        </div>
-                    </div>
-
-                    <!-- Collection -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Collection</h4>
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <label class="form-label" for="total-amount">Total Amount</label>
-                            <input type="number" id="total-amount" class="form-control" placeholder="₹0" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label" for="lab-profit">Total Lab Profit</label>
-                            <input type="number" id="lab-profit" class="form-control" placeholder="₹0" />
-                        </div>
-                    </div>
-
-                    <!-- Payment Method -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Payment Method</h4>
-                    <div class="mb-4">
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
-                            <label class="form-check-label" for="cash">Cash</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
-                            <label class="form-check-label" for="online">Online</label>
-                        </div>
-                    </div>
-
-                    <!-- Payment Amount -->
-                    <div class="row mb-4">
-                        <label class="col-sm-4 col-form-label" for="payment-amount">Payment Amount</label>
-                        <div class="col-sm-8">
-                            <input type="number" id="payment-amount" class="form-control" placeholder="₹0" required />
-                        </div>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="row justify-content-end">
-                        <div class="col text-end">
-                            <button type="submit" class="btn btn-primary me-2">Save</button>
-                            <button type="reset" class="btn btn-danger">Cancel</button>
-                        </div>
-                    </div>
-
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 </div>
@@ -228,7 +278,7 @@
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let cases of case | paginate: {
+                    <tr *ngFor="let cases of filteredCases() | paginate: {
                   itemsPerPage: pageSize,
                   currentPage: page
                 }">
@@ -258,468 +308,6 @@
         </div>
         <div class="d-flex justify-content-center p-3">
             <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
-        </div>
-    </div>
-</div>
-
-
-<!-- new case paper -->
-
-<div class="container-xxl flex-grow-1 container-p-y">
-  
-    <div class="col-xxl">
-        <div class="card mb-6">
-            <div class="card-header d-flex align-items-center justify-content-between mb-4 bg-light   ">
-                <h5 class="mb-0 text-dark">Case Paper</h5>
-            </div>
-            <div class="card-body">
-                <form>
-                    <div class="form-floating form-floating-outline mb-6">
-                        <input class="form-control" type="date" id="html5-date-input" />
-                        <label for="html5-date-input">Date</label>
-                    </div>
-                    <div class="form-check mt-4">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" />
-                        <label class="form-check-label" for="defaultCheck1"> Home collection </label>
-                    </div>
-
-
-
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="basic-icon-default-fullname">Name</label>
-                        <div class="col-sm-10">
-                            <div class="input-group input-group-merge">
-                                <span id="basic-icon-default-fullname2" class="input-group-text"><i
-                                        class="ri-user-line ri-20px"></i></span>
-                                <input type="text" class="form-control" id="basic-icon-default-fullname"
-                                    placeholder="Atharv" aria-label="Atharv"
-                                    aria-describedby="basic-icon-default-fullname2" />
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="row mb-4">
-                        <!-- Gender -->
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label for="defaultSelect" class="col-sm-4 col-form-label">Gender</label>
-                                <div class="col-sm-8">
-                                    <select id="defaultSelect" class="form-select">
-                                        <option selected disabled>Select gender</option>
-                                        <option value="1">Male</option>
-                                        <option value="2">Female</option>
-                                        <option value="3">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Phone Number -->
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label for="inline-phone" class="col-sm-3 col-form-label ">Phone No</label>
-                                <div class="col-sm-9">
-                                    <div class="input-group input-group-merge">
-                                        <span class="input-group-text"><i class="ri-phone-fill ri-20px"></i></span>
-                                        <input type="text" id="inline-phone" class="form-control phone-mask"
-                                            placeholder="0000000000" aria-label="Phone Number" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="basic-icon-default-company">Address</label>
-                        <div class="col-sm-10">
-                            <div class="input-group input-group-merge">
-                                <span id="basic-icon-default-company2" class="input-group-text"><i
-                                        class="ri-building-4-line ri-20px"></i></span>
-                                <input type="text" id="basic-icon-default-company" class="form-control"
-                                    placeholder="address.(optional)" aria-label="address"
-                                    aria-describedby="basic-icon-default-company2" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="basic-icon-default-fullname">Doctor Refrence</label>
-                        <div class="col-sm-10">
-                            <div class="input-group input-group-merge">
-                                <select id="defaultSelect" class="form-select">
-                                    <option>Default select</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="mb-4 bg-light text-dark p-3">Blood Tests</h4>
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-dark">
-                                <thead>
-                                    <tr>
-                                        <th>Sr No</th>
-                                        <th>Test Name</th>
-                                        <th>Price (₹)</th>
-                                        <th>Lab Price (₹)</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-border-bottom-0">
-                                    <tr>
-                                        <td>1</td>
-                                        <td>White blood cells </td>
-
-                                        <td>2000000</td>
-
-                                        <td><span class="badge rounded-pill bg-label-primary me-1">200000000</span>
-                                        </td>
-
-                                        <td>
-                                            <div class="dropdown">
-                                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                                    data-bs-toggle="dropdown">
-                                                    <i class="ri-more-2-line"></i>
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                                            class="ri-pencil-line me-1"></i>
-                                                        Edit</a>
-                                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                                            class="ri-delete-bin-6-line me-1"></i>
-                                                        Delete</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-8">
-                            <div class="row mb-4">
-                                <label class="col-sm-3 col-form-label" for="basic-icon-default-fullname">Test
-                                    Name</label>
-                                <div class="col-sm-8">
-                                    <div class="input-group input-group-merge">
-                                        <span id="basic-icon-default-fullname2" class="input-group-text"><i
-                                                class="ri-test-tube-line"></i></span>
-                                        <input type="text" class="form-control" id="basic-icon-default-fullname"
-                                            placeholder="Test" aria-label="Test"
-                                            aria-describedby="basic-icon-default-fullname2" />
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="col-sm-4">
-                            <button type="button" class="btn btn-primary">
-                                <span class="tf-icons ri-checkbox-circle-line ri-16px me-1_5"></span>ADD
-                            </button>
-                        </div>
-                    </div>
-                   
-
-                    <h4 class="mb-4 bg-light text-dark p-3">Discount (%)</h4>
-                    <h5>If you gave the discount please fill in the below field</h5>
-
-                    <div class="row mb-4">
-
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label for="defaultSelect" class="col-sm-4 col-form-label">Dis (%)</label>
-                                <div class="col-sm-8">
-                                    <div class="form-floating form-floating-outline mb-6">
-                                        <input class="form-control" type="text" placeholder="discount%"
-                                            id="html5-text-input" />
-                                        <label for="html5-text-input">Dis (%)</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label for="inline-phone" class="col-sm-3 col-form-label ">Dis Amount</label>
-                                <div class="col-sm-9">
-                                    <div class="form-floating form-floating-outline mb-6">
-                                        <input class="form-control" type="text" placeholder="discount%"
-                                            id="html5-text-input" />
-                                        <label for="html5-text-input">Dis Amount</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 class="mb-4 bg-light text-dark p-3">Collection</h4>
-
-                    <div class="row mb-4">
-
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label for="defaultSelect" class="col-sm-4 col-form-label">Total Amount</label>
-                                <div class="col-sm-8">
-                                    <div class=" mb-6">
-                                        <input class="form-control" type="text" placeholder="₹0"
-                                            id="html5-text-input" />
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label for="inline-phone" class="col-sm-3 col-form-label ">Total Lab Profit</label>
-                                <div class="col-sm-9">
-                                    <div class=" mb-6">
-                                        <input class="form-control" type="text" placeholder="₹0"
-                                            id="html5-text-input" />
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 class="mb-4 bg-light text-dark p-3">Payment Method </h4>
-
-                    <div class="mb-3">
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="paymentMethod" id="cash" class="form-check-input">
-                            <label for="cash" class="form-check-label">Cash</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="paymentMethod" id="online" class="form-check-input">
-                            <label for="online" class="form-check-label">Online</label>
-                        </div>
-                    </div>
-                    <br>
-
-                    <div class="row">
-                        <label for="defaultSelect" class="col-sm-4 col-form-label">Payment Amount</label>
-                        <div class="col-sm-8">
-                            <div class=" mb-6">
-                                <input class="form-control" type="text" placeholder="₹0" id="html5-text-input" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row justify-content-end">
-                        <div class="col">
-                            <button type="submit" class="btn btn-primary m-4 tf-icons ri-checkbox-circle-line ri-16px me-1_5">Save</button>
-                            <button type="button" class="btn btn-danger ">Cancel</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- modified one -->
- <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="col-xxl">
-        <div class="card mb-6">
-            <div class="card-header d-flex align-items-center justify-content-between mb-4 bg-light">
-                <h5 class="mb-0 text-dark">Case Paper</h5>
-            </div>
-            <div class="card-body">
-                <form>
-
-                    <!-- Date -->
-                    <div class="form-floating form-floating-outline mb-4">
-                        <input class="form-control" type="date" id="date-input" required />
-                        <label for="date-input">Date</label>
-                    </div>
-
-                    <!-- Home Collection -->
-                    <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="home-collection" />
-                        <label class="form-check-label" for="home-collection">Home collection</label>
-                    </div>
-
-                    <!-- Name -->
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="patient-name">Name</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-user-line ri-20px"></i></span>
-                                <input type="text" id="patient-name" class="form-control" placeholder="Atharv" required />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Gender and Phone -->
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label class="col-sm-4 col-form-label" for="gender">Gender</label>
-                                <div class="col-sm-8">
-                                    <select id="gender" class="form-select" required>
-                                        <option disabled selected>Select gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <div class="row">
-                                <label class="col-sm-3 col-form-label" for="phone">Phone No</label>
-                                <div class="col-sm-9">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="ri-phone-fill ri-20px"></i></span>
-                                        <input type="tel" id="phone" class="form-control" pattern="[0-9]{10}" placeholder="0000000000" required />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Address -->
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="address">Address</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-building-4-line ri-20px"></i></span>
-                                <input type="text" id="address" class="form-control" placeholder="Address (optional)" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Doctor Reference -->
-                    <div class="row mb-4">
-                        <label class="col-sm-2 col-form-label" for="doctor-reference">Doctor Reference</label>
-                        <div class="col-sm-10">
-                            <select id="doctor-reference" class="form-select" required>
-                                <option disabled selected>Select doctor</option>
-                                <option value="1">Dr. One</option>
-                                <option value="2">Dr. Two</option>
-                                <option value="3">Dr. Three</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Blood Tests -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Blood Tests</h4>
-                    <div class="table-responsive mb-4">
-                        <table class="table table-dark">
-                            <thead>
-                                <tr>
-                                    <th>Sr No</th>
-                                    <th>Test Name</th>
-                                    <th>Price (₹)</th>
-                                    <th>Lab Price (₹)</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>White blood cells</td>
-                                    <td>200</td>
-                                    <td><span class="badge bg-label-primary">150</span></td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn p-0 dropdown-toggle" data-bs-toggle="dropdown">
-                                                <i class="ri-more-2-line"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#"><i class="ri-pencil-line me-1"></i>Edit</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="ri-delete-bin-6-line me-1"></i>Delete</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Add Test -->
-                    <div class="row mb-4 align-items-end">
-                        <div class="col-sm-8">
-                            <label class="form-label" for="test-name">Test Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="ri-test-tube-line"></i></span>
-                                <input type="text" id="test-name" class="form-control" placeholder="Test" />
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <button type="button" class="btn btn-primary">ADD</button>
-                        </div>
-                    </div>
-
-                    <!-- Discount -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Discount (%)</h4>
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <label class="form-label" for="discount">Discount (%)</label>
-                            <input type="number" id="discount" class="form-control" placeholder="e.g. 10" min="0" max="100" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label" for="discount-amount">Discount Amount</label>
-                            <input type="number" id="discount-amount" class="form-control" placeholder="e.g. ₹50" />
-                        </div>
-                    </div>
-
-                    <!-- Collection -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Collection</h4>
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <label class="form-label" for="total-amount">Total Amount</label>
-                            <input type="number" id="total-amount" class="form-control" placeholder="₹0" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label" for="lab-profit">Total Lab Profit</label>
-                            <input type="number" id="lab-profit" class="form-control" placeholder="₹0" />
-                        </div>
-                    </div>
-
-                    <!-- Payment Method -->
-                    <h4 class="mb-4 bg-light text-dark p-3">Payment Method</h4>
-                    <div class="mb-4">
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
-                            <label class="form-check-label" for="cash">Cash</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
-                            <label class="form-check-label" for="online">Online</label>
-                        </div>
-                    </div>
-
-                    <!-- Payment Amount -->
-                    <div class="row mb-4">
-                        <label class="col-sm-4 col-form-label" for="payment-amount">Payment Amount</label>
-                        <div class="col-sm-8">
-                            <input type="number" id="payment-amount" class="form-control" placeholder="₹0" required />
-                        </div>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="row justify-content-end">
-                        <div class="col text-end">
-                            <button type="submit" class="btn btn-primary me-2">Save</button>
-                            <button type="reset" class="btn btn-danger">Cancel</button>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
         </div>
     </div>
 </div>
