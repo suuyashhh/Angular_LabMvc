@@ -2,6 +2,16 @@ import { Routes } from '@angular/router';
 
 export const lABADMIN_ROUTES: Routes = [
  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+ {
+    path:'dashboard',
+    loadComponent:()=> import('../labadmin/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+ },
+    {
     path:'casepaper',
     loadComponent:()=> import('../labadmin/casepaper/casepaper.component')
         .then(m => m.CasepaperComponent)
