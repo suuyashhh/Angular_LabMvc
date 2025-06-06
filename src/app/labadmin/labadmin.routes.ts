@@ -40,6 +40,11 @@ export const lABADMIN_ROUTES: Routes = [
     path:'approve/test',
     loadComponent: () => import('../labadmin/approve/test/test.component')
         .then(m => m.TestComponent)
+ },
+ {
+    path:'lab-materials',
+    loadComponent: () => import('../labadmin/lab-materials/lab-materials.component')
+        .then(m => m.LabMaterialsComponent)
  }
     //   {
 //     path: 'drr',

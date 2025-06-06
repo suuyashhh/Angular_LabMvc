@@ -1,0 +1,76 @@
+<div class="container  container-p-y">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#MaterialsFormModal">
+      Add Materials
+  </button>
+</div>
+
+<div class="modal fade" id="MaterialsFormModal" tabindex="-1" aria-labelledby="MaterialsFormModal" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="MaterialsFormModal">Material Form</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form [formGroup]="data" (ngSubmit)="submit(data.value)">                    
+                      <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                       <input class="form-control" type="date" [(ngModel)]="startDate" id="start-date" />
+                    </div>
+                      <div class="mb-3">
+                          <label for="MaterialsName" class="form-label">Test Name</label>
+                          <input type="text" class="form-control" id="MaterialsName"  formControlName="Materials_NAME">
+                      </div>
+                      <div class="mb-3">
+                          <label for="price" class="form-label">Price</label>
+                          <input type="text" class="form-control" id="price" formControlName="PRICE">
+                      </div>
+                      <button type="submit" class="btn btn-success m-10" data-bs-dismiss="modal">Save</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+</div>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="card">
+        <h5 class="card-header">Test Table</h5>
+        <div class="table-responsive text-nowrap">
+          <table class="table">
+            <thead class="table-dark">
+              <tr>
+                <th>Test Code</th>
+                <th>Test Name</th>
+                <th>price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              <tr *ngFor="let test of tests">
+                <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{test.tesT_CODE}}</span></td>
+                <td>{{test.tesT_NAME}}</td>
+                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{test.price}}</span></td>
+                <td>
+                  <div class="dropdown">
+                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                      <i class="ri-more-2-line"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="javascript:void(0);"
+                        ><i class="ri-pencil-line me-1"></i> Edit</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0);"
+                        ><i class="ri-delete-bin-6-line me-1"></i> Delete</a
+                      >
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+</div>
+   
+
