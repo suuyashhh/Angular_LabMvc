@@ -1,30 +1,34 @@
 <div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#MaterialsFormModal">
-      Add Materials
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+      Add Test
   </button>
 </div>
 
-<div class="modal fade" id="MaterialsFormModal" tabindex="-1" aria-labelledby="MaterialsFormModal" aria-hidden="true">
+<div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="MaterialsFormModal">Material Form</h5>
+                  <h5 class="modal-title" id="doctorFormModalLabel">Test Form</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                  <form [formGroup]="data" (ngSubmit)="submit(data.value)">                    
+                  <form [formGroup]="data" (ngSubmit)="submit(data.value)">
                       <div class="mb-3">
-                        <label for="date" class="form-label">Date</label>
-                       <input class="form-control" type="date" [(ngModel)]="startDate" id="start-date" />
+                          <label for="doctorName" class="form-label">Test Name</label>
+                          <input type="text" class="form-control" id="doctorName"  formControlName="TEST_NAME">
+                      </div>
+                      <!-- <div class="mb-3">
+                          <label for="number" class="form-label">Address</label>
+                          <input type="text" class="form-control" id="number">
+                      </div> -->
+                      <div class="mb-3">
+                          <label for="address" class="form-label">Price</label>
+                          <input type="text" class="form-control" id="number" formControlName="PRICE">
+                      </div>
+                      <div class="mb-3">
+                        <label for="address" class="form-label">Lab Price</label>
+                        <input type="text" class="form-control" id="address"  formControlName="LAB_PRICE">
                     </div>
-                      <div class="mb-3">
-                          <label for="MaterialsName" class="form-label">Test Name</label>
-                          <input type="text" class="form-control" id="MaterialsName"  formControlName="Materials_NAME">
-                      </div>
-                      <div class="mb-3">
-                          <label for="price" class="form-label">Price</label>
-                          <input type="text" class="form-control" id="price" formControlName="PRICE">
-                      </div>
                       <button type="submit" class="btn btn-success m-10" data-bs-dismiss="modal">Save</button>
                       <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                   </form>
