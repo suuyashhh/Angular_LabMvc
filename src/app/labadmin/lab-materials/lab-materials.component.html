@@ -1,6 +1,6 @@
 <div class="container  container-p-y">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
-      Add Test
+      Add Material
   </button>
 </div>
 
@@ -8,27 +8,24 @@
       <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="doctorFormModalLabel">Test Form</h5>
+                  <h5 class="modal-title" id="doctorFormModalLabel">MATERIAL Form</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
                   <form [formGroup]="data" (ngSubmit)="submit(data.value)">
+                         
                       <div class="mb-3">
-                          <label for="doctorName" class="form-label">Test Name</label>
-                          <input type="text" class="form-control" id="doctorName"  formControlName="TEST_NAME">
+                          <label for="doctorName" class="form-label">Date</label>
+                          <input class="form-control" type="date"  id="start-date" fromControlName="DATE" />
                       </div>
-                      <!-- <div class="mb-3">
-                          <label for="number" class="form-label">Address</label>
-                          <input type="text" class="form-control" id="number">
-                      </div> -->
+                      <div class="mb-3">
+                          <label for="doctorName" class="form-label">Material Name</label>
+                          <input type="text" class="form-control"  formControlName="MAT_NAME">
+                      </div>
                       <div class="mb-3">
                           <label for="address" class="form-label">Price</label>
-                          <input type="text" class="form-control" id="number" formControlName="PRICE">
+                          <input type="text" class="form-control" id="number" formControlName="MAT_PRICE">
                       </div>
-                      <div class="mb-3">
-                        <label for="address" class="form-label">Lab Price</label>
-                        <input type="text" class="form-control" id="address"  formControlName="LAB_PRICE">
-                    </div>
                       <button type="submit" class="btn btn-success m-10" data-bs-dismiss="modal">Save</button>
                       <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                   </form>
@@ -39,22 +36,22 @@
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="card">
-        <h5 class="card-header">Test Table</h5>
+        <h5 class="card-header">Index</h5>
         <div class="table-responsive text-nowrap">
           <table class="table">
-            <thead class="table-dark">
+            <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;"> 
               <tr>
-                <th>Test Code</th>
-                <th>Test Name</th>
+                <th>Material Code</th>
+                <th>Material Name</th>
                 <th>price</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody class="table-border-bottom-0">
-              <tr *ngFor="let test of tests">
-                <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{test.tesT_CODE}}</span></td>
-                <td>{{test.tesT_NAME}}</td>
-                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{test.price}}</span></td>
+              <tr *ngFor="let material of materials">
+                <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{material.maT_ID}}</span></td>
+                <td>{{material.maT_NAME}}</td>
+                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{material.maT_PRICE}}</span></td>
                 <td>
                   <div class="dropdown">
                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">

@@ -15,7 +15,7 @@ import { Modal } from 'bootstrap';
 export class LabMaterialsComponent implements OnInit {
   
   
-    tests:any;
+    materials:any;
     data:any;
   
     constructor(private api:ApiService){}
@@ -31,16 +31,16 @@ export class LabMaterialsComponent implements OnInit {
   
   
     load(){
-      this.api.get('Test/Test').subscribe((res:any)=>{
-        this.tests=res;
-        console.log(this.tests)
+      this.api.get('LabMaterials/LabMaterials').subscribe((res:any)=>{
+        this.materials=res;
+        console.log(this.materials)
       })
   
     }
   
-    submit(test:any){
-      console.log(test);
-      this.api.post('Test/SaveTest',test).subscribe((res:any)=>{
+    submit(materials:any){
+      console.log(materials);
+      this.api.post('LabMaterials/SaveLabMaterials',materials).subscribe((res:any)=>{
         console.log(res);
         this.load();
   
