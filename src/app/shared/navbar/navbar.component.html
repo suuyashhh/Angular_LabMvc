@@ -1,14 +1,8 @@
-  <!-- style="position: fixed;top: 10px;left: 287px; "  -->
-<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme shadow-xs bg-white p-5 mt-3" id="layout-navbar">
+<!-- style="position: fixed;top: 10px;left: 287px; "  -->
 
-
-
-
-
-
-
-
-
+<nav
+  class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme shadow-xs bg-white p-5 mt-3"
+  id="layout-navbar">
   <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0   d-xl-none ">
     <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
       <i class="ri-menu-fill ri-24px"></i>
@@ -17,50 +11,35 @@
 
 
   <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-
-
-    <!-- Search -->
-    <div class="navbar-nav align-items-center">
-      <div class="nav-item navbar-search-wrapper mb-0">
-        <a class="nav-item nav-link search-toggler fw-normal px-0" href="javascript:void(0);">
-          <i class="ri-search-line ri-22px scaleX-n1-rtl me-1_5"></i>
-          <span class="d-none d-md-inline-block text-muted ms-1_5">Search (Ctrl+/)</span>
-        </a>
-      </div>
-    </div>
-    <!-- /Search -->
-
-
-
-
-
     <ul class="navbar-nav flex-row align-items-center ms-auto">
-
-
-
       <!-- Language -->
       <li class="nav-item dropdown-language dropdown">
-        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light" href="javascript:void(0);" data-bs-toggle="dropdown">
+        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light"
+          href="javascript:void(0);" data-bs-toggle="dropdown">
           <i class="ri-translate-2 ri-22px"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end py-2">
           <li>
-            <a class="dropdown-item waves-effect active" href="javascript:void(0);" data-language="en" data-text-direction="ltr">
+            <a class="dropdown-item waves-effect active" href="javascript:void(0);" data-language="en"
+              data-text-direction="ltr">
               <span class="align-middle">English</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="fr" data-text-direction="ltr">
+            <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="fr"
+              data-text-direction="ltr">
               <span class="align-middle">French</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="ar" data-text-direction="rtl">
+            <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="ar"
+              data-text-direction="rtl">
               <span class="align-middle">Arabic</span>
             </a>
           </li>
           <li>
-            <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="de" data-text-direction="ltr">
+            <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="de"
+              data-text-direction="ltr">
               <span class="align-middle">German</span>
             </a>
           </li>
@@ -70,7 +49,8 @@
 
       <!-- Style Switcher -->
       <li class="nav-item dropdown-style-switcher dropdown">
-        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light" href="javascript:void(0);" data-bs-toggle="dropdown">
+        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light"
+          href="javascript:void(0);" data-bs-toggle="dropdown">
           <i class="ri-22px ri-sun-line"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
@@ -93,93 +73,13 @@
       </li>
       <!-- / Style Switcher-->
 
-      <!-- Quick links  -->
-      <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown">
-        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-          <i class="ri-star-smile-line ri-22px"></i>
-        </a>
-        <div class="dropdown-menu dropdown-menu-end py-0">
-          <div class="dropdown-menu-header border-bottom py-50">
-            <div class="dropdown-header d-flex align-items-center py-2">
-              <h6 class="mb-0 me-auto">Shortcuts</h6>
-              <a href="javascript:void(0)" class="btn btn-text-secondary rounded-pill btn-icon dropdown-shortcuts-add waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Add shortcuts" data-bs-original-title="Add shortcuts"><i class="ri-layout-grid-line ri-24px text-heading"></i></a>
-            </div>
-          </div>
-          <div class="dropdown-shortcuts-list scrollable-container ps">
-            <div class="row row-bordered overflow-visible g-0">
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-calendar-line ri-26px text-heading"></i>
-                </span>
-                <a href="app-calendar.html" class="stretched-link">Calendar</a>
-                <small>Appointments</small>
-              </div>
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-file-text-line ri-26px text-heading"></i>
-                </span>
-                <a href="app-invoice-list.html" class="stretched-link">Invoice App</a>
-                <small>Manage Accounts</small>
-              </div>
-            </div>
-            <div class="row row-bordered overflow-visible g-0">
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-user-line ri-26px text-heading"></i>
-                </span>
-                <a href="app-user-list.html" class="stretched-link">User App</a>
-                <small>Manage Users</small>
-              </div>
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-computer-line ri-26px text-heading"></i>
-                </span>
-                <a href="app-access-roles.html" class="stretched-link">Role Management</a>
-                <small>Permission</small>
-              </div>
-            </div>
-            <div class="row row-bordered overflow-visible g-0">
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-pie-chart-2-line ri-26px text-heading"></i>
-                </span>
-                <a href="index.html" class="stretched-link">Dashboard</a>
-                <small>Analytics</small>
-              </div>
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-settings-4-line ri-26px text-heading"></i>
-                </span>
-                <a href="pages-account-settings-account.html" class="stretched-link">Setting</a>
-                <small>Account Settings</small>
-              </div>
-            </div>
-            <div class="row row-bordered overflow-visible g-0">
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-question-line ri-26px text-heading"></i>
-                </span>
-                <a href="pages-faq.html" class="stretched-link">FAQs</a>
-                <small class="text-muted mb-0">FAQs &amp; Articles</small>
-              </div>
-              <div class="dropdown-shortcuts-item col">
-                <span class="dropdown-shortcuts-icon rounded-circle mb-2">
-                  <i class="ri-tv-2-line ri-26px text-heading"></i>
-                </span>
-                <a href="modal-examples.html" class="stretched-link">Modals</a>
-                <small>Useful Popups</small>
-              </div>
-            </div>
-          <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
-        </div>
-      </li>
-      <!-- Quick links -->
-
       <!-- Notification -->
       <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-4 me-xl-1">
-        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow waves-effect waves-light"
+          href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
           <i class="ri-notification-2-line ri-22px"></i>
-          <span class="position-absolute top-0 start-50 translate-middle-y badge badge-dot bg-danger mt-2 border"></span>
+          <span
+            class="position-absolute top-0 start-50 translate-middle-y badge badge-dot bg-danger mt-2 border"></span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end py-0">
           <li class="dropdown-menu-header border-bottom">
@@ -187,7 +87,10 @@
               <h6 class="mb-0 me-auto">Notification</h6>
               <div class="d-flex align-items-center">
                 <span class="badge rounded-pill bg-label-primary me-2">8 New</span>
-                <a href="javascript:void(0)" class="btn btn-text-secondary rounded-pill btn-icon dropdown-notifications-all waves-effect waves-light" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Mark all as read" data-bs-original-title="Mark all as read"><i class="ri-mail-open-line ri-20px text-body"></i></a>
+                <a href="javascript:void(0)"
+                  class="btn btn-text-secondary rounded-pill btn-icon dropdown-notifications-all waves-effect waves-light"
+                  data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Mark all as read"
+                  data-bs-original-title="Mark all as read"><i class="ri-mail-open-line ri-20px text-body"></i></a>
               </div>
             </div>
           </li>
@@ -206,8 +109,10 @@
                     <small class="text-muted">1h ago</small>
                   </div>
                   <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
+                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span
+                        class="badge badge-dot"></span></a>
+                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span
+                        class="ri-close-line"></span></a>
                   </div>
                 </div>
               </li>
@@ -224,139 +129,21 @@
                     <small class="text-muted">12hr ago</small>
                   </div>
                   <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <img src="../../assets/img/avatars/2.png" alt="" class="w-px-40 h-auto rounded-circle">
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">New Message ✉️</h6>
-                    <small class="mb-1 d-block text-body">You have new message from Natalie</small>
-                    <small class="text-muted">1h ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <span class="avatar-initial rounded-circle bg-label-success"><i class="ri-shopping-cart-2-line"></i></span>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">Whoo! You have new order 🛒 </h6>
-                    <small class="mb-1 d-block text-body">ACME Inc. made new order $1,154</small>
-                    <small class="text-muted">1 day ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <img src="../../assets/img/avatars/9.png" alt="" class="w-px-40 h-auto rounded-circle">
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">Application has been approved 🚀 </h6>
-                    <small class="mb-1 d-block text-body">Your ABC project application has been approved.</small>
-                    <small class="text-muted">2 days ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <span class="avatar-initial rounded-circle bg-label-success"><i class="ri-pie-chart-2-line"></i></span>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">Monthly report is generated</h6>
-                    <small class="mb-1 d-block text-body">July monthly financial report is generated </small>
-                    <small class="text-muted">3 days ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <img src="../../assets/img/avatars/5.png" alt="" class="w-px-40 h-auto rounded-circle">
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">Send connection request</h6>
-                    <small class="mb-1 d-block text-body">Peter sent you connection request</small>
-                    <small class="text-muted">4 days ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <img src="../../assets/img/avatars/6.png" alt="" class="w-px-40 h-auto rounded-circle">
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">New message from Jane</h6>
-                    <small class="mb-1 d-block text-body">Your have new message from Jane</small>
-                    <small class="text-muted">5 days ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <span class="avatar-initial rounded-circle bg-label-warning"><i class="ri-error-warning-line"></i></span>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 small">CPU is running high</h6>
-                    <small class="mb-1 d-block text-body">CPU Utilization Percent is currently at 88.63%,</small>
-                    <small class="text-muted">5 days ago</small>
-                  </div>
-                  <div class="flex-shrink-0 dropdown-notifications-actions">
-                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ri-close-line"></span></a>
+                    <a href="javascript:void(0)" class="dropdown-notifications-read"><span
+                        class="badge badge-dot"></span></a>
+                    <a href="javascript:void(0)" class="dropdown-notifications-archive"><span
+                        class="ri-close-line"></span></a>
                   </div>
                 </div>
               </li>
             </ul>
-          <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></li>
+            <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+              <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+            </div>
+            <div class="ps__rail-y" style="top: 0px; right: 0px;">
+              <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+            </div>
+          </li>
           <li class="border-top">
             <div class="d-grid p-4">
               <a class="btn btn-primary btn-sm d-flex waves-effect waves-light" href="javascript:void(0);">
@@ -412,7 +199,8 @@
               <span class="d-flex align-items-center align-middle">
                 <i class="flex-shrink-0 ri-file-text-line ri-22px me-2"></i>
                 <span class="flex-grow-1 align-middle">Billing</span>
-                <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger h-px-20 d-flex align-items-center justify-content-center">4</span>
+                <span
+                  class="flex-shrink-0 badge badge-center rounded-pill bg-danger h-px-20 d-flex align-items-center justify-content-center">4</span>
               </span>
             </a>
           </li>
@@ -451,7 +239,24 @@
 
   <!-- Search Small Screens -->
   <div class="navbar-search-wrapper search-input-wrapper d-none">
-    <span class="twitter-typeahead" style="position: relative; display: inline-block;"><input type="text" class="form-control search-input container-xxl border-0 tt-input" placeholder="Search..." aria-label="Search..." autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;"><pre aria-hidden="true" style="position: absolute; visibility: hidden; white-space: pre; font-family: Inter, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; font-size: 15px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre><div class="tt-menu navbar-search-suggestion ps" style="position: absolute; top: 100%; left: 0px; z-index: 100; display: none;"><div class="tt-dataset tt-dataset-pages"></div><div class="tt-dataset tt-dataset-files"></div><div class="tt-dataset tt-dataset-members"></div><div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div></span>
+    <span class="twitter-typeahead" style="position: relative; display: inline-block;"><input type="text"
+        class="form-control search-input container-xxl border-0 tt-input" placeholder="Search..." aria-label="Search..."
+        autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;">
+      <pre aria-hidden="true"
+        style="position: absolute; visibility: hidden; white-space: pre; font-family: Inter, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; font-size: 15px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre>
+      <div class="tt-menu navbar-search-suggestion ps"
+        style="position: absolute; top: 100%; left: 0px; z-index: 100; display: none;">
+        <div class="tt-dataset tt-dataset-pages"></div>
+        <div class="tt-dataset tt-dataset-files"></div>
+        <div class="tt-dataset tt-dataset-members"></div>
+        <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+          <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+        </div>
+        <div class="ps__rail-y" style="top: 0px; right: 0px;">
+          <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+        </div>
+      </div>
+    </span>
     <i class="ri-close-fill search-toggler cursor-pointer"></i>
   </div>
 
