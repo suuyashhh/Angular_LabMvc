@@ -16,13 +16,17 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   reinitializeSidebarMenu(): void {
-    if (typeof (window as any).Menu !== 'undefined') {
-      // Materio uses 'Menu' global class to handle dropdowns
-      const menu = new (window as any).Menu(document.querySelector('#layout-menu'), {
+  // Wait for DOM to update, especially after route change or sidebar toggle
+  setTimeout(() => {
+    const layoutMenu = document.querySelector('#layout-menu');
+    if (typeof (window as any).Menu !== 'undefined' && layoutMenu) {
+      const menu = new (window as any).Menu(layoutMenu, {
         orientation: 'vertical',
-        closeChildren: false
+        closeChildren: false,
       });
       menu.init();
     }
-  }
+  }, 50); // Small delay allows DOM rendering to finish
+}
+
 }
