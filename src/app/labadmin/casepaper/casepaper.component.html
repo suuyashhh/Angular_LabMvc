@@ -1,313 +1,344 @@
 <div class="container container-p-y">
-    <div class="row g-3">
+  <div class="row g-3">
 
-        <div class="col-12 col-sm-6 col-md-2">
-            <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
-                <i class="ri-add-box-fill"></i> &nbsp; New
-            </button>
-        </div>
-
-        <div class="col-6 col-md-2">
-            <div class="form-floating form-floating-outline">
-               <input class="form-control" type="date" [(ngModel)]="startDate" id="start-date" />
-                <label for="start-date">Start Date</label>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-2">
-            <div class="form-floating form-floating-outline">
-                <input class="form-control" type="date" [(ngModel)]="endDate" id="end-date" />
-                <label for="end-date">End Date</label>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-2">
-            <button type="button" class="btn btn-primary m-1" (click)="filterByDate()">
-                Search by Date
-            </button>
-        </div>
-
-        <div class="d-none d-md-block col-md-1"></div>
-
-        <div class="col-12 col-md-3">
-            <div class="form-floating form-floating-outline">
-                <input class="form-control" type="search" placeholder="Search ..."  [(ngModel)]="searchTerm" id="html5-search-input" />
-                <label for="html5-search-input"><i class="ri-search-2-fill"></i> Search by Name</label>
-            </div>
-        </div>
-        
+    <div class="col-12 col-sm-6 col-md-2">
+      <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+        <i class="ri-add-box-fill"></i> &nbsp; New
+      </button>
     </div>
+
+    <div class="col-6 col-md-2">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="date" [(ngModel)]="startDate" id="start-date" />
+        <label for="start-date">Start Date</label>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="date" [(ngModel)]="endDate" id="end-date" />
+        <label for="end-date">End Date</label>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-2">
+      <button type="button" class="btn btn-primary m-1" (click)="filterByDate()">
+        Search by Date
+      </button>
+    </div>
+
+    <div class="d-none d-md-block col-md-1"></div>
+
+    <div class="col-12 col-md-3">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="searchTerm"
+          id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill"></i> Search by Name</label>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 
 <div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="doctorFormModalLabel">Case Form</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h5 class="modal-title" id="doctorFormModalLabel">Case Form</h5> -->
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- modified one -->
+      <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="col-xxl">
+          <!-- Add this to your component.html -->
+          <div class="card shadow mb-5 p-4 rounded-4 border-0">
+            <div
+              class="card-header bg-light d-flex justify-content-between align-items-center rounded-3 px-4 py-3 mb-4 shadow-sm">
+              <h5 class="mb-0 text-dark fw-bold">
+                <i class="ri-file-list-3-line me-2 text-primary"></i> Case Paper
+              </h5>
             </div>
-            <!-- modified one -->
-            <div class="container-xxl flex-grow-1 container-p-y">
-                <div class="col-xxl">
-                    <div class="card mb-6">
-                        <div class="card-header d-flex align-items-center justify-content-between mb-4 bg-light">
-                            <h5 class="mb-0 text-dark">Case Paper</h5>
-                        </div>
-                        <div class="card-body">
-                            <form>
 
-                                <!-- Date -->
-                                <div class="form-floating form-floating-outline mb-4">
-                                    <input class="form-control" type="date" id="date-input" required />
-                                    <label for="date-input">Date</label>
-                                </div>
-
-                                <!-- Home Collection -->
-                                <div class="form-check mb-4">
-                                    <input class="form-check-input" type="checkbox" id="home-collection" />
-                                    <label class="form-check-label" for="home-collection">Home collection</label>
-                                </div>
-
-                                <!-- Name -->
-                                <div class="row mb-4">
-                                    <label class="col-sm-2 col-form-label" for="patient-name">Name</label>
-                                    <div class="col-sm-10">
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="ri-user-line ri-20px"></i></span>
-                                            <input type="text" id="patient-name" class="form-control"
-                                                placeholder="Atharv" required />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Gender and Phone -->
-                                <div class="row mb-4">
-                                    <div class="col-sm-6">
-                                        <div class="row">
-                                            <label class="col-sm-4 col-form-label" for="gender">Gender</label>
-                                            <div class="col-sm-8">
-                                                <select id="gender" class="form-select" required>
-                                                    <option disabled selected>Select gender</option>
-                                                    <option value="male">Male</option>
-                                                    <option value="female">Female</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-6">
-                                        <div class="row">
-                                            <label class="col-sm-3 col-form-label" for="phone">Phone No</label>
-                                            <div class="col-sm-9">
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i
-                                                            class="ri-phone-fill ri-20px"></i></span>
-                                                    <input type="tel" id="phone" class="form-control"
-                                                        pattern="[0-9]{10}" placeholder="0000000000" required />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Address -->
-                                <div class="row mb-4">
-                                    <label class="col-sm-2 col-form-label" for="address">Address</label>
-                                    <div class="col-sm-10">
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i
-                                                    class="ri-building-4-line ri-20px"></i></span>
-                                            <input type="text" id="address" class="form-control"
-                                                placeholder="Address (optional)" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Doctor Reference -->
-                                <div class="row mb-4">
-                                    <label class="col-sm-2 col-form-label" for="doctor-reference">Doctor
-                                        Reference</label>
-                                    <div class="col-sm-10">
-                                        <select id="doctor-reference" class="form-select" required>
-                                            <option disabled selected>Select doctor</option>
-                                            <option value="1">Dr. One</option>
-                                            <option value="2">Dr. Two</option>
-                                            <option value="3">Dr. Three</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Blood Tests -->
-                                <h4 class="mb-4 bg-light text-dark p-3">Blood Tests</h4>
-                                <div class="table-responsive mb-4">
-                                    <table class="table table-dark">
-                                        <thead>
-                                            <tr>
-                                                <th>Sr No</th>
-                                                <th>Test Name</th>
-                                                <th>Price (₹)</th>
-                                                <th>Lab Price (₹)</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr *ngfor="let data of matIs;">
-                                                <td>1</td>
-                                                <td>White blood cells</td>
-                                                <td>200</td>
-                                                <td><span class="badge bg-label-primary">150</span></td>
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn p-0 dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
-                                                            <i class="ri-more-2-line"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" href="#"><i
-                                                                        class="ri-pencil-line me-1"></i>Edit</a></li>
-                                                            <li><a class="dropdown-item" href="#"><i
-                                                                        class="ri-delete-bin-6-line me-1"></i>Delete</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Add Test -->
-                                <div class="row mb-4 align-items-end">
-                                    <div class="col-sm-8">
-                                        <label class="form-label" for="test-name">Test Name</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="ri-test-tube-line"></i></span>
-                                            <input type="text" id="test-name" class="form-control" placeholder="Test" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button type="button" (click)="add(1)" class="btn btn-primary">ADD</button>
-                                    </div>
-                                </div>
-
-                                <!-- Discount -->
-                                <h4 class="mb-4 bg-light text-dark p-3">Discount (%)</h4>
-                                <div class="row mb-4">
-                                    <div class="col-sm-6">
-                                        <label class="form-label" for="discount">Discount (%)</label>
-                                        <input type="number" id="discount" class="form-control" placeholder="e.g. 10"
-                                            min="0" max="100" />
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <label class="form-label" for="discount-amount">Discount Amount</label>
-                                        <input type="number" id="discount-amount" class="form-control"
-                                            placeholder="e.g. ₹50" />
-                                    </div>
-                                </div>
-
-                                <!-- Collection -->
-                                <h4 class="mb-4 bg-light text-dark p-3">Collection</h4>
-                                <div class="row mb-4">
-                                    <div class="col-sm-6">
-                                        <label class="form-label" for="total-amount">Total Amount</label>
-                                        <input type="number" id="total-amount" class="form-control" placeholder="₹0" />
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <label class="form-label" for="lab-profit">Total Lab Profit</label>
-                                        <input type="number" id="lab-profit" class="form-control" placeholder="₹0" />
-                                    </div>
-                                </div>
-
-                                <!-- Payment Method -->
-                                <h4 class="mb-4 bg-light text-dark p-3">Payment Method</h4>
-                                <div class="mb-4">
-                                    <div class="form-check form-check-inline">
-                                        <input type="radio" name="paymentMethod" id="cash" class="form-check-input"
-                                            required />
-                                        <label class="form-check-label" for="cash">Cash</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
-                                        <label class="form-check-label" for="online">Online</label>
-                                    </div>
-                                </div>
-
-                                <!-- Payment Amount -->
-                                <div class="row mb-4">
-                                    <label class="col-sm-4 col-form-label" for="payment-amount">Payment Amount</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" id="payment-amount" class="form-control" placeholder="₹0"
-                                            required />
-                                    </div>
-                                </div>
-
-                                <!-- Buttons -->
-                                <div class="row justify-content-end">
-                                    <div class="col text-end">
-                                        <button type="submit" class="btn btn-primary me-2">Save</button>
-                                        <button type="reset" class="btn btn-danger">Cancel</button>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
+            <div class="card-body">
+              <form [formGroup]="data" (ngSubmit)="submit(data.value)">
+                <div class="row mb-4 align-items-center">
+                  <!-- Home Collection -->
+                  <div class="col-md-6 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="home-collection">
+                      <label class="form-check-label text-dark ms-2" for="home-collection">
+                        Home Collection
+                      </label>
                     </div>
+                  </div>
+
+                  <!-- Date Picker -->
+                  <div class="col-md-6 text-end">
+                    <div class="form-floating">
+                      <input type="date" class="form-control shadow-sm" id="date-input" required>
+                      <label for="date-input">Select Date</label>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- Patient Name -->
+                <div class="form-floating form-floating-outline mb-4">
+                  <input type="text" id="patient-name" class="form-control" placeholder="Patient Name"
+                    formControlName="patienT_NAME" required />
+                  <label for="patient-name">Patient Name <span class="text-danger">*</span></label>
+                  <div class="text-danger mt-1" *ngIf="submitted && data.get('patienT_NAME')?.errors">
+                    <small *ngIf="data.get('patienT_NAME')?.errors['required']">Patient Name is required.</small>
+                  </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-floating form-floating-outline mb-4">
+                  <select class="form-select" id="gender" formControlName="gender">
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <label for="gender">Gender <span class="text-danger">*</span></label>
+                  <div class="text-danger mt-1" *ngIf="submitted && data.get('gender')?.errors">
+                    <small *ngIf="data.get('gender')?.errors['required']">Gender is required.</small>
+                  </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-floating form-floating-outline mb-4">
+                  <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
+                    formControlName="coN_NUMBER" />
+                  <label for="phone">Phone Number <span class="text-danger">*</span></label>
+                  <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
+                    <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small>
+                    <small *ngIf="data.get('coN_NUMBER')?.errors['pattern']">Enter valid 10-digit number.</small>
+                  </div>
+                </div>
+
+                <!-- Address -->
+                <div class="form-floating form-floating-outline mb-4">
+                  <input type="text" id="address" class="form-control" formControlName="address"
+                    placeholder="Address" />
+                  <label for="address">Address <span class="text-danger">*</span></label>
+                  <div class="text-danger mt-1" *ngIf="submitted && data.get('address')?.errors">
+                    <small *ngIf="data.get('address')?.errors['required']">Address is required.</small>
+                  </div>
+                </div>
+
+                <!-- Doctor Reference -->
+                <div class="form-floating form-floating-outline mb-4">
+                  <select class="form-select" id="doctor-reference" formControlName="doctoR_CODE" required>
+                    <option value="{{0}}" disabled selected>Select doctor</option>
+                    <option *ngFor="let doc of doctor" [value]="doc.doctoR_CODE">{{ doc.doctoR_NAME }}</option>
+                  </select>
+                  <label for="doctor-reference">Doctor Reference <span class="text-danger">*</span></label>
+                  <div class="text-danger mt-1"
+                    *ngIf="data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid">
+                    Doctor selection is required.
+                  </div>
+                </div>
+
+                <!-- Blood Tests Table -->
+                <div class="card shadow-lg rounded-4 mt-5 mb-3 border-0" style="background: #fff; overflow: hidden;">
+                  <div
+                    class="card-header bg-gradient-primary text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-white">
+                      <i class="ri-flask-line me-2"></i>Blood Tests
+                    </h5>
+                    <span class="badge bg-white text-primary fs-6 px-3 py-2 rounded-pill">{{ matIs.length }}
+                      Tests</span>
+                  </div>
+
+                  <div class="table-responsive">
+                    <table class="table align-middle mb-0 text-center">
+                      <thead style="background: linear-gradient(90deg, #4b6cb7, #182848); color: white;">
+                        <tr>
+                          <th style="width: 5%;">Sr No</th>
+                          <th class="text-start ps-4" style="width: 45%;">Test Name</th>
+                          <th style="width: 15%;">Price (₹)</th>
+                          <th style="width: 15%;">Lab Price (₹)</th>
+                          <th style="width: 20%;">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let data of matIs; let i = index" class="table-row-hover"
+                          style="transition: background-color 0.3s ease;">
+                          <td class=" text-secondary">{{ i + 1 }}</td>
+                          <td class="text-start ps-4 text-capitalize  text-dark"> {{ getTestNameByCode(data.tesT_CODE)
+                            }}</td>
+                          <td class="text-success ">₹ {{ data.price }}</td>
+                          <td><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
+                              (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
+                              <i class="ri-delete-bin-6-line"></i> Delete
+                            </button>
+                          </td>
+                        </tr>
+                        <tr *ngIf="matIs.length === 0">
+                          <td colspan="5" class="text-center text-muted py-4 fst-italic">No tests added yet.</td>
+                        </tr>
+                      </tbody>
+                      <tfoot class="table-light  text-dark">
+                        <tr>
+                          <td colspan="2" class="text-end pe-4">Total Amount</td>
+                          <td class="text-success">₹ {{ test_Amount }}</td>
+                          <td class="text-info">₹ {{ total_test_LabPrice }}</td>
+                          <td></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Add Test -->
+                <div class="row mb-4 align-items-end">
+                  <div class="col-sm-8 position-relative">
+                    <label class="form-label fw-bold mb-2">Test Name</label>
+                    <div class="input-group shadow-sm rounded">
+                      <span class="input-group-text bg-light border-end-0">
+                        <i class="ri-test-tube-line text-primary"></i>
+                      </span>
+                      <input type="text" id="test-name" class="form-control border-start-0"
+                        placeholder="Enter test name..." [(ngModel)]="searchText" (input)="onSearchChange()"
+                        (focus)="onSearchChange()" (blur)="hideSuggestions()" [ngModelOptions]="{ standalone: true }"
+                        autocomplete="off" />
+                    </div>
+
+                    <!-- Filtered Suggestions -->
+                    <ul *ngIf="showSuggestions && filteredTests.length > 0"
+                      class="list-group position-absolute w-100 mt-1 shadow-sm z-3"
+                      style="max-height: 240px; overflow-y: auto; border-radius: 0.375rem;background-color: white;">
+                      <li *ngFor="let test of filteredTests" (mousedown)="selectTest(test.tesT_NAME)"
+                        class="list-group-item list-group-item-action" style="cursor: pointer;">
+                        {{ test.tesT_NAME }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="col-sm-4">
+                    <button type="button" (click)="add(searchText)" class="btn btn-primary w-100">ADD</button>
+                  </div>
+                </div>
+
+                <!-- Discount -->
+                <h4 class="section-heading mb-4"><i class="ri-discount-percent-line me-2"></i>Discount (%)</h4>
+                <div class="row mb-4">
+                  <div class="col-sm-6">
+                    <label class="form-label">Discount (%)</label>
+                    <input type="number" class="form-control" placeholder="e.g. 10" min="0" max="100"
+                      formControlName="discount" [(ngModel)]="dis" (input)="discount()" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Discount Amount</label>
+                    <input type="number" class="form-control" placeholder="₹0" min="0" [(ngModel)]="discount_Amount"
+                      [ngModelOptions]="{ standalone: true }" />
+                  </div>
+                </div>
+
+                <!-- Collection -->
+                <h4 class="section-heading mb-4"><i class="ri-hand-coin-line me-2"></i>Collection</h4>
+                <div class="row mb-4">
+                  <div class="col-sm-6">
+                    <label class="form-label">Total Amount</label>
+                    <input type="number" class="form-control" placeholder="₹0" formControlName="totaL_AMOUNT"
+                      [(ngModel)]="total_Amount" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Total Lab Profit</label>
+                    <input type="number" class="form-control" placeholder="₹0" formControlName="totaL_PROFIT"
+                      [(ngModel)]="total_Lab_Profit" />
+                  </div>
+                </div>
+
+                <!-- Payment Method -->
+                <h4 class="section-heading mb-4"><i class="ri-bank-card-line me-2"></i>Payment Method</h4>
+                <div class="mb-4">
+                  <div class="form-check form-check-inline">
+                    <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
+                    <label for="cash" class="form-check-label">Cash</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
+                    <label for="online" class="form-check-label">Online</label>
+                  </div>
+                </div>
+
+                <!-- Payment Amount -->
+                <div class="row mb-5">
+                  <div class="col-sm-12">
+                    <label class="form-label">Payment Amount</label>
+                    <input type="number" class="form-control" placeholder="₹0" formControlName="paymenT_AMOUNT"
+                      required />
+                  </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="text-end">
+                  <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill">Save</button>
+                  <button type="reset" class="btn btn-danger px-4 py-2 rounded-pill">Cancel</button>
+                </div>
+              </form>
             </div>
+          </div>
+
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    <div class="card">
-        <h5 class="card-header">Case Paper</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Actions</th>
-                        <th>Trn_No</th>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Date</th>
-                        <th>Status</th>
+  <div class="card">
+    <h5 class="card-header">Case Paper</h5>
+    <div class="table-responsive text-nowrap">
+      <table class="table">
+        <thead class="table-dark">
+          <tr>
+            <th>Actions</th>
+            <th>Trn_No</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Date</th>
+            <th>Status</th>
 
-                    </tr>
-                </thead>
-                <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let cases of filteredCases() | paginate: {
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          <tr *ngFor="let cases of filteredCases() | paginate: {
                   itemsPerPage: pageSize,
                   currentPage: page
                 }">
-                        <td>
-                            <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown">
-                                    <i class="ri-more-2-line"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="ri-pencil-line me-1"></i> Edit</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="ri-delete-bin-6-line me-1"></i> Delete</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="ri-delete-bin-6-line me-1"></i>Invoice</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td><i class=" ri-22px text-danger me-4"></i><span>{{cases.trN_NO}}</span></td>
-                        <td><i class=" ri-22px text-danger me-4"></i><span>{{cases.patienT_NAME}}</span></td>
-                        <td><span class="badge  bg-label-primary me-1">{{cases.coN_NUMBER}}</span></td>
-                        <td><span class="badge rounded-pill bg-label-primary me-1">{{cases.date}}</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="d-flex justify-content-center p-3">
-            <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
-        </div>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="ri-more-2-line"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" (click)="edit(cases.trN_NO)"
+                    data-bs-toggle="modal" data-bs-target="#doctorFormModal"><i class="ri-pencil-line me-1"></i>
+                    Edit</a>
+                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i>
+                    Delete</a>
+                  <a class="dropdown-item" href="javascript:void(0);"><i
+                      class="ri-delete-bin-6-line me-1"></i>Invoice</a>
+                </div>
+              </div>
+            </td>
+            <td><i class=" ri-22px text-danger me-4"></i><span>{{cases.trN_NO}}</span></td>
+            <td><i class=" ri-22px text-danger me-4"></i><span>{{cases.patienT_NAME}}</span></td>
+            <td><span class="badge  bg-label-primary me-1">{{cases.coN_NUMBER}}</span></td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">{{cases.date}}</span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+    <div class="d-flex justify-content-center p-3">
+      <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+    </div>
+  </div>
 </div>

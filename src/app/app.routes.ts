@@ -16,7 +16,7 @@ export const routes: Routes = [
   },
   {path:"", component:LoginComponent},
   {path:'labadmin',
-    // canActivate:[authGuard],
+    canActivate:[authGuard],
     loadComponent:() => import('../app/labadmin/landing/landing.component').then(m=>m.LandingComponent),
       loadChildren: () =>import('../app/labadmin/labadmin.routes').then(m => m.lABADMIN_ROUTES)
   },

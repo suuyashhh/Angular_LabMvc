@@ -1,0 +1,16 @@
+.zindex-dropdown {
+  z-index: 1050;
+}
+
+.table-row-hover:hover {
+    background-color: #f1f5ff;
+    cursor: pointer;
+  }
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(90deg, #4b6cb7, #182848);
+  }
