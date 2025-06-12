@@ -45,6 +45,11 @@ export const lABADMIN_ROUTES: Routes = [
     path:'lab-materials',
     loadComponent: () => import('../labadmin/lab-materials/lab-materials.component')
         .then(m => m.LabMaterialsComponent)
+ },
+ {
+    path:'bike-fule',
+    loadComponent: () => import('../labadmin/bike-fule/bike-fule.component')
+        .then(m => m.BikeFuleComponent)
  }
     //   {
 //     path: 'drr',
