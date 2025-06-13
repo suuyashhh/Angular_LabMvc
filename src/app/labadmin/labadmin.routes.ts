@@ -50,6 +50,16 @@ export const lABADMIN_ROUTES: Routes = [
     path:'bike-fule',
     loadComponent: () => import('../labadmin/bike-fule/bike-fule.component')
         .then(m => m.BikeFuleComponent)
+ },
+ {
+    path:'employee-salary',
+    loadComponent: () => import('../labadmin/employee-salary/employee-salary.component')
+        .then(m => m.EmployeeSalaryComponent)
+ },
+ {
+    path:'ele-bill',
+    loadComponent: () => import('../labadmin/electricity-bill/electricity-bill.component')
+        .then(m => m.ElectricityBillComponent)
  }
     //   {
 //     path: 'drr',

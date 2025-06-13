@@ -6,39 +6,37 @@ import { ApiService } from '../../shared/api.service';
 import { Modal } from 'bootstrap';
 
 @Component({
-  selector: 'app-bike-fule',
+  selector: 'app-electricity-bill',
   standalone: true,
   imports: [HttpClientModule,ReactiveFormsModule,CommonModule,FormsModule],
-  templateUrl: './bike-fule.component.html',
-  styleUrl: './bike-fule.component.css'
+  templateUrl: './electricity-bill.component.html',
+  styleUrl: './electricity-bill.component.css'
 })
-export class BikeFuleComponent {
-  
-    bikefule:any;
+export class ElectricityBillComponent {
+
+    elebill:any;
     data:any;
   
     constructor(private api:ApiService){}
     ngOnInit(): void {
       this.data = new FormGroup({
-        BIKE_ID : new FormControl(),
-        BIKE_NAME: new FormControl('',Validators.compose([Validators.required])),
-        BIKE_PRICE : new FormControl(),
+        ELC_PRICE : new FormControl(),
         DATE: new FormControl()
       });
       this.load();
     }
   
     load(){
-      this.api.get('BikeFule/BikeFule').subscribe((res:any)=>{
-        this.bikefule=res;
-        console.log(this.bikefule)
+      this.api.get('ElectricityBill/ElectricityBill').subscribe((res:any)=>{
+        this.elebill=res;
+        console.log(this.elebill)
       })
   
     }
   
-    submit(bikefule:any){
-      console.log(bikefule);
-      this.api.post('BikeFule/SaveBikeFule',bikefule).subscribe((res:any)=>{
+    submit(elebill:any){
+      console.log(elebill);
+      this.api.post('ElectricityBill/SaveElectricityBill',elebill).subscribe((res:any)=>{
         console.log(res);
         this.load();
   
@@ -50,5 +48,4 @@ export class BikeFuleComponent {
       
       })
     }
-  
 }
