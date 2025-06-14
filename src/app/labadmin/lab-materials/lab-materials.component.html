@@ -1,77 +1,132 @@
 <div class="container  container-p-y">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
-      Add Material
-  </button>
+        Add Material
+    </button>
 </div>
 
-<div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="doctorFormModalLabel">MATERIAL Form</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <form [formGroup]="data" (ngSubmit)="submit(data.value)">
-                         
-                      <div class="mb-3">
-                          <label for="doctorName" class="form-label">Date</label>
-                          <input class="form-control" type="date"  id="start-date" fromControlName="DATE" />
-                      </div>
-                      <div class="mb-3">
-                          <label for="doctorName" class="form-label">Material Name</label>
-                          <input type="text" class="form-control"  formControlName="MAT_NAME">
-                      </div>
-                      <div class="mb-3">
-                          <label for="address" class="form-label">Price</label>
-                          <input type="text" class="form-control" id="number" formControlName="MAT_PRICE">
-                      </div>
-                      <button type="submit" class="btn btn-success m-10" data-bs-dismiss="modal">Save</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                  </form>
-              </div>
-          </div>
-      </div>
+<div class="modal fade material-custom-modal-fade" id="doctorFormModal" tabindex="-1"
+    aria-labelledby="doctorFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered material-custom-modal-dialog">
+        <div class="modal-content material-custom-modal-content">
+            <div class="modal-header material-custom-modal-header">
+                <div class="material-modal-title-wrapper">
+                    <div class="material-modal-icon">
+                        <i class="ri-file-add-line"></i>
+                    </div>
+                    <h5 class="modal-title material-custom-modal-title" id="doctorFormModalLabel">Add New Material</h5>
+                </div>
+                <button type="button" class="btn-close material-custom-btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body material-custom-modal-body">
+                <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="material-custom-form">
+                    <div class="material-form-group-wrapper">
+                        <div class="material-custom-form-group">
+                            <!-- <label for="start-date" class="material-custom-form-label">
+                                <i class="ri-calendar-line"></i>
+                                Date
+                            </label>
+                            <div class="material-custom-date-wrapper">
+                                <input class="material-custom-date-input" type="date" id="start-date" fromControlName="DATE" />
+                                <i class="ri-calendar-2-line material-date-icon"></i>
+                            </div> -->
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="date" class="form-control" bsDatepicker [bsConfig]="bsConfig"
+                                    formControlName="DATE" placeholder="Select date">
+                                <label for="date">Date<span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div class="material-custom-form-group">
+                            <!-- <label for="materialName" class="material-custom-form-label">
+                                <i class="ri-box-3-line"></i>
+                                Material Name
+                            </label>
+                            <input type="text" class="material-custom-form-input" id="materialName" formControlName="MAT_NAME" placeholder="Enter material name">
+                             -->
+                            <!-- material Name -->
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="text" id="material-name" class="form-control"
+                                    placeholder="Material Name" />
+                                <label for="material-name"><i class="ri-box-3-line"></i>Material Name <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div class="material-custom-form-group">
+                            <!-- <label for="materialPrice" class="material-custom-form-label">
+                                <i class="ri-money-rupee-circle-line"></i>
+                                Price
+                            </label>
+                            <div class="material-price-input-wrapper">
+                                <span class="material-currency-symbol">₹</span>
+                                <input type="number" class="material-custom-form-input material-price-input" id="materialPrice" formControlName="MAT_PRICE" placeholder="0.00" step="0.01">
+                            </div> -->
+                            <!-- Price -->
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="number" id="materialPrice" class="form-control" placeholder="Price" />
+                                <label for="materialPrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer material-custom-modal-footer">
+                        <button type="button" class="material-custom-btn material-custom-btn-cancel"
+                            data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="material-custom-btn material-custom-btn-save"
+                            data-bs-dismiss="modal">
+                            <i class="ri-save-line"></i>
+                            Save Material
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="card">
-        <h5 class="card-header">Index</h5>
+        <h5 class="card-header">Material Index</h5>
         <div class="table-responsive text-nowrap">
-          <table class="table">
-            <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;"> 
-              <tr>
-                <th>Material Code</th>
-                <th>Material Name</th>
-                <th>price</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              <tr *ngFor="let material of materials">
-                <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{material.maT_ID}}</span></td>
-                <td>{{material.maT_NAME}}</td>
-                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{material.maT_PRICE}}</span></td>
-                <td>
-                  <div class="dropdown">
-                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="ri-more-2-line"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" href="javascript:void(0);"
-                        ><i class="ri-pencil-line me-1"></i> Edit</a
-                      >
-                      <a class="dropdown-item" href="javascript:void(0);"
-                        ><i class="ri-delete-bin-6-line me-1"></i> Delete</a
-                      >
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <table class="table">
+                <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+                    <tr>
+                        <th>Material Code</th>
+                        <th>Material Name</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    <tr *ngFor="let material of materials">
+                        <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{material.maT_ID}}</span>
+                        </td>
+                        <td>{{material.maT_NAME}}</td>
+                        <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{material.maT_PRICE}}</span></td>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                    data-bs-toggle="dropdown">
+                                    <i class="ri-more-2-line"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="javascript:void(0);">
+                                        <i class="ri-pencil-line me-1"></i> Edit
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0);">
+                                        <i class="ri-delete-bin-6-line me-1"></i> Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-      </div>
+    </div>
 </div>
-   
-
