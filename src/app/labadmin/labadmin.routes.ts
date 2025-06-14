@@ -60,6 +60,16 @@ export const lABADMIN_ROUTES: Routes = [
     path:'ele-bill',
     loadComponent: () => import('../labadmin/electricity-bill/electricity-bill.component')
         .then(m => m.ElectricityBillComponent)
+ },
+ {
+    path:'other-expense',
+    loadComponent: () => import('../labadmin/other-expense/other-expense.component')
+        .then(m => m.OtherExpenseComponent)
+ },
+ {
+    path:'doctor-commission',
+    loadComponent: () => import('../labadmin/doctor-commission/doctor-commission.component')
+        .then(m => m.DoctorCommissionComponent)
  }
     //   {
 //     path: 'drr',
