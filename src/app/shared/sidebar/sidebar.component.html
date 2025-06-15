@@ -2,19 +2,24 @@
   <div class="layout-container ">
     <!-- Menu -->
 
-    <aside id="layout-menu" style="position: fixed;" class="layout-menu menu-vertical menu shadow-xs bg-white rounded m-3">
+    <aside id="layout-menu" style="position: fixed;"
+      class="layout-menu menu-vertical menu shadow-xs bg-white rounded m-3">
+
       <div class="app-brand demo ">
         <a href="index.html" class="app-brand-link">
           <span class="app-brand-logo demo me-1">
-            <span style="color: var(--bs-primary)">
-              <svg width="250" height="200" viewBox="0 0 250 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M125 10L10 190H60L90 140H160L190 190H240L125 10Z" fill="currentColor"/>
-                <path d="M125 10L90 140H160L125 10Z" fill="white" fill-opacity="0.3"/>
-              </svg>
-
-            </span>
+            <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M48 12C43 7 37 4 30 4C16.7 4 4 20 4 32C4 46 16.7 60 30 60C37 60 43 57 48 52" stroke="url(#grad)"
+                stroke-width="8" stroke-linecap="round" />
+              <defs>
+                <linearGradient id="grad" x1="4" y1="32" x2="48" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#A065F0" />
+                  <stop offset="1" stop-color="#7161EF" />
+                </linearGradient>
+              </defs>
+            </svg>
           </span>
-          <span class="app-brand-text demo menu-text fw-semibold ms-2">Automate</span>
+          <span class="app-brand-text demo menu-text fw-semibold ms-2">CLINIK-ONE</span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -25,10 +30,26 @@
       <div class="menu-inner-shadow"></div>
 
       <ul class="menu-inner py-1 ">
-        <!-- Dashboards -->
-        <li class="menu-item active open">
-          <a href="javascript:void(0);" class="menu-link menu-toggle">
+
+        <li class="menu-item" routerLinkActive="active">
+          <a routerLink="/labadmin/dashboard" class="menu-link">
             <i class="menu-icon tf-icons ri-home-smile-line"></i>
+            <div data-i18n="dashboard">Home</div>
+          </a>
+        </li>
+
+        <li class="menu-item" routerLinkActive="active">
+          <a routerLink="/labadmin/casepaper" class="menu-link">
+            <i class="menu-icon ri-profile-line"></i>
+            <div data-i18n="casepaper">CasePaper</div>
+            
+          </a>
+        </li>
+
+        <!-- Dashboards -->
+        <li class="menu-item active close">
+          <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon ri-bar-chart-horizontal-fill "></i>
             <div data-i18n="Dashboards">Master</div>
             <!-- <div class="badge bg-danger rounded-pill ms-auto">5</div> -->
           </a>
@@ -43,17 +64,13 @@
               </a>
             </li> -->
             <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="/labadmin/add-test"
-                class="menu-link">
+              <a routerLink="/labadmin/add-test" class="menu-link">
                 <div data-i18n="add-test">Test</div>
                 <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
               </a>
             </li>
             <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="/labadmin/doctor"
-                class="menu-link">
+              <a routerLink="/labadmin/doctor" class="menu-link">
                 <div data-i18n="doctor">Doctor</div>
                 <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
               </a>
@@ -63,14 +80,11 @@
                 <div data-i18n="create-employee"> Create Employee</div>
               </a>
             </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="/labadmin/casepaper"
-                class="menu-link">
+            <!-- <li class="menu-item" routerLinkActive="active">
+              <a routerLink="/labadmin/casepaper" class="menu-link">
                 <div data-i18n="casepaper">Case Paper</div>
-                <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
               </a>
-            </li>
+            </li> -->
             <!-- <li class="menu-item">
               <a
                 href="#"
@@ -89,60 +103,109 @@
             </li> -->
           </ul>
         </li>
-<!-- APPROVE -->
-        <li class="menu-item active open">
+        <!-- APPROVE -->
+        <li class="menu-item active close">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-home-smile-line"></i>
+            <i class="menu-icon ri-checkbox-circle-line"></i>
             <div data-i18n="Dashboards">Approve</div>
-            
+
           </a>
           <ul class="menu-sub">
-           
+
             <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="/labadmin/approve/casepaper/"
-                class="menu-link">
+              <a routerLink="/labadmin/approve/casepaper/" class="menu-link">
                 <div data-i18n="approve/casepaper">CasePaper</div>
-               
+
               </a>
             </li>
             <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="/labadmin/approve/test"
-                class="menu-link">
+              <a routerLink="/labadmin/approve/test" class="menu-link">
                 <div data-i18n="approve/test">Test</div>
               </a>
             </li>
           </ul>
         </li>
 
-<!-- EMPLOYEE START!! -->
- <li class="menu-item active open">
+        <!-- EMPLOYEE START!! -->
+        <li class="menu-item active close">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-home-smile-line"></i>
+            <i class="menu-icon ri-bar-chart-horizontal-fill "></i>
             <div data-i18n="Dashboards">MASTER</div>
+
+          </a>
+          <ul class="menu-sub">
+
+            <li class="menu-item" routerLinkActive="active">
+              <a routerLink="casepaper" class="menu-link">
+                <div data-i18n="casepaper">CasePaper</div>
+
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a routerLink="#" class="menu-link">
+                <div data-i18n="#">Test</div>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <!-- EMPLOYEE END!! -->
+
+ 
+<!-- Liabilities START!! -->
+ <li class="menu-item active close">
+          <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons ri-uninstall-fill"></i>
+            <div data-i18n="Dashboards">Liabilities</div>
             
           </a>
           <ul class="menu-sub">
            
             <li class="menu-item" routerLinkActive="active">
               <a
-                routerLink="casepaper"
+                routerLink="lab-materials"
                 class="menu-link">
-                <div data-i18n="casepaper">CasePaper</div>
+                <div data-i18n="casepaper">Lab Materials</div>
                
               </a>
             </li>
             <li class="menu-item" routerLinkActive="active">
               <a
-                routerLink="#"
+                routerLink="bike-fule"
                 class="menu-link">
-                <div data-i18n="#">Test</div>
+                <div data-i18n="#">Bike Fule</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a
+                routerLink="employee-salary"
+                class="menu-link">
+                <div data-i18n="#"> Employee Salary</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a
+                routerLink="ele-bill"
+                class="menu-link">
+                <div data-i18n="#"> Electricity Bill	</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a
+                routerLink="other-expense"
+                class="menu-link">
+                <div data-i18n="#">Other Expance</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a
+                routerLink="doctor-commission"
+                class="menu-link">
+                <div data-i18n="#">Doctors</div>
               </a>
             </li>
           </ul>
         </li>
- <!-- EMPLOYEE END!! -->
+ <!-- Liabilities END!! -->
 
         <!-- Layouts -->
         <!-- <li class="menu-item">
