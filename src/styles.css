@@ -1,48 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
-
-html, body { height: 100%; }
-/* body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; } */
-body { margin: 0; font-family: Poppins, sans-serif; }
-
-
-/* Material Modern Add Button */
-.material-modern-add-btn {
-    background: linear-gradient(135deg, #8c57ff 0%, #a855f7 100%) !important;
-    border: none !important;
-    border-radius: 12px !important;
-    color: white !important;
-    padding: 12px 24px !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 15px rgba(140, 87, 255, 0.3) !important;
-}
-
-.material-modern-add-btn:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(140, 87, 255, 0.4) !important;
-    background: linear-gradient(135deg, #7c47ef 0%, #9333ea 100%) !important;
-    color: white !important;
-}
-
-.material-modern-add-btn i {
-    font-size: 16px !important;
-}
-
-/* Material Custom Modal Styles */
-.material-custom-modal-fade .modal-dialog {
+/* Modal Styles */
+.custom-modal-fade .modal-dialog {
     transition: transform 0.4s ease-out, opacity 0.4s ease-out !important;
 }
 
-.material-custom-modal-dialog {
+.custom-modal-dialog {
     max-width: 500px !important;
     margin: 1.75rem auto !important;
 }
 
-.material-custom-modal-content {
+.custom-modal-content {
     border: none !important;
     border-radius: 20px !important;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
@@ -50,20 +16,20 @@ body { margin: 0; font-family: Poppins, sans-serif; }
     background: white !important;
 }
 
-.material-custom-modal-header {
+.custom-modal-header {
     background: linear-gradient(135deg, #8c57ff 0%, #a855f7 100%) !important;
     border-bottom: none !important;
     padding: 24px 30px !important;
     position: relative !important;
 }
 
-.material-modal-title-wrapper {
+.modal-title-wrapper {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
 }
 
-.material-modal-icon {
+.modal-icon {
     width: 40px !important;
     height: 40px !important;
     background: rgba(255, 255, 255, 0.2) !important;
@@ -74,19 +40,19 @@ body { margin: 0; font-family: Poppins, sans-serif; }
     backdrop-filter: blur(10px) !important;
 }
 
-.material-modal-icon i {
+.modal-icon i {
     font-size: 20px !important;
     color: white !important;
 }
 
-.material-custom-modal-title {
+.custom-modal-title {
     color: white !important;
     font-weight: 600 !important;
     font-size: 18px !important;
     margin: 0 !important;
 }
 
-.material-custom-btn-close {
+.custom-btn-close {
     background: rgba(255, 255, 255, 0.2) !important;
     border: none !important;
     border-radius: 8px !important;
@@ -104,136 +70,36 @@ body { margin: 0; font-family: Poppins, sans-serif; }
     font-weight: bold !important;
 }
 
-.material-custom-btn-close:hover {
+.custom-btn-close:hover {
     background: rgba(255, 255, 255, 0.3) !important;
     transform: rotate(90deg) !important;
 }
 
-.material-custom-btn-close::after {
+.custom-btn-close::after {
     content: "×" !important;
 }
 
-.material-custom-modal-body {
+.custom-modal-body {
     padding: 30px !important;
     background: white !important;
 }
 
-.material-custom-form {
+.custom-form {
     width: 100% !important;
 }
 
-.material-form-group-wrapper {
+.form-group-wrapper {
     display: flex !important;
     flex-direction: column !important;
     gap: 24px !important;
     margin-bottom: 30px !important;
 }
 
-.material-custom-form-group {
+.custom-form-group {
     position: relative !important;
 }
 
-.material-custom-form-label {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    font-weight: 600 !important;
-    color: #374151 !important;
-    margin-bottom: 8px !important;
-    font-size: 14px !important;
-}
-
-.material-custom-form-label i {
-    font-size: 16px !important;
-    color: #8c57ff !important;
-}
-
-.material-custom-form-input {
-    width: 100% !important;
-    padding: 14px 16px !important;
-    border: 2px solid #e5e7eb !important;
-    border-radius: 12px !important;
-    font-size: 14px !important;
-    transition: all 0.3s ease !important;
-    background: #fafafa !important;
-}
-
-.material-custom-form-input:focus {
-    outline: none !important;
-    border-color: #8c57ff !important;
-    background: white !important;
-    box-shadow: 0 0 0 3px rgba(140, 87, 255, 0.1) !important;
-}
-
-.material-custom-form-input::placeholder {
-    color: #9ca3af !important;
-}
-
-/* Material Custom Date Input */
-.material-custom-date-wrapper {
-    position: relative !important;
-}
-
-.material-custom-date-input {
-    width: 100% !important;
-    padding: 14px 50px 14px 16px !important;
-    border: 2px solid #e5e7eb !important;
-    border-radius: 12px !important;
-    font-size: 14px !important;
-    transition: all 0.3s ease !important;
-    background: #fafafa !important;
-    color: #374151 !important;
-}
-
-.material-custom-date-input:focus {
-    outline: none !important;
-    border-color: #8c57ff !important;
-    background: white !important;
-    box-shadow: 0 0 0 3px rgba(140, 87, 255, 0.1) !important;
-}
-
-.material-date-icon {
-    position: absolute !important;
-    right: 16px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    color: #8c57ff !important;
-    font-size: 18px !important;
-    pointer-events: none !important;
-}
-
-/* Material Custom Date Input Calendar Styling */
-.material-custom-date-input::-webkit-calendar-picker-indicator {
-    opacity: 0 !important;
-    position: absolute !important;
-    right: 16px !important;
-    width: 20px !important;
-    height: 20px !important;
-    cursor: pointer !important;
-}
-
-/* Material Price Input Wrapper */
-.material-price-input-wrapper {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-.material-currency-symbol {
-    position: absolute !important;
-    left: 16px !important;
-    color: #8c57ff !important;
-    font-weight: 600 !important;
-    font-size: 16px !important;
-    z-index: 1 !important;
-}
-
-.material-price-input {
-    padding-left: 40px !important;
-}
-
-/* Material Custom Modal Footer */
-.material-custom-modal-footer {
+.custom-modal-footer {
     border-top: 1px solid #f3f4f6 !important;
     padding: 20px 30px !important;
     background: #fafafa !important;
@@ -243,7 +109,7 @@ body { margin: 0; font-family: Poppins, sans-serif; }
     margin: 0 !important;
 }
 
-.material-custom-btn {
+.custom-btn {
     padding: 12px 24px !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
@@ -256,208 +122,126 @@ body { margin: 0; font-family: Poppins, sans-serif; }
     cursor: pointer !important;
 }
 
-.material-custom-btn-cancel {
+.custom-btn-cancel {
     background: #f3f4f6 !important;
     color: #6b7280 !important;
 }
 
-.material-custom-btn-cancel:hover {
+.custom-btn-cancel:hover {
     background: #e5e7eb !important;
     color: #374151 !important;
     transform: translateY(-1px) !important;
 }
 
-.material-custom-btn-save {
+.custom-btn-save {
     background: linear-gradient(135deg, #8c57ff 0%, #a855f7 100%) !important;
     color: white !important;
     box-shadow: 0 4px 15px rgba(140, 87, 255, 0.3) !important;
 }
 
-.material-custom-btn-save:hover {
+.custom-btn-save:hover {
     transform: translateY(-2px) !important;
     box-shadow: 0 8px 25px rgba(140, 87, 255, 0.4) !important;
     background: linear-gradient(135deg, #7c47ef 0%, #9333ea 100%) !important;
 }
 
-/* Material Container */
-.material-container {
-    width: 100% !important;
-    max-width: 1200px !important;
-    margin: 0 auto !important;
-    padding: 0 15px !important;
+/* Form Input Styles */
+.form-floating-outline .form-control {
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: #fafafa !important;
+    transition: all 0.3s ease !important;
+    padding: 14px 16px !important;
 }
 
-.material-container-p-y {
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
+.form-floating-outline .form-control:focus {
+    outline: none !important;
+    border-color: #8c57ff !important;
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(140, 87, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
 }
 
-/* Material Responsive Design */
+.form-floating-outline .form-control:hover {
+    border-color: #c4b5fd !important;
+}
+
+.form-floating-outline label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+}
+
+.form-floating-outline label i {
+    font-size: 16px !important;
+    color: #8c57ff !important;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .material-custom-modal-dialog {
+    .custom-modal-dialog {
         margin: 1rem !important;
         max-width: calc(100% - 2rem) !important;
     }
     
-    .material-custom-modal-header,
-    .material-custom-modal-body,
-    .material-custom-modal-footer {
+    .custom-modal-header,
+    .custom-modal-body,
+    .custom-modal-footer {
         padding: 20px !important;
     }
     
-    .material-form-group-wrapper {
+    .form-group-wrapper {
         gap: 20px !important;
     }
     
-    .material-custom-modal-footer {
+    .custom-modal-footer {
         flex-direction: column !important;
     }
     
-    .material-custom-btn {
+    .custom-btn {
         width: 100% !important;
         justify-content: center !important;
     }
 }
 
 @media (max-width: 480px) {
-    .material-custom-modal-dialog {
+    .custom-modal-dialog {
         margin: 0.5rem !important;
         max-width: calc(100% - 1rem) !important;
     }
     
-    .material-modal-title-wrapper {
+    .modal-title-wrapper {
         gap: 8px !important;
     }
     
-    .material-modal-icon {
+    .modal-icon {
         width: 35px !important;
         height: 35px !important;
     }
     
-    .material-custom-modal-title {
+    .custom-modal-title {
         font-size: 16px !important;
     }
 }
 
-/* Material Animation for modal appearance */
-@keyframes materialModalSlideIn {
+/* Animation */
+@keyframes modalSlideIn {
     from {
-        opacity: 0;
-        transform: translateY(-50px) scale(0.9);
+        opacity: 0 !important;
+        transform: translateY(-50px) scale(0.9) !important;
     }
     to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+        opacity: 1 !important;
+        transform: translateY(0) scale(1) !important;
     }
 }
 
-.material-custom-modal-fade.show .material-custom-modal-content {
-    animation: materialModalSlideIn 0.4s ease-out !important;
+.custom-modal-fade.show .custom-modal-content {
+    animation: modalSlideIn 0.4s ease-out !important;
 }
-
-/* Material Focus states for better accessibility */
-.material-custom-form-input:focus,
-.material-custom-date-input:focus {
-    transform: translateY(-1px) !important;
-}
-
-/* Material Hover effects for interactive elements */
-.material-custom-form-input:hover,
-.material-custom-date-input:hover {
-    border-color: #c4b5fd !important;
-}
-
-/* Material Loading state for save button */
-.material-custom-btn-save:disabled {
-    opacity: 0.7 !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-}
-
-.material-custom-btn-save:disabled:hover {
-    transform: none !important;
-    box-shadow: 0 4px 15px rgba(140, 87, 255, 0.3) !important;
-}
-
-/* Material Additional overrides for Bootstrap conflicts */
-.material-custom-modal-content .modal-header {
-    background: linear-gradient(135deg, #8c57ff 0%, #a855f7 100%) !important;
-    border-bottom: none !important;
-}
-
-.material-custom-modal-content .modal-body {
-    background: white !important;
-    padding: 30px !important;
-}
-
-.material-custom-modal-content .modal-footer {
-    background: #fafafa !important;
-    border-top: 1px solid #f3f4f6 !important;
-    padding: 20px 30px !important;
-}
-
-/* Material Override Bootstrap button styles */
-.material-custom-btn.btn {
-    padding: 12px 24px !important;
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-}
-
-/* Material Override Bootstrap form control styles */
-.material-custom-form-input.form-control {
-    padding: 14px 16px !important;
-    border: 2px solid #e5e7eb !important;
-    border-radius: 12px !important;
-    background: #fafafa !important;
-}
-
-.material-custom-date-input.form-control {
-    padding: 14px 50px 14px 16px !important;
-    border: 2px solid #e5e7eb !important;
-    border-radius: 12px !important;
-    background: #fafafa !important;
-}
-
-/* Material Override Bootstrap modal styles */
-.modal.material-custom-modal-fade .modal-dialog {
-    max-width: 500px !important;
-    margin: 1.75rem auto !important;
-}
-
-.modal.material-custom-modal-fade .modal-content {
-    border: none !important;
-    border-radius: 20px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
-}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 
-/* Date */
-
-/* Include Bootstrap styles */
-@import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~ngx-bootstrap/datepicker/bs-datepicker.css";
-
-/* Custom datepicker styles */
-.bs-datepicker {
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  border-radius: 0.375rem;
-}
-
-.bs-datepicker-head {
-  background-color: #4e73df;
-}
-
-.bs-datepicker-body table td span.selected {
-  background-color: #4e73df;
-}
-
-.form-floating-outline .form-control {
-  border: 1px solid #ced4da;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.form-floating-outline .form-control:focus {
-  border-color: #4e73df;
-  box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
-}

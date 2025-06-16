@@ -1,79 +1,101 @@
 <div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
-      Add Fule Expense
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+    Add Fule Expense
   </button>
 </div>
 
-<div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="doctorFormModalLabel">Fule Expense</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <form [formGroup]="data" (ngSubmit)="submit(data.value)">
-                         
-                      <div class="mb-3">
-                          <label for="doctorName" class="form-label">Date</label>
-                          <input class="form-control" type="date"  id="start-date" fromControlName="DATE" />
-                      </div>
-                      <div class="mb-3">
-                          <label for="doctorName" class="form-label">Bike Name</label>
-                          <input type="text" class="form-control"  formControlName="MAT_NAME">
-                      </div>
-                      <div class="mb-3">
-                          <label for="address" class="form-label">Price</label>
-                          <input type="text" class="form-control" id="number" formControlName="MAT_PRICE">
-                      </div>
-                      <button type="submit" class="btn btn-success m-10" data-bs-dismiss="modal">Save</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                  </form>
-              </div>
+<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="ri-file-add-line"></i>
           </div>
+          <h5 class="modal-title custom-modal-title" id="doctorFormModalLabel">Add Fule Expense</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body custom-modal-body">
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
+          <div class="form-group-wrapper">
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="date" class="form-control" formControlName="DATE" placeholder="Select date">
+                <label for="date"><i class="ri-calendar-line"></i> Date<span class="text-danger">*</span></label>
+              </div>
+            </div>
+
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="bike-name" class="form-control" formControlName="MAT_NAME"
+                  placeholder="Bike Name" />
+                <label for="bike-name"><i class="ri-bike-line"></i>Bike Name <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="number" id="bikePrice" class="form-control" formControlName="MAT_PRICE"
+                  placeholder="Price" />
+                <label for="bikePrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer custom-modal-footer">
+            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+              <i class="ri-close-line"></i>
+              Cancel
+            </button>
+            <button type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
+              <i class="ri-save-line"></i>
+              Save 
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="card">
-        <h5 class="card-header">Index</h5>
-        <div class="table-responsive text-nowrap">
-          <table class="table">
-            <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;"> 
-              <tr>
-                <th>Date</th>
-                <th>Bike Code</th>
-                <th>Bike Name</th>
-                <th>price</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              <tr *ngFor="let _objBF of bikefule">
-                <td>{{_objBF.date}}</td>
-                <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{_objBF.bikE_ID}}</span></td>
-                <td>{{_objBF.bikE_NAME}}</td>
-                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objBF.bikE_PRICE}}</span></td>
-                <td>
-                  <div class="dropdown">
-                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="ri-more-2-line"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" href="javascript:void(0);"
-                        ><i class="ri-pencil-line me-1"></i> Edit</a
-                      >
-                      <a class="dropdown-item" href="javascript:void(0);"
-                        ><i class="ri-delete-bin-6-line me-1"></i> Delete</a
-                      >
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <div class="card">
+    <h5 class="card-header">Index</h5>
+    <div class="table-responsive text-nowrap">
+      <table class="table">
+        <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+          <tr>
+            <th>Date</th>
+            <th>Bike Code</th>
+            <th>Bike Name</th>
+            <th>price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          <tr *ngFor="let _objBF of bikefule">
+            <td>{{_objBF.date}}</td>
+            <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{_objBF.bikE_ID}}</span></td>
+            <td>{{_objBF.bikE_NAME}}</td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objBF.bikE_PRICE}}</span></td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="ri-more-2-line"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-pencil-line me-1"></i> Edit</a>
+                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i>
+                    Delete</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
-   
-

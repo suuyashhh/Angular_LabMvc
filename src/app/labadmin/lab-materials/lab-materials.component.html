@@ -4,80 +4,57 @@
     </button>
 </div>
 
-<div class="modal fade material-custom-modal-fade" id="doctorFormModal" tabindex="-1"
+<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1"
     aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered material-custom-modal-dialog">
-        <div class="modal-content material-custom-modal-content">
-            <div class="modal-header material-custom-modal-header">
-                <div class="material-modal-title-wrapper">
-                    <div class="material-modal-icon">
+    <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon">
                         <i class="ri-file-add-line"></i>
                     </div>
-                    <h5 class="modal-title material-custom-modal-title" id="doctorFormModalLabel">Add New Material</h5>
+                    <h5 class="modal-title custom-modal-title" id="doctorFormModalLabel">Add New Material</h5>
                 </div>
-                <button type="button" class="btn-close material-custom-btn-close" data-bs-dismiss="modal"
+                <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
-            <div class="modal-body material-custom-modal-body">
-                <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="material-custom-form">
-                    <div class="material-form-group-wrapper">
-                        <div class="material-custom-form-group">
-                            <!-- <label for="start-date" class="material-custom-form-label">
-                                <i class="ri-calendar-line"></i>
-                                Date
-                            </label>
-                            <div class="material-custom-date-wrapper">
-                                <input class="material-custom-date-input" type="date" id="start-date" fromControlName="DATE" />
-                                <i class="ri-calendar-2-line material-date-icon"></i>
-                            </div> -->
+            <div class="modal-body custom-modal-body">
+                <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
+                    <div class="form-group-wrapper">
+                        <div class="custom-form-group">
                             <div class="form-floating form-floating-outline mb-4">
-                                <input type="date" class="form-control" bsDatepicker [bsConfig]="bsConfig"
+                                <input type="date" class="form-control"
                                     formControlName="DATE" placeholder="Select date">
-                                <label for="date">Date<span class="text-danger">*</span></label>
+                                <label for="date"><i class="ri-calendar-line"></i> Date<span class="text-danger">*</span></label>
                             </div>
                         </div>
 
-                        <div class="material-custom-form-group">
-                            <!-- <label for="materialName" class="material-custom-form-label">
-                                <i class="ri-box-3-line"></i>
-                                Material Name
-                            </label>
-                            <input type="text" class="material-custom-form-input" id="materialName" formControlName="MAT_NAME" placeholder="Enter material name">
-                             -->
-                            <!-- material Name -->
+                        <div class="custom-form-group">
                             <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="material-name" class="form-control"
+                                <input type="text" id="material-name" class="form-control" formControlName="MAT_NAME"
                                     placeholder="Material Name" />
                                 <label for="material-name"><i class="ri-box-3-line"></i>Material Name <span
                                         class="text-danger">*</span></label>
                             </div>
                         </div>
 
-                        <div class="material-custom-form-group">
-                            <!-- <label for="materialPrice" class="material-custom-form-label">
-                                <i class="ri-money-rupee-circle-line"></i>
-                                Price
-                            </label>
-                            <div class="material-price-input-wrapper">
-                                <span class="material-currency-symbol">₹</span>
-                                <input type="number" class="material-custom-form-input material-price-input" id="materialPrice" formControlName="MAT_PRICE" placeholder="0.00" step="0.01">
-                            </div> -->
-                            <!-- Price -->
+                        <div class="custom-form-group">
                             <div class="form-floating form-floating-outline mb-4">
-                                <input type="number" id="materialPrice" class="form-control" placeholder="Price" />
+                                <input type="number" id="materialPrice" class="form-control" formControlName="MAT_PRICE" 
+                                    placeholder="Price" />
                                 <label for="materialPrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
                                         class="text-danger">*</span></label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-footer material-custom-modal-footer">
-                        <button type="button" class="material-custom-btn material-custom-btn-cancel"
+                    <div class="modal-footer custom-modal-footer">
+                        <button type="button" class="custom-btn custom-btn-cancel"
                             data-bs-dismiss="modal">
                             <i class="ri-close-line"></i>
                             Cancel
                         </button>
-                        <button type="submit" class="material-custom-btn material-custom-btn-save"
+                        <button type="submit" class="custom-btn custom-btn-save"
                             data-bs-dismiss="modal">
                             <i class="ri-save-line"></i>
                             Save Material
