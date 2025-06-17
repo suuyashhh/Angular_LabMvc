@@ -71,17 +71,14 @@
       <table class="table">
         <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
           <tr>
+            <th>Actions</th>
             <th>Date</th>
             <th>Employee Name</th>
             <th>price</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
           <tr *ngFor="let _objES of employeesalary">
-            <td>{{_objES.date}}</td>
-            <td>{{_objES.emP_ID}}</td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objES.emP_PRICE}}</span></td>
             <td>
               <div class="dropdown">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -94,6 +91,9 @@
                 </div>
               </div>
             </td>
+            <td>{{_objES.date}}</td>
+            <td>{{_objES.emP_ID}}</td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objES.emP_PRICE}}</span></td>
           </tr>
         </tbody>
       </table>
