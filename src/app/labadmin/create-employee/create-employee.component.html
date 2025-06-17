@@ -1,10 +1,10 @@
 <div class="container  container-p-y">
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
-      Add Employee
-  </button>
+        Add Employee
+    </button>
 </div>
 
-<div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
@@ -31,44 +31,104 @@
               </div>
           </div>
       </div>
+</div> -->
+
+<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon">
+                        <i class="ri-file-add-line"></i>
+                    </div>
+                    <h5 class="modal-title custom-modal-title" id="doctorFormModalLabel">Add Employee</h5>
+                </div>
+                <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                <form [formGroup]="data" class="custom-form">
+                    <div class="form-group-wrapper">
+
+                        <div class="custom-form-group">
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="text" id="emp-name" class="form-control" formControlName="MAT_NAME"
+                                    placeholder="Employee Name" />
+                                <label for="emp-name"><i class="ri-group-3-line"></i>Employee Name <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div class="custom-form-group">
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="text" id="empAddress" class="form-control" formControlName="MAT_PRICE"
+                                    placeholder="Address" />
+                                <label for="empAddress"> <i class="ri-map-pin-line"></i>Address <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                        <div class="custom-form-group">
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="text" id="empCoNo" class="form-control" formControlName="MAT_PRICE"
+                                    placeholder="Phone No" />
+                                <label for="empCoNo"> <i class="ri-phone-line"></i>Phone No <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer custom-modal-footer">
+                        <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
+                            <i class="ri-save-line"></i>
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    
-            <div class="card">
-                <h5 class="card-header">Employee Table</h5>
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead class="table-dark">
-                      <tr>
-                        <th>Emp Name</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                      <tr>
-                        <td>Suyash Patil</td>
-                        <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="ri-more-2-line"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-pencil-line me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="ri-delete-bin-6-line me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-        </div>
-   
 
+    <div class="card">
+        <h5 class="card-header">Employee Table</h5>
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Emp Name</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    <tr>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                    data-bs-toggle="dropdown">
+                                    <i class="ri-more-2-line"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="javascript:void(0);"><i
+                                            class="ri-pencil-line me-1"></i> Edit</a>
+                                    <a class="dropdown-item" href="javascript:void(0);"><i
+                                            class="ri-delete-bin-6-line me-1"></i> Delete</a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Suyash Patil</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

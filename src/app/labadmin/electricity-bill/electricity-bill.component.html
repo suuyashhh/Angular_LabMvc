@@ -4,30 +4,56 @@
   </button>
 </div>
 
-<div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="doctorFormModalLabel">Electricity Bill</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <form [formGroup]="data" (ngSubmit)="submit(data.value)">
-                         
-                      <div class="mb-3">
-                          <label for="doctorName" class="form-label">Date</label>
-                          <input class="form-control" type="date"  id="start-date" fromControlName="DATE" />
-                      </div>
-                      <div class="mb-3">
-                          <label for="address" class="form-label">Price</label>
-                          <input type="text" class="form-control" id="number" formControlName="MAT_PRICE">
-                      </div>
-                      <button type="submit" class="btn btn-success m-10" data-bs-dismiss="modal">Save</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                  </form>
-              </div>
-          </div>
-      </div>
+<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1"
+    aria-labelledby="doctorFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon">
+                        <i class="ri-file-add-line"></i>
+                    </div>
+                    <h5 class="modal-title custom-modal-title" id="doctorFormModalLabel">Add Electricity Bill</h5>
+                </div>
+                <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
+                    <div class="form-group-wrapper">
+                        <div class="custom-form-group">
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="date" class="form-control"
+                                    formControlName="DATE" placeholder="Select date">
+                                <label for="date"><i class="ri-calendar-line"></i> Date<span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="custom-form-group">
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="number" id="materialPrice" class="form-control" formControlName="MAT_PRICE" 
+                                    placeholder="Price" />
+                                <label for="elcbillPrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer custom-modal-footer">
+                        <button type="button" class="custom-btn custom-btn-cancel"
+                            data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="custom-btn custom-btn-save"
+                            data-bs-dismiss="modal">
+                            <i class="ri-save-line"></i>
+                            Save 
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -37,15 +63,13 @@
           <table class="table">
             <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;"> 
               <tr>
+                <th>Actions</th>
                 <th>Date</th>
                 <th>price</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody class="table-border-bottom-0">
               <tr *ngFor="let _objEB of elebill">
-                <td>{{_objEB.date}}</td>
-                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objEB.elC_PRICE}}</span></td>
                 <td>
                   <div class="dropdown">
                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -61,6 +85,8 @@
                     </div>
                   </div>
                 </td>
+                <td>{{_objEB.date}}</td>
+                <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objEB.elC_PRICE}}</span></td>
               </tr>
             </tbody>
           </table>
