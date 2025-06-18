@@ -20,6 +20,7 @@ export class AddTestComponent implements OnInit {
 
   tests:any;
   data:any;
+  TEST_CODE:any;
 
   constructor(private api:ApiService){}
   ngOnInit(): void {
@@ -41,19 +42,48 @@ export class AddTestComponent implements OnInit {
 
   }
 
-  submit(test:any){
+  submit(test: any) {
     console.log(test);
-    this.api.post('Test/SaveTest',test).subscribe((res:any)=>{
-      console.log(res);
-      this.load();
+    if(this.TEST_CODE == null){
+      this.api.post('Test/SaveTest', test).subscribe((res: any) => {
+        console.log(res);
+        this.load();
 
-      const modalElement = document.getElementById('myModal');
-    if(modalElement){
-      const modal = Modal.getInstance(modalElement);
-      modal?.hide();
+        const modalElement = document.getElementById('myModal');
+        if (modalElement) {
+          const modal = Modal.getInstance(modalElement);
+          modal?.hide();
+        }
+
+      });
+    }else{
+       this.api.post('Test/EditTest/'+ this.TEST_CODE,test).subscribe((res: any) => {
+        console.log(res);
+        this.load();
+
+      });
     }
-    
+  }
+
+  edit(testCode: any) {
+    this.api.get('Test/Test/' + testCode).subscribe((res: any) => {
+      console.log(res);
+      
+      this.TEST_CODE = res.tesT_CODE;
+      this.data.patchValue({
+        TEST_NAME: res.tesT_NAME,
+        PRICE: res.price,
+        LAB_PRICE: res.laB_PRICE
+      })
     })
+  }
+
+  deleteTest(testCode:any){
+    if(confirm("Are You Delete?")){
+      this.api.delete('Test/DeleteTest/' + testCode).subscribe((res: any) => {
+       this.load();
+      })
+    }
   }
 
 }

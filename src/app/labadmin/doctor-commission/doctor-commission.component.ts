@@ -15,6 +15,7 @@ import { Modal } from 'bootstrap';
 export class DoctorCommissionComponent {
 doctorcommission:any;
     data:any;
+  doctor: any;
   
     constructor(private api:ApiService){}
     ngOnInit(): void {
@@ -30,7 +31,11 @@ doctorcommission:any;
       this.api.get('DoctorCommission/DoctorCommission').subscribe((res:any)=>{
         this.doctorcommission=res;
         console.log(this.doctorcommission)
-      })
+      });
+    this.api.get('Doctor/Doctor').subscribe((res: any) => {
+      this.doctor = res;
+      console.log(this.doctor);
+    });
   
     }
   

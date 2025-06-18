@@ -1,8 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { FooterComponent } from '../../shared/footer/footer.component';
-import { NavbarComponent } from '../../shared/navbar/navbar.component';
-import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { HttpClientModule } from '@angular/common/http';
 import {
@@ -13,15 +9,19 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { log } from 'node:console';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Modal } from 'bootstrap';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+import Swal from 'sweetalert2'
 
 interface CasePaper {
   trN_NO: number;
   patienT_NAME: string;
   coN_NUMBER: string;
   date: string;
+  statuS_CODE:number;
 
 }
 
@@ -33,13 +33,17 @@ interface CasePaper {
     CommonModule,
     ReactiveFormsModule,
     NgxPaginationModule,
-    FormsModule
+    FormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
   ],
   templateUrl: './casepaper.component.html',
   styleUrl: './casepaper.component.css',
 })
 export class CasepaperComponent implements OnInit {
-  case: any;
+  cases: any;
   data: any;
   tests: any;
   doctor: any;
@@ -54,8 +58,13 @@ export class CasepaperComponent implements OnInit {
   total_Lab_Profit: any = 0;
   total_test_LabPrice: any = 0;
   submitted = false;
+  dateRange: { start: Date | null; end: Date | null } = { start: null, end: null };
+  today: Date = new Date();
+  trn_no:number = 0;
+  // startDate: any;
+  // endDate: any;
 
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService) {}
 
   ngOnInit(): void {
     this.data = new FormGroup({
@@ -176,8 +185,8 @@ export class CasepaperComponent implements OnInit {
 
   load() {
     this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
-      this.case = res;
-      console.log(this.case);
+      this.cases = res;
+      console.log(this.cases);
     });
 
     this.api.get('Test/Test').subscribe((res: any) => {
@@ -199,8 +208,24 @@ export class CasepaperComponent implements OnInit {
     this.submitted = true;
 
     if (!this.data.valid) {
-      alert('Please fill all required form fields.');
+      // alert('Please fill all required form fields.');
+
+     Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: 'Your work has been saved!',
+    showConfirmButton: false,
+    timer: 1500,
+    backdrop: false,
+    customClass: {
+      container: 'swal2-on-modal',
+      popup: 'swal2-toast-override'
+    }
+  });
+
       return;
+
     }
 
     if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
@@ -234,7 +259,7 @@ export class CasepaperComponent implements OnInit {
   isDateFiltered = false;
 
   filteredCases(): CasePaper[] {
-    let result = this.case;
+    let result = this.cases;
 
     if (this.searchTerm) {
       result = result.filter((c: CasePaper) =>
@@ -266,7 +291,8 @@ export class CasepaperComponent implements OnInit {
   edit(trN_NO: any): void {
     this.api.get(`CasePaper/CasePaper/${trN_NO}`).subscribe({
       next: (res: any) => {
-        console.log(res);
+
+        this.trn_no = res.trN_NO;
 
         // Patch form fields
         this.data.patchValue({
@@ -303,5 +329,38 @@ export class CasepaperComponent implements OnInit {
     const match = this.tests.find((t: any) => t.tesT_CODE === code);
     return match ? match.tesT_NAME : 'N/A';
   }
+
+  selectedProduct: any | null = null;
+
+  products: any[] = [
+    {
+      id: 1,
+      name: 'Air Jordan',
+      description: 'Air Jordan is a line of basketball shoes produced by Nike',
+      image: 'assets/img/ecommerce-images/product-9.png',
+      category: 'Shoes',
+      categoryIcon: 'ri-home-6-line',
+      stock: true,
+      sku: '31063',
+      price: '$125',
+      qty: 942,
+      status: 'Inactive'
+    },
+    {
+      id: 2,
+      name: 'Amazon Fire TV',
+      description: '4K UHD smart TV, stream live TV without cable',
+      image: 'assets/img/ecommerce-images/product-13.png',
+      category: 'Electronics',
+      categoryIcon: 'ri-computer-line',
+      stock: false,
+      sku: '5829',
+      price: '$263.49',
+      qty: 587,
+      status: 'Scheduled'
+    }
+  ];
+
+
 
 }

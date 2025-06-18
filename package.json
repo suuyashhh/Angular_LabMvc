@@ -28,6 +28,7 @@
     "express": "^4.18.2",
     "ngx-pagination": "^6.0.3",
     "rxjs": "~7.8.0",
+    "sweetalert2": "^11.22.0",
     "three": "^0.176.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
