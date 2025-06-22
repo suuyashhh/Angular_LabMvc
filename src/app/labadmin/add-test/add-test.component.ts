@@ -7,7 +7,7 @@ import { log } from 'console';
 import { HttpClientModule } from '@angular/common/http';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import bootstrap, { Modal } from 'bootstrap';
+
 
 @Component({
   selector: 'app-add-test',
@@ -30,8 +30,8 @@ export class AddTestComponent implements OnInit {
 
 
   ngOnInit(): void {
+    // this.clearData();
     this.load();
-    this.clearData();
   }
 
   load() {
@@ -69,39 +69,16 @@ export class AddTestComponent implements OnInit {
     }
     if (this.TEST_CODE == 0 && this.btn == '') {
       test.COM_ID = this.ComId
-      //   this.api.post('Test/SaveTest', test).subscribe((res: any) => {
-      //     this.load();
-      //  }); 
-      // Ensure this runs after the modal is shown at least once
-const modalElement = document.getElementById('CreateFormModal');
-
-if (modalElement) {
-  // Step 1: Create or get modal instance
-  const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-
-  // Step 2: Hide the modal using Bootstrap API
-  modal.hide();
-
-  // Step 3: Wait for the modal to finish hiding and then cleanup
-  modalElement.addEventListener('hidden.bs.modal', () => {
-    // Remove any leftover backdrop manually (failsafe)
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(b => b.remove());
-
-    // Remove body lock styles
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-  }, { once: true }); // add listener only once
-}
-
-
-
-      console.log("post");
-
+        this.api.post('Test/SaveTest', test).subscribe((res: any) => {
+          this.api.modalClose();
+          this.load();
+       }); 
     } else if (this.TEST_CODE != 0 && this.btn == 'E') {
+      console.log(this.TEST_CODE);
       this.api.post('Test/EditTest/' + this.TEST_CODE, test).subscribe((res: any) => {
         this.load();
+        console.log(res);
+        
       });
     }
     else if (this.TEST_CODE != 0 && this.btn == 'D') {
@@ -119,7 +96,6 @@ if (modalElement) {
   }
 
   getDataById(testCode: number, btn: any) {
-    // alert('Hii');
     this.btn = btn;
     this.api.get('Test/Test/' + testCode).subscribe((res: any) => {
       console.log(res);
