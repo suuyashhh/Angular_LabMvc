@@ -1,27 +1,12 @@
 <div class="container container-p-y">
-  <div class="row g-3">
-
+  <div class="row g-3" *ngIf="!isCreatingNew">
+    <!-- New Button -->
     <div class="col-12 col-sm-6 col-md-2">
-      <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+      <button type="button" (click)="isCreatingNew = true" class="btn btn-primary m-1">
         <i class="ri-add-box-fill"></i> &nbsp; New
       </button>
     </div>
 
-    <!-- <div class="col-6 col-md-2">
-      <div class="form-floating form-floating-outline">
-        <input class="form-control" type="date" [(ngModel)]="startDate" id="start-date" />
-        <label for="start-date">Start Date</label>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-2">
-      <div class="form-floating form-floating-outline">
-        <input class="form-control" type="date" [(ngModel)]="endDate" id="end-date" />
-        <label for="end-date">End Date</label>
-      </div>
-    </div> -->
-
-    <!-- date picker -->
     <!-- Start Date -->
     <div class="col-6 col-md-2 mb-3">
       <mat-form-field appearance="outline" class="custom-datepicker w-100">
@@ -42,22 +27,17 @@
       </mat-form-field>
     </div>
 
-    <div class="form-floating form-floating-outline mb-4">
-      <!-- <input type="date" class="form-control" formControlName="DATE" placeholder="Select date"> -->
-      <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" [max]="today" />
-      <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-      <label for="date"><i class="ri-calendar-line"></i> Date<span class="text-danger">*</span></label>
-    </div>
-
-
+    <!-- Search by Date -->
     <div class="col-12 col-sm-6 col-md-2">
       <button type="button" class="btn btn-primary m-1" (click)="filterByDate()">
         Search by Date
       </button>
     </div>
 
+    <!-- Spacer -->
     <div class="d-none d-md-block col-md-1"></div>
 
+    <!-- Search by Name -->
     <div class="col-12 col-md-3">
       <div class="form-floating form-floating-outline">
         <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="searchTerm"
@@ -65,33 +45,26 @@
         <label for="html5-search-input"><i class="ri-search-2-fill"></i> Search by Name</label>
       </div>
     </div>
-
   </div>
 </div>
 
-<div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <!-- <h5 class="modal-title" id="doctorFormModalLabel">Case Form</h5> -->
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Inline Form (Visible when isCreatingNew is true) -->
+<div *ngIf="isCreatingNew" class="container-xxl flex-grow-1 container-p-y">
+  <div class="col-xxl">
+    <div class="card shadow mb-5 p-4 rounded-4 border-0">
+      <div
+        class="card-header bg-light d-flex justify-content-between align-items-center rounded-3 px-4 py-3 mb-4 shadow-sm">
+        <h5 class="mb-0 text-dark fw-bold">
+          <i class="ri-file-list-3-line me-2 text-primary"></i> Case Paper
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="isCreatingNew = false"></button>
       </div>
-      <!-- modified one -->
-      <div class="container-xxl flex-grow-1 container-p-y">
-        <div class="col-xxl">
-          <!-- Add this to your component.html -->
-          <div class="card shadow mb-5 p-4 rounded-4 border-0">
-            <div
-              class="card-header bg-light d-flex justify-content-between align-items-center rounded-3 px-4 py-3 mb-4 shadow-sm">
-              <h5 class="mb-0 text-dark fw-bold">
-                <i class="ri-file-list-3-line me-2 text-primary"></i> Case Paper
-              </h5>
-            </div>
 
-            <div class="card-body">
-              <form [formGroup]="data" (ngSubmit)="submit(data.value)">
-                <div class="row mb-4 align-items-center">
+      <div class="card-body">
+
+        <!-- Example placeholder -->
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)">
+         <div class="row mb-4 align-items-center">
                   <!-- Home Collection -->
                   <div class="col-md-6 mb-3 d-flex align-items-center">
                     <div class="form-check form-switch">
@@ -347,24 +320,20 @@
                   </div>
                 </div>
 
-                <!-- Buttons -->
-                <div class="text-end">
-                  <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no === 0">Save</button>
-                  <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no !== 0">Update</button>
-                  <button type="reset" class="btn btn-danger px-4 py-2 rounded-pill">Cancel</button>
-                </div>
-              </form>
-            </div>
+          <!-- Cancel Button -->
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no === 0">Save</button>
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no !== 0">Update</button>
+            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">Cancel</button>
           </div>
-
-        </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container-xxl flex-grow-1 container-p-y">
-
+<!-- Case Paper List Table -->
+<div *ngIf="!isCreatingNew" class="container-xxl flex-grow-1 container-p-y">
   <div class="card">
     <h5 class="card-header">Case Paper</h5>
     <div class="table-responsive text-nowrap">
@@ -377,7 +346,6 @@
             <th>Contact</th>
             <th>Date</th>
             <th>Status</th>
-
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
@@ -387,26 +355,26 @@
                 }">
             <td>
               <div *ngIf="case.statuS_CODE === 101">
-                <a class="dropdown-item" href="javascript:void(0);"><i
-                    class="ri-bill-line me-1"></i>Invoice</a>
+                <a class="dropdown-item" href="javascript:void(0);"><i class="ri-bill-line me-1"></i>Invoice</a>
               </div>
               <div class="dropdown" *ngIf="case.statuS_CODE === 0">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                   <i class="ri-more-2-line"></i>
                 </button>
-                <div class="dropdown-menu" >
-                    <a class="dropdown-item" href="javascript:void(0);" (click)="edit(case.trN_NO)"
-                      data-bs-toggle="modal" data-bs-target="#doctorFormModal"><i class="ri-pencil-line me-1"></i>
-                      Edit</a>
-                    <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i>
-                      Delete</a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0);" (click)="edit(case.trN_NO)"><i class="ri-pencil-line me-1"></i> Edit</a>
+                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i> Delete</a>
                 </div>
               </div>
             </td>
-            <td><i class=" ri-22px text-danger me-4"></i><span>{{case.trN_NO}}</span></td>
-            <td><i class=" ri-22px text-danger me-4"></i><span>{{case.patienT_NAME}}</span></td>
-            <td><span class="badge  bg-label-primary me-1">{{case.coN_NUMBER}}</span></td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">{{case.date}}</span></td>
+            <td><span>{{ case.trN_NO }}</span></td>
+            <td><span>{{ case.patienT_NAME }}</span></td>
+            <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date }}</span></td>
+            <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
+              <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
+            </td>
+            
           </tr>
         </tbody>
       </table>
