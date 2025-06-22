@@ -245,3 +245,18 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 
+
+ /* Start For Edit Delete buttons  */
+.btn-purple {
+  background-color: #6f42c1;
+  color: white;
+}
+.btn-purple:hover {
+  background-color: #5a32a8;
+}
+
+.btn-sm {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+/* End For Edit Delete buttons  */
