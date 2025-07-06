@@ -14,15 +14,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 interface CasePaper {
   trN_NO: number;
   patienT_NAME: string;
   coN_NUMBER: string;
   date: string;
-  statuS_CODE:number;
-
+  statuS_CODE: number;
 }
 
 @Component({
@@ -43,6 +42,8 @@ interface CasePaper {
   styleUrl: './casepaper.component.css',
 })
 export class CasepaperComponent implements OnInit {
+  isCreatingNew: boolean = false; // ✅ Added
+
   cases: any;
   data: any;
   tests: any;
@@ -60,9 +61,7 @@ export class CasepaperComponent implements OnInit {
   submitted = false;
   dateRange: { start: Date | null; end: Date | null } = { start: null, end: null };
   today: Date = new Date();
-  trn_no:number = 0;
-  // startDate: any;
-  // endDate: any;
+  trn_no: number = 0;
 
   constructor(private api: ApiService) {}
 
@@ -82,8 +81,8 @@ export class CasepaperComponent implements OnInit {
       date: new FormControl(''),
       coM_ID: new FormControl(101),
       paymenT_STATUS: new FormControl(''),
-
     });
+
     this.load();
   }
 
@@ -106,7 +105,6 @@ export class CasepaperComponent implements OnInit {
   }
 
   hideSuggestions() {
-    // Give time for click to register before hiding
     setTimeout(() => {
       this.showSuggestions = false;
     }, 150);
@@ -117,7 +115,6 @@ export class CasepaperComponent implements OnInit {
       test.tesT_NAME.toLowerCase() === Entertest.toLowerCase()
     );
 
-    // Optional: Avoid duplicates
     filteredTests.forEach((test: any) => {
       const alreadyExists = this.matIs.some(
         (item: any) => item.tesT_NAME.toLowerCase() === test.tesT_NAME.toLowerCase()
@@ -125,7 +122,6 @@ export class CasepaperComponent implements OnInit {
       if (alreadyExists) return;
 
       const srNo = this.matIs.length + 1;
-
       const newTest = {
         ...test,
         sR_NO: srNo
@@ -155,7 +151,6 @@ export class CasepaperComponent implements OnInit {
   removeTest(srno: number) {
     this.matIs = this.matIs.filter((item: any) => item.sR_NO !== Number(srno));
 
-    // Reassign serial numbers
     this.matIs = this.matIs.map((item: any, index: number) => ({
       ...item,
       sR_NO: index + 1
@@ -163,9 +158,6 @@ export class CasepaperComponent implements OnInit {
 
     this.testAmount();
   }
-
-
-
 
   discount() {
     this.discount_Amount = (this.test_Amount * (this.dis || 0)) / 100;
@@ -179,10 +171,6 @@ export class CasepaperComponent implements OnInit {
     console.log('Lab Profit:', this.total_Lab_Profit);
   }
 
-
-
-
-
   load() {
     this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
       this.cases = res;
@@ -190,10 +178,10 @@ export class CasepaperComponent implements OnInit {
     });
 
     this.api.get('Test/Test').subscribe((res: any) => {
-      // this.filteredTests = res;
       this.tests = res;
-      console.log(this.tests)
+      console.log(this.tests);
     });
+
     this.api.get('Doctor/Doctor').subscribe((res: any) => {
       this.doctor = res;
       console.log(this.doctor);
@@ -208,24 +196,20 @@ export class CasepaperComponent implements OnInit {
     this.submitted = true;
 
     if (!this.data.valid) {
-      // alert('Please fill all required form fields.');
-
-     Swal.fire({
-    toast: true,
-    position: 'top-end',
-    icon: 'success',
-    title: 'Your work has been saved!',
-    showConfirmButton: false,
-    timer: 1500,
-    backdrop: false,
-    customClass: {
-      container: 'swal2-on-modal',
-      popup: 'swal2-toast-override'
-    }
-  });
-
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'warning',
+        title: 'Please fill all required fields!',
+        showConfirmButton: false,
+        timer: 1500,
+        backdrop: false,
+        customClass: {
+          container: 'swal2-on-modal',
+          popup: 'swal2-toast-override'
+        }
+      });
       return;
-
     }
 
     if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
@@ -244,6 +228,7 @@ export class CasepaperComponent implements OnInit {
       next: (res: any) => {
         console.log('Response:', res);
         this.load();
+        this.cancelCreate();
       },
       error: (err: any) => {
         console.error('Error occurred:', err);
@@ -252,10 +237,19 @@ export class CasepaperComponent implements OnInit {
     });
   }
 
+  cancelCreate() {
+    this.isCreatingNew = false;     // ✅ Hide form
+    this.data.reset();              // ✅ Reset form data
+    this.matIs = [];                // ✅ Clear tests
+    this.test_Amount = 0;
+    this.total_Amount = 0;
+    this.total_test_LabPrice = 0;
+    this.total_Lab_Profit = 0;
+  }
 
   startDate: string = '';
   endDate: string = '';
-  filtered: CasePaper[] = []; // Holds filtered data
+  filtered: CasePaper[] = [];
   isDateFiltered = false;
 
   filteredCases(): CasePaper[] {
@@ -281,43 +275,18 @@ export class CasepaperComponent implements OnInit {
   }
 
   filterByDate() {
-    if (this.startDate && this.endDate) {
-      this.isDateFiltered = true;
-    } else {
-      this.isDateFiltered = false;
-    }
+    this.isDateFiltered = !!(this.startDate && this.endDate);
   }
 
   edit(trN_NO: any): void {
     this.api.get(`CasePaper/CasePaper/${trN_NO}`).subscribe({
       next: (res: any) => {
-
         this.trn_no = res.trN_NO;
-
-        // Patch form fields
-        this.data.patchValue({
-          trN_NO: res?.trN_NO,
-          patienT_NAME: res?.patienT_NAME,
-          gender: res?.gender,
-          coN_NUMBER: res?.coN_NUMBER,
-          address: res?.address,
-          doctoR_CODE: res?.doctoR_CODE,
-          totaL_AMOUNT: res?.totaL_AMOUNT,
-          totaL_PROFIT: res?.totaL_PROFIT,
-          discount: res?.discount,
-          paymenT_AMOUNT: res?.paymenT_AMOUNT,
-          paymenT_METHOD: res?.paymenT_METHOD,
-          date: res?.date,
-          coM_ID: res?.coM_ID,
-          paymenT_STATUS: res?.paymenT_STATUS,
-        });
-
-        // Assign materials
+        this.data.patchValue(res);
         this.matIs = res?.matIs || [];
-
-        // Recalculate totals
         this.testAmount();
         this.discount();
+        this.isCreatingNew = true; // Show form on edit
       },
       error: (err) => {
         console.error('Error loading case paper:', err);
@@ -325,6 +294,7 @@ export class CasepaperComponent implements OnInit {
       }
     });
   }
+
   getTestNameByCode(code: string): string {
     const match = this.tests.find((t: any) => t.tesT_CODE === code);
     return match ? match.tesT_NAME : 'N/A';
@@ -360,7 +330,4 @@ export class CasepaperComponent implements OnInit {
       status: 'Scheduled'
     }
   ];
-
-
-
 }

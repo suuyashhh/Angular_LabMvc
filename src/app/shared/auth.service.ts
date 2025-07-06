@@ -19,6 +19,7 @@ export class AuthService {
 
   setToken(token:string){
     localStorage.setItem("token", token);
+    localStorage.setItem("COM_ID", '101');
 
     document.cookie = `authToken=${token}; path=/; max-age=${60 * 60 * 24}`;
   }
