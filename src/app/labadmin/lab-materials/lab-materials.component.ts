@@ -15,46 +15,96 @@ import { Modal } from 'bootstrap';
 export class LabMaterialsComponent implements OnInit {
   
   
-    materials:any;
-    data:any;
-  
-    constructor(private api:ApiService){}
-    ngOnInit(): void {
-      this.data = new FormGroup({
-        MAT_ID : new FormControl(),
-        MAT_NAME: new FormControl('',Validators.compose([Validators.required])),
-        MAT_PRICE : new FormControl(),
-        DATE: new FormControl()
-      });
-      this.load();
+  material: any;
+  data: any;
+  MAT_ID: any = 0;
+  ComId: number = 0;
+  btn: any = '';
+  submitted = false;
+  Reason: any = '';
+
+  constructor(private api: ApiService) { }
+
+
+  ngOnInit(): void {
+    // this.clearData();
+    this.load();
+  }
+
+  load() {
+    this.data = new FormGroup({
+      MAT_NAME: new FormControl('', Validators.required),
+      MAT_PRICE: new FormControl('', Validators.required),
+      DATE: new FormControl(''),
+      COM_ID: new FormControl()
+    });
+
+    this.api.get('LabMaterials/LabMaterials').subscribe((res: any) => {
+      this.material = res;
+      console.log(this.material)
+    })
+
+    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
+
+  }
+
+  clearData() {
+    this.MAT_ID = 0;
+    this.btn = '';
+    this.data.patchValue({
+      MAT_NAME: '',
+      MAT_PRICE: '',
+      DATE: ''
+    })
+  }
+
+  submit(material: any) {
+    this.submitted = false;
+    if (!this.data.valid) {
+      this.submitted = true;
+      return;
     }
-  
-  
-  
-    load(){
-      this.api.get('LabMaterials/LabMaterials').subscribe((res:any)=>{
-        this.materials=res;
-        console.log(this.materials)
-      })
-  
-    }
-  
-    submit(materials:any){
-      console.log(materials);
-      this.api.post('LabMaterials/SaveLabMaterials',materials).subscribe((res:any)=>{
-        console.log(res);
+    if (this.MAT_ID == 0 && this.btn == '') {
+      material.COM_ID = this.ComId
+        this.api.post('LabMaterials/SaveLabMaterials', material).subscribe((res: any) => {
+          this.api.modalClose();
+          this.load();
+       }); 
+    } else if (this.MAT_ID != 0 && this.btn == 'E') {
+      console.log(this.MAT_ID);
+      this.api.post('LabMaterials/EditLabMaterials/' + this.MAT_ID, material).subscribe((res: any) => {
         this.load();
-  
-        const modalElement = document.getElementById('myModal');
-      if(modalElement){
-        const modal = Modal.getInstance(modalElement);
-        modal?.hide();
-      }
-      
-      })
+        console.log(res);
+        
+      });
     }
-  
-  
+    else if (this.MAT_ID != 0 && this.btn == 'D') {
+      console.log(this.Reason);
+
+      if (this.Reason != '') {
+        this.api.delete('LabMaterials/DeleteLabMaterials/' + this.MAT_ID).subscribe((res: any) => {
+          this.load();
+        })
+      }
+      else {
+        alert("Fill the reason");
+      }
+    }
+  }
+
+  getDataById(matCode: number, btn: any) {
+    this.btn = btn;
+    this.api.get('LabMaterials/LabMaterials/' + matCode).subscribe((res: any) => {
+      console.log(res);
+
+      this.MAT_ID = res.maT_ID;
+      this.data.patchValue({
+        MAT_NAME: res.maT_NAME,
+        MAT_PRICE: res.maT_PRICE,
+        DATE: res.date
+      })
+    })
+  }
 
 
 }
