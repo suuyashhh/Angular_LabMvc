@@ -1,19 +1,25 @@
 <div class="container  container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorComFormModal" (click)="clearData()">
     Add Doctor Commission
   </button>
 </div>
 
-<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"
+<div class="modal fade custom-modal-fade" id="doctorComFormModal" tabindex="-1" aria-labelledby="doctorComFormModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
         <div class="modal-title-wrapper">
           <div class="modal-icon">
-            <i class="ri-file-add-line"></i>
+            <i class="ri-file-add-line" *ngIf="DOC_COM_ID == 0 && btn == ''"></i>
+            <i class="ri-edit-line" *ngIf="DOC_COM_ID != 0 && btn == 'E'"></i>
+            <i class="ri-delete-bin-line" *ngIf="DOC_COM_ID != 0 && btn == 'D'"></i>
+            <i class="ri-eye-line" *ngIf="DOC_COM_ID != 0 && btn == 'dtls'"></i>
           </div>
-          <h5 class="modal-title custom-modal-title" id="doctorFormModalLabel">Add Doctor Commission</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID == 0 && btn == ''">Add Doctor Commission</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'E'">Edit </h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'D'">Delete </h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'dtls'">Details </h5>
         </div>
         <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -40,7 +46,7 @@
 
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="doctorPrice" class="form-control" formControlName="MAT_PRICE"
+                <input type="number" id="doctorPrice" class="form-control" formControlName="DOC_COM_PRICE"
                   placeholder="Price" />
                 <label for="doctorPrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
                     class="text-danger">*</span></label>
@@ -53,10 +59,20 @@
               <i class="ri-close-line"></i>
               Cancel
             </button>
-            <button type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
+            <button *ngIf="DOC_COM_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
               <i class="ri-save-line"></i>
               Save
             </button>
+              <button *ngIf="DOC_COM_ID != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save"
+                data-bs-dismiss="modal">
+                <i class="ri-edit-line"></i>
+                Edit Test
+              </button>
+              <button *ngIf="DOC_COM_ID != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save"
+                data-bs-dismiss="modal">
+                <i class="ri-delete-bin-line"></i>
+                Delete Test
+              </button>
           </div>
         </form>
       </div>
@@ -79,21 +95,19 @@
         </thead>
         <tbody class="table-border-bottom-0">
           <tr *ngFor="let _objDC of doctorcommission">
-            <td>
-              <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                  <i class="ri-more-2-line"></i>
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-pencil-line me-1"></i> Edit</a>
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i>
-                    Delete</a>
-                </div>
-              </div>
+            <td style="width: 160px; white-space: nowrap;">
+              <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
+                data-bs-target="#doctorComFormModal" (click)="getDataById(_objDC.doC_COM_ID,'E')">
+                <i class="ri-pencil-line me-1"></i> Edit</a>
+
+              <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                data-bs-target="#doctorComFormModal" (click)="getDataById(_objDC.doC_COM_ID,'D')">
+                <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
             </td>
             <td>{{_objDC.date}}</td>
-            <td>{{_objDC.bikE_NAME}}</td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objDC.bikE_PRICE}}</span></td>
+            <td><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#doctorComFormModal"
+                (click)="getDataById(_objDC.doC_COM_ID,'dtls')">{{_objDC.doctoR_ID}}</a></td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objDC.doC_COM_PRICE}}</span></td>
           </tr>
         </tbody>
       </table>

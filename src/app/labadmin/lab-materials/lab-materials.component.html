@@ -1,10 +1,10 @@
 <div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="clearData()">
         Add Material
     </button>
 </div>
 
-<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"
+<div class="modal fade custom-modal-fade" id="labMatFormModal" tabindex="-1" aria-labelledby="labMatFormModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
         <div class="modal-content custom-modal-content">
@@ -62,7 +62,7 @@
                             <i class="ri-close-line"></i>
                             Cancel
                         </button>
-                        <button type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
+                        <button *ngIf="MAT_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
                             <i class="ri-save-line"></i>
                             Save Material
                         </button>
@@ -100,17 +100,17 @@
                     <tr *ngFor="let mat of material">
                         <td style="width: 160px; white-space: nowrap;">
                             <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);"
-                                data-bs-toggle="modal" data-bs-target="#CreateFormModal"
+                                data-bs-toggle="modal" data-bs-target="#labMatFormModal"
                                 (click)="getDataById(mat.maT_ID,'E')">
                                 <i class="ri-pencil-line me-1"></i> Edit</a>
 
                             <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                                data-bs-target="#CreateFormModal" (click)="getDataById(mat.maT_ID,'D')">
+                                data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID,'D')">
                                 <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
                         </td>
                         <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{mat.maT_ID}}</span>
                         </td>
-                        <td><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#CreateFormModal"
+                        <td><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal"
                                 (click)="getDataById(mat.maT_ID,'dtls')">{{mat.maT_NAME}}</a></td>
                         <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{mat.maT_PRICE}}</span></td>
                     </tr>
