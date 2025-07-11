@@ -42,7 +42,7 @@
           <a routerLink="/labadmin/casepaper" class="menu-link">
             <i class="menu-icon ri-profile-line"></i>
             <div data-i18n="casepaper">CasePaper</div>
-            
+
           </a>
         </li>
 
@@ -103,29 +103,51 @@
             </li> -->
           </ul>
         </li>
-        <!-- APPROVE -->
+
+
+        <!-- Liabilities START!! -->
         <li class="menu-item active close">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon ri-checkbox-circle-line"></i>
-            <div data-i18n="Dashboards">Approve</div>
+            <i class="menu-icon tf-icons ri-uninstall-fill"></i>
+            <div data-i18n="Dashboards">Liabilities</div>
 
           </a>
           <ul class="menu-sub">
 
             <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/approve/casepaper/" class="menu-link">
-                <div data-i18n="approve/casepaper">CasePaper</div>
+              <a routerLink="lab-materials" class="menu-link">
+                <div data-i18n="casepaper">Lab Materials</div>
 
               </a>
             </li>
             <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/approve/test" class="menu-link">
-                <div data-i18n="approve/test">Test</div>
+              <a routerLink="bike-fule" class="menu-link">
+                <div data-i18n="#">Bike Fule</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a routerLink="employee-salary" class="menu-link">
+                <div data-i18n="#"> Employee Salary</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a routerLink="ele-bill" class="menu-link">
+                <div data-i18n="#"> Electricity Bill </div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a routerLink="other-expense" class="menu-link">
+                <div data-i18n="#">Other Expance</div>
+              </a>
+            </li>
+            <li class="menu-item" routerLinkActive="active">
+              <a routerLink="doctor-commission" class="menu-link">
+                <div data-i18n="#">Doctors</div>
               </a>
             </li>
           </ul>
         </li>
-
+        <!-- Liabilities END!! -->
         <!-- EMPLOYEE START!! -->
         <!-- <li class="menu-item active close">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -150,62 +172,43 @@
         </li> -->
         <!-- EMPLOYEE END!! -->
 
- 
-<!-- Liabilities START!! -->
- <li class="menu-item active close">
+
+        <li class="menu-header mt-7"><span class="menu-header-text">Finance</span></li>
+
+        <!-- Finance -->
+        <li class="menu-item" routerLinkActive="active">
+          <a routerLink="/labadmin/finance" class="menu-link">
+            <i class="menu-icon ri-money-dollar-circle-line"></i>
+            <div data-i18n="Finance">Finance</div>
+
+          </a>
+        </li>
+
+        <li class="menu-header mt-7"><span class="menu-header-text">APPROVE</span></li>
+
+        <!-- APPROVE -->
+        <li class="menu-item active close">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-uninstall-fill"></i>
-            <div data-i18n="Dashboards">Liabilities</div>
-            
+            <i class="menu-icon ri-checkbox-circle-line"></i>
+            <div data-i18n="Dashboards">Approve</div>
+
           </a>
           <ul class="menu-sub">
-           
+
             <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="lab-materials"
-                class="menu-link">
-                <div data-i18n="casepaper">Lab Materials</div>
-               
+              <a routerLink="/labadmin/approve/casepaper/" class="menu-link">
+                <div data-i18n="approve/casepaper">CasePaper</div>
+
               </a>
             </li>
             <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="bike-fule"
-                class="menu-link">
-                <div data-i18n="#">Bike Fule</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="employee-salary"
-                class="menu-link">
-                <div data-i18n="#"> Employee Salary</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="ele-bill"
-                class="menu-link">
-                <div data-i18n="#"> Electricity Bill	</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="other-expense"
-                class="menu-link">
-                <div data-i18n="#">Other Expance</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a
-                routerLink="doctor-commission"
-                class="menu-link">
-                <div data-i18n="#">Doctors</div>
+              <a routerLink="/labadmin/approve/test" class="menu-link">
+                <div data-i18n="approve/test">Test</div>
               </a>
             </li>
           </ul>
         </li>
- <!-- Liabilities END!! -->
+
 
         <!-- Layouts -->
         <!-- <li class="menu-item">
