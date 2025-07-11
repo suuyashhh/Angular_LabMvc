@@ -260,3 +260,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-size: 0.75rem;
 }
 /* End For Edit Delete buttons  */
+
+@media print {
+.no-print {
+    display: none !important;
+  }
+}
