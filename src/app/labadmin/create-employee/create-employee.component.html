@@ -1,48 +1,25 @@
 <div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateEmployeeFormModal">
         Add Employee
     </button>
 </div>
 
-<!-- <div class="modal fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="doctorFormModalLabel">Employee Form</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <form>
-                      <div class="mb-3">
-                          <label for="doctorName" class="form-label">Employee Name</label>
-                          <input type="text" class="form-control" id="doctorName">
-                      </div>
-                      <div class="mb-3">
-                          <label for="number" class="form-label">Address</label>
-                          <input type="text" class="form-control" id="number">
-                      </div>
-                      <div class="mb-3">
-                          <label for="address" class="form-label">Phone Number</label>
-                          <input type="text" class="form-control" id="address">
-                      </div>
-                      <button type="button" class="btn btn-success m-10">Save</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                  </form>
-              </div>
-          </div>
-      </div>
-</div> -->
-
-<div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"
-    aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="CreateEmployeeFormModal" tabindex="-1"
+    aria-labelledby="doctorFormModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
         <div class="modal-content custom-modal-content">
             <div class="modal-header custom-modal-header">
                 <div class="modal-title-wrapper">
                     <div class="modal-icon">
-                        <i class="ri-file-add-line"></i>
+                        <i class="ri-file-add-line" *ngIf="EMP_ID == 0 && btn == ''"></i>
+                        <i class="ri-edit-line" *ngIf="EMP_ID != 0 && btn == 'E'"></i>
+                        <i class="ri-delete-bin-line" *ngIf="EMP_ID != 0 && btn == 'D'"></i>
+                        <i class="ri-eye-line" *ngIf="EMP_ID != 0 && btn == 'dtls'"></i>
                     </div>
-                    <h5 class="modal-title custom-modal-title" id="doctorFormModalLabel">Add Employee</h5>
+                    <h5 class="modal-title custom-modal-title" *ngIf="EMP_ID == 0 && btn == ''">Add Employee</h5>
+                    <h5 class="modal-title custom-modal-title" *ngIf="EMP_ID != 0 && btn == 'E'">Edit Test</h5>
+                    <h5 class="modal-title custom-modal-title" *ngIf="EMP_ID != 0 && btn == 'D'">Delete Test</h5>
+                    <h5 class="modal-title custom-modal-title" *ngIf="EMP_ID != 0 && btn == 'dtls'">Details Test</h5>
                 </div>
                 <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
@@ -53,7 +30,7 @@
 
                         <div class="custom-form-group">
                             <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="emp-name" class="form-control" formControlName="MAT_NAME"
+                                <input type="text" id="emp-name" class="form-control" formControlName="EMP_NAME"
                                     placeholder="Employee Name" />
                                 <label for="emp-name"><i class="ri-group-3-line"></i>Employee Name <span
                                         class="text-danger">*</span></label>
@@ -62,21 +39,33 @@
 
                         <div class="custom-form-group">
                             <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="empAddress" class="form-control" formControlName="MAT_PRICE"
+                                <input type="text" id="empAddress" class="form-control" formControlName="EMP_PASSWORD"
                                     placeholder="Address" />
-                                <label for="empAddress"> <i class="ri-map-pin-line"></i>Address <span
+                                <label for="empAddress"> <i class="ri-map-pin-line"></i>Password <span
                                         class="text-danger">*</span></label>
                             </div>
                         </div>
 
                         <div class="custom-form-group">
                             <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="empCoNo" class="form-control" formControlName="MAT_PRICE"
+                                <input type="text" id="empCoNo" class="form-control" formControlName="EMP_CONTACT"
                                     placeholder="Phone No" />
                                 <label for="empCoNo"> <i class="ri-phone-line"></i>Phone No <span
                                         class="text-danger">*</span></label>
                             </div>
                         </div>
+
+                        <!-- <div class="custom-form-group" *ngIf="EMP_ID != 0 && btn == 'D'">
+                            <div class="form-floating form-floating-outline mb-4">
+                                <input type="text" id="empLabreason" class="form-control" placeholder="Reason"
+                                    [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" required />
+                                <label for="empLabreason"> <i class="ri-chat-3-line"></i> Delete Reason <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="text-danger mt-1" *ngIf="Reason == '' ">
+                                <small *ngIf="Reason == '' ">Delete Reason required.</small>
+                            </div>
+                        </div> -->
 
                     </div>
 
@@ -85,9 +74,20 @@
                             <i class="ri-close-line"></i>
                             Cancel
                         </button>
-                        <button type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
+                        <button *ngIf="EMP_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save"
+                            data-bs-dismiss="modal">
                             <i class="ri-save-line"></i>
                             Save
+                        </button>
+                        <button *ngIf="EMP_ID != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save"
+                            data-bs-dismiss="modal">
+                            <i class="ri-edit-line"></i>
+                            Edit Test
+                        </button>
+                        <button *ngIf="EMP_ID != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save"
+                            data-bs-dismiss="modal">
+                            <i class="ri-delete-bin-line"></i>
+                            Delete Test
                         </button>
                     </div>
                 </form>
@@ -109,22 +109,20 @@
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
-                    <tr>
-                        <td>
-                            <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown">
-                                    <i class="ri-more-2-line"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="ri-pencil-line me-1"></i> Edit</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="ri-delete-bin-6-line me-1"></i> Delete</a>
-                                </div>
-                            </div>
+                    <tr *ngFor="let emp of employee">
+                        <td style="width: 160px; white-space: nowrap;">
+                            <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);"
+                                data-bs-toggle="modal" data-bs-target="#CreateEmployeeFormModal"
+                                (click)="getDataById(emp.emP_ID,'E')">
+                                <i class="ri-pencil-line me-1"></i> Edit</a>
+
+                            <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                                data-bs-target="#CreateEmployeeFormModal" (click)="getDataById(emp.emP_ID,'D')">
+                                <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
                         </td>
-                        <td>Suyash Patil</td>
+                        <td><a href="javascript:void(0);" data-bs-toggle="modal"
+                                data-bs-target="#CreateEmployeeFormModal"
+                                (click)="getDataById(emp.emP_ID,'dtls')">{{emp.emP_NAME}}</a></td>
                     </tr>
 
                 </tbody>

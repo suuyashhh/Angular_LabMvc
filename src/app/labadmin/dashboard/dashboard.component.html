@@ -1,66 +1,116 @@
-<div class="container container-p-y">
-
-        <!-- STAT CARD -->
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="card bg-primary text-white shadow-sm rounded-4">
-              <div
-                class="card-body d-flex flex-column flex-md-row justify-content-around align-items-center py-4 gap-3">
-                <div class="d-flex flex-column align-items-center">
-                  <i class="ri-group-2-fill ri-4x mb-2"></i>
-                  <span class="h6 mb-0">Patients</span>
-                </div>
-                <div class="text-center">
-                  <h4 class="fw-semibold mb-1">Today's Total Patients</h4>
-                  <p class="display-6 fw-bold mb-0">45</p>
-                </div>
-              </div>
-            </div>
+<div class="dashboard-container">
+  <div class="stats-grid">
+    <!-- Today Total Patients -->
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="stat-icon patients">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-title">Today Total Patients</h3>
+            <div class="stat-number" data-target="127">0</div>
+          </div>
+          <div class="stat-trend up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+12%</span>
           </div>
         </div>
-
-        <!-- PARTNER CARDS WITH SHADES -->
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-
-          <!-- Card 1: Alice -->
-          <div class="col">
-            <div class="card h-100 shadow-sm text-center border-0 rounded-4" style="background-color: #e8f0fe;">
-              <div class="p-4"><a href="http://183.82.121.72/login.aspx?ReturnUrl=%2f">
-                <img src="../assets/img/elements/image1.png" alt="Allice" class="img-fluid"
-                  style="height: 100px; object-fit: contain;"></a>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title mb-0 fw-semibold text-primary">Allice</h5>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 2: Manipal Trutest -->
-          <div class="col">
-            <div class="card h-100 shadow-sm text-center border-0 rounded-4" style="background-color: #fcefe3;">
-              <div class="p-4"><a href="https://www.manipaltrutest.com/">
-                <img src="../assets/img/elements/image2.png" alt="Manipal" class="img-fluid"
-                  style="height: 100px; object-fit: contain;"></a>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title mb-0 fw-semibold text-warning">Manipal Trutest</h5>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 3: Crelio Health -->
-          <div class="col">
-            <div class="card h-100 shadow-sm text-center border-0 rounded-4" style="background-color: #e8f5e9;">
-              <div class="p-4"><a href="https://livehealth.solutions/">
-                <img src="../assets/img/elements/image.png" alt="Crelio Health" class="img-fluid"
-                  style="height: 100px; object-fit: contain;"></a>
-              </div>
-              <div class="card-body">
-                <h5 class="card-title mb-0 fw-semibold text-success">Crelio Health</h5>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
       </div>
+    </div>
+
+    <!-- Home Collection Total -->
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="stat-icon home-collection">
+            <i class="fas fa-home"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-title">Home Collection Total</h3>
+            <div class="stat-number" data-target="45">0</div>
+          </div>
+          <div class="stat-trend up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+8%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Total -->
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="stat-icon pending">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-title">Pending Total</h3>
+            <div class="stat-number" data-target="23">0</div>
+          </div>
+          <div class="stat-trend down">
+            <i class="fas fa-arrow-down"></i>
+            <span>-5%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today Total Bill -->
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="stat-icon billing">
+            <i class="fas fa-rupee-sign"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-title">Today Total Bill</h3>
+            <div class="stat-number" data-target="85420">₹0</div>
+          </div>
+          <div class="stat-trend up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+15%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Partner Cards Section -->
+  <div class="partners-section">
+    <div class="partners-container">
+      <div class="partners-grid">
+        <div class="partner-card" data-aos="zoom-in" data-aos-delay="500">
+          <a href="https://www.manipaltrutest.com/">
+            <div class="partner-logo">
+              <img src="../assets/img/elements/image2.png" alt="Manipal" alt="Manipal TruTest" class="partner-img">
+            </div>
+            <h3 class="partner-name">Manipal TruTest</h3>
+          </a>
+        </div>
+        <div class="partner-card" data-aos="zoom-in" data-aos-delay="600">
+          <a href="https://livehealth.solutions/">
+            <div class="partner-logo">
+              <img src="../assets/img/elements/image.png" alt="Crelio Health" class="partner-img">
+            </div>
+            <h3 class="partner-name">Crelio Health</h3>
+          </a>
+        </div>
+
+        <div class="partner-card full-width-card" data-aos="zoom-in" data-aos-delay="700">
+          <a href="http://183.82.121.72/login.aspx?ReturnUrl=%2f">
+            <div class="partner-logo">
+              <img src="../assets/img/elements/image1.png" alt="Aceline" class="partner-img">
+            </div>
+            <h3 class="partner-name">ACELINE</h3>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
