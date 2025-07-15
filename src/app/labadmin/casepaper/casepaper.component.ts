@@ -1,4 +1,13 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  QueryList,
+  ViewChildren,
+  ElementRef,
+} 
+from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { HttpClientModule } from '@angular/common/http';
 import {
@@ -14,7 +23,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
-import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 interface CasePaper {
   trN_NO: number;
@@ -37,11 +47,16 @@ interface CasePaper {
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    NgSelectModule,
   ],
   templateUrl: './casepaper.component.html',
   styleUrl: './casepaper.component.css',
 })
+
 export class CasepaperComponent implements OnInit {
+  @ViewChildren('formField') formFields!: QueryList<ElementRef>;
+  
+
   isCreatingNew: boolean = false; // ✅ Added
 
   cases: any;
@@ -59,18 +74,24 @@ export class CasepaperComponent implements OnInit {
   total_Lab_Profit: any = 0;
   total_test_LabPrice: any = 0;
   submitted = false;
-  dateRange: { start: Date | null; end: Date | null } = { start: null, end: null };
+  dateRange: { start: Date | null; end: Date | null } = {
+    start: null,
+    end: null,
+  };
   today: Date = new Date();
   trn_no: number = 0;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService,private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.data = new FormGroup({
       trN_NO: new FormControl(0),
       patienT_NAME: new FormControl('', Validators.required),
       gender: new FormControl('', Validators.required),
-      coN_NUMBER: new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]),
+      coN_NUMBER: new FormControl('', [
+        Validators.required,
+        Validators.pattern('^[0-9]{10}$'),
+      ]),
       address: new FormControl('', Validators.required),
       doctoR_CODE: new FormControl(0, Validators.required),
       totaL_AMOUNT: new FormControl(0),
@@ -111,20 +132,21 @@ export class CasepaperComponent implements OnInit {
   }
 
   add(Entertest: string) {
-    const filteredTests = this.tests.filter((test: any) =>
-      test.tesT_NAME.toLowerCase() === Entertest.toLowerCase()
+    const filteredTests = this.tests.filter(
+      (test: any) => test.tesT_NAME.toLowerCase() === Entertest.toLowerCase()
     );
 
     filteredTests.forEach((test: any) => {
       const alreadyExists = this.matIs.some(
-        (item: any) => item.tesT_NAME.toLowerCase() === test.tesT_NAME.toLowerCase()
+        (item: any) =>
+          item.tesT_NAME.toLowerCase() === test.tesT_NAME.toLowerCase()
       );
       if (alreadyExists) return;
 
       const srNo = this.matIs.length + 1;
       const newTest = {
         ...test,
-        sR_NO: srNo
+        sR_NO: srNo,
       };
 
       this.matIs.push(newTest);
@@ -153,7 +175,7 @@ export class CasepaperComponent implements OnInit {
 
     this.matIs = this.matIs.map((item: any, index: number) => ({
       ...item,
-      sR_NO: index + 1
+      sR_NO: index + 1,
     }));
 
     this.testAmount();
@@ -190,57 +212,61 @@ export class CasepaperComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 7;
+  readonly pageSize: number = 6;
 
   submit(data: any): void {
-    this.submitted = true;
+  this.submitted = true;
 
-    if (!this.data.valid) {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'warning',
-        title: 'Please fill all required fields!',
-        showConfirmButton: false,
-        timer: 1500,
-        backdrop: false,
-        customClass: {
-          container: 'swal2-on-modal',
-          popup: 'swal2-toast-override'
-        }
+  if (!this.data.valid) {
+    // Scroll to first invalid field
+    setTimeout(() => {
+      const firstInvalid = this.formFields.find((el) => {
+        const controlName = el.nativeElement.getAttribute('formControlName');
+        return controlName && this.data.get(controlName)?.invalid;
       });
-      return;
-    }
-
-    if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
-      alert('Please add at least one test.');
-      return;
-    }
-
-    const payload = {
-      ...data,
-      matIs: this.matIs
-    };
-
-    console.log('Submitting:', payload);
-
-    this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
-      next: (res: any) => {
-        console.log('Response:', res);
-        this.load();
-        this.cancelCreate();
-      },
-      error: (err: any) => {
-        console.error('Error occurred:', err);
-        alert('An error occurred while saving. Please try again.');
+      if (firstInvalid) {
+        firstInvalid.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+        firstInvalid.nativeElement.focus();
       }
-    });
+    }, 0);
+
+    // Toastr error toast instead of Swal
+    this.toastr.error('Please fill all required fields!', 'Validation Error');
+    return;
   }
 
+  if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
+    this.toastr.error('Please add at least one test!', 'Test Missing');
+    return;
+  }
+
+  const payload = {
+    ...data,
+    matIs: this.matIs,
+  };
+
+  console.log('Submitting:', payload);
+
+  this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
+    next: (res: any) => {
+      console.log('Response:', res);
+      this.load();
+      this.cancelCreate();
+    },
+    error: (err: any) => {
+      console.error('Error occurred:', err);
+      this.toastr.error('An error occurred while saving. Please try again.', 'Server Error');
+    },
+  });
+}
+
   cancelCreate() {
-    this.isCreatingNew = false;     // ✅ Hide form
-    this.data.reset();              // ✅ Reset form data
-    this.matIs = [];                // ✅ Clear tests
+    this.isCreatingNew = false; // ✅ Hide form
+    this.data.reset(); // ✅ Reset form data
+    this.matIs = []; // ✅ Clear tests
     this.test_Amount = 0;
     this.total_Amount = 0;
     this.total_test_LabPrice = 0;
@@ -291,7 +317,7 @@ export class CasepaperComponent implements OnInit {
       error: (err) => {
         console.error('Error loading case paper:', err);
         alert('Failed to load case paper data.');
-      }
+      },
     });
   }
 
@@ -314,7 +340,7 @@ export class CasepaperComponent implements OnInit {
       sku: '31063',
       price: '$125',
       qty: 942,
-      status: 'Inactive'
+      status: 'Inactive',
     },
     {
       id: 2,
@@ -327,7 +353,7 @@ export class CasepaperComponent implements OnInit {
       sku: '5829',
       price: '$263.49',
       qty: 587,
-      status: 'Scheduled'
-    }
+      status: 'Scheduled',
+    },
   ];
 }
