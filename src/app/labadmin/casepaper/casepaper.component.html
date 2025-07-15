@@ -49,7 +49,7 @@
 </div>
 
 <!-- Inline Form (Visible when isCreatingNew is true) -->
-<div *ngIf="isCreatingNew" class="container-xxl flex-grow-1 container-p-y">
+<div *ngIf="isCreatingNew" class="container-xxl flex-grow-1 mt-n6">
   <div class="col-xxl">
     <div class="card shadow mb-5 p-4 rounded-4 border-0">
       <div
@@ -57,274 +57,280 @@
         <h5 class="mb-0 text-dark fw-bold">
           <i class="ri-file-list-3-line me-2 text-primary"></i> Case Paper
         </h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="isCreatingNew = false"></button>
+        <button style="color: rgb(102, 3, 3); font-weight: bold; background-color: rgba(255, 0, 0, 0.05); border-radius: 50%; padding: 0.5rem;" type="button" class="btn-close" aria-label="Close" (click)="isCreatingNew = false"></button>
       </div>
 
       <div class="card-body">
 
         <!-- Example placeholder -->
         <form [formGroup]="data" (ngSubmit)="submit(data.value)">
-         <div class="row mb-4 align-items-center">
-                  <!-- Home Collection -->
-                  <div class="col-md-6 mb-3 d-flex align-items-center">
-                    <div class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" id="home-collection">
-                      <label class="form-check-label text-dark ms-2" for="home-collection">
-                        Home Collection
-                      </label>
-                    </div>
-                  </div>
+          <div class="row mb-4 align-items-center">
+            <!-- Home Collection -->
+            <div class="col-md-6 mb-3 d-flex align-items-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="home-collection">
+                <label class="form-check-label text-dark ms-2" for="home-collection">
+                  Home Collection
+                </label>
+              </div>
+            </div>
 
-                  <!-- Date Picker -->
-                  <div class="col-md-6 text-end">
-                    <div class="form-floating form-floating-outline mb-4">
-                      <input type="date" class="form-control shadow-sm" id="date-input" required>
-                      <label for="date"><i class="ri-calendar-line"></i>Date<span class="text-danger">*</span></label>
-                    </div>
-                  </div>
-                </div>
+            <!-- Date Picker -->
+            <div class="col-md-6 text-end">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="date" class="form-control shadow-sm" id="date-input" required #formField>
+                <label for="date"><i class="ri-calendar-line"></i>Date<span class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
 
-                <!-- Patient Name -->
-                <div class="form-floating form-floating-outline mb-4">
-                  <input type="text" id="patient-name" class="form-control" placeholder="Patient Name"
-                    formControlName="patienT_NAME" required />
-                  <label for="patient-name"> <i class="ri-user-3-line"></i>Patient Name <span
-                      class="text-danger">*</span></label>
-                  <div class="text-danger mt-1" *ngIf="submitted && data.get('patienT_NAME')?.errors">
+          <!-- Patient Name -->
+          <div class="form-floating form-floating-outline mb-4">
+            <input type="text" id="patient-name" class="form-control" placeholder="Patient Name"
+              formControlName="patienT_NAME" required #formField />
+            <label for="patient-name"> <i class="ri-user-3-line"></i>Patient Name <span
+                class="text-danger">*</span></label>
+            <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('patienT_NAME')?.errors">
                     <small *ngIf="data.get('patienT_NAME')?.errors['required']">Patient Name is required.</small>
-                  </div>
-                </div>
+                  </div> -->
+          </div>
 
-                <!-- Gender -->
+          <!-- Gender -->
 
-                <div class="row mb-4" style="margin-top: 30px;">
-                  <div class="col-sm-6">
-                    <div class="form-floating form-floating-outline mb-4">
-                      <select class="form-select" id="gender" formControlName="gender">
-                        <option value="" disabled selected>Select Gender</option>
-                        <option value="male"><i class="ri-men-line"></i>Male</option>
-                        <option value="female"><i class="ri-women-line"></i>Female</option>
-                        <option value="other"><i class="ri-genderless-line"></i>Other</option>
-                      </select>
-                      <label for="gender">Gender <span class="text-danger">*</span></label>
-                      <div class="text-danger mt-1" *ngIf="submitted && data.get('gender')?.errors">
+          <div class="row mb-4" style="margin-top: 30px;">
+            <div class="col-sm-6">
+              <div class="form-floating form-floating-outline mb-4">
+                <select class="form-select" id="gender" formControlName="gender" required #formField>
+                  <option value="" disabled selected>Select Gender</option>
+                  <option value="male"><i class="ri-men-line"></i>Male</option>
+                  <option value="female"><i class="ri-women-line"></i>Female</option>
+                  <option value="other"><i class="ri-genderless-line"></i>Other</option>
+                </select>
+                <label for="gender">Gender <span class="text-danger">*</span></label>
+                <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('gender')?.errors">
                         <small *ngIf="data.get('gender')?.errors['required']">Gender is required.</small>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                    <!-- Phone Number -->
-                    <div class="form-floating form-floating-outline mb-4">
-                      <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
-                        formControlName="coN_NUMBER" />
-                      <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
-                          class="text-danger">*</span></label>
-                      <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
-                        <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small>
-                        <small *ngIf="data.get('coN_NUMBER')?.errors['pattern']">Enter valid 10-digit number.</small>
-                      </div>
-                    </div>
-                  </div>
+                      </div> -->
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <!-- Phone Number -->
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
+                  formControlName="coN_NUMBER" #formField />
+                <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
+                    class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
+                  <!-- <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small> -->
+                  <small *ngIf="data.get('coN_NUMBER')?.errors['pattern']">Enter valid 10-digit number.</small>
                 </div>
-                <!-- Address -->
-                <div class="form-floating form-floating-outline mb-4">
-                  <textarea class="form-control h-px-100" id="address" formControlName="address" placeholder="Address"
-                    style="height: 113px;"></textarea>
-                  <label for="address"><i class="ri-map-pin-line"></i>Address <span class="text-danger">*</span></label>
-                  <div class="text-danger mt-1" *ngIf="submitted && data.get('address')?.errors">
+              </div>
+            </div>
+          </div>
+          <!-- Address -->
+          <div class="form-floating form-floating-outline mb-4">
+            <textarea class="form-control h-px-100" id="address" formControlName="address" placeholder="Address"
+              style="height: 113px;" #formField></textarea>
+            <label for="address"><i class="ri-map-pin-line"></i>Address <span class="text-danger">*</span></label>
+            <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('address')?.errors">
                     <small *ngIf="data.get('address')?.errors['required']">Address is required.</small>
-                  </div>
-                </div>
+                  </div> -->
+          </div>
 
-                <!-- Doctor Reference -->
-                <div class="form-floating form-floating-outline mb-4">
-                  <select class="form-select" id="doctor-reference" formControlName="doctoR_CODE"
-                    style="margin-top: 30px;" required>
-                    <option value="{{0}}" disabled selected>Select doctor</option>
-                    <option *ngFor="let doc of doctor" [value]="doc.doctoR_CODE">{{ doc.doctoR_NAME }}</option>
-                  </select>
-                  <label for="doctor-reference"><i class="ri-user-star-line"></i>Doctor Reference <span
-                      class="text-danger">*</span></label>
-                  <div class="text-danger mt-1"
-                    *ngIf="data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid">
-                    Doctor selection is required.
-                  </div>
-                </div>
+          <!-- Doctor Reference -->
+          <div class="form-floating form-floating-outline mb-4">
+            <ng-select  id="doctor-reference" [items]="doctor" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
+              placeholder="Select / Search doctor" formControlName="doctoR_CODE" [searchable]="true" [clearable]="false"
+              class="form-select" 
+              [ngClass]="{ 'is-invalid': data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid }"
+              style="margin-top: 30px;" #formField>
+            </ng-select>
 
-                <hr style="border: 2px solid Black; margin: 50px 0;">
+            <label for="doctor-reference">
+              <i class="ri-user-star-line"></i> Doctor Reference <span class="text-danger">*</span>
+            </label>
 
-                <!-- Blood Tests Table -->
-                <div class="card shadow-lg rounded-4 mt-5 mb-3 border-0" style="background: #fff; overflow: hidden;">
-                  <div
-                    class="card-header bg-gradient-primary text-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-white">
-                      <i class="ri-flask-line me-2"></i>Blood Tests
-                    </h5>
-                    <span class="badge bg-white text-primary fs-6 px-3 py-2 rounded-pill">{{ matIs.length }}
-                      Tests</span>
-                  </div>
-
-                  <div class="table-responsive">
-                    <table class="table align-middle mb-0 text-center">
-                      <thead style="background: linear-gradient(90deg, #4b6cb7, #182848); color: white;">
-                        <tr>
-                          <th style="width: 5%;">Sr No</th>
-                          <th class="text-start ps-4" style="width: 45%;">Test Name</th>
-                          <th style="width: 15%;">Price (₹)</th>
-                          <th style="width: 15%;">Lab Price (₹)</th>
-                          <th style="width: 20%;">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let data of matIs; let i = index" class="table-row-hover"
-                          style="transition: background-color 0.3s ease;">
-                          <td class=" text-secondary">{{ i + 1 }}</td>
-                          <td class="text-start ps-4 text-capitalize  text-dark"> {{ getTestNameByCode(data.tesT_CODE)
-                            }}</td>
-                          <td class="text-success ">₹ {{ data.price }}</td>
-                          <td><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
-                          <td>
-                            <button class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
-                              (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
-                              <i class="ri-delete-bin-6-line"></i> Delete
-                            </button>
-                          </td>
-                        </tr>
-                        <tr *ngIf="matIs.length === 0">
-                          <td colspan="5" class="text-center text-muted py-4 fst-italic">No tests added yet.</td>
-                        </tr>
-                      </tbody>
-                      <tfoot class="table-light  text-dark">
-                        <tr>
-                          <td colspan="2" class="text-end pe-4">Total Amount</td>
-                          <td class="text-success">₹ {{ test_Amount }}</td>
-                          <td class="text-info">₹ {{ total_test_LabPrice }}</td>
-                          <td></td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-
-                <!-- Add Test -->
-                <div class="row mb-4 align-items-end">
-                  <div class="col-sm-8 position-relative mb-2 mb-sm-0">
-                    <label class="form-label fw-bold mb-2">Test Name</label>
-                    <div class="input-group shadow-sm rounded">
-                      <span class="input-group-text bg-light border-end-0">
-                        <i class="ri-test-tube-line text-primary"></i>
-                      </span>
-                      <input type="text" id="test-name" class="form-control border-start-0"
-                        placeholder="Enter test name..." [(ngModel)]="searchText" (input)="onSearchChange()"
-                        (focus)="onSearchChange()" (blur)="hideSuggestions()" [ngModelOptions]="{ standalone: true }"
-                        autocomplete="off" />
-                    </div>
-
-                    <ul *ngIf="showSuggestions && filteredTests.length > 0"
-                      class="list-group position-absolute w-100 mt-1 shadow-sm z-3"
-                      style="max-height: 240px; overflow-y: auto; border-radius: 0.375rem;background-color: white;">
-                      <li *ngFor="let test of filteredTests" (mousedown)="selectTest(test.tesT_NAME)"
-                        class="list-group-item list-group-item-action" style="cursor: pointer;">
-                        {{ test.tesT_NAME }}
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div class="col-sm-4 mt-2 mt-sm-0">
-                    <button type="button" (click)="add(searchText)" class="btn btn-primary w-100">ADD</button>
-                  </div>
-                </div>
-
-                <hr style="border: 2px solid Black; margin: 50px 0;">
-
-                <!-- Discount -->
-                <h4 class="section-heading mb-4"><i class="ri-discount-percent-line me-2"></i>Discount (%)</h4>
-
-                <div class="row mb-4">
-
-                  <!-- Discount Percentage -->
-                  <div class="col-12 mb-4">
-                    <div class="form-floating form-floating-outline" style="max-width: 300px;">
-                      <input type="number" class="form-control text-end" placeholder="e.g. 10" min="0" max="100"
-                        formControlName="discount" [(ngModel)]="dis" (input)="discount()" />
-                      <label for="discount"><i class="ri-percent-line"></i> Discount (%) <span
-                          class="text-danger">*</span></label>
-                    </div>
-                  </div>
-
-                  <div class="col-12">
-                    <div class="form-floating form-floating-outline" style="max-width: 300px;">
-                      <input type="number" class="form-control text-end" placeholder="₹0" min="0"
-                        [(ngModel)]="discount_Amount" [ngModelOptions]="{ standalone: true }" readonly/>
-                      <label for="discount_Amount"><i class="ri-coupon-2-line"></i> Discount Amount <span
-                          class="text-danger">*</span></label>
-                    </div>
-                  </div>
-                </div>
-
-                <hr style="border: 2px solid Black; margin: 50px 0;">
-
-                <!-- Collection -->
-                <h4 class="section-heading mb-4"><i class="ri-hand-coin-line me-2"></i>Collection</h4>
-
-                <div class="row mb-4" style="text-align: right;">
-
-                  <!-- First input -->
-                  <div class="col-sm-3 offset-sm-9 mb-4">
-                    <div class="form-floating form-floating-outline">
-                      <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_AMOUNT"
-                        [(ngModel)]="total_Amount" readonly/>
-                      <label for="totaL_AMOUNT"><i class="ri-wallet-3-line"></i> Total Amount <span
-                          class="text-danger">*</span></label>
-                    </div>
-                  </div>
-
-                  <!-- Second input -->
-                  <div class="col-sm-3 offset-sm-9">
-                    <div class="form-floating form-floating-outline">
-                      <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_PROFIT"
-                        [(ngModel)]="total_Lab_Profit" readonly/>
-                      <label for="totaL_PROFIT"><i class="ri-file-list-3-line"></i> Total Lab Profit <span
-                          class="text-danger">*</span></label>
-                    </div>
-                  </div>
-
-                </div>
+            <!-- <div class="text-danger mt-1" *ngIf="data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid">
+              Doctor selection is required.
+            </div> -->
+          </div>
 
 
-                <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <!-- Blood Tests Table -->
+          <div class="card shadow-lg rounded-4 mt-5 mb-3 border-0" style="background: #fff; overflow: hidden;">
+            <div
+              class="card-header bg-gradient-primary text-white py-3 d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold text-white">
+                <i class="ri-flask-line me-2"></i>Blood Tests
+              </h5>
+              <span class="badge bg-white text-primary fs-6 px-3 py-2 rounded-pill">{{ matIs.length }}
+                Tests</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 text-center">
+                <thead style="background: linear-gradient(90deg, #4b6cb7, #182848); color: white;">
+                  <tr>
+                    <th style="width: 5%;">Sr No</th>
+                    <th class="text-start ps-4" style="width: 45%;">Test Name</th>
+                    <th style="width: 15%;">Price (₹)</th>
+                    <th style="width: 15%;">Lab Price (₹)</th>
+                    <th style="width: 20%;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let data of matIs; let i = index" class="table-row-hover"
+                    style="transition: background-color 0.3s ease;">
+                    <td class=" text-secondary">{{ i + 1 }}</td>
+                    <td class="text-start ps-4 text-capitalize  text-dark"> {{ getTestNameByCode(data.tesT_CODE)
+                      }}</td>
+                    <td class="text-success ">₹ {{ data.price }}</td>
+                    <td><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
+                        (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
+                        <i class="ri-delete-bin-6-line"></i> Delete
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="matIs.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4 fst-italic">No tests added yet.</td>
+                  </tr>
+                </tbody>
+                <tfoot class="table-light  text-dark">
+                  <tr>
+                    <td colspan="2" class="text-end pe-4">Total Amount</td>
+                    <td class="text-success">₹ {{ test_Amount }}</td>
+                    <td class="text-info">₹ {{ total_test_LabPrice }}</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Add Test -->
+          <div class="row mb-4 align-items-end">
+            <div class="col-sm-8 position-relative mb-2 mb-sm-0">
+              <label class="form-label fw-bold mb-2">Test Name</label>
+              <div class="input-group shadow-sm rounded">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="ri-test-tube-line text-primary"></i>
+                </span>
+                <input type="text" id="test-name" class="form-control border-start-0" placeholder="Enter test name..."
+                  [(ngModel)]="searchText" (input)="onSearchChange()" (focus)="onSearchChange()"
+                  (blur)="hideSuggestions()" [ngModelOptions]="{ standalone: true }" autocomplete="off" />
+              </div>
+
+              <ul *ngIf="showSuggestions && filteredTests.length > 0"
+                class="list-group position-absolute w-100 mt-1 shadow-sm z-3"
+                style="max-height: 240px; overflow-y: auto; border-radius: 0.375rem;background-color: white;">
+                <li *ngFor="let test of filteredTests" (mousedown)="selectTest(test.tesT_NAME)"
+                  class="list-group-item list-group-item-action" style="cursor: pointer;">
+                  {{ test.tesT_NAME }}
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-sm-4 mt-2 mt-sm-0">
+              <button type="button" (click)="add(searchText)" class="btn btn-primary w-100">ADD</button>
+            </div>
+          </div>
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <!-- Discount -->
+          <h4 class="section-heading mb-4"><i class="ri-discount-percent-line me-2"></i>Discount (%)</h4>
+
+          <div class="row mb-4">
+
+            <!-- Discount Percentage -->
+            <div class="col-12 mb-4">
+              <div class="form-floating form-floating-outline" style="max-width: 300px;">
+                <input type="number" class="form-control text-end" placeholder="e.g. 10" min="0" max="100"
+                  formControlName="discount" [(ngModel)]="dis" (input)="discount()" />
+                <label for="discount"><i class="ri-percent-line"></i> Discount (%) <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-floating form-floating-outline" style="max-width: 300px;">
+                <input type="number" class="form-control text-end" placeholder="₹0" min="0"
+                  [(ngModel)]="discount_Amount" [ngModelOptions]="{ standalone: true }" readonly />
+                <label for="discount_Amount"><i class="ri-coupon-2-line"></i> Discount Amount <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <!-- Collection -->
+          <h4 class="section-heading mb-4"><i class="ri-hand-coin-line me-2"></i>Collection</h4>
+
+          <div class="row mb-4" style="text-align: right;">
+
+            <!-- First input -->
+            <div class="col-sm-3 offset-sm-9 mb-4">
+              <div class="form-floating form-floating-outline">
+                <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_AMOUNT"
+                  [(ngModel)]="total_Amount" readonly />
+                <label for="totaL_AMOUNT"><i class="ri-wallet-3-line"></i> Total Amount <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+            <!-- Second input -->
+            <div class="col-sm-3 offset-sm-9">
+              <div class="form-floating form-floating-outline">
+                <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_PROFIT"
+                  [(ngModel)]="total_Lab_Profit" readonly />
+                <label for="totaL_PROFIT"><i class="ri-file-list-3-line"></i> Total Lab Profit <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+          </div>
 
 
-                <!-- Payment Method -->
-                <h4 class="section-heading mb-4"><i class="ri-bank-card-line me-2"></i>Payment Method</h4>
-                <div class="mb-4">
-                  <div class="form-check form-check-inline">
-                    <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
-                    <label for="cash" class="form-check-label">Cash</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
-                    <label for="online" class="form-check-label">Online</label>
-                  </div>
-                </div>
+          <hr style="border: 2px solid Black; margin: 50px 0;">
 
-                <!-- Payment Amount -->
-                <div class="row mb-5">
-                  <div class="col-sm-6">
-                    <div class="form-floating form-floating-outline mb-4">
-                      <input type="number" class="form-control text-end " placeholder="₹0"
-                        formControlName="paymenT_AMOUNT" required style="max-width: 300px;" />
-                      <label for="paymenT_AMOUNT"><i class="ri-cash-line"></i>Payment Amount<span
-                          class="text-danger">*</span></label>
-                    </div>
-                  </div>
-                </div>
+
+          <!-- Payment Method -->
+          <h4 class="section-heading mb-4"><i class="ri-bank-card-line me-2"></i>Payment Method</h4>
+          <div class="mb-4">
+            <div class="form-check form-check-inline">
+              <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
+              <label for="cash" class="form-check-label">Cash</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
+              <label for="online" class="form-check-label">Online</label>
+            </div>
+          </div>
+
+          <!-- Payment Amount -->
+          <div class="row mb-5">
+            <div class="col-sm-6">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="number" class="form-control text-end " placeholder="₹0" formControlName="paymenT_AMOUNT"
+                  required style="max-width: 300px;" />
+                <label for="paymenT_AMOUNT"><i class="ri-cash-line"></i>Payment Amount<span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
 
           <!-- Cancel Button -->
           <div class="text-end">
             <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no === 0">Save</button>
-            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no !== 0">Update</button>
-            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">Cancel</button>
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
+              *ngIf="trn_no !== 0">Update</button>
+            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill"
+              (click)="isCreatingNew = false">Cancel</button>
           </div>
         </form>
       </div>
@@ -333,13 +339,14 @@
 </div>
 
 <!-- Case Paper List Table -->
-<div *ngIf="!isCreatingNew" class="container-xxl flex-grow-1 container-p-y">
+<div *ngIf="!isCreatingNew" class="container-xxl flex-grow-1 container-p-y mt-n9">
   <div class="card">
     <h5 class="card-header">Case Paper</h5>
     <div class="table-responsive text-nowrap">
       <table class="table">
-        <thead class="table-dark">
+        <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
           <tr>
+            <th>sr</th>
             <th>Actions</th>
             <th>Trn_No</th>
             <th>Name</th>
@@ -348,11 +355,12 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody class="table-border-bottom-0">
+        <tbody class="table-border-bottom-0" let i = index>
           <tr *ngFor="let case of filteredCases() | paginate: {
                   itemsPerPage: pageSize,
                   currentPage: page
-                }">
+                };let i = index">
+                <td>{{(i+1)}}</td>
             <td>
               <div *ngIf="case.statuS_CODE === 101">
                 <a class="dropdown-item" href="javascript:void(0);"><i class="ri-bill-line me-1"></i>Invoice</a>
@@ -362,8 +370,10 @@
                   <i class="ri-more-2-line"></i>
                 </button>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);" (click)="edit(case.trN_NO)"><i class="ri-pencil-line me-1"></i> Edit</a>
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i> Delete</a>
+                  <a class="dropdown-item" href="javascript:void(0);" (click)="edit(case.trN_NO)"><i
+                      class="ri-pencil-line me-1"></i> Edit</a>
+                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i>
+                    Delete</a>
                 </div>
               </div>
             </td>
@@ -374,7 +384,7 @@
             <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
               <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
             </td>
-            
+
           </tr>
         </tbody>
       </table>
