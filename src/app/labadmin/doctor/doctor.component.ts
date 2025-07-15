@@ -26,26 +26,24 @@ export class DoctorComponent implements OnInit {
     });
     this.load();
   }
-
   load() {
-    this.api.get('Doctor/Doctor').subscribe((res: any) => {
+    this.api.get('Doctor/Doctors').subscribe((res: any) => {
       this.doctor = res;
       console.log(this.doctor);
     });
   }
-
   submit(doctors:any){
       console.log(doctors);
       this.api.post('Doctor/SaveDoctor',doctors).subscribe((res:any)=>{
         console.log(res);
         this.load();
-  
+
         const modalElement = document.getElementById('myModal');
       if(modalElement){
         const modal = Modal.getInstance(modalElement);
         modal?.hide();
       }
-      
+
       })
     }
 

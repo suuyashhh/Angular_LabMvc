@@ -56,17 +56,17 @@
                 <td>{{test.tesT_NAME}}</td>
                 <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{test.price}}</span></td>
                 <td>
+                  <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#doctorFormModal" (click)="edit(test.tesT_CODE)"
+                    ><i class="ri-pencil-line me-1"></i> Edit</a
+                  >
+                  <a class="dropdown-item" href="javascript:void(0);" (click)="deleteTest(test.tesT_CODE)"
+                    ><i class="ri-delete-bin-6-line me-1"></i> Delete</a
+                  >
                   <div class="dropdown">
                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                       <i class="ri-more-2-line"></i>
                     </button>
                     <div class="dropdown-menu">
-                      <a class="dropdown-item" href="javascript:void(0);"
-                        ><i class="ri-pencil-line me-1"></i> Edit</a
-                      >
-                      <a class="dropdown-item" href="javascript:void(0);"
-                        ><i class="ri-delete-bin-6-line me-1"></i> Delete</a
-                      >
                     </div>
                   </div>
                 </td>
@@ -76,5 +76,5 @@
         </div>
       </div>
 </div>
-   
+
 

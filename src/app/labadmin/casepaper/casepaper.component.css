@@ -14,3 +14,74 @@
   .bg-gradient-primary {
     background: linear-gradient(90deg, #4b6cb7, #182848);
   }
+
+  .detail-box {
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+}
+
+td.control {
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  width: 30px;
+}
+
+tr.shown td.control {
+  background: #e6f7ff;
+}
+
+
+/* Date Picker */
+.custom-datepicker .mat-form-field-outline {
+  border-color: #915eff !important;
+}
+
+.custom-datepicker.mat-focused .mat-form-field-outline-thick {
+  border-color: #915eff !important;
+}
+
+.custom-datepicker input {
+  font-size: 16px;
+}
+
+.mat-calendar-body-selected {
+  background-color: #915eff !important;
+  color: white !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: 1px solid #915eff !important;
+}
+
+
+.small-swal-popup .swal2-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+.small-swal-popup .swal2-icon {
+  width: 2em;
+  height: 2em;
+  font-size: 1.5em;
+}
+/* Make sure SweetAlert appears above modal */
+.swal2-on-modal {
+  z-index: 11000 !important;
+}
+
+/* Styles the toast box to be small */
+.swal2-toast-override {
+  font-size: 0.85rem;
+  padding: 0.75rem 1.25rem !important;
+  width: auto !important;
+  min-height: auto !important;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+}
+
+
+
+
+

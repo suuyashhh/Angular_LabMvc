@@ -25,15 +25,18 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/mdb-angular-ui-kit/assets/scss/mdb.scss",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+              "node_modules/datatables.net-dt/css/dataTables.dataTables.css",
               "src/assets/vendor/css/core.css",
               "@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.css",
               "src/assets/vendor/fonts/remixicon/remixicon.css",
               "src/assets/vendor/libs/node-waves/node-waves.css",
               "src/assets/vendor/css/theme-default.css",
               "src/assets/css/demo.css",
               "src/assets/vendor/css/pages/page-auth.css",
-              "src//assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css"
+              "src//assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css",
+              "src/styles.css"
             ],
             "scripts": [
               "src/assets/vendor/libs/jquery/jquery.js",
@@ -43,7 +46,9 @@
               "src/assets/vendor/js/menu.js",
               "src/assets/js/main.js",
               "src//assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js",
-              "src//assets/vendor/libs/popper/popper.js"
+              "src//assets/vendor/libs/popper/popper.js",
+              "node_modules/jquery/dist/jquery.js",
+  "node_modules/datatables.net/js/dataTables.js"
             ],
             "server": "src/main.server.ts",
             "prerender": true,

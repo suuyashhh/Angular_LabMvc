@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -8,6 +9,8 @@ import { Component, HostListener, OnInit } from '@angular/core';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+
+  constructor(private router:Router){}
   toggleSidebar(): void {
   if (window.innerWidth < 1200) { // Example breakpoint for mobile
     const layoutMenu = document.querySelector('#layout-menu');
@@ -35,5 +38,9 @@ ngAfterViewInit(): void {
       menu.init();
     }
   }, 50); // Small delay allows DOM rendering to finish
+}
+logout(){
+  localStorage.clear();
+  this.router.navigate(['/']);
 }
 }

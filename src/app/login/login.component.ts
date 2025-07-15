@@ -15,7 +15,7 @@ import { AuthService } from '../shared/auth.service';
 })
 export class LoginComponent implements OnInit {
   loginObj: any = {
-    username: '',
+    contact: '',
     password: ''
   };
   res:any;
@@ -82,16 +82,29 @@ export class LoginComponent implements OnInit {
   //   }
   // }
   login(){
-    this.res = this.auth.login(this.loginObj);
+    // this.res = this.auth.login(this.loginObj);
 
-    if(this.res.status == "success"){
-      this.router.navigate(['labadmin']);
-    }
-    else
-    {
-      alert("User Not Found");
-      
-    }
-   
+    // if(this.res.status == "success"){
+    //   this.router.navigate(['labadmin']);
+    // }
+    // else
+    // {
+    //   alert("User Not Found");
+
+    // }
+    this.auth.login(this.loginObj).subscribe({
+      next: (result: any) => {
+        console.log('Login success:', result);
+        this.auth.setToken(result);
+        alert('Login successful!');
+        this.router.navigate(['labadmin']);
+        // Navigate to dashboard or other page here
+      },
+      error: (error:any) => {
+        console.error('Login failed:', error);
+        alert('Invalid credentials or server error.');
+      }
+    });
+
   }
 }

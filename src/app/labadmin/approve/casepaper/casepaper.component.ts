@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { Modal } from 'bootstrap';
+import { ApiService } from '../../../shared/api.service';
 
 @Component({
   selector: 'app-casepaper',
@@ -19,94 +20,33 @@ import { Modal } from 'bootstrap';
   styleUrl: './casepaper.component.css',
 })
 export class CasepaperComponent implements OnInit {
+
+  cases:any;
+  data:any = [];
+  approve_list:any = [];
+  constructor(private api:ApiService){}
+
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
-  }
-  data = [
-    {
-      trNo: 1724,
-      date: '2025-05-31',
-      name: 'Active',
-      contact: '1236547890',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    {
-      trNo: 1725,
-      date: '2025-05-30',
-      name: 'Active',
-      contact: '9876543210',
-      createdBy: 'Atharv',
-      status: 'Completed',
-      selected: false,
-    },
-    // Add more dummy or real data here
-  ];
-
-  currentPage = 1;
-  rowsPerPage = 5;
-  masterSelected: boolean = false;
-
-  toggleAllSelection() {
-    this.data.forEach((row) => (row.selected = this.masterSelected));
+    this.load();
   }
 
-  checkIfAllSelected() {
-    this.masterSelected = this.data.every((row) => row.selected);
+
+  // currentPage = 1;
+  // rowsPerPage = 5;
+  // masterSelected: boolean = false;
+
+  // toggleAllSelection() {
+  //   this.data.forEach((ro) => (row.selected = this.masterSelected));
+  // }
+
+  // checkIfAllSelected() {
+  //   this.masterSelected = this.data.every((row) => row.selected);
+  // }
+
+  load() {
+    this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
+      this.data = res.filter((item:any) => item.statuS_CODE === 0);
+      console.log(this.data);
+    });
   }
 }

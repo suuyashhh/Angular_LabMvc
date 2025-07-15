@@ -1,4 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,17 +11,19 @@ export class AuthService {
 
   private platformId = inject(PLATFORM_ID);
 
-  constructor(private router:Router) { }
+  constructor(private router:Router,private http:HttpClient) { }
 
   generateUUIDToken(): string {
     return uuidv4();
   }
 
 
-  setToken(token:string){
-    localStorage.setItem("token", token);
+  setToken(token:any){
+    localStorage.setItem('token', token.token);
+    localStorage.setItem('token_expiration', token.expiration);
+    localStorage.setItem('userDetails', JSON.stringify(token.userDetails));
 
-    document.cookie = `authToken=${token}; path=/; max-age=${60 * 60 * 24}`;
+    document.cookie = `authToken=${token.token}; path=/; max-age=${60 * 60 * 24}`;
   }
 
   getToken(){
@@ -56,12 +59,7 @@ export class AuthService {
     this.router.navigate(['/'])
   }
   login(data:any):any{
-    if(data.username == "Atharv" && data.password == "Atharv123"){
-      this.setToken(this.generateUUIDToken());
-      return {status:"success"}
-    }
-    else{
-      return {status:"failed"}
-    }
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post("https://localhost:7193/api/Login/Login", data, { headers });
   }
 }
