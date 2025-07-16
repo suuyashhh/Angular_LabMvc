@@ -13,7 +13,7 @@ import { Modal } from 'bootstrap';
   styleUrl: './bike-fule.component.css'
 })
 export class BikeFuleComponent {
-  
+
   bikefule:any;
   data: any;
   BIKE_ID: any = 0;
@@ -37,7 +37,7 @@ export class BikeFuleComponent {
       COM_ID: new FormControl()
     });
 
-    this.api.get('BikeFule/BikeFule').subscribe((res: any) => {
+    this.api.get('BikeFule/BikeFules').subscribe((res: any) => {
       this.bikefule = res;
       console.log(this.bikefule)
     })
@@ -64,15 +64,15 @@ export class BikeFuleComponent {
     if (this.BIKE_ID == 0 && this.btn == '') {
       bike.COM_ID = this.ComId
         this.api.post('BikeFule/SaveBikeFule', bike).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('bikeFormModal');
           this.load();
-       }); 
+       });
     } else if (this.BIKE_ID != 0 && this.btn == 'E') {
       console.log(this.BIKE_ID);
       this.api.post('BikeFule/EditBikeFule/' + this.BIKE_ID, bike).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.BIKE_ID != 0 && this.btn == 'D') {
@@ -101,5 +101,5 @@ export class BikeFuleComponent {
       })
     })
   }
-  
+
 }

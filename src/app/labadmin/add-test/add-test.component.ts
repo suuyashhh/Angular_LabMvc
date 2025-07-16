@@ -42,7 +42,7 @@ export class AddTestComponent implements OnInit {
       COM_ID: new FormControl()
     });
 
-    this.api.get('Test/Test').subscribe((res: any) => {
+    this.api.get('Test/Tests').subscribe((res: any) => {
       this.tests = res;
       console.log(this.tests)
     })
@@ -70,15 +70,15 @@ export class AddTestComponent implements OnInit {
     if (this.TEST_CODE == 0 && this.btn == '') {
       test.COM_ID = this.ComId
         this.api.post('Test/SaveTest', test).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('CreateFormModal');
           this.load();
-       }); 
+       });
     } else if (this.TEST_CODE != 0 && this.btn == 'E') {
       console.log(this.TEST_CODE);
       this.api.post('Test/EditTest/' + this.TEST_CODE, test).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.TEST_CODE != 0 && this.btn == 'D') {

@@ -35,7 +35,7 @@ export class ElectricityBillComponent {
       ELC_PRICE: new FormControl('', Validators.required),
     });
 
-    this.api.get('ElectricityBill/ElectricityBill').subscribe((res: any) => {
+    this.api.get('ElectricityBill/ElectricityBills').subscribe((res: any) => {
       this.elebill = res;
       console.log(this.elebill)
     })
@@ -61,15 +61,15 @@ export class ElectricityBillComponent {
     if (this.ELC_TRN_ID == 0 && this.btn == '') {
       ElcBill.COM_ID = this.ComId
         this.api.post('ElectricityBill/SaveElectricityBill', ElcBill).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('ElcBillFormModal');
           this.load();
-       }); 
+       });
     } else if (this.ELC_TRN_ID != 0 && this.btn == 'E') {
       console.log(this.ELC_TRN_ID);
       this.api.post('ElectricityBill/EditElectricityBill/' + this.ELC_TRN_ID, ElcBill).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.ELC_TRN_ID != 0 && this.btn == 'D') {

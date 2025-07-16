@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule,Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Modal } from 'bootstrap';
+import { HttpClientModule } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-doctor',
@@ -13,96 +13,135 @@ import { Modal } from 'bootstrap';
   styleUrl: './doctor.component.css',
 })
 export class DoctorComponent implements OnInit {
-  data: any;
+  data!: FormGroup;
   doctor: any;
-  btn: any = '';
-  DOCTOR_CODE: any = 0;
+  btn: string = '';
+  DOCTOR_CODE: number = 0;
   ComId: number = 0;
-  submitted = false;
+  submitted: boolean = false;
+  loadingDoctors = false;
 
-  constructor(private api: ApiService) { }
 
-  // ngOnInit(): void {
-  //   this.data = new FormGroup({
-  //     DOCTOR_NAME : new FormControl,
-  //     DOCTOR_ADDRESS: new FormControl,
-  //     DOCTOR_NUMBER : new FormControl
-  //   });
-  //   this.load();
-  // }
+  constructor(private api: ApiService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
-    this.load();
-
+    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
+    this.initForm();
+    this.getDoctors();
   }
 
-  load() {
+  initForm() {
     this.data = new FormGroup({
-      DOCTOR_NAME: new FormControl('', Validators.compose([Validators.required])),
+      DOCTOR_NAME: new FormControl('', Validators.required),
       DOCTOR_ADDRESS: new FormControl(),
       DOCTOR_NUMBER: new FormControl(),
-      COM_ID: new FormControl()
+      COM_ID: new FormControl(this.ComId)
     });
-
-    this.api.get('Doctor/Doctor').subscribe((res: any) => {
-      this.doctor = res;
-      console.log(this.doctor);
-    });
-
-    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
-
   }
+
+  getDoctors() {
+    if (this.doctor == null) {
+      this.loadingDoctors = true;
+    }
+    this.api.get('Doctor/Doctors').subscribe({
+      next: (res: any) => {
+        this.doctor = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load doctor list');
+        console.error(err);
+        this.doctor = [];
+      },
+      complete: () => {
+        this.loadingDoctors = false;
+      }
+    });
+  }
+
 
   clearData() {
     this.DOCTOR_CODE = 0;
     this.btn = '';
-    this.data.patchValue({
-      DOCTOR_NAME: '',
-      DOCTOR_ADDRESS: '',
-      DOCTOR_NUMBER: ''
-    })
+    this.data.reset();
+    this.initForm(); // re-set COM_ID
   }
 
   submit(doctors: any) {
-     this.submitted = true;
-    
-    if(this.DOCTOR_CODE == 0 && this.btn == ''){
-      doctors.COM_ID = this.ComId
-    this.api.post('Doctor/SaveDoctor', doctors).subscribe((res: any) => {
-      this.load();
+    this.submitted = true;
+    this.data.patchValue({ COM_ID: this.ComId });
 
-      // const modalElement = document.getElementById('myModal');
-      // if (modalElement) {
-      //   const modal = Modal.getInstance(modalElement);
-      //   modal?.hide();
-      // }
+    if (this.DOCTOR_CODE == 0 && this.btn == '') {
+      // Add Doctor
+      this.api.post('Doctor/SaveDoctor', this.data.value).subscribe({
+        next: () => {
+          this.getDoctors();
+          setTimeout(() => {
+            this.toastr.success('Doctor added successfully');
+            this.api.modalClose('doctorFormModal');
+            this.getDoctors();
 
-    });
-  }else if(this.DOCTOR_CODE != 0 && this.btn == 'E'){
-       this.api.post('Doctor/EditDoctor/'+ this.DOCTOR_CODE,doctors).subscribe((res: any) => {
-         this.load();
+            this.initForm(); // this includes COM_ID
+            this.clearData();
+          }, 300);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to add doctor');
+          console.error(err);
+        }
       });
-    }
-    else if(this.DOCTOR_CODE != 0 && this.btn == 'D'){
-      this.api.delete('Doctor/DeleteDoctor/' + this.DOCTOR_CODE).subscribe((res: any) => {
-       this.load();
-      })
+
+    } else if (this.DOCTOR_CODE != 0 && this.btn == 'E') {
+      // Edit Doctor
+      this.api.post('Doctor/EditDoctor/' + this.DOCTOR_CODE, this.data.value).subscribe({
+        next: () => {
+          this.getDoctors();
+          setTimeout(() => {
+            this.toastr.success('Doctor updated successfully');
+            this.getDoctors();
+            this.data.reset();
+            this.initForm();
+            this.api.modalClose('doctorFormModal');
+            this.clearData();
+          }, 200);
+
+        },
+        error: (err) => {
+          this.toastr.error('Failed to update doctor');
+          console.error(err);
+        }
+      });
+
+    } else if (this.DOCTOR_CODE != 0 && this.btn == 'D') {
+      // Delete Doctor
+      this.api.delete('Doctor/DeleteDoctor/' + this.DOCTOR_CODE).subscribe({
+        next: () => {
+          this.getDoctors();
+          setTimeout(() => {
+            this.toastr.success('Doctor deleted successfully');
+            this.getDoctors();
+            this.clearData();
+            this.api.modalClose('doctorFormModal');
+            this.clearData();
+          }, 200);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to delete doctor');
+          console.error(err);
+        }
+      });
+
     }
   }
 
-  getDataById(doctorCode: number, btn: any) {
-    // alert('Hii');
+  getDataById(doctorCode: number, btn: string) {
     this.btn = btn;
     this.api.get('Doctor/Doctor/' + doctorCode).subscribe((res: any) => {
-      console.log(res);
-
       this.DOCTOR_CODE = res.doctoR_CODE;
       this.data.patchValue({
         DOCTOR_NAME: res.doctoR_NAME,
         DOCTOR_ADDRESS: res.doctoR_ADDRESS,
         DOCTOR_NUMBER: res.doctoR_NUMBER
-      })
-    })
+      });
+    });
   }
-
 }

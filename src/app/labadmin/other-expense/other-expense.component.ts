@@ -31,12 +31,13 @@ export class OtherExpenseComponent {
 
   load() {
     this.data = new FormGroup({
+      DATE: new FormControl('', Validators.required),
       OTHER_NAME: new FormControl('', Validators.required),
       OTHER_PRICE: new FormControl('', Validators.required),
       COM_ID: new FormControl()
     });
 
-    this.api.get('OtherExpense/OtherExpense').subscribe((res: any) => {
+    this.api.get('OtherExpense/OtherExpenses').subscribe((res: any) => {
       this.otherexpense = res;
       console.log(this.otherexpense)
     })
@@ -63,15 +64,15 @@ export class OtherExpenseComponent {
     if (this.OTHER_ID == 0 && this.btn == '') {
       OtherEx.COM_ID = this.ComId
         this.api.post('OtherExpense/SaveOtherExpense', OtherEx).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('OEFormModal');
           this.load();
-       }); 
+       });
     } else if (this.OTHER_ID != 0 && this.btn == 'E') {
       console.log(this.OTHER_ID);
       this.api.post('OtherExpense/EditOtherExpense/' + this.OTHER_ID, OtherEx).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.OTHER_ID != 0 && this.btn == 'D') {
@@ -95,6 +96,7 @@ export class OtherExpenseComponent {
 
       this.OTHER_ID = res.otheR_ID;
       this.data.patchValue({
+        DATE:this.api.formatDate(res.date),
         OTHER_NAME: res.otheR_NAME,
         OTHER_PRICE: res.otheR_PRICE,
       })
