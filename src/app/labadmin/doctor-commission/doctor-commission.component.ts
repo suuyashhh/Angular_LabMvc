@@ -37,7 +37,7 @@ export class DoctorCommissionComponent {
       COM_ID: new FormControl()
     });
 
-    this.api.get('DoctorCommission/DoctorCommission').subscribe((res: any) => {
+    this.api.get('DoctorCommission/DoctorCommissions').subscribe((res: any) => {
       this.doctorcommission = res;
       console.log(this.doctorcommission)
     });
@@ -50,7 +50,7 @@ export class DoctorCommissionComponent {
     this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
 
   }
-  
+
   clearData() {
     this.DOC_COM_ID = 0;
     this.btn = '';
@@ -69,15 +69,15 @@ export class DoctorCommissionComponent {
     if (this.DOC_COM_ID == 0 && this.btn == '') {
       DocCom.COM_ID = this.ComId
         this.api.post('DoctorCommission/SaveDoctorCommission', DocCom).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('doctorComFormModal');
           this.load();
-       }); 
+       });
     } else if (this.DOC_COM_ID != 0 && this.btn == 'E') {
       console.log(this.DOC_COM_ID);
       this.api.post('DoctorCommission/EditDoctorCommission/' + this.DOC_COM_ID, DocCom).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.DOC_COM_ID != 0 && this.btn == 'D') {

@@ -43,7 +43,7 @@ export class EmployeeSalaryComponent {
       COM_ID: new FormControl()
     });
 
-    this.api.get('EmployeeSalary/EmployeeSalary').subscribe((res: any) => {
+    this.api.get('EmployeeSalary/EmployeeSalarys').subscribe((res: any) => {
       this.employeesalary = res;
       console.log(this.employeesalary)
     });
@@ -74,15 +74,15 @@ export class EmployeeSalaryComponent {
     if (this.EMP_TRN_ID == 0 && this.btn == '') {
       employeesalary.COM_ID = this.ComId
         this.api.post('EmployeeSalary/SaveEmployeeSalary', employeesalary).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('EmpSalFormModal');
           this.load();
-       }); 
+       });
     } else if (this.EMP_TRN_ID != 0 && this.btn == 'E') {
       console.log(this.EMP_TRN_ID);
       this.api.post('EmployeeSalary/EditEmployeeSalary/' + this.EMP_TRN_ID, employeesalary).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.EMP_TRN_ID != 0 && this.btn == 'D') {

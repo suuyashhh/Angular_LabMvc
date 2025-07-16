@@ -13,8 +13,8 @@ import { Modal } from 'bootstrap';
   styleUrl: './lab-materials.component.css'
 })
 export class LabMaterialsComponent implements OnInit {
-  
-  
+
+
   material: any;
   data: any;
   MAT_ID: any = 0;
@@ -67,15 +67,15 @@ export class LabMaterialsComponent implements OnInit {
     if (this.MAT_ID == 0 && this.btn == '') {
       material.COM_ID = this.ComId
         this.api.post('LabMaterials/SaveLabMaterials', material).subscribe((res: any) => {
-          this.api.modalClose();
           this.load();
-       }); 
+          this.api.modalClose('labMatFormModal');
+       });
     } else if (this.MAT_ID != 0 && this.btn == 'E') {
       console.log(this.MAT_ID);
       this.api.post('LabMaterials/EditLabMaterials/' + this.MAT_ID, material).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.MAT_ID != 0 && this.btn == 'D') {

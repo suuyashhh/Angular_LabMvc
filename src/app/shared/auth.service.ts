@@ -57,7 +57,7 @@ export class AuthService {
     this.router.navigate(['/'])
   }
   login(data:any):any{
-    if(data.username == "Atharv" && data.password == "Atharv123"){
+    if(data.username == "admin" && data.password == "123"){
       this.setToken(this.generateUUIDToken());
       return {status:"success"}
     }

@@ -6,7 +6,7 @@ import {
   QueryList,
   ViewChildren,
   ElementRef,
-} 
+}
 from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -55,7 +55,7 @@ interface CasePaper {
 
 export class CasepaperComponent implements OnInit {
   @ViewChildren('formField') formFields!: QueryList<ElementRef>;
-  
+
 
   isCreatingNew: boolean = false; // ✅ Added
 
@@ -81,7 +81,7 @@ export class CasepaperComponent implements OnInit {
   today: Date = new Date();
   trn_no: number = 0;
 
-  constructor(private api: ApiService,private toastr: ToastrService) {}
+  constructor(private api: ApiService,private toastr : ToastrService) {}
 
   ngOnInit(): void {
     this.data = new FormGroup({

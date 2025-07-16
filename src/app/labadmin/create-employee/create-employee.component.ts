@@ -17,10 +17,10 @@ import { ApiService } from '../../shared/api.service';
   styleUrl: './create-employee.component.css'
 })
 export class CreateEmployeeComponent implements OnInit {
-  
+
   data:any;
   employee:any;
-  btn :any = '';  
+  btn :any = '';
   EMP_ID: any = 0;
   ComId: number = 0;
   submitted = false;
@@ -34,7 +34,7 @@ export class CreateEmployeeComponent implements OnInit {
 
   load() {
       this.data = new FormGroup({
-        EMP_NAME: new FormControl('', Validators.required),        
+        EMP_NAME: new FormControl('', Validators.required),
         EMP_PASSWORD: new FormControl('', Validators.required),
         EMP_CONTACT: new FormControl('', Validators.required),
         COM_ID: new FormControl()
@@ -58,7 +58,7 @@ export class CreateEmployeeComponent implements OnInit {
     })
   }
 
-  
+
   submit(employee: any) {
     this.submitted = false;
     if (!this.data.valid) {
@@ -68,15 +68,15 @@ export class CreateEmployeeComponent implements OnInit {
     if (this.EMP_ID == 0 && this.btn == '') {
       employee.COM_ID = this.ComId
         this.api.post('Employee/SaveEmployee', employee).subscribe((res: any) => {
-          this.api.modalClose();
+          this.api.modalClose('CreateEmployeeFormModal');
           this.load();
-       }); 
+       });
     } else if (this.EMP_ID != 0 && this.btn == 'E') {
       console.log(this.EMP_ID);
       this.api.post('Employee/EditEmployee/' + this.EMP_ID, employee).subscribe((res: any) => {
         this.load();
         console.log(res);
-        
+
       });
     }
     else if (this.EMP_ID != 0 && this.btn == 'D') {
