@@ -75,6 +75,11 @@ export const lABADMIN_ROUTES: Routes = [
     path:'finance',
     loadComponent: () => import('../labadmin/finance/finance.component')
         .then(m => m.FinanceComponent)
+ },
+ {
+    path:'charts',
+    loadComponent: () => import('../labadmin/charts/charts.component')
+        .then(m => m.ChartsComponent)
  }
     //   {
 //     path: 'drr',
