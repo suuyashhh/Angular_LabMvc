@@ -1,14 +1,11 @@
 <div class="container" style="max-width: 800px!important;margin: 50px auto!important;">
-    <!-- Header Section - Not printed -->
     <div class="header-section no-print">
-        <!-- <h1 class="main-title">Expense Report System</h1> -->
 
-        <!-- Date Input Section -->
         <div class="date-inputs">
             <div class="input-group">
                 <label for="fromDate">From Date</label>
                 <div class="input-wrapper">
-                    <input type="date" id="fromDate">
+                    <input type="date" id="fromDate" (change)="onFromDateChange($event)">
                     <i class="fas fa-calendar-alt input-icon"></i>
                 </div>
             </div>
@@ -16,112 +13,101 @@
             <div class="input-group">
                 <label for="toDate">To Date</label>
                 <div class="input-wrapper">
-                    <input type="date" id="toDate">
+                    <input type="date" id="toDate" (change)="onToDateChange($event)">
                     <i class="fas fa-calendar-alt input-icon"></i>
                 </div>
             </div>
         </div>
-
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button id="printBtn" class="btn btn-primary" (click)="handlePrint()">
-                <i class="fas fa-print"></i>
-                Print Report
-            </button>
-            <button id="cancelBtn" class="btn btn-secondary" (click)="handleCancel()">
-                <i class="fas fa-times"></i>
-                Cancel
-            </button>
-        </div>
     </div>
 
-    <!-- Report Section - This will be printed -->
     <div class="report-section" id="printableArea">
-        <!-- Report Header -->
         <div class="report-header">
             <div class="date-display">
-                <span class="date-item">From Date: <span id="displayFromDate">[DD/MM/yyyy]</span></span>
-                <span class="date-item">To Date: <span id="displayToDate">[DD/MM/yyyy]</span></span>
+                <span class="date-item">From Date: <span id="displayFromDate">{{displayFromDate}}</span></span>
+                <span class="date-item">To Date: <span id="displayToDate">{{displayToDate}}</span></span>
             </div>
         </div>
 
-        <!-- Report Content -->
         <div class="report-content">
-            <!-- Turnover Section -->
             <div class="turnover-row">
                 <span class="turnover-label">TurnOver</span>
-                <span class="turnover-amount">RS/- 9*****</span>
+                <span class="turnover-amount">RS/- {{reportCount.turnover}}</span>
             </div>
 
-            <!-- Expenses Header -->
             <div class="expenses-header">
                 <span class="header-name">Name</span>
                 <span class="header-amount">RS/-</span>
             </div>
 
-            <!-- Expenses List -->
             <div class="expenses-list">
                 <div class="expense-item">
                     <span class="expense-number">1.</span>
                     <span class="expense-name">CasePaper</span>
-                    <span class="expense-amount">7***</span>
+                    <span class="expense-amount">{{reportCount.turnover}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">2.</span>
                     <span class="expense-name">Lab Materials</span>
-                    <span class="expense-amount">8**</span>
+                    <span class="expense-amount">{{reportCount.laB_MATERIALS}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">3.</span>
                     <span class="expense-name">Bike Fuel</span>
-                    <span class="expense-amount">5**</span>
+                    <span class="expense-amount">{{reportCount.bikE_FUEL}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">4.</span>
                     <span class="expense-name">Employee Salary</span>
-                    <span class="expense-amount">9**</span>
+                    <span class="expense-amount">{{reportCount.employeE_SALARY}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">5.</span>
-                    <span class="expense-name">Light Bill</span>
-                    <span class="expense-amount">7**</span>
+                    <span class="expense-name">Electricity Bill</span>
+                    <span class="expense-amount">{{reportCount.electricitY_BILL}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">6.</span>
-                    <span class="expense-name">Other Expense ....like(Rent, Small events,)</span>
-                    <span class="expense-amount">7**</span>
+                    <span class="expense-name">Other Expense ....like(Rent, Small events, Food)</span>
+                    <span class="expense-amount">{{reportCount.otheR_EXPENSE}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">7.</span>
-                    <span class="expense-name">Doctors</span>
-                    <span class="expense-amount">8**</span>
+                    <span class="expense-name">Doctors Commission</span>
+                    <span class="expense-amount">{{reportCount.doctoR_COMMISSION}}</span>
                 </div>
             </div>
 
-            <!-- Summary Section -->
             <div class="summary-section">
                 <div class="summary-item">
                     <span class="summary-label">TurnOver</span>
-                    <span class="summary-amount positive">9*****</span>
+                    <span class="summary-amount positive">{{reportCount.turnover}}</span>
                 </div>
 
                 <div class="summary-item">
                     <span class="summary-label">Total Expense</span>
-                    <span class="summary-amount negative">-6***</span>
+                    <span class="summary-amount negative">-{{reportCount.totaL_EXPENSE}}</span>
                 </div>
 
                 <div class="summary-item net-amount">
                     <span class="summary-label">Net Amount</span>
-                    <span class="summary-amount net">3*****</span>
+                    <span class="summary-amount net">{{reportCount.neT_AMOUNT}}</span>
                 </div>
             </div>
+            <div class="action-buttons no-print d-flex justify-content-end" style="margin-top: 100px;">
+                <button id="printBtn" class="btn btn-primary" (click)="handlePrint()">
+                    <i class="fas fa-print"></i>
+                    Print Report
+                </button>
+            </div>
         </div>
+
+
+
     </div>
 </div>
