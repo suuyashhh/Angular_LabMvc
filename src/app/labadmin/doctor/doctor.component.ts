@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-doctor',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './doctor.component.html',
-  styleUrl: './doctor.component.css',
+  styleUrls: ['./doctor.component.css']
 })
 export class DoctorComponent implements OnInit {
   data!: FormGroup;
@@ -19,10 +19,10 @@ export class DoctorComponent implements OnInit {
   DOCTOR_CODE: number = 0;
   ComId: number = 0;
   submitted: boolean = false;
+  Reason: string = '';
   loadingDoctors = false;
 
-
-  constructor(private api: ApiService, private toastr: ToastrService) { }
+  constructor(private api: ApiService, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
@@ -33,54 +33,50 @@ export class DoctorComponent implements OnInit {
   initForm() {
     this.data = new FormGroup({
       DOCTOR_NAME: new FormControl('', Validators.required),
-      DOCTOR_ADDRESS: new FormControl(),
-      DOCTOR_NUMBER: new FormControl(),
+      DOCTOR_ADDRESS: new FormControl('', Validators.required),
+      DOCTOR_NUMBER: new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]),
       COM_ID: new FormControl(this.ComId)
     });
   }
 
   getDoctors() {
-    if (this.doctor == null) {
-      this.loadingDoctors = true;
-    }
+    this.loadingDoctors = true;
     this.api.get('Doctor/Doctors').subscribe({
-      next: (res: any) => {
-        this.doctor = res;
-      },
+      next: (res: any) => this.doctor = res,
       error: (err) => {
         this.toastr.error('Failed to load doctor list');
         console.error(err);
         this.doctor = [];
       },
-      complete: () => {
-        this.loadingDoctors = false;
-      }
+      complete: () => this.loadingDoctors = false
     });
   }
-
 
   clearData() {
     this.DOCTOR_CODE = 0;
     this.btn = '';
     this.data.reset();
-    this.initForm(); // re-set COM_ID
+    this.initForm();
   }
 
-  submit(doctors: any) {
+  submit(doctor: any) {
     this.submitted = true;
-    this.data.patchValue({ COM_ID: this.ComId });
 
-    if (this.DOCTOR_CODE == 0 && this.btn == '') {
+    if (this.data.invalid) {
+      this.toastr.error('Please fix validation errors.');
+      return;
+    }
+
+    if (this.DOCTOR_CODE === 0 && this.btn === '') {
       // Add Doctor
-      this.api.post('Doctor/SaveDoctor', this.data.value).subscribe({
+      this.api.post('Doctor/SaveDoctor', doctor).subscribe({
         next: () => {
           this.getDoctors();
           setTimeout(() => {
             this.toastr.success('Doctor added successfully');
             this.api.modalClose('doctorFormModal');
             this.getDoctors();
-
-            this.initForm(); // this includes COM_ID
+            this.initForm();
             this.clearData();
           }, 300);
         },
@@ -90,9 +86,9 @@ export class DoctorComponent implements OnInit {
         }
       });
 
-    } else if (this.DOCTOR_CODE != 0 && this.btn == 'E') {
+    } else if (this.DOCTOR_CODE !== 0 && this.btn === 'E') {
       // Edit Doctor
-      this.api.post('Doctor/EditDoctor/' + this.DOCTOR_CODE, this.data.value).subscribe({
+      this.api.post('Doctor/EditDoctor/' + this.DOCTOR_CODE, doctor).subscribe({
         next: () => {
           this.getDoctors();
           setTimeout(() => {
@@ -103,7 +99,6 @@ export class DoctorComponent implements OnInit {
             this.api.modalClose('doctorFormModal');
             this.clearData();
           }, 200);
-
         },
         error: (err) => {
           this.toastr.error('Failed to update doctor');
@@ -111,25 +106,28 @@ export class DoctorComponent implements OnInit {
         }
       });
 
-    } else if (this.DOCTOR_CODE != 0 && this.btn == 'D') {
+    } else if (this.DOCTOR_CODE !== 0 && this.btn === 'D') {
       // Delete Doctor
-      this.api.delete('Doctor/DeleteDoctor/' + this.DOCTOR_CODE).subscribe({
-        next: () => {
-          this.getDoctors();
-          setTimeout(() => {
-            this.toastr.success('Doctor deleted successfully');
+      if (this.Reason !== '') {
+        this.api.delete('Doctor/DeleteDoctor/' + this.DOCTOR_CODE).subscribe({
+          next: () => {
             this.getDoctors();
-            this.clearData();
-            this.api.modalClose('doctorFormModal');
-            this.clearData();
-          }, 200);
-        },
-        error: (err) => {
-          this.toastr.error('Failed to delete doctor');
-          console.error(err);
-        }
-      });
-
+            setTimeout(() => {
+              this.toastr.success('Doctor deleted successfully');
+              this.getDoctors();
+              this.api.modalClose('doctorFormModal');
+              this.clearData();
+              this.Reason = "";
+            }, 200);
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete doctor');
+            console.error(err);
+          }
+        });
+      } else {
+        this.toastr.warning("Please provide a reason for deletion.");
+      }
     }
   }
 

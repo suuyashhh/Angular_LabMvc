@@ -7,7 +7,7 @@ import {
   ViewChildren,
   ElementRef,
 }
-from '@angular/core';
+  from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { HttpClientModule } from '@angular/common/http';
 import {
@@ -24,7 +24,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
-import { NgSelectModule } from '@ng-select/ng-select';
+import { NgSelectModule, NgOption } from '@ng-select/ng-select';
+
 
 interface CasePaper {
   trN_NO: number;
@@ -81,7 +82,8 @@ export class CasepaperComponent implements OnInit {
   today: Date = new Date();
   trn_no: number = 0;
 
-  constructor(private api: ApiService,private toastr : ToastrService) {}
+
+  constructor(private api: ApiService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.data = new FormGroup({
@@ -93,7 +95,7 @@ export class CasepaperComponent implements OnInit {
         Validators.pattern('^[0-9]{10}$'),
       ]),
       address: new FormControl('', Validators.required),
-      doctoR_CODE: new FormControl(0, Validators.required),
+      doctoR_CODE: new FormControl('', Validators.required),
       totaL_AMOUNT: new FormControl(0),
       totaL_PROFIT: new FormControl(0),
       discount: new FormControl(0),
@@ -103,6 +105,7 @@ export class CasepaperComponent implements OnInit {
       coM_ID: new FormControl(101),
       paymenT_STATUS: new FormControl(''),
     });
+
 
     this.load();
   }
@@ -199,12 +202,12 @@ export class CasepaperComponent implements OnInit {
       console.log(this.cases);
     });
 
-    this.api.get('Test/Test').subscribe((res: any) => {
+    this.api.get('Test/Tests').subscribe((res: any) => {
       this.tests = res;
       console.log(this.tests);
     });
 
-    this.api.get('Doctor/Doctor').subscribe((res: any) => {
+    this.api.get('Doctor/Doctors').subscribe((res: any) => {
       this.doctor = res;
       console.log(this.doctor);
     });
@@ -215,53 +218,53 @@ export class CasepaperComponent implements OnInit {
   readonly pageSize: number = 6;
 
   submit(data: any): void {
-  this.submitted = true;
+    this.submitted = true;
 
-  if (!this.data.valid) {
-    // Scroll to first invalid field
-    setTimeout(() => {
-      const firstInvalid = this.formFields.find((el) => {
-        const controlName = el.nativeElement.getAttribute('formControlName');
-        return controlName && this.data.get(controlName)?.invalid;
-      });
-      if (firstInvalid) {
-        firstInvalid.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
+    if (!this.data.valid) {
+      // Scroll to first invalid field
+      setTimeout(() => {
+        const firstInvalid = this.formFields.find((el) => {
+          const controlName = el.nativeElement.getAttribute('formControlName');
+          return controlName && this.data.get(controlName)?.invalid;
         });
-        firstInvalid.nativeElement.focus();
-      }
-    }, 0);
+        if (firstInvalid) {
+          firstInvalid.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+          firstInvalid.nativeElement.focus();
+        }
+      }, 0);
 
-    // Toastr error toast instead of Swal
-    this.toastr.error('Please fill all required fields!', 'Validation Error');
-    return;
+      // Toastr error toast instead of Swal
+      this.toastr.error('Please fill all required fields!', 'Validation Error');
+      return;
+    }
+
+    if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
+      this.toastr.error('Please add at least one test!', 'Test Missing');
+      return;
+    }
+
+    const payload = {
+      ...data,
+      matIs: this.matIs,
+    };
+
+    console.log('Submitting:', payload);
+
+    this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
+      next: (res: any) => {
+        console.log('Response:', res);
+        this.load();
+        this.cancelCreate();
+      },
+      error: (err: any) => {
+        console.error('Error occurred:', err);
+        this.toastr.error('An error occurred while saving. Please try again.', 'Server Error');
+      },
+    });
   }
-
-  if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
-    this.toastr.error('Please add at least one test!', 'Test Missing');
-    return;
-  }
-
-  const payload = {
-    ...data,
-    matIs: this.matIs,
-  };
-
-  console.log('Submitting:', payload);
-
-  this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
-    next: (res: any) => {
-      console.log('Response:', res);
-      this.load();
-      this.cancelCreate();
-    },
-    error: (err: any) => {
-      console.error('Error occurred:', err);
-      this.toastr.error('An error occurred while saving. Please try again.', 'Server Error');
-    },
-  });
-}
 
   cancelCreate() {
     this.isCreatingNew = false; // ✅ Hide form
@@ -326,34 +329,13 @@ export class CasepaperComponent implements OnInit {
     return match ? match.tesT_NAME : 'N/A';
   }
 
-  selectedProduct: any | null = null;
+   selectedDoctor: number | null = null;
 
-  products: any[] = [
-    {
-      id: 1,
-      name: 'Air Jordan',
-      description: 'Air Jordan is a line of basketball shoes produced by Nike',
-      image: 'assets/img/ecommerce-images/product-9.png',
-      category: 'Shoes',
-      categoryIcon: 'ri-home-6-line',
-      stock: true,
-      sku: '31063',
-      price: '$125',
-      qty: 942,
-      status: 'Inactive',
-    },
-    {
-      id: 2,
-      name: 'Amazon Fire TV',
-      description: '4K UHD smart TV, stream live TV without cable',
-      image: 'assets/img/ecommerce-images/product-13.png',
-      category: 'Electronics',
-      categoryIcon: 'ri-computer-line',
-      stock: false,
-      sku: '5829',
-      price: '$263.49',
-      qty: 587,
-      status: 'Scheduled',
-    },
-  ];
+
+  customSearchFn(term: string, item: any) {
+    const search = term.toLowerCase();
+    const name = item.doctoR_NAME.toLowerCase();
+    return name.includes(search);
+  }
+
 }

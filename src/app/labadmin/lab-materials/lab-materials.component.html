@@ -1,121 +1,159 @@
-<div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="clearData()">
-        Add Material
-    </button>
+<!-- Add Button -->
+<div class="container container-p-y">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="clearData()">
+    Add Material
+  </button>
 </div>
 
-<div class="modal fade custom-modal-fade" id="labMatFormModal" tabindex="-1" aria-labelledby="labMatFormModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
-        <div class="modal-content custom-modal-content">
-            <div class="modal-header custom-modal-header">
-                <div class="modal-title-wrapper">
-                    <div class="modal-icon">
-                        <i class="ri-file-add-line" *ngIf="MAT_ID == 0 && btn == ''"></i>
-                        <i class="ri-edit-line" *ngIf="MAT_ID != 0 && btn == 'E'"></i>
-                        <i class="ri-delete-bin-line" *ngIf="MAT_ID != 0 && btn == 'D'"></i>
-                        <i class="ri-eye-line" *ngIf="MAT_ID != 0 && btn == 'dtls'"></i>
-                    </div>
-                    <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID == 0 && btn == ''">Add New Material</h5>
-                    <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID != 0 && btn == 'E'">Edit Material</h5>
-                    <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID != 0 && btn == 'D'">Delete Material</h5>
-                    <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID != 0 && btn == 'dtls'">Details Material
-                    </h5>
+<!-- Modal -->
+<div class="modal fade custom-modal-fade" id="labMatFormModal" tabindex="-1" aria-labelledby="labMatFormModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="ri-file-add-line" *ngIf="MAT_ID == 0 && btn == ''"></i>
+            <i class="ri-edit-line" *ngIf="MAT_ID != 0 && btn == 'E'"></i>
+            <i class="ri-delete-bin-line" *ngIf="MAT_ID != 0 && btn == 'D'"></i>
+            <i class="ri-eye-line" *ngIf="MAT_ID != 0 && btn == 'dtls'"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID == 0 && btn == ''">Add Material</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID != 0 && btn == 'E'">Edit Material</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID != 0 && btn == 'D'">Delete Material</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="MAT_ID != 0 && btn == 'dtls'">Material Details</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
+      <div class="modal-body custom-modal-body">
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form" novalidate>
+          <div class="form-group-wrapper">
+
+            <!-- Date -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="date" class="form-control" formControlName="DATE" placeholder="Select date">
+                <label for="date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('DATE')?.invalid">
+                  <small *ngIf="data.get('DATE')?.errors?.['required']">Date is required.</small>
                 </div>
-                <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+              </div>
             </div>
-            <div class="modal-body custom-modal-body">
-                <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
-                    <div class="form-group-wrapper">
-                        <div class="custom-form-group">
-                            <div class="form-floating form-floating-outline mb-4">
-                                <input type="date" class="form-control" formControlName="DATE"
-                                    placeholder="Select date">
-                                <label for="date"><i class="ri-calendar-line"></i> Date<span
-                                        class="text-danger">*</span></label>
-                            </div>
-                        </div>
 
-                        <div class="custom-form-group">
-                            <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="material-name" class="form-control" formControlName="MAT_NAME"
-                                    placeholder="Material Name" />
-                                <label for="material-name"><i class="ri-box-3-line"></i>Material Name <span
-                                        class="text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                        <div class="custom-form-group">
-                            <div class="form-floating form-floating-outline mb-4">
-                                <input type="number" id="materialPrice" class="form-control" formControlName="MAT_PRICE"
-                                    placeholder="Price" />
-                                <label for="materialPrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
-                                        class="text-danger">*</span></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer custom-modal-footer">
-                        <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
-                            <i class="ri-close-line"></i>
-                            Cancel
-                        </button>
-                        <button *ngIf="MAT_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
-                            <i class="ri-save-line"></i>
-                            Save Material
-                        </button>
-                        <button *ngIf="MAT_ID != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save"
-                            data-bs-dismiss="modal">
-                            <i class="ri-edit-line"></i>
-                            Edit Material
-                        </button>
-                        <button *ngIf="MAT_ID != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save"
-                            data-bs-dismiss="modal">
-                            <i class="ri-delete-bin-line"></i>
-                            Delete Material
-                        </button>
-                    </div>
-                </form>
+            <!-- Material Name -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="material-name" class="form-control" formControlName="MAT_NAME" placeholder="Material Name" />
+                <label for="material-name"><i class="ri-box-3-line"></i>Material Name <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('MAT_NAME')?.invalid">
+                  <small *ngIf="data.get('MAT_NAME')?.errors?.['required']">Material name is required.</small>
+                </div>
+              </div>
             </div>
-        </div>
+
+            <!-- Material Price -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="number" id="material-price" class="form-control" formControlName="MAT_PRICE" placeholder="Price" />
+                <label for="material-price"><i class="ri-money-rupee-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('MAT_PRICE')?.invalid">
+                  <small *ngIf="data.get('MAT_PRICE')?.errors?.['required']">Price is required.</small>
+                  <small *ngIf="data.get('MAT_PRICE')?.errors?.['pattern']">Enter a valid number.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Reason -->
+            <div class="custom-form-group" *ngIf="MAT_ID != 0 && btn == 'D'">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="deleteReason" class="form-control" placeholder="Delete Reason"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="deleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+              </div>
+              <div class="text-danger mt-1" *ngIf="submitted && Reason == ''">
+                <small>Delete reason is required.</small>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Modal Footer Buttons -->
+          <div class="modal-footer custom-modal-footer">
+            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+              <i class="ri-close-line"></i>
+              Cancel
+            </button>
+            <button *ngIf="MAT_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-save-line"></i>
+              Save
+            </button>
+            <button *ngIf="MAT_ID != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i>
+              Edit Material
+            </button>
+            <button *ngIf="MAT_ID != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-delete-bin-line"></i>
+              Delete Material
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 
+<!-- Table -->
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="card">
-        <h5 class="card-header">Material Index</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table">
-                <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
-                    <tr>
-                        <th>Actions</th>
-                        <th>Material Code</th>
-                        <th>Material Name</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let mat of material">
-                        <td style="width: 160px; white-space: nowrap;">
-                            <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);"
-                                data-bs-toggle="modal" data-bs-target="#labMatFormModal"
-                                (click)="getDataById(mat.maT_ID,'E')">
-                                <i class="ri-pencil-line me-1"></i> Edit</a>
+  <div class="card">
+    <h5 class="card-header">Material Table</h5>
 
-                            <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                                data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID,'D')">
-                                <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
-                        </td>
-                        <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{mat.maT_ID}}</span>
-                        </td>
-                        <td><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal"
-                                (click)="getDataById(mat.maT_ID,'dtls')">{{mat.maT_NAME}}</a></td>
-                        <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{mat.maT_PRICE}}</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- Loading Spinner -->
+    <div *ngIf="loadingMaterials" class="text-center my-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
+
+    <!-- Table Content -->
+    <div *ngIf="!loadingMaterials">
+      <div class="table-responsive text-nowrap" *ngIf="material && material.length > 0; else noData">
+        <table class="table">
+          <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+            <tr>
+              <th>Actions</th>
+              <th>Date</th>
+              <th>Material</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            <tr *ngFor="let mat of material">
+              <td style="width: 160px; white-space: nowrap;">
+                <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'E')">
+                  <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'D')">
+                  <i class="ri-delete-bin-6-line me-1"></i> Delete
+                </a>
+              </td>
+              <td>{{ mat.date | formattedDate:3 }}</td>
+              <td>
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'dtls')">
+                  {{ mat.maT_NAME }}
+                </a>
+              </td>
+              <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{ mat.maT_PRICE }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Data Message -->
+      <ng-template #noData>
+        <div class="text-center py-4">
+          <p class="text-muted">No material records found.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
 </div>

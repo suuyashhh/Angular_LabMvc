@@ -1,11 +1,12 @@
-<div class="container  container-p-y">
+<!-- Add Button -->
+<div class="container container-p-y">
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#OEFormModal" (click)="clearData()">
     Add Other Expense
   </button>
 </div>
 
-<div class="modal fade custom-modal-fade" id="OEFormModal" tabindex="-1" aria-labelledby="OEFormModalLabel"
-  aria-hidden="true">
+<!-- Modal -->
+<div class="modal fade custom-modal-fade" id="OEFormModal" tabindex="-1" aria-labelledby="OEFormModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -23,54 +24,76 @@
         </div>
         <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body custom-modal-body">
-        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form" novalidate>
           <div class="form-group-wrapper">
+
+            <!-- Date -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="date" class="form-control" formControlName="DATE" placeholder="Select date">
-                <label for="date"><i class="ri-calendar-line"></i> Date<span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="expense-date" formControlName="DATE" placeholder="Select date">
+                <label for="expense-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('DATE')?.invalid">
+                  <small *ngIf="data.get('DATE')?.errors?.['required']">Date is required.</small>
+                </div>
               </div>
             </div>
 
+            <!-- Expense Name -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="expense-name" class="form-control" formControlName="OTHER_NAME"
-                  placeholder="Expense Name" />
-                <label for="expense-name"><i class="ri-file-list-3-line"></i>Expense Name <span
-                    class="text-danger">*</span></label>
+                <input type="text" id="expense-name" class="form-control" formControlName="OTHER_NAME" placeholder="Expense Name" />
+                <label for="expense-name"><i class="ri-file-list-3-line"></i>Expense Name <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('OTHER_NAME')?.invalid">
+                  <small *ngIf="data.get('OTHER_NAME')?.errors?.['required']">Expense name is required.</small>
+                </div>
               </div>
             </div>
 
+            <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="expensePrice" class="form-control" formControlName="OTHER_PRICE"
-                  placeholder="Price" />
-                <label for="expensePrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
-                    class="text-danger">*</span></label>
+                <input type="number" id="expense-price" class="form-control" formControlName="OTHER_PRICE" placeholder="Price" />
+                <label for="expense-price"><i class="ri-money-rupee-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('OTHER_PRICE')?.invalid">
+                  <small *ngIf="data.get('OTHER_PRICE')?.errors?.['required']">Price is required.</small>
+                  <small *ngIf="data.get('OTHER_PRICE')?.errors?.['pattern']">Enter a valid number.</small>
+                </div>
               </div>
             </div>
+
+            <div class="custom-form-group" *ngIf="OTHER_ID != 0 && btn == 'D'">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="empDeleteReason" class="form-control" placeholder="Delete Reason"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="empDeleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+              </div>
+              <div class="text-danger mt-1" *ngIf="submitted && btn == 'D' && Reason == ''">
+                <small>Delete reason is required.</small>
+              </div>
+            </div>
+
           </div>
 
+          <!-- Footer Buttons -->
           <div class="modal-footer custom-modal-footer">
             <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
               <i class="ri-close-line"></i>
               Cancel
             </button>
-            <button *ngIf="OTHER_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save" data-bs-dismiss="modal">
+            <button *ngIf="OTHER_ID == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save">
               <i class="ri-save-line"></i>
               Save
             </button>
-              <button *ngIf="OTHER_ID != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save"
-                data-bs-dismiss="modal">
-                <i class="ri-edit-line"></i>
-                Edit Expense
-              </button>
-              <button *ngIf="OTHER_ID != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save"
-                data-bs-dismiss="modal">
-                <i class="ri-delete-bin-line"></i>
-                Delete Expense
-              </button>
+            <button *ngIf="OTHER_ID != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i>
+              Edit Expense
+            </button>
+            <button *ngIf="OTHER_ID != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-delete-bin-line"></i>
+              Delete Expense
+            </button>
           </div>
         </form>
       </div>
@@ -78,37 +101,59 @@
   </div>
 </div>
 
+<!-- Table -->
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="card">
-    <h5 class="card-header">Index</h5>
-    <div class="table-responsive text-nowrap">
-      <table class="table">
-        <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
-          <tr>
-            <th>Actions</th>
-            <th>Date</th>
-            <th>Expense</th>
-            <th>price</th>
-          </tr>
-        </thead>
-        <tbody class="table-border-bottom-0">
-          <tr *ngFor="let _objOE of otherexpense">
-              <td style="width: 160px; white-space: nowrap;">
-              <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#OEFormModal" (click)="getDataById(_objOE.otheR_ID,'E')">
-                <i class="ri-pencil-line me-1"></i> Edit</a>
+    <h5 class="card-header">Expense Table</h5>
 
-              <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#OEFormModal" (click)="getDataById(_objOE.otheR_ID,'D')">
-                <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
-            </td>
-            <td>{{_objOE.date}}</td>
-            <td><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#OEFormModal"
-                (click)="getDataById(_objOE.otheR_ID,'dtls')">{{_objOE.otheR_NAME}}</a></td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_objOE.otheR_PRICE}}</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Loading Spinner -->
+    <div *ngIf="loadingExpenses" class="text-center my-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Table Data -->
+    <div *ngIf="!loadingExpenses">
+      <div class="table-responsive text-nowrap" *ngIf="otherexpense && otherexpense.length > 0; else noData">
+        <table class="table">
+          <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+            <tr>
+              <th>Actions</th>
+              <th>Date</th>
+              <th>Expense</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            <tr *ngFor="let _objOE of otherexpense">
+              <td style="width: 160px; white-space: nowrap;">
+                <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#OEFormModal" (click)="getDataById(_objOE.otheR_ID, 'E')">
+                  <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#OEFormModal" (click)="getDataById(_objOE.otheR_ID, 'D')">
+                  <i class="ri-delete-bin-6-line me-1"></i> Delete
+                </a>
+              </td>
+              <td>{{ _objOE.date | formattedDate:3 }}</td>
+              <td>
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#OEFormModal"
+                  (click)="getDataById(_objOE.otheR_ID, 'dtls')">{{ _objOE.otheR_NAME }}</a>
+              </td>
+              <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{ _objOE.otheR_PRICE }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Data Template -->
+      <ng-template #noData>
+        <div class="text-center py-4">
+          <p class="text-muted">No expense records found.</p>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

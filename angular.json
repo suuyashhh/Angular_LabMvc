@@ -34,7 +34,8 @@
               "src/assets/css/demo.css",
               "src/assets/vendor/css/pages/page-auth.css",
               "src//assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css"
             ],
             "scripts": [
               "src/assets/vendor/libs/jquery/jquery.js",

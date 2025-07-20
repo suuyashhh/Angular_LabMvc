@@ -57,7 +57,9 @@
         <h5 class="mb-0 text-dark fw-bold">
           <i class="ri-file-list-3-line me-2 text-primary"></i> Case Paper
         </h5>
-        <button style="color: rgb(102, 3, 3); font-weight: bold; background-color: rgba(255, 0, 0, 0.05); border-radius: 50%; padding: 0.5rem;" type="button" class="btn-close" aria-label="Close" (click)="isCreatingNew = false"></button>
+        <button
+          style="color: rgb(102, 3, 3); font-weight: bold; background-color: rgba(255, 0, 0, 0.05); border-radius: 50%; padding: 0.5rem;"
+          type="button" class="btn-close" aria-label="Close" (click)="isCreatingNew = false"></button>
       </div>
 
       <div class="card-body">
@@ -137,23 +139,21 @@
           </div>
 
           <!-- Doctor Reference -->
-          <div class="form-floating form-floating-outline mb-4">
-            <ng-select  id="doctor-reference" [items]="doctor" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
-              placeholder="Select / Search doctor" formControlName="doctoR_CODE" [searchable]="true" [clearable]="false"
-              class="form-select" 
-              [ngClass]="{ 'is-invalid': data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid }"
-              style="margin-top: 30px;" #formField>
+
+          <div class="form-floating form-floating-outline mb-4 position-relative">
+            <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
+              placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
+              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating">
             </ng-select>
 
-            <label for="doctor-reference">
+            <label for="doctor-reference" class="floating-label">
               <i class="ri-user-star-line"></i> Doctor Reference <span class="text-danger">*</span>
             </label>
 
-            <!-- <div class="text-danger mt-1" *ngIf="data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid">
+            <div class="text-danger mt-1" *ngIf="data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid">
               Doctor selection is required.
-            </div> -->
+            </div>
           </div>
-
 
 
           <hr style="border: 2px solid Black; margin: 50px 0;">
@@ -355,12 +355,12 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody class="table-border-bottom-0" let i = index>
+        <tbody class="table-border-bottom-0" let i=index>
           <tr *ngFor="let case of filteredCases() | paginate: {
                   itemsPerPage: pageSize,
                   currentPage: page
                 };let i = index">
-                <td>{{(i+1)}}</td>
+            <td>{{(i+1)}}</td>
             <td>
               <div *ngIf="case.statuS_CODE === 101">
                 <a class="dropdown-item" href="javascript:void(0);"><i class="ri-bill-line me-1"></i>Invoice</a>
