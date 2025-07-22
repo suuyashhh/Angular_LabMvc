@@ -2,7 +2,7 @@
   <div class="row g-3" *ngIf="!isCreatingNew">
     <!-- New Button -->
     <div class="col-12 col-sm-6 col-md-2">
-      <button type="button" (click)="isCreatingNew = true" class="btn btn-primary m-1">
+      <button type="button" (click)="resetCasepaperForm()" class="btn btn-primary m-1">
         <i class="ri-add-box-fill"></i> &nbsp; New
       </button>
     </div>
@@ -80,7 +80,7 @@
             <!-- Date Picker -->
             <div class="col-md-6 text-end">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="date" class="form-control shadow-sm" id="date-input" required #formField>
+                <input type="date" class="form-control shadow-sm" formControlName="date" id="date-input" required #formField>
                 <label for="date"><i class="ri-calendar-line"></i>Date<span class="text-danger">*</span></label>
               </div>
             </div>
@@ -365,22 +365,22 @@
               <div *ngIf="case.statuS_CODE === 101">
                 <a class="dropdown-item" href="javascript:void(0);"><i class="ri-bill-line me-1"></i>Invoice</a>
               </div>
-              <div class="dropdown" *ngIf="case.statuS_CODE === 0">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                  <i class="ri-more-2-line"></i>
-                </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);" (click)="edit(case.trN_NO)"><i
-                      class="ri-pencil-line me-1"></i> Edit</a>
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i>
-                    Delete</a>
-                </div>
+
+              <div *ngIf="case.statuS_CODE === 0">
+                <a (click)="openInlineForm(case.trN_NO,'E')"  class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" 
+                  >
+                  <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <a (click)="openInlineForm(case.trN_NO,'D')" class="btn btn-sm btn-danger me-2" href="javascript:void(0);" 
+                 >
+                  <i class="ri-delete-bin-6-line me-1"></i> Delete
+                </a>
               </div>
             </td>
             <td><span>{{ case.trN_NO }}</span></td>
             <td><span>{{ case.patienT_NAME }}</span></td>
             <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date }}</span></td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
             <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
               <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
             </td>
