@@ -14,6 +14,8 @@ body {
 .container {
   max-width: 1000px;
   margin: 0 auto;
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling on small screens */
 }
 
 /* Header Section - Not printed */
@@ -127,6 +129,7 @@ body {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   border: 1px solid #e9d5ff;
+  width: 100%;
 }
 
 .report-header {
@@ -149,6 +152,8 @@ body {
 
 .report-content {
   padding: 2rem;
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling for the table */
 }
 
 .turnover-row {
@@ -173,30 +178,43 @@ body {
 }
 
 .expenses-header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 40px minmax(120px, 2fr) minmax(90px, 1fr) 80px 100px;
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid #d1d5db;
+  gap: 10px;
+  min-width: 600px; /* Minimum width to prevent squeezing */
 }
 
+.header-number,
 .header-name,
+.header-date,
+.header-count,
 .header-amount {
   font-weight: 600;
   color: #9333ea;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.header-amount {
+  padding-left: 40px; /* Added spacing for RS/- column */
 }
 
 .expenses-list {
   margin-bottom: 2rem;
+  min-width: 600px; /* Minimum width to prevent squeezing */
 }
 
 .expense-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px minmax(120px, 2fr) minmax(90px, 1fr) 80px 100px;
   align-items: center;
   padding: 0.75rem 0;
   border-bottom: 1px solid #f3f4f6;
+  gap: 10px;
 }
 
 .expense-item:last-child {
@@ -205,26 +223,41 @@ body {
 
 .expense-number {
   color: #6b7280;
-  margin-right: 0.75rem;
   font-weight: 500;
-  min-width: 1.5rem;
 }
 
 .expense-name {
-  flex: 1;
   color: #374151;
   font-weight: 500;
+  word-break: break-word;
+}
+
+.expense-date {
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-family: "Courier New", monospace;
+  white-space: nowrap;
+}
+
+.expense-count {
+  color: #6b7280;
+  font-weight: 500;
+  text-align: center;
+  font-family: "Courier New", monospace;
 }
 
 .expense-amount {
   color: #dc2626;
   font-weight: bold;
   font-family: "Courier New", monospace;
+  text-align: right;
+  padding-right: 10px; /* Added spacing for RS/- column */
 }
 
 .summary-section {
   border-top: 2px solid #e9d5ff;
   padding-top: 1.5rem;
+  min-width: 600px; /* Minimum width to prevent squeezing */
 }
 
 .summary-item {
@@ -255,12 +288,14 @@ body {
   color: #059669;
   font-weight: bold;
   font-family: "Courier New", monospace;
+  padding-right: 10px; /* Added spacing for amount */
 }
 
 .summary-amount.negative {
   color: #dc2626;
   font-weight: bold;
   font-family: "Courier New", monospace;
+  padding-right: 10px; /* Added spacing for amount */
 }
 
 .summary-amount.net {
@@ -268,24 +303,66 @@ body {
   font-weight: bold;
   font-size: 1.5rem;
   font-family: "Courier New", monospace;
+  padding-right: 10px; /* Added spacing for amount */
 }
 
 /* Responsive Design */
-@media (min-width: 768px) {
-  body {
-    padding: 2rem;
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
   }
-
-  .date-inputs {
-    grid-template-columns: 1fr 1fr;
+  
+  .report-content {
+    padding: 1rem;
   }
-
-  .action-buttons {
-    flex-direction: row;
+  
+  .expenses-header,
+  .expense-item {
+    grid-template-columns: 30px minmax(100px, 2fr) minmax(80px, 1fr) 70px 90px;
+    font-size: 0.9rem;
+    gap: 8px;
   }
+  
+  .header-number,
+  .header-name,
+  .header-date,
+  .header-count,
+  .header-amount {
+    font-size: 0.9rem;
+  }
+  
+  .expense-date {
+    font-size: 0.8rem;
+  }
+  
+  .expense-amount {
+    padding-right: 5px;
+  }
+}
 
-  .date-display {
-    font-size: 1.1rem;
+@media (max-width: 576px) {
+  .expenses-header,
+  .expense-item {
+    grid-template-columns: 25px minmax(80px, 2fr) minmax(70px, 1fr) 60px 80px;
+    gap: 6px;
+  }
+  
+  .expense-name {
+    font-size: 0.85rem;
+  }
+  
+  .expense-date {
+    font-size: 0.75rem;
+  }
+  
+  .expense-count,
+  .expense-amount {
+    font-size: 0.85rem;
+  }
+  
+  .header-amount,
+  .expense-amount {
+    padding-right: 5px;
   }
 }
 
@@ -311,6 +388,7 @@ body {
     align-items: flex-start;
     min-height: 90vh;
     padding: 2cm 1cm !important;
+    overflow: visible !important;
   }
 
   .report-section {
@@ -320,6 +398,7 @@ body {
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 18cm !important;
+    overflow: visible !important;
   }
 
   .report-header {
@@ -335,11 +414,22 @@ body {
 
   .report-content {
     padding: 20px !important;
+    overflow: visible !important;
+  }
+
+  .expenses-header,
+  .expense-item {
+    grid-template-columns: 25px minmax(120px, 2fr) minmax(90px, 1fr) 70px 90px !important;
+    gap: 8px !important;
+    min-width: auto !important;
   }
 
   .turnover-label,
   .header-name,
   .header-amount,
+  .header-number,
+  .header-date,
+  .header-count,
   .summary-label {
     color: #9333ea !important;
     -webkit-print-color-adjust: exact;
@@ -353,6 +443,14 @@ body {
     color: #666 !important;
   }
 
+  .expense-date {
+    color: #4b5563 !important;
+  }
+
+  .expense-count {
+    color: #6b7280 !important;
+  }
+
   .turnover-amount,
   .summary-amount.positive {
     color: #059669 !important;
@@ -363,11 +461,13 @@ body {
   .summary-amount.negative {
     color: #dc2626 !important;
     -webkit-print-color-adjust: exact;
+    padding-right: 10px !important;
   }
 
   .summary-amount.net {
     color: #2563eb !important;
     -webkit-print-color-adjust: exact;
+    padding-right: 10px !important;
   }
 
   /* Hide browser print headers and footers */
@@ -417,6 +517,8 @@ body {
 
 .clickable {
   cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
 }
 
 .clickable:hover {
