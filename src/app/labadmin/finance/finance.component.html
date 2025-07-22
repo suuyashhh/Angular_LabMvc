@@ -42,43 +42,43 @@
             <div class="expenses-list">
                 <div class="expense-item">
                     <span class="expense-number">1.</span>
-                    <span class="expense-name">CasePaper</span>
+                <span class="expense-name clickable" (click)="navigateToCasePaper()">CasePaper</span>
                     <span class="expense-amount">{{reportCount.turnover}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">2.</span>
-                    <span class="expense-name">Lab Materials</span>
+                    <span class="expense-name clickable" (click)="navigateToLabMat()">Lab Materials</span>
                     <span class="expense-amount">{{reportCount.laB_MATERIALS}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">3.</span>
-                    <span class="expense-name">Bike Fuel</span>
+                    <span class="expense-name clickable" (click)="navigateToBikeFule()">Bike Fuel</span>
                     <span class="expense-amount">{{reportCount.bikE_FUEL}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">4.</span>
-                    <span class="expense-name">Employee Salary</span>
+                    <span class="expense-name clickable" (click)="navigateToEmpSalary()">Employee Salary</span>
                     <span class="expense-amount">{{reportCount.employeE_SALARY}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">5.</span>
-                    <span class="expense-name">Electricity Bill</span>
+                    <span class="expense-name clickable" (click)="navigateToElcBill()">Electricity Bill</span>
                     <span class="expense-amount">{{reportCount.electricitY_BILL}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">6.</span>
-                    <span class="expense-name">Other Expense ....like(Rent, Small events, Food)</span>
+                    <span class="expense-name clickable" (click)="navigateToOtherExp()">Other Expense ....like(Rent, Small events, Food)</span>
                     <span class="expense-amount">{{reportCount.otheR_EXPENSE}}</span>
                 </div>
 
                 <div class="expense-item">
                     <span class="expense-number">7.</span>
-                    <span class="expense-name">Doctors Commission</span>
+                    <span class="expense-name clickable" (click)="navigateToDocCommission()">Doctors Commission</span>
                     <span class="expense-amount">{{reportCount.doctoR_COMMISSION}}</span>
                 </div>
             </div>
