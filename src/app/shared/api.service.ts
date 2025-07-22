@@ -8,7 +8,8 @@ import * as bootstrap from 'bootstrap';
 })
 export class ApiService {
 
- baseurl = 'https://localhost:7193/api/';
+//  baseurl = 'https://localhost:7193/api/';
+ baseurl = 'https://labmvcapi.bsite.net/api/';
 
   constructor(private http: HttpClient) {}
 
@@ -21,9 +22,9 @@ export class ApiService {
   }
 
   private getComId(): string {
-  // const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-  // return userDetails.coM_ID || '';
-  return JSON.parse(localStorage.getItem('COM_ID') || '');
+  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+  return userDetails.coM_ID || '';
+  // return JSON.parse(localStorage.getItem('COM_ID') || '');
 }
 
 get(api: string, params: any = {}) {

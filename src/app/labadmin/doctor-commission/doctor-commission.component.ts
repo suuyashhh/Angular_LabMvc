@@ -159,8 +159,10 @@ export class DoctorCommissionComponent implements OnInit {
   }
 
   getDoctorName(code: number): string {
-  const doc = this.doctor.find((d:any) => d.doctoR_CODE === code);
+  if (!this.doctor || !Array.isArray(this.doctor)) return 'Unknown';
+  const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
   return doc ? doc.doctoR_NAME : 'Unknown';
 }
+
 
 }

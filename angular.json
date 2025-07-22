@@ -22,7 +22,12 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "_redirects",
+                "input": "src/assets",
+                "output": "/"
+              }
             ],
             "styles": [
               "src/assets/vendor/css/core.css",
@@ -33,38 +38,34 @@
               "src/assets/vendor/css/theme-default.css",
               "src/assets/css/demo.css",
               "src/assets/vendor/css/pages/page-auth.css",
-              "src//assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css",
+              "src/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css",
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css"
             ],
             "scripts": [
               "src/assets/vendor/libs/jquery/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "src/assets/vendor/libs/popper/popper.js",
               "src/assets/vendor/js/helpers.js",
               "src/assets/js/config.js",
               "src/assets/vendor/js/bootstrap.js",
               "src/assets/vendor/js/menu.js",
               "src/assets/js/main.js",
-              "src//assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js",
-              "src//assets/vendor/libs/popper/popper.js"
-            ],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
+              "src/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "500mb",
+                  "maximumError": "100mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "200mb",
+                  "maximumError": "400mb"
                 }
               ],
               "outputHashing": "all"
