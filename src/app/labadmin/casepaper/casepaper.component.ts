@@ -6,8 +6,7 @@ import {
   QueryList,
   ViewChildren,
   ElementRef,
-}
-  from '@angular/core';
+} from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { HttpClientModule } from '@angular/common/http';
 import {
@@ -25,7 +24,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgSelectModule, NgOption } from '@ng-select/ng-select';
-
+import { log } from 'console';
+import { ServicesService } from '../../shared/services.service';
+import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
 
 interface CasePaper {
   trN_NO: number;
@@ -49,17 +50,17 @@ interface CasePaper {
     MatInputModule,
     MatNativeDateModule,
     NgSelectModule,
+    FormattedDatePipe
   ],
   templateUrl: './casepaper.component.html',
   styleUrl: './casepaper.component.css',
 })
-
 export class CasepaperComponent implements OnInit {
   @ViewChildren('formField') formFields!: QueryList<ElementRef>;
 
-
   isCreatingNew: boolean = false; // ✅ Added
 
+  btn: string = '';
   cases: any;
   data: any;
   tests: any;
@@ -82,8 +83,11 @@ export class CasepaperComponent implements OnInit {
   today: Date = new Date();
   trn_no: number = 0;
 
-
-  constructor(private api: ApiService, private toastr: ToastrService) { }
+  constructor(
+    private api: ApiService,
+    private toastr: ToastrService,
+    private service: ServicesService
+  ) {}
 
   ngOnInit(): void {
     this.data = new FormGroup({
@@ -105,7 +109,6 @@ export class CasepaperComponent implements OnInit {
       coM_ID: new FormControl(101),
       paymenT_STATUS: new FormControl(''),
     });
-
 
     this.load();
   }
@@ -219,7 +222,10 @@ export class CasepaperComponent implements OnInit {
 
   submit(data: any): void {
     this.submitted = true;
-
+    const rawDate = this.data.get('DATE')?.value;
+    const parts = rawDate.split('-');
+    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    data.DATE = this.service.getFormattedDate(formatted, 1);
     if (!this.data.valid) {
       // Scroll to first invalid field
       setTimeout(() => {
@@ -261,7 +267,10 @@ export class CasepaperComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error occurred:', err);
-        this.toastr.error('An error occurred while saving. Please try again.', 'Server Error');
+        this.toastr.error(
+          'An error occurred while saving. Please try again.',
+          'Server Error'
+        );
       },
     });
   }
@@ -329,8 +338,7 @@ export class CasepaperComponent implements OnInit {
     return match ? match.tesT_NAME : 'N/A';
   }
 
-   selectedDoctor: number | null = null;
-
+  selectedDoctor: number | null = null;
 
   customSearchFn(term: string, item: any) {
     const search = term.toLowerCase();
@@ -338,4 +346,87 @@ export class CasepaperComponent implements OnInit {
     return name.includes(search);
   }
 
+  openInlineForm(trN_NO: number, action: string) {
+    this.isCreatingNew = true;
+    this.btn = action;
+    this.getDataById(trN_NO, action);
+  }
+
+  getDataById(trN_NO: number, btn: string) {
+    this.btn = btn;
+    this.api.get('CasePaper/CasePaper/' + trN_NO).subscribe((res: any) => {
+      this.trn_no = res.trN_NO;
+      console.log(res);
+
+      this.data.patchValue({
+        patienT_NAME: res.patienT_NAME,
+        gender: res.gender,
+        coN_NUMBER: res.coN_NUMBER,
+        address: res.address,
+        totaL_AMOUNT: res.totaL_AMOUNT,
+        totaL_PROFIT: res.totaL_PROFIT,
+        discount: res.discount,
+        paymenT_AMOUNT: res.paymenT_AMOUNT,
+        collectioN_TYPE: res.collectioN_TYPE,
+        paymenT_METHOD: res.paymenT_METHOD,
+        paymenT_STATUS: res.paymenT_STATUS,
+        date: this.service.getFormattedDate(res.date, 8),
+        doctoR_CODE: res.doctoR_CODE,
+        //"totaL_AMOUNT": 0,
+        // "totaL_PROFIT": 0,
+        // "discount": 0,
+        // "date": "string",
+        // "paymenT_AMOUNT": 0,
+        // "collectioN_TYPE": 0,
+        // "paymenT_METHOD": 0,
+        // "paymenT_STATUS": "string"
+        // patch other fields as needed
+      });
+
+      this.matIs = res.matIs;
+      this.testAmount();
+      this.total();
+
+      // Optional: If this is for delete, you can show a confirmation prompt
+      if (btn === 'D') {
+        if (confirm('Are you sure you want to delete this test?')) {
+          // this.Reason = 'User confirmed deletion'; // Example
+          this.submit(this.data.value); // triggers delete logic
+        } else {
+          this.isCreatingNew = false;
+        }
+      }
+    });
+  }
+
+  resetCasepaperForm() {
+    this.isCreatingNew = true; // Show the inline form
+    this.btn = ''; // Clear action (E/D/etc.)
+    // this.TEST_CODE = 0;              // Reset TEST_CODE
+    this.trn_no = 0; // Reset transaction number (if used)
+    this.searchText = ''; // Reset test search input
+    this.selectedDoctor = null; // Reset ng-select
+    this.discount_Amount = 0; // Reset discount calculation
+    this.total_Amount = 0; // Reset total
+    this.total_Lab_Profit = 0; // Reset profit
+    this.matIs = []; // Reset tests list (blood tests)
+
+    // Reset the FormGroup values
+    this.data.reset({
+      trN_NO: 0,
+      patienT_NAME: '',
+      gender: '',
+      coN_NUMBER: '',
+      address: '',
+      doctoR_CODE: '',
+      totaL_AMOUNT: 0,
+      totaL_PROFIT: 0,
+      discount: 0,
+      paymenT_AMOUNT: 0,
+      paymenT_METHOD: 0,
+      date: '', // optional: can use `new Date()` if needed
+      coM_ID: 101, // static value you set during init
+      paymenT_STATUS: '',
+    });
+  }
 }
