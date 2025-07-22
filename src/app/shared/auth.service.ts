@@ -1,7 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,24 +12,36 @@ export class AuthService {
 
   private platformId = inject(PLATFORM_ID);
 
-  constructor(private router:Router) { }
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private api: ApiService
+  ) {}
 
+  // Generate UUID (optional utility)
   generateUUIDToken(): string {
     return uuidv4();
   }
 
-
-  setToken(token:string){
-    localStorage.setItem("token", token);
-    localStorage.setItem("COM_ID", '101');
-
-    document.cookie = `authToken=${token}; path=/; max-age=${60 * 60 * 24}`;
+  // Set token and user data in localStorage and cookie
+  setToken(res: any): void {
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('userDetails', JSON.stringify(res.userDetails));
+    document.cookie = `authToken=${res.token}; path=/`;
   }
 
-  getToken(){
-    return localStorage.getItem("token");
+  // Get current user object
+  getUser(): any {
+    const userJson = localStorage.getItem('user');
+    return userJson ? JSON.parse(userJson) : null;
   }
 
+  // Get JWT token from localStorage
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  // Get token from cookies
   getTokenFromCookies(): string | null {
     const cookies = document.cookie.split('; ');
     for (const cookie of cookies) {
@@ -39,30 +53,48 @@ export class AuthService {
     return null;
   }
 
+  // Check if token in localStorage matches cookie
   isTokenValid(): boolean {
     const localStorageToken = this.getToken();
     const cookieToken = this.getTokenFromCookies();
-
-    return localStorageToken !== null && cookieToken !== null && localStorageToken === cookieToken;
+    return !!localStorageToken && localStorageToken === cookieToken;
   }
 
+  // Return true if logged in
   isLoggedIn(): boolean {
-    if (this.isTokenValid()) { // Check if running in the browser
-      return true; // Now safe to access localStorage
-    }
-    return false; // Return false if running on the server
+    return isPlatformBrowser(this.platformId) && this.isTokenValid();
   }
-  logout(){
+
+  // API: Login
+  login(credentials: any) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${this.api.baseurl}Login/Login`, credentials, { headers });
+  }
+
+  // API: Logout
+  logout(): void {
+    const token = this.getToken();
+
+    if (!token) {
+      this.clearLocalSession();
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.post(`${this.api.baseurl}Login/Logout`, {}, { headers }).subscribe({
+      next: () => this.clearLocalSession(),
+      error: () => this.clearLocalSession()
+    });
+  }
+
+  // Clear session from browser
+  private clearLocalSession(): void {
     localStorage.clear();
-    this.router.navigate(['/'])
-  }
-  login(data:any):any{
-    if(data.username == "admin" && data.password == "123"){
-      this.setToken(this.generateUUIDToken());
-      return {status:"success"}
-    }
-    else{
-      return {status:"failed"}
-    }
+    document.cookie = 'authToken=; path=/; max-age=0';
+    this.router.navigate(['/']);
   }
 }

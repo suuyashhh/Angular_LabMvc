@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,6 +10,12 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 })
 export class NavbarComponent implements AfterViewInit {
 
+
+  constructor(private auth: AuthService) {}
+
+logout() {
+  this.auth.logout();
+}
   toggleSidebar(): void {
     if (window.innerWidth < 1200) {
       const layoutMenu = document.querySelector('#layout-menu');
