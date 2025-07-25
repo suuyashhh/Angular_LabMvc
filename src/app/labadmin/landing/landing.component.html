@@ -21,7 +21,14 @@
       <!-- Content wrapper -->
 
       <!-- Content -->
-      
+
+      <div class="floating-home-button" *ngIf="user.lab_Admin == 'Y'">
+        <button class="btn btn-primary shadow-lg rounded-pill" (click)="home()">
+          <i class="fas fa-home"></i>
+        </button>
+      </div>
+
+
 
 
 

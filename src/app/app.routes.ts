@@ -6,9 +6,15 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   {
-    path: 'labadmin',
+    path: 'LABADMIN',
     canActivate: [authGuard],
     loadComponent: () => import('./labadmin/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./labadmin/labadmin.routes').then(m => m.lABADMIN_ROUTES)
+  },
+  {
+    path: 'ADMIN',
+    canActivate: [authGuard],
+    loadComponent: () => import('./admin/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES)
   }
 ];

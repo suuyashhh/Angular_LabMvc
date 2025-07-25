@@ -82,6 +82,7 @@ export class CasepaperComponent implements OnInit {
   };
   today: Date = new Date();
   trn_no: number = 0;
+  Reason: any;
 
   constructor(
     private api: ApiService,
@@ -138,15 +139,20 @@ export class CasepaperComponent implements OnInit {
   }
 
   add(Entertest: string) {
+    if (!Entertest) return;
+
     const filteredTests = this.tests.filter(
-      (test: any) => test.tesT_NAME.toLowerCase() === Entertest.toLowerCase()
+      (test: any) => test.tesT_NAME?.toLowerCase() === Entertest?.toLowerCase()
     );
 
     filteredTests.forEach((test: any) => {
+      const testName = test.tesT_NAME?.toLowerCase();
+      if (!testName) return;
+
       const alreadyExists = this.matIs.some(
-        (item: any) =>
-          item.tesT_NAME.toLowerCase() === test.tesT_NAME.toLowerCase()
+        (item: any) => item?.tesT_NAME?.toLowerCase() === testName
       );
+
       if (alreadyExists) return;
 
       const srNo = this.matIs.length + 1;
@@ -162,6 +168,8 @@ export class CasepaperComponent implements OnInit {
     this.testAmount();
     this.total();
   }
+
+
 
   testAmount() {
     this.test_Amount = 0;
@@ -222,31 +230,34 @@ export class CasepaperComponent implements OnInit {
 
   submit(data: any): void {
     this.submitted = true;
-    const rawDate = this.data.get('DATE')?.value;
-    const parts = rawDate.split('-');
-    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-    data.DATE = this.service.getFormattedDate(formatted, 1);
-    if (!this.data.valid) {
-      // Scroll to first invalid field
+
+    // Format the date
+    const rawDate = this.data.get('date')?.value;
+    if (rawDate) {
+      const parts = rawDate.split('-');
+      const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      data.DATE = this.service.getFormattedDate(formatted, 1);
+    }
+
+    // Validation check
+    if (this.data.invalid) {
       setTimeout(() => {
         const firstInvalid = this.formFields.find((el) => {
           const controlName = el.nativeElement.getAttribute('formControlName');
           return controlName && this.data.get(controlName)?.invalid;
         });
+
         if (firstInvalid) {
-          firstInvalid.nativeElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
+          firstInvalid.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           firstInvalid.nativeElement.focus();
         }
       }, 0);
 
-      // Toastr error toast instead of Swal
       this.toastr.error('Please fill all required fields!', 'Validation Error');
       return;
     }
 
+    // Check if at least one test is added
     if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
       this.toastr.error('Please add at least one test!', 'Test Missing');
       return;
@@ -257,23 +268,62 @@ export class CasepaperComponent implements OnInit {
       matIs: this.matIs,
     };
 
-    console.log('Submitting:', payload);
+    // Handle Add / Edit logic
+    if (!this.trn_no || this.btn === '') {
+      // ➕ Add CasePaper
+      this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
+        next: () => {
+          setTimeout(() => {
+            this.toastr.success('Case paper added successfully');
+            this.load();
+            this.cancelCreate();
+          }, 300);
+        },
+        error: (err) => {
+          console.error('Add error:', err);
+          this.toastr.error('Failed to add case paper', 'Server Error');
+        }
+      });
 
-    this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
-      next: (res: any) => {
-        console.log('Response:', res);
-        this.load();
-        this.cancelCreate();
-      },
-      error: (err: any) => {
-        console.error('Error occurred:', err);
-        this.toastr.error(
-          'An error occurred while saving. Please try again.',
-          'Server Error'
-        );
-      },
-    });
+    } else if (this.trn_no && this.btn === 'E') {
+      // ✏️ Edit CasePaper
+      this.api.post(`CasePaper/EditCasePaper/${this.trn_no}`, payload).subscribe({
+        next: () => {
+          setTimeout(() => {
+            this.toastr.success('Case paper updated successfully');
+            this.load();
+            this.cancelCreate();
+          }, 200);
+        },
+        error: (err) => {
+          console.error('Edit error:', err);
+          this.toastr.error('Failed to update case paper', 'Server Error');
+        }
+      });
+
+    } else if (this.trn_no && this.btn === 'D') {
+      // 🗑️ Delete CasePaper
+      if (this.Reason && this.Reason.trim() !== '') {
+        this.api.delete(`CasePaper/DeleteCasePaper/${this.trn_no}`).subscribe({
+          next: () => {
+            setTimeout(() => {
+              this.toastr.success('Case paper deleted successfully');
+              this.load();
+              this.cancelCreate();
+              this.Reason = "";
+            }, 200);
+          },
+          error: (err) => {
+            console.error('Delete error:', err);
+            this.toastr.error('Failed to delete case paper', 'Server Error');
+          }
+        });
+      } else {
+        this.toastr.warning('Please provide a reason for deletion.', 'Missing Reason');
+      }
+    }
   }
+
 
   cancelCreate() {
     this.isCreatingNew = false; // ✅ Hide form
@@ -291,36 +341,36 @@ export class CasepaperComponent implements OnInit {
   isDateFiltered = false;
 
 
- filteredCases(): CasePaper[] {
-  let result = this.cases || [];
+  filteredCases(): CasePaper[] {
+    let result = this.cases || [];
 
-  // Apply search filter if searchTerm exists
-  if (this.searchTerm) {
-    const searchTermLower = this.searchTerm.toLowerCase();
-    result = result.filter((c: CasePaper) =>
-      c.patienT_NAME.toLowerCase().includes(searchTermLower) || // Name search
-      (c.coN_NUMBER && c.coN_NUMBER.includes(this.searchTerm)) // Contact number search (exact match)
-    );
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm) {
+      const searchTermLower = this.searchTerm.toLowerCase();
+      result = result.filter((c: CasePaper) =>
+        c.patienT_NAME.toLowerCase().includes(searchTermLower) || // Name search
+        (c.coN_NUMBER && c.coN_NUMBER.includes(this.searchTerm)) // Contact number search (exact match)
+      );
+    }
+
+    // Apply date filter if enabled and dates exist
+    if (this.isDateFiltered && this.startDate && this.endDate) {
+      const start = new Date(this.startDate);
+      const end = new Date(this.endDate);
+
+      result = result.filter((c: CasePaper) => {
+        const caseDate = new Date(c.date);
+        return caseDate >= start && caseDate <= end;
+      });
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
   }
-
-  // Apply date filter if enabled and dates exist
-  if (this.isDateFiltered && this.startDate && this.endDate) {
-    const start = new Date(this.startDate);
-    const end = new Date(this.endDate);
-
-    result = result.filter((c: CasePaper) => {
-      const caseDate = new Date(c.date);
-      return caseDate >= start && caseDate <= end;
-    });
-  }
-
-  // Reset to page 1 when search term changes
-  if (this.searchTerm) {
-    this.page = 1;
-  }
-
-  return result;
-}
 
   onSearch() {
     // Reset to first page when searching
@@ -356,8 +406,8 @@ export class CasepaperComponent implements OnInit {
   selectedDoctor: number | null = null;
 
   customSearchFn(term: string, item: any) {
-    const search = term.toLowerCase();
-    const name = item.doctoR_NAME.toLowerCase();
+    const search = term?.toLowerCase?.() ?? '';
+    const name = item?.doctoR_NAME?.toLowerCase?.() ?? '';
     return name.includes(search);
   }
 
@@ -398,19 +448,15 @@ export class CasepaperComponent implements OnInit {
         // patch other fields as needed
       });
 
-      this.matIs = res.matIs;
+      this.matIs = res.matIs.map((item: any) => ({
+    ...item,
+    TEST_NAME: this.getTestNameByCode(item.tesT_CODE)
+  }));
       this.testAmount();
+      this.discount();
       this.total();
 
-      // Optional: If this is for delete, you can show a confirmation prompt
-      if (btn === 'D') {
-        if (confirm('Are you sure you want to delete this test?')) {
-          // this.Reason = 'User confirmed deletion'; // Example
-          this.submit(this.data.value); // triggers delete logic
-        } else {
-          this.isCreatingNew = false;
-        }
-      }
+
     });
   }
 

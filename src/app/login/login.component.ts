@@ -27,7 +27,15 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     if (this.auth.isLoggedIn()) {
-      this.router.navigate(['labadmin']);
+      var user = this.auth.getUser();
+      console.log(user);
+
+      // this.router.navigate([user.useR_LOGIN]);
+      if(user.useR_LOGIN == "LABADMIN" || user.useR_LOGIN == "EMPLOYEE"){
+            this.router.navigate(["LABADMIN"]);
+          }else if(user.useR_LOGIN == "ADMIN"){
+            this.router.navigate(["ADMIN"]);
+          }
     }
   }
 
@@ -39,7 +47,11 @@ export class LoginComponent implements OnInit {
         console.log('Login response:', res);
         if (res.token) {
           this.auth.setToken(res);
-          this.router.navigate(['labadmin']);
+          if(res.userDetails.useR_LOGIN == "LABADMIN" || res.userDetails.useR_LOGIN == "EMPLOYEE" ){
+            this.router.navigate(["LABADMIN"]);
+          }else if(res.userDetails.useR_LOGIN == "ADMIN"){
+            this.router.navigate(["ADMIN"]);
+          }
         } else {
           alert('Login failed');
         }

@@ -189,8 +189,8 @@
                       }}</td>
                     <td class="text-success ">₹ {{ data.price }}</td>
                     <td><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
-                    <td>
-                      <button class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-danger rounded-pill align-items-center gap-1"
                         (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
                         <i class="ri-delete-bin-6-line"></i> Delete
                       </button>
@@ -325,14 +325,43 @@
             </div>
           </div>
 
+          <div class="row mb-5" *ngIf="trn_no !== 0 && btn === 'D'">
+            <div class="col-sm-6">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="test" class="form-control text-end " placeholder="Delete Reason" [(ngModel)]="Reason"
+                  required style="max-width: 300px;" [ngModelOptions]="{standalone: true}"/>
+                <label for="reason"><i class="ri-cash-line"></i>Delete Reason<span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
+
           <!-- Cancel Button -->
           <div class="text-end">
-            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no === 0">Save</button>
+            <!-- Save Button -->
             <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
-              *ngIf="trn_no !== 0">Update</button>
-            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill"
-              (click)="isCreatingNew = false">Cancel</button>
+              *ngIf="trn_no === 0 && btn === ''">
+              Save
+            </button>
+
+            <!-- Update Button -->
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
+              *ngIf="trn_no !== 0 && btn === 'E'">
+              Update
+            </button>
+
+            <!-- Delete Confirmation Button (Also labeled Update) -->
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
+              *ngIf="trn_no !== 0 && btn === 'D'">
+              Delete
+            </button>
+
+            <!-- Cancel Button -->
+            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">
+              Cancel
+            </button>
           </div>
+
         </form>
       </div>
     </div>
