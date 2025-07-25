@@ -6,11 +6,12 @@ import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { ServicesService } from '../../shared/services.service';
 import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-employee-salary',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule,FormattedDatePipe],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule,FormattedDatePipe,NgxPaginationModule],
   templateUrl: './employee-salary.component.html',
   styleUrl: './employee-salary.component.css'
 })
@@ -34,10 +35,14 @@ export class EmployeeSalaryComponent implements OnInit {
   }
 
   initForm() {
+    
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+
     this.data = new FormGroup({
       EMP_ID: new FormControl('',Validators.required),
       EMP_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
-      DATE: new FormControl('', Validators.required),
+      DATE: new FormControl(formattedDate, Validators.required),
       COM_ID: new FormControl()
     });
   }
@@ -67,6 +72,10 @@ export class EmployeeSalaryComponent implements OnInit {
     this.data.reset();
     this.initForm();
   }
+
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 2;
 
   submit(employeesalary: any) {
     this.submitted = true;
@@ -152,5 +161,29 @@ export class EmployeeSalaryComponent implements OnInit {
   getEmployeeName(id: number): string {
   const emp = this.employee.find((e:any) => e.emP_ID == id);
   return emp ? emp.emP_NAME : 'Unknown';
+}
+
+filteredEmpSalary(): any[] {
+  let result = this.employeesalary || [];
+debugger;
+  // Apply search filter if searchTerm exists
+  if (this.searchTerm && this.searchTerm.trim() !== '') {
+    const searchTermLower = this.searchTerm.toLowerCase().trim();
+    result = result.filter((employeesalary: any) => 
+      employeesalary.emP_PRICE?.toLowerCase().includes(searchTermLower)
+    );
+  }
+
+  // Reset to page 1 when search term changes
+  if (this.searchTerm) {
+    this.page = 1;
+  }
+
+  return result;
+}
+
+ onSearch() {
+  // Reset to first page when searching
+  this.page = 1;
 }
 }

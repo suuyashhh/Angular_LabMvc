@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
 import { ServicesService } from '../../shared/services.service';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-lab-materials',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormattedDatePipe, FormsModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormattedDatePipe, FormsModule, NgxPaginationModule],
   templateUrl: './lab-materials.component.html',
   styleUrl: './lab-materials.component.css'
 })
@@ -24,7 +25,7 @@ export class LabMaterialsComponent implements OnInit {
   loadingMaterials = false;
   Reason: string = '';
 
-  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) {}
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
@@ -32,9 +33,21 @@ export class LabMaterialsComponent implements OnInit {
     this.getMaterials();
   }
 
+  // initForm() {
+  //   this.data = new FormGroup({
+  //     DATE: new FormControl('', Validators.required),
+  //     MAT_NAME: new FormControl('', Validators.required),
+  //     MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
+  //     COM_ID: new FormControl(this.ComId)
+  //   });
+  // }
+
   initForm() {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
     this.data = new FormGroup({
-      DATE: new FormControl('', Validators.required),
+      DATE: new FormControl(formattedDate, Validators.required),
       MAT_NAME: new FormControl('', Validators.required),
       MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
@@ -62,6 +75,10 @@ export class LabMaterialsComponent implements OnInit {
     this.data.reset();
     this.initForm();
   }
+
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 10;
 
   submit(material: any) {
     this.submitted = true;
@@ -142,4 +159,31 @@ export class LabMaterialsComponent implements OnInit {
       });
     });
   }
+
+
+  filteredMaterials(): any[] {
+    let result = this.material || [];
+
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((material: any) =>
+        material.maT_NAME?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
+  }
+
+
 }

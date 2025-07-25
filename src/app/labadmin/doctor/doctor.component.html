@@ -1,9 +1,28 @@
+
 <div class="container container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal"
+  <div class="row align-items-center justify-content-between g-3">
+    <!-- Add Button - Left Side -->
+    <div class="col-auto">
+     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal"
     (click)="clearData()">
-    Add Doctor
+     <i class="ri-add-line me-2"></i> Add Doctor
   </button>
+    </div>
+    
+    <!-- Search - Right Side -->
+    <div class="col-md-4 col-lg-3 ms-md-auto">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." 
+           [(ngModel)]="searchTerm"
+           (ngModelChange)="onSearch()"
+           id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
+      </div>
+    </div>
+  </div>
 </div>
+
+
 
 <div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"
   aria-hidden="true">
@@ -122,7 +141,10 @@
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
-            <tr *ngFor="let Doctor of doctor">
+            <tr *ngFor="let Doctor of filteredDoctors() | paginate: {
+      itemsPerPage: pageSize,
+      currentPage: page
+    };">
               <td style="width: 160px; white-space: nowrap;">
                 <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
                   data-bs-target="#doctorFormModal" (click)="getDataById(Doctor.doctoR_CODE, 'E')">
@@ -142,6 +164,9 @@
           </tbody>
         </table>
       </div>
+          <div class="d-flex justify-content-center p-3">
+          <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+        </div>
     </div>
 
     <ng-template #noData>

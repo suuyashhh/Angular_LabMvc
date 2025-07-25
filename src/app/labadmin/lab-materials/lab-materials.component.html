@@ -1,12 +1,30 @@
 <!-- Add Button -->
+
 <div class="container container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="clearData()">
-    Add Material
-  </button>
+  <div class="row align-items-center justify-content-between g-3">
+    <!-- Add Button - Left Side -->
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#labMatFormModal"
+        (click)="clearData()">
+        <i class="ri-add-line me-2"></i> Add Material
+      </button>
+    </div>
+
+    <!-- Search - Right Side -->
+    <div class="col-md-4 col-lg-3 ms-md-auto">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()" id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
+      </div>
+    </div>
+  </div>
 </div>
 
+
 <!-- Modal -->
-<div class="modal fade custom-modal-fade" id="labMatFormModal" tabindex="-1" aria-labelledby="labMatFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="labMatFormModal" tabindex="-1" aria-labelledby="labMatFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -43,8 +61,10 @@
             <!-- Material Name -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="material-name" class="form-control" formControlName="MAT_NAME" placeholder="Material Name" />
-                <label for="material-name"><i class="ri-box-3-line"></i>Material Name <span class="text-danger">*</span></label>
+                <input type="text" id="material-name" class="form-control" formControlName="MAT_NAME"
+                  placeholder="Material Name" />
+                <label for="material-name"><i class="ri-box-3-line"></i>Material Name <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('MAT_NAME')?.invalid">
                   <small *ngIf="data.get('MAT_NAME')?.errors?.['required']">Material name is required.</small>
                 </div>
@@ -54,8 +74,10 @@
             <!-- Material Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="material-price" class="form-control" formControlName="MAT_PRICE" placeholder="Price" />
-                <label for="material-price"><i class="ri-money-rupee-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <input type="number" id="material-price" class="form-control" formControlName="MAT_PRICE"
+                  placeholder="Price" />
+                <label for="material-price"><i class="ri-money-rupee-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('MAT_PRICE')?.invalid">
                   <small *ngIf="data.get('MAT_PRICE')?.errors?.['required']">Price is required.</small>
                   <small *ngIf="data.get('MAT_PRICE')?.errors?.['pattern']">Enter a valid number.</small>
@@ -68,7 +90,8 @@
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="deleteReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
-                <label for="deleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                <label for="deleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                    class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1" *ngIf="submitted && Reason == ''">
                 <small>Delete reason is required.</small>
@@ -127,18 +150,24 @@
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
-            <tr *ngFor="let mat of material">
+            <tr *ngFor="let mat of filteredMaterials() | paginate: {
+      itemsPerPage: pageSize,
+      currentPage: page
+    };">
               <td style="width: 160px; white-space: nowrap;">
-                <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'E')">
+                <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'E')">
                   <i class="ri-pencil-line me-1"></i> Edit
                 </a>
-                <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'D')">
+                <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'D')">
                   <i class="ri-delete-bin-6-line me-1"></i> Delete
                 </a>
               </td>
               <td>{{ mat.date | formattedDate:3 }}</td>
               <td>
-                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal" (click)="getDataById(mat.maT_ID, 'dtls')">
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#labMatFormModal"
+                  (click)="getDataById(mat.maT_ID, 'dtls')">
                   {{ mat.maT_NAME }}
                 </a>
               </td>
@@ -146,6 +175,9 @@
             </tr>
           </tbody>
         </table>
+         <div class="d-flex justify-content-center p-3">
+          <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+        </div>
       </div>
 
       <!-- No Data Message -->
