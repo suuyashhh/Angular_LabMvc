@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { ServicesService } from '../../shared/services.service';
 import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-doctor-commission',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe,NgxPaginationModule],
   templateUrl: './doctor-commission.component.html',
   styleUrl: './doctor-commission.component.css'
 })
@@ -35,8 +36,12 @@ export class DoctorCommissionComponent implements OnInit {
   }
 
   initForm() {
+
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
     this.data = new FormGroup({
-      DATE: new FormControl('', Validators.required),
+      DATE: new FormControl(formattedDate, Validators.required),
       DOCTOR_ID: new FormControl('', Validators.required),
       DOC_COM_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
@@ -77,6 +82,10 @@ export class DoctorCommissionComponent implements OnInit {
     this.data.reset();
     this.initForm();
   }
+
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 2;
 
   submit(DocCom: any) {
     this.submitted = true;
@@ -163,6 +172,30 @@ export class DoctorCommissionComponent implements OnInit {
   const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
   return doc ? doc.doctoR_NAME : 'Unknown';
 }
+
+  filteredDocCommission(): any[] {
+    let result = this.doctorcommission || [];
+
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((doctorcommission: any) =>
+        doctorcommission.doC_COM_PRICE?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
+  }
 
 
 }

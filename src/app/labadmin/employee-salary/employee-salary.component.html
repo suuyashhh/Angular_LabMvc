@@ -1,12 +1,28 @@
 <!-- Add Button -->
 <div class="container container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EmpSalFormModal" (click)="clearData()">
-    Add Salary Slip
-  </button>
+  <div class="row align-items-center justify-content-between g-3">
+    <!-- Add Button - Left Side -->
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EmpSalFormModal"
+        (click)="clearData()">
+        <i class="ri-add-line me-2"></i>Add Salary Slip
+      </button>
+    </div>
+
+    <!-- Search - Right Side -->
+    <div class="col-md-4 col-lg-3 ms-md-auto">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()" id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal -->
-<div class="modal fade custom-modal-fade" id="EmpSalFormModal" tabindex="-1" aria-labelledby="EmpSalFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="EmpSalFormModal" tabindex="-1" aria-labelledby="EmpSalFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -47,7 +63,8 @@
                   <option value="" disabled selected>Select Employee</option>
                   <option *ngFor="let emp of employee" [value]="emp.emP_ID">{{ emp.emP_NAME }}</option>
                 </select>
-                <label for="employee-reference"><i class="ri-group-3-line"></i> Employee Name <span class="text-danger">*</span></label>
+                <label for="employee-reference"><i class="ri-group-3-line"></i> Employee Name <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('EMP_ID')?.invalid">
                   <small *ngIf="data.get('EMP_ID')?.errors?.['required']">Employee name is required.</small>
                 </div>
@@ -57,8 +74,10 @@
             <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="employeePrice" class="form-control" formControlName="EMP_PRICE" placeholder="Price" />
-                <label for="employeePrice"><i class="ri-money-rupee-circle-line"></i> Price <span class="text-danger">*</span></label>
+                <input type="number" id="employeePrice" class="form-control" formControlName="EMP_PRICE"
+                  placeholder="Price" />
+                <label for="employeePrice"><i class="ri-money-rupee-circle-line"></i> Price <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('EMP_PRICE')?.invalid">
                   <small *ngIf="data.get('EMP_PRICE')?.errors?.['required']">Price is required.</small>
                   <small *ngIf="data.get('EMP_PRICE')?.errors?.['pattern']">Enter a valid number.</small>
@@ -69,8 +88,10 @@
             <!-- Delete Reason -->
             <div class="custom-form-group" *ngIf="EMP_TRN_ID != 0 && btn == 'D'">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="empDeleteReason" class="form-control" placeholder="Delete Reason" [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
-                <label for="empDeleteReason"><i class="ri-chat-3-line"></i> Delete Reason <span class="text-danger">*</span></label>
+                <input type="text" id="empDeleteReason" class="form-control" placeholder="Delete Reason"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="empDeleteReason"><i class="ri-chat-3-line"></i> Delete Reason <span
+                    class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1" *ngIf="submitted && btn == 'D' && Reason == ''">
                 <small>Delete reason is required.</small>
@@ -125,7 +146,10 @@
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
-            <tr *ngFor="let _objES of employeesalary">
+            <tr *ngFor="let _objES of filteredEmpSalary() | paginate: {
+      itemsPerPage: pageSize,
+      currentPage: page
+    };">
               <td style="width: 160px; white-space: nowrap;">
                 <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
                   data-bs-target="#EmpSalFormModal" (click)="getDataById(_objES.emP_TRN_ID, 'E')">
@@ -145,6 +169,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="d-flex justify-content-center p-3">
+          <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+        </div>
       </div>
 
       <!-- No Data Template -->

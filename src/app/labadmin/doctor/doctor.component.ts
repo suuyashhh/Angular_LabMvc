@@ -4,11 +4,12 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-doctor',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, NgxPaginationModule],
   templateUrl: './doctor.component.html',
   styleUrls: ['./doctor.component.css']
 })
@@ -22,7 +23,7 @@ export class DoctorComponent implements OnInit {
   Reason: string = '';
   loadingDoctors = false;
 
-  constructor(private api: ApiService, private toastr: ToastrService) {}
+  constructor(private api: ApiService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
@@ -58,6 +59,10 @@ export class DoctorComponent implements OnInit {
     this.data.reset();
     this.initForm();
   }
+
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 10;
 
   submit(doctor: any) {
     this.submitted = true;
@@ -142,4 +147,31 @@ export class DoctorComponent implements OnInit {
       });
     });
   }
+
+
+  filteredDoctors(): any[] {
+    debugger;
+    let result = this.doctor || [];
+
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((doctor: any) =>
+        doctor.doctoR_NAME?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
+  }
+
 }

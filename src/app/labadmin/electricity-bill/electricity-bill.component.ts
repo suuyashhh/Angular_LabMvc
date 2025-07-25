@@ -34,8 +34,12 @@ export class ElectricityBillComponent implements OnInit {
   }
 
   initForm() {
+    
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+
     this.data = new FormGroup({
-      DATE: new FormControl('', Validators.required),
+      DATE: new FormControl(formattedDate, Validators.required),
       ELC_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl()
     });
