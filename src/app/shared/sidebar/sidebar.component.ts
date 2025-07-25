@@ -1,4 +1,4 @@
-import { AfterViewInit, Component,OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -11,22 +11,20 @@ import { RouterModule } from '@angular/router';
 export class SidebarComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
-    // Trigger menu.js logic again
     this.reinitializeSidebarMenu();
   }
 
   reinitializeSidebarMenu(): void {
-  // Wait for DOM to update, especially after route change or sidebar toggle
-  setTimeout(() => {
-    const layoutMenu = document.querySelector('#layout-menu');
-    if (typeof (window as any).Menu !== 'undefined' && layoutMenu) {
-      const menu = new (window as any).Menu(layoutMenu, {
-        orientation: 'vertical',
-        closeChildren: false,
-      });
-      menu.init();
-    }
-  }, 50); // Small delay allows DOM rendering to finish
-}
+    setTimeout(() => {
+      const layoutMenu = document.querySelector('#layout-menu');
+      if (typeof (window as any).Menu !== 'undefined' && layoutMenu) {
+        new (window as any).Menu(layoutMenu, {
+          orientation: 'vertical',
+          closeChildren: false,
+        });
+        // ✅ Removed: menu.init(); — unnecessary and causes TypeError
+      }
+    }, 50);
+  }
 
 }

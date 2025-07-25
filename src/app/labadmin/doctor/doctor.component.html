@@ -1,120 +1,178 @@
-<div class="container  container-p-y">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal"
-        (click)="clearData()">
-        Add Doctor
-    </button>
+
+<div class="container container-p-y">
+  <div class="row align-items-center justify-content-between g-3">
+    <!-- Add Button - Left Side -->
+    <div class="col-auto">
+     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorFormModal"
+    (click)="clearData()">
+     <i class="ri-add-line me-2"></i> Add Doctor
+  </button>
+    </div>
+    
+    <!-- Search - Right Side -->
+    <div class="col-md-4 col-lg-3 ms-md-auto">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." 
+           [(ngModel)]="searchTerm"
+           (ngModelChange)="onSearch()"
+           id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
+      </div>
+    </div>
+  </div>
 </div>
 
+
+
 <div class="modal fade custom-modal-fade" id="doctorFormModal" tabindex="-1" aria-labelledby="doctorFormModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
-        <div class="modal-content custom-modal-content">
-            <div class="modal-header custom-modal-header">
-                <div class="modal-title-wrapper">
-                    <div class="modal-icon">
-                        <i class="ri-file-add-line"></i>
-                    </div>
-                    <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE == 0 && btn == ''"
-                        id="doctorFormModalLabel">Add Doctor</h5>
-                    <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE != 0 && btn == 'E'">Edit Doctor</h5>
-                    <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE != 0 && btn == 'D'">Delete Doctor</h5>
-                    <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE != 0 && btn == 'dtls'">Details Doctor
-                    </h5>
-                </div>
-                <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body custom-modal-body">
-                <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
-                    <div class="form-group-wrapper">
-
-                        <div class="custom-form-group">
-                            <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="doctor-name" class="form-control" formControlName="DOCTOR_NAME"
-                                    placeholder="Doctor Name" />
-                                <label for="doctor-name"><i class="ri-box-3-line"></i>Doctor Name <span
-                                        class="text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                        <div class="custom-form-group">
-                            <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="doctorAddress" class="form-control"
-                                    formControlName="DOCTOR_ADDRESS" placeholder="Address" />
-                                <label for="doctorAddress"> <i class="ri-map-pin-line"></i>Address <span
-                                        class="text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                        <div class="custom-form-group">
-                            <div class="form-floating form-floating-outline mb-4">
-                                <input type="text" id="doctorCoNo" class="form-control" formControlName="DOCTOR_NUMBER"
-                                    placeholder="Phone No" />
-                                <label for="doctorCoNo"> <i class="ri-phone-line"></i>Phone No <span
-                                        class="text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer custom-modal-footer">
-                        <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
-                            <i class="ri-close-line"></i>
-                            Cancel
-                        </button>
-                        <button *ngIf="DOCTOR_CODE == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save"
-                            data-bs-dismiss="modal">
-                            <i class="ri-save-line"></i>
-                            Save
-                        </button>
-                        <button *ngIf="DOCTOR_CODE != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save"
-                            data-bs-dismiss="modal">
-                            <i class="ri-edit-line"></i>
-                            Edit Doctor
-                        </button>
-                        <button *ngIf="DOCTOR_CODE != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save"
-                            data-bs-dismiss="modal">
-                            <i class="ri-delete-bin-line"></i>
-                            Delete Doctor
-                        </button>
-                    </div>
-                </form>
-            </div>
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="ri-file-add-line" *ngIf="DOCTOR_CODE == 0 && btn == ''"></i>
+            <i class="ri-edit-line" *ngIf="DOCTOR_CODE != 0 && btn == 'E'"></i>
+            <i class="ri-delete-bin-line" *ngIf="DOCTOR_CODE != 0 && btn == 'D'"></i>
+            <i class="ri-eye-line" *ngIf="DOCTOR_CODE != 0 && btn == 'dtls'"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE == 0 && btn == ''">Add Doctor</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE != 0 && btn == 'E'">Edit Doctor</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE != 0 && btn == 'D'">Delete Doctor</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOCTOR_CODE != 0 && btn == 'dtls'">Doctor Details</h5>
         </div>
+        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body custom-modal-body">
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form" novalidate>
+          <div class="form-group-wrapper">
+
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="doctor-name" class="form-control" formControlName="DOCTOR_NAME"
+                  placeholder="Doctor Name" />
+                <label for="doctor-name"><i class="ri-user-3-line"></i>Doctor Name <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('DOCTOR_NAME')?.invalid">
+                  <small *ngIf="data.get('DOCTOR_NAME')?.errors?.['required']">Doctor name is required.</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="doctorAddress" class="form-control" formControlName="DOCTOR_ADDRESS"
+                  placeholder="Address" />
+                <label for="doctorAddress"><i class="ri-map-pin-line"></i>Address <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('DOCTOR_ADDRESS')?.invalid">
+                  <small *ngIf="data.get('DOCTOR_ADDRESS')?.errors?.['required']">Address is required.</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="doctorCoNo" class="form-control" formControlName="DOCTOR_NUMBER"
+                  placeholder="Phone No" />
+                <label for="doctorCoNo"><i class="ri-phone-line"></i>Phone No <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('DOCTOR_NUMBER')?.invalid">
+                  <small *ngIf="data.get('DOCTOR_NUMBER')?.errors?.['required']">Phone number is required.</small>
+                  <small *ngIf="data.get('DOCTOR_NUMBER')?.errors?.['pattern']">Enter valid 10-digit number.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Reason -->
+            <div class="custom-form-group" *ngIf="DOCTOR_CODE != 0 && btn == 'D'">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="deleteReason" class="form-control" placeholder="Delete Reason"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="deleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+              </div>
+              <div class="text-danger mt-1" *ngIf="submitted && btn == 'D' && Reason == ''">
+                <small>Delete reason is required.</small>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer custom-modal-footer">
+            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+              <i class="ri-close-line"></i>
+              Cancel
+            </button>
+            <button *ngIf="DOCTOR_CODE == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-save-line"></i>
+              Save
+            </button>
+            <button *ngIf="DOCTOR_CODE != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i>
+              Edit
+            </button>
+            <button *ngIf="DOCTOR_CODE != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-delete-bin-line"></i>
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
+  <div class="card">
+    <h5 class="card-header">Doctor Table</h5>
 
-    <div class="card">
-        <h5 class="card-header">Doctor Table</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table">
-                <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
-                    <tr>
-                        <th>Actions</th>
-                        <th>Doc Code</th>
-                        <th>Doc Name</th>
-                    </tr>
-                </thead>
-                <tbody class="table-border-bottom-0">
-                    <tr *ngFor="let Doctor of doctor">
-                        <td style="width: 160px; white-space: nowrap;">
-                            <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);"
-                                data-bs-toggle="modal" data-bs-target="#doctorFormModal"
-                                (click)="getDataById(Doctor.doctoR_CODE,'E')">
-                                <i class="ri-pencil-line me-1"></i> Edit</a>
+    <div *ngIf="loadingDoctors" class="text-center my-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
-                            <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                                data-bs-target="#doctorFormModal" (click)="getDataById(Doctor.doctoR_CODE,'D')">
-                                <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
-
-                        </td>
-                        <td>{{Doctor.doctoR_CODE}}</td>
-                        <td>{{Doctor.doctoR_NAME}}</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div *ngIf="!loadingDoctors && doctor?.length > 0">
+      <div class="table-responsive text-nowrap" *ngIf="doctor && doctor.length > 0; else noData">
+        <table class="table">
+          <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+            <tr>
+              <th>Actions</th>
+              <th>Doc Code</th>
+              <th>Doc Name</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            <tr *ngFor="let Doctor of filteredDoctors() | paginate: {
+      itemsPerPage: pageSize,
+      currentPage: page
+    };">
+              <td style="width: 160px; white-space: nowrap;">
+                <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#doctorFormModal" (click)="getDataById(Doctor.doctoR_CODE, 'E')">
+                  <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#doctorFormModal" (click)="getDataById(Doctor.doctoR_CODE, 'D')">
+                  <i class="ri-delete-bin-6-line me-1"></i> Delete
+                </a>
+              </td>
+              <td>{{ Doctor.doctoR_CODE }}</td>
+              <td>
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#doctorFormModal"
+                  (click)="getDataById(Doctor.doctoR_CODE, 'dtls')">{{ Doctor.doctoR_NAME }}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+          <div class="d-flex justify-content-center p-3">
+          <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
         </div>
     </div>
+
+    <ng-template #noData>
+      <div class="text-center py-4">
+        <p class="text-muted">No doctor records found.</p>
+      </div>
+    </ng-template>
+  </div>
 </div>

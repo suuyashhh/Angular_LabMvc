@@ -1,109 +1,188 @@
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
-import { Modal } from 'bootstrap';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { ServicesService } from '../../shared/services.service';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-lab-materials',
   standalone: true,
-  imports: [HttpClientModule,ReactiveFormsModule,CommonModule,FormsModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormattedDatePipe, FormsModule, NgxPaginationModule],
   templateUrl: './lab-materials.component.html',
   styleUrl: './lab-materials.component.css'
 })
 export class LabMaterialsComponent implements OnInit {
-  
-  
+  data!: FormGroup;
   material: any;
-  data: any;
-  MAT_ID: any = 0;
+  MAT_ID: number = 0;
   ComId: number = 0;
-  btn: any = '';
-  submitted = false;
-  Reason: any = '';
+  btn: string = '';
+  submitted: boolean = false;
+  loadingMaterials = false;
+  Reason: string = '';
 
-  constructor(private api: ApiService) { }
-
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
-    // this.clearData();
-    this.load();
+    this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
+    this.initForm();
+    this.getMaterials();
   }
 
-  load() {
+  // initForm() {
+  //   this.data = new FormGroup({
+  //     DATE: new FormControl('', Validators.required),
+  //     MAT_NAME: new FormControl('', Validators.required),
+  //     MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
+  //     COM_ID: new FormControl(this.ComId)
+  //   });
+  // }
+
+  initForm() {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
     this.data = new FormGroup({
+      DATE: new FormControl(formattedDate, Validators.required),
       MAT_NAME: new FormControl('', Validators.required),
-      MAT_PRICE: new FormControl('', Validators.required),
-      DATE: new FormControl(''),
-      COM_ID: new FormControl()
+      MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
+      COM_ID: new FormControl(this.ComId)
     });
+  }
 
-    this.api.get('LabMaterials/LabMaterials').subscribe((res: any) => {
-      this.material = res;
-      console.log(this.material)
-    })
-
-    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
-
+  getMaterials() {
+    this.loadingMaterials = true;
+    this.api.get('LabMaterials/LabMaterials').subscribe({
+      next: (res: any) => {
+        this.material = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.material = [];
+      },
+      complete: () => this.loadingMaterials = false
+    });
   }
 
   clearData() {
     this.MAT_ID = 0;
     this.btn = '';
-    this.data.patchValue({
-      MAT_NAME: '',
-      MAT_PRICE: '',
-      DATE: ''
-    })
+    this.data.reset();
+    this.initForm();
   }
+
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 10;
 
   submit(material: any) {
-    this.submitted = false;
-    if (!this.data.valid) {
-      this.submitted = true;
+    this.submitted = true;
+
+    if (this.data.invalid) {
+      this.toastr.error('Please fix validation errors.');
       return;
     }
-    if (this.MAT_ID == 0 && this.btn == '') {
-      material.COM_ID = this.ComId
-        this.api.post('LabMaterials/SaveLabMaterials', material).subscribe((res: any) => {
-          this.api.modalClose();
-          this.load();
-       }); 
-    } else if (this.MAT_ID != 0 && this.btn == 'E') {
-      console.log(this.MAT_ID);
-      this.api.post('LabMaterials/EditLabMaterials/' + this.MAT_ID, material).subscribe((res: any) => {
-        this.load();
-        console.log(res);
-        
-      });
-    }
-    else if (this.MAT_ID != 0 && this.btn == 'D') {
-      console.log(this.Reason);
 
-      if (this.Reason != '') {
-        this.api.delete('LabMaterials/DeleteLabMaterials/' + this.MAT_ID).subscribe((res: any) => {
-          this.load();
-        })
-      }
-      else {
-        alert("Fill the reason");
+    const rawDate = this.data.get('DATE')?.value;
+    const parts = rawDate.split('-');
+    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    material.DATE = this.service.getFormattedDate(formatted, 1);
+
+    if (this.MAT_ID == 0 && this.btn == '') {
+      this.api.post('LabMaterials/SaveLabMaterials', material).subscribe({
+        next: () => {
+          this.getMaterials();
+          setTimeout(() => {
+            this.toastr.success('Material added successfully');
+            this.api.modalClose('labMatFormModal');
+            this.clearData();
+          }, 300);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to add material');
+          console.error(err);
+        }
+      });
+
+    } else if (this.MAT_ID != 0 && this.btn == 'E') {
+      this.api.post('LabMaterials/EditLabMaterials/' + this.MAT_ID, material).subscribe({
+        next: () => {
+          this.getMaterials();
+          setTimeout(() => {
+            this.toastr.success('Material updated successfully');
+            this.api.modalClose('labMatFormModal');
+            this.clearData();
+          }, 200);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to update material');
+          console.error(err);
+        }
+      });
+
+    } else if (this.MAT_ID != 0 && this.btn == 'D') {
+      if (this.Reason.trim() !== '') {
+        this.api.delete('LabMaterials/DeleteLabMaterials/' + this.MAT_ID).subscribe({
+          next: () => {
+            this.getMaterials();
+            setTimeout(() => {
+              this.toastr.success('Material deleted successfully');
+              this.api.modalClose('labMatFormModal');
+              this.clearData();
+              this.Reason = "";
+            }, 200);
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete material');
+            console.error(err);
+          }
+        });
+      } else {
+        this.toastr.warning('Please fill in the reason before deleting.');
       }
     }
   }
 
-  getDataById(matCode: number, btn: any) {
+  getDataById(matCode: number, btn: string) {
     this.btn = btn;
-    this.api.get('LabMaterials/LabMaterials/' + matCode).subscribe((res: any) => {
-      console.log(res);
-
+    this.api.get('LabMaterials/LabMaterial/' + matCode).subscribe((res: any) => {
       this.MAT_ID = res.maT_ID;
       this.data.patchValue({
+        DATE: this.service.getFormattedDate(res.date, 8),
         MAT_NAME: res.maT_NAME,
-        MAT_PRICE: res.maT_PRICE,
-        DATE: res.date
-      })
-    })
+        MAT_PRICE: res.maT_PRICE
+      });
+    });
+  }
+
+
+  filteredMaterials(): any[] {
+    let result = this.material || [];
+
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((material: any) =>
+        material.maT_NAME?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
   }
 
 

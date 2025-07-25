@@ -1,13 +1,28 @@
-<div class="container  container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateFormModal"
-    (click)="clearData()">
-    Add Test
-  </button>
+<div class="container container-p-y">
+  <div class="row align-items-center justify-content-between g-3">
+    <!-- Add Button - Left Side -->
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateFormModal"
+        (click)="clearData()">
+        <i class="ri-add-line me-2"></i> Add Test
+      </button>
+    </div>
+    
+    <!-- Search - Right Side -->
+    <div class="col-md-4 col-lg-3 ms-md-auto">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." 
+           [(ngModel)]="searchTerm"
+           (ngModelChange)="onSearch()"
+           id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- For Create Model -->
-
-<div class="modal fade custom-modal-fade" id="CreateFormModal" tabindex="-1" aria-labelledby="createFormModalLabel"
+<!-- Modal -->
+<div class="modal fade custom-modal-fade" id="CreateFormModal" tabindex="-1" aria-labelledby="CreateFormModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
@@ -19,128 +34,151 @@
             <i class="ri-delete-bin-line" *ngIf="TEST_CODE != 0 && btn == 'D'"></i>
             <i class="ri-eye-line" *ngIf="TEST_CODE != 0 && btn == 'dtls'"></i>
           </div>
-          <h5 class="modal-title custom-modal-title" *ngIf="TEST_CODE == 0 && btn == ''">Add New Test</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="TEST_CODE == 0 && btn == ''">Add Test</h5>
           <h5 class="modal-title custom-modal-title" *ngIf="TEST_CODE != 0 && btn == 'E'">Edit Test</h5>
           <h5 class="modal-title custom-modal-title" *ngIf="TEST_CODE != 0 && btn == 'D'">Delete Test</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="TEST_CODE != 0 && btn == 'dtls'">Details Test</h5>
-
+          <h5 class="modal-title custom-modal-title" *ngIf="TEST_CODE != 0 && btn == 'dtls'">Test Details</h5>
         </div>
         <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body custom-modal-body">
-        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form">
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)" class="custom-form" novalidate>
           <div class="form-group-wrapper">
 
+            <!-- Test Name -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="test-name" class="form-control" formControlName="TEST_NAME"
                   placeholder="Test Name" />
                 <label for="test-name"><i class="ri-flask-line"></i>Test Name <span class="text-danger">*</span></label>
-              </div>
-              <!-- <div class="text-danger mt-1"
-                *ngIf="submitted && data.get('TEST_NAME')?.error && data.get('TEST_NAME')?.invalid">
-                TEST NAME is required.
-              </div> -->
-              <div class="text-danger mt-1" *ngIf="submitted && data.get('TEST_NAME')?.errors">
-                <small *ngIf="data.get('TEST_NAME')?.errors['required']">Test Name is required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('TEST_NAME')?.invalid">
+                  <small *ngIf="data.get('TEST_NAME')?.errors?.['required']">Test name is required.</small>
+                </div>
               </div>
             </div>
 
+            <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="testPrice" class="form-control" formControlName="PRICE" placeholder="Price" />
-                <label for="testPrice"> <i class="ri-money-rupee-circle-line"></i>Price <span
+                <input type="number" id="test-price" class="form-control" formControlName="PRICE" placeholder="Price" />
+                <label for="test-price"><i class="ri-money-rupee-circle-line"></i>Price <span
                     class="text-danger">*</span></label>
-              </div>
-              <div class="text-danger mt-1" *ngIf="submitted && data.get('PRICE')?.errors">
-                <small *ngIf="data.get('PRICE')?.errors['required']">Price is required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('PRICE')?.invalid">
+                  <small *ngIf="data.get('PRICE')?.errors?.['required']">Price is required.</small>
+                </div>
               </div>
             </div>
 
+            <!-- Lab Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="testLabPrice" class="form-control" formControlName="LAB_PRICE"
-                  placeholder="Price" />
-                <label for="testLabPrice"> <i class="ri-money-rupee-circle-line"></i> Lab Price <span
-                    class="text-danger">*</span></label>
+                <input type="number" id="lab-price" class="form-control" formControlName="LAB_PRICE"
+                  placeholder="Lab Price" />
+                <label for="lab-price"><i class="ri-money-rupee-circle-line"></i>Lab Price</label>
               </div>
             </div>
 
+            <!-- Delete Reason -->
             <div class="custom-form-group" *ngIf="TEST_CODE != 0 && btn == 'D'">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="testLabreason" class="form-control" placeholder="Reason" [(ngModel)]="Reason"
-                  [ngModelOptions]="{standalone: true}" required />
-                <label for="testLabreason"> <i class="ri-chat-3-line"></i> Delete Reason <span
+                <input type="text" id="test-reason" class="form-control" placeholder="Delete Reason"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="test-reason"><i class="ri-chat-3-line"></i>Delete Reason <span
                     class="text-danger">*</span></label>
-              </div>
-              <div class="text-danger mt-1" *ngIf="Reason == '' ">
-                <small *ngIf="Reason == '' ">Delete Reason required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && Reason == ''">
+                  <small>Delete reason is required.</small>
+                </div>
               </div>
             </div>
 
-            <div class="modal-footer custom-modal-footer">
-              <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
-                <i class="ri-close-line"></i>
-                Cancel
-              </button>
-              <button *ngIf="TEST_CODE == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save" >
-                <i class="ri-save-line"></i>
-                Save Test
-              </button>
-              <button *ngIf="TEST_CODE != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save"
-                data-bs-dismiss="modal">
-                <i class="ri-edit-line"></i>
-                Edit Test
-              </button>
-              <button *ngIf="TEST_CODE != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save"
-                data-bs-dismiss="modal">
-                <i class="ri-delete-bin-line"></i>
-                Delete Test
-              </button>
-            </div>
           </div>
+
+          <!-- Footer Buttons -->
+          <div class="modal-footer custom-modal-footer">
+            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+              <i class="ri-close-line"></i>
+              Cancel
+            </button>
+            <button *ngIf="TEST_CODE == 0 && btn == ''" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-save-line"></i>
+              Save Test
+            </button>
+            <button *ngIf="TEST_CODE != 0 && btn == 'E'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i>
+              Edit Test
+            </button>
+            <button *ngIf="TEST_CODE != 0 && btn == 'D'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-delete-bin-line"></i>
+              Delete Test
+            </button>
+          </div>
+
         </form>
       </div>
     </div>
   </div>
 </div>
 
-
+<!-- Table -->
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="card">
     <h5 class="card-header">Test Table</h5>
-    <div class="table-responsive text-nowrap">
-      <table class="table">
-        <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
-          <tr>
-            <th>Actions</th>
-            <th>Test Code</th>
-            <th>Test Name</th>
-            <th>price</th>
-          </tr>
-        </thead>
-        <tbody class="table-border-bottom-0">
-          <tr *ngFor="let _test of tests">
-            <td style="width: 160px; white-space: nowrap;">
-              <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#CreateFormModal" (click)="getDataById(_test.tesT_CODE,'E')">
-                <i class="ri-pencil-line me-1"></i> Edit</a>
 
-              <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#CreateFormModal" (click)="getDataById(_test.tesT_CODE,'D')">
-                <i class="ri-delete-bin-6-line me-1"></i> Delete</a>
+    <!-- Loading Spinner -->
+    <div *ngIf="loadingTests" class="text-center my-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
-              <a class="btn btn-sm btn-success me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#CreateFormModal">
-                <i class="ri-file-text-line me-1"></i> Invoice</a>
-            </td>
-            <td><i class="ri-suitcase-2-line ri-22px text-danger me-4"></i><span>{{_test.tesT_CODE}}</span></td>
-            <td><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#CreateFormModal"
-                (click)="getDataById(_test.tesT_CODE,'dtls')">{{_test.tesT_NAME}}</a></td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{_test.price}}</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Table Content -->
+    <div *ngIf="!loadingTests">
+      <div class="table-responsive text-nowrap" *ngIf="tests && tests.length > 0; else noTests">
+        <table class="table">
+          <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+            <tr>
+              <th>Actions</th>
+              <th>Test Code</th>
+              <th>Test Name</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            <tr *ngFor="let _test of filteredTests() | paginate: {
+      itemsPerPage: pageSize,
+      currentPage: page
+    };">
+              <td style="width: 160px; white-space: nowrap;">
+                <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#CreateFormModal" (click)="getDataById(_test.tesT_CODE, 'E')">
+                  <i class="ri-pencil-line me-1"></i> Edit
+                </a>
+                <a class="btn btn-sm btn-danger me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#CreateFormModal" (click)="getDataById(_test.tesT_CODE, 'D')">
+                  <i class="ri-delete-bin-6-line me-1"></i> Delete
+                </a>
+              </td>
+              <td><i class="ri-suitcase-2-line ri-22px text-danger me-2"></i>{{ _test.tesT_CODE }}</td>
+              <td>
+                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#CreateFormModal"
+                  (click)="getDataById(_test.tesT_CODE, 'dtls')">{{ _test.tesT_NAME }}</a>
+              </td>
+              <td><span class="badge rounded-pill bg-label-primary me-1">₹ {{ _test.price }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="d-flex justify-content-center p-3">
+          <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+        </div>
+      </div>
+
+      <!-- No Data Template -->
+      <ng-template #noTests>
+        <div class="text-center py-4">
+          <p class="text-muted">No test records found.</p>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

@@ -14,3 +14,95 @@
   .bg-gradient-primary {
     background: linear-gradient(90deg, #4b6cb7, #182848);
   }
+.doc {
+    box-sizing: content-box;
+    background: none transparent;
+    border: 0 none;
+    box-shadow: none;
+    outline: none;
+    padding: 0;
+    cursor: default;
+    width: 100%;
+}
+
+
+::ng-deep .ng-dropdown-panel {
+  border-radius: 4px;
+  z-index: 1050;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background-color:snow;
+}
+
+
+/* Main panel container */
+::ng-deep .ng-dropdown-panel {
+  border: 1px solid #4b6cb7;
+  z-index: 1050;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  max-height: 250px;
+  overflow-y: auto;
+  width: 100% !important;
+  box-sizing: border-box;
+  margin-top: 16px;
+  margin-left: -14px;
+}
+
+/* Search input inside dropdown */
+::ng-deep .ng-dropdown-panel .ng-dropdown-header input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  margin: 8px;
+}
+
+/* Dropdown items */
+::ng-deep .ng-dropdown-panel .ng-option {
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  word-wrap: break-word;
+  white-space: normal;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover and keyboard-highlighted option */
+::ng-deep .ng-dropdown-panel .ng-option:hover,
+::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked {
+  background-color: #e6f0ff;
+  color: #1a237e;
+}
+
+/* Selected option style */
+::ng-deep .ng-dropdown-panel .ng-option-selected {
+  background-color: #d0e0ff;
+  font-weight: 500;
+  color: #2a3eb1;
+}
+
+/* Responsive tweaks for small screens */
+@media (max-width: 576px) {
+  ::ng-deep .ng-dropdown-panel {
+    max-height: 200px;
+    font-size: 13px;
+  }
+
+  ::ng-deep .ng-dropdown-panel .ng-option {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  ::ng-deep .ng-dropdown-panel .ng-dropdown-header input {
+    padding: 8px 10px;
+    font-size: 13px;
+    margin: 6px;
+  }
+}
+
+

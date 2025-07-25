@@ -70,6 +70,21 @@ export const lABADMIN_ROUTES: Routes = [
     path:'doctor-commission',
     loadComponent: () => import('../labadmin/doctor-commission/doctor-commission.component')
         .then(m => m.DoctorCommissionComponent)
+ },
+ {
+    path:'finance',
+    loadComponent: () => import('../labadmin/finance/finance.component')
+        .then(m => m.FinanceComponent)
+ },
+ {
+    path:'charts',
+    loadComponent: () => import('../labadmin/charts/charts.component')
+        .then(m => m.ChartsComponent)
+ },
+ {
+    path:'finance-records',
+    loadComponent: () => import('../labadmin/finance-records/finance-records.component')
+        .then(m => m.FinanceRecordsComponent)
  }
     //   {
 //     path: 'drr',

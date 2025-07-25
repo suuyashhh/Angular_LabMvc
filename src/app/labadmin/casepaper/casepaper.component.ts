@@ -1,4 +1,12 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  QueryList,
+  ViewChildren,
+  ElementRef,
+} from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { HttpClientModule } from '@angular/common/http';
 import {
@@ -14,7 +22,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
-import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
+import { NgSelectModule, NgOption } from '@ng-select/ng-select';
+import { log } from 'console';
+import { ServicesService } from '../../shared/services.service';
+import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
 
 interface CasePaper {
   trN_NO: number;
@@ -37,13 +49,18 @@ interface CasePaper {
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    NgSelectModule,
+    FormattedDatePipe
   ],
   templateUrl: './casepaper.component.html',
   styleUrl: './casepaper.component.css',
 })
 export class CasepaperComponent implements OnInit {
+  @ViewChildren('formField') formFields!: QueryList<ElementRef>;
+
   isCreatingNew: boolean = false; // ✅ Added
 
+  btn: string = '';
   cases: any;
   data: any;
   tests: any;
@@ -59,20 +76,30 @@ export class CasepaperComponent implements OnInit {
   total_Lab_Profit: any = 0;
   total_test_LabPrice: any = 0;
   submitted = false;
-  dateRange: { start: Date | null; end: Date | null } = { start: null, end: null };
+  dateRange: { start: Date | null; end: Date | null } = {
+    start: null,
+    end: null,
+  };
   today: Date = new Date();
   trn_no: number = 0;
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private toastr: ToastrService,
+    private service: ServicesService
+  ) { }
 
   ngOnInit(): void {
     this.data = new FormGroup({
       trN_NO: new FormControl(0),
       patienT_NAME: new FormControl('', Validators.required),
       gender: new FormControl('', Validators.required),
-      coN_NUMBER: new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]),
+      coN_NUMBER: new FormControl('', [
+        Validators.required,
+        Validators.pattern('^[0-9]{10}$'),
+      ]),
       address: new FormControl('', Validators.required),
-      doctoR_CODE: new FormControl(0, Validators.required),
+      doctoR_CODE: new FormControl('', Validators.required),
       totaL_AMOUNT: new FormControl(0),
       totaL_PROFIT: new FormControl(0),
       discount: new FormControl(0),
@@ -111,20 +138,21 @@ export class CasepaperComponent implements OnInit {
   }
 
   add(Entertest: string) {
-    const filteredTests = this.tests.filter((test: any) =>
-      test.tesT_NAME.toLowerCase() === Entertest.toLowerCase()
+    const filteredTests = this.tests.filter(
+      (test: any) => test.tesT_NAME.toLowerCase() === Entertest.toLowerCase()
     );
 
     filteredTests.forEach((test: any) => {
       const alreadyExists = this.matIs.some(
-        (item: any) => item.tesT_NAME.toLowerCase() === test.tesT_NAME.toLowerCase()
+        (item: any) =>
+          item.tesT_NAME.toLowerCase() === test.tesT_NAME.toLowerCase()
       );
       if (alreadyExists) return;
 
       const srNo = this.matIs.length + 1;
       const newTest = {
         ...test,
-        sR_NO: srNo
+        sR_NO: srNo,
       };
 
       this.matIs.push(newTest);
@@ -153,7 +181,7 @@ export class CasepaperComponent implements OnInit {
 
     this.matIs = this.matIs.map((item: any, index: number) => ({
       ...item,
-      sR_NO: index + 1
+      sR_NO: index + 1,
     }));
 
     this.testAmount();
@@ -177,12 +205,12 @@ export class CasepaperComponent implements OnInit {
       console.log(this.cases);
     });
 
-    this.api.get('Test/Test').subscribe((res: any) => {
+    this.api.get('Test/Tests').subscribe((res: any) => {
       this.tests = res;
       console.log(this.tests);
     });
 
-    this.api.get('Doctor/Doctor').subscribe((res: any) => {
+    this.api.get('Doctor/Doctors').subscribe((res: any) => {
       this.doctor = res;
       console.log(this.doctor);
     });
@@ -190,36 +218,43 @@ export class CasepaperComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 7;
+  readonly pageSize: number = 15;
 
   submit(data: any): void {
     this.submitted = true;
-
+    const rawDate = this.data.get('DATE')?.value;
+    const parts = rawDate.split('-');
+    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    data.DATE = this.service.getFormattedDate(formatted, 1);
     if (!this.data.valid) {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'warning',
-        title: 'Please fill all required fields!',
-        showConfirmButton: false,
-        timer: 1500,
-        backdrop: false,
-        customClass: {
-          container: 'swal2-on-modal',
-          popup: 'swal2-toast-override'
+      // Scroll to first invalid field
+      setTimeout(() => {
+        const firstInvalid = this.formFields.find((el) => {
+          const controlName = el.nativeElement.getAttribute('formControlName');
+          return controlName && this.data.get(controlName)?.invalid;
+        });
+        if (firstInvalid) {
+          firstInvalid.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+          firstInvalid.nativeElement.focus();
         }
-      });
+      }, 0);
+
+      // Toastr error toast instead of Swal
+      this.toastr.error('Please fill all required fields!', 'Validation Error');
       return;
     }
 
     if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
-      alert('Please add at least one test.');
+      this.toastr.error('Please add at least one test!', 'Test Missing');
       return;
     }
 
     const payload = {
       ...data,
-      matIs: this.matIs
+      matIs: this.matIs,
     };
 
     console.log('Submitting:', payload);
@@ -232,15 +267,18 @@ export class CasepaperComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error occurred:', err);
-        alert('An error occurred while saving. Please try again.');
-      }
+        this.toastr.error(
+          'An error occurred while saving. Please try again.',
+          'Server Error'
+        );
+      },
     });
   }
 
   cancelCreate() {
-    this.isCreatingNew = false;     // ✅ Hide form
-    this.data.reset();              // ✅ Reset form data
-    this.matIs = [];                // ✅ Clear tests
+    this.isCreatingNew = false; // ✅ Hide form
+    this.data.reset(); // ✅ Reset form data
+    this.matIs = []; // ✅ Clear tests
     this.test_Amount = 0;
     this.total_Amount = 0;
     this.total_test_LabPrice = 0;
@@ -252,26 +290,41 @@ export class CasepaperComponent implements OnInit {
   filtered: CasePaper[] = [];
   isDateFiltered = false;
 
-  filteredCases(): CasePaper[] {
-    let result = this.cases;
 
-    if (this.searchTerm) {
-      result = result.filter((c: CasePaper) =>
-        c.patienT_NAME.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
+ filteredCases(): CasePaper[] {
+  let result = this.cases || [];
 
-    if (this.isDateFiltered && this.startDate && this.endDate) {
-      const start = new Date(this.startDate);
-      const end = new Date(this.endDate);
+  // Apply search filter if searchTerm exists
+  if (this.searchTerm) {
+    const searchTermLower = this.searchTerm.toLowerCase();
+    result = result.filter((c: CasePaper) =>
+      c.patienT_NAME.toLowerCase().includes(searchTermLower) || // Name search
+      (c.coN_NUMBER && c.coN_NUMBER.includes(this.searchTerm)) // Contact number search (exact match)
+    );
+  }
 
-      result = result.filter((c: CasePaper) => {
-        const caseDate = new Date(c.date);
-        return caseDate >= start && caseDate <= end;
-      });
-    }
+  // Apply date filter if enabled and dates exist
+  if (this.isDateFiltered && this.startDate && this.endDate) {
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
 
-    return result;
+    result = result.filter((c: CasePaper) => {
+      const caseDate = new Date(c.date);
+      return caseDate >= start && caseDate <= end;
+    });
+  }
+
+  // Reset to page 1 when search term changes
+  if (this.searchTerm) {
+    this.page = 1;
+  }
+
+  return result;
+}
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
   }
 
   filterByDate() {
@@ -291,7 +344,7 @@ export class CasepaperComponent implements OnInit {
       error: (err) => {
         console.error('Error loading case paper:', err);
         alert('Failed to load case paper data.');
-      }
+      },
     });
   }
 
@@ -300,34 +353,95 @@ export class CasepaperComponent implements OnInit {
     return match ? match.tesT_NAME : 'N/A';
   }
 
-  selectedProduct: any | null = null;
+  selectedDoctor: number | null = null;
 
-  products: any[] = [
-    {
-      id: 1,
-      name: 'Air Jordan',
-      description: 'Air Jordan is a line of basketball shoes produced by Nike',
-      image: 'assets/img/ecommerce-images/product-9.png',
-      category: 'Shoes',
-      categoryIcon: 'ri-home-6-line',
-      stock: true,
-      sku: '31063',
-      price: '$125',
-      qty: 942,
-      status: 'Inactive'
-    },
-    {
-      id: 2,
-      name: 'Amazon Fire TV',
-      description: '4K UHD smart TV, stream live TV without cable',
-      image: 'assets/img/ecommerce-images/product-13.png',
-      category: 'Electronics',
-      categoryIcon: 'ri-computer-line',
-      stock: false,
-      sku: '5829',
-      price: '$263.49',
-      qty: 587,
-      status: 'Scheduled'
-    }
-  ];
+  customSearchFn(term: string, item: any) {
+    const search = term.toLowerCase();
+    const name = item.doctoR_NAME.toLowerCase();
+    return name.includes(search);
+  }
+
+  openInlineForm(trN_NO: number, action: string) {
+    this.isCreatingNew = true;
+    this.btn = action;
+    this.getDataById(trN_NO, action);
+  }
+
+  getDataById(trN_NO: number, btn: string) {
+    this.btn = btn;
+    this.api.get('CasePaper/CasePaper/' + trN_NO).subscribe((res: any) => {
+      this.trn_no = res.trN_NO;
+      console.log(res);
+
+      this.data.patchValue({
+        patienT_NAME: res.patienT_NAME,
+        gender: res.gender,
+        coN_NUMBER: res.coN_NUMBER,
+        address: res.address,
+        totaL_AMOUNT: res.totaL_AMOUNT,
+        totaL_PROFIT: res.totaL_PROFIT,
+        discount: res.discount,
+        paymenT_AMOUNT: res.paymenT_AMOUNT,
+        collectioN_TYPE: res.collectioN_TYPE,
+        paymenT_METHOD: res.paymenT_METHOD,
+        paymenT_STATUS: res.paymenT_STATUS,
+        date: this.service.getFormattedDate(res.date, 8),
+        doctoR_CODE: res.doctoR_CODE,
+        //"totaL_AMOUNT": 0,
+        // "totaL_PROFIT": 0,
+        // "discount": 0,
+        // "date": "string",
+        // "paymenT_AMOUNT": 0,
+        // "collectioN_TYPE": 0,
+        // "paymenT_METHOD": 0,
+        // "paymenT_STATUS": "string"
+        // patch other fields as needed
+      });
+
+      this.matIs = res.matIs;
+      this.testAmount();
+      this.total();
+
+      // Optional: If this is for delete, you can show a confirmation prompt
+      if (btn === 'D') {
+        if (confirm('Are you sure you want to delete this test?')) {
+          // this.Reason = 'User confirmed deletion'; // Example
+          this.submit(this.data.value); // triggers delete logic
+        } else {
+          this.isCreatingNew = false;
+        }
+      }
+    });
+  }
+
+  resetCasepaperForm() {
+    this.isCreatingNew = true; // Show the inline form
+    this.btn = ''; // Clear action (E/D/etc.)
+    // this.TEST_CODE = 0;              // Reset TEST_CODE
+    this.trn_no = 0; // Reset transaction number (if used)
+    this.searchText = ''; // Reset test search input
+    this.selectedDoctor = null; // Reset ng-select
+    this.discount_Amount = 0; // Reset discount calculation
+    this.total_Amount = 0; // Reset total
+    this.total_Lab_Profit = 0; // Reset profit
+    this.matIs = []; // Reset tests list (blood tests)
+
+    // Reset the FormGroup values
+    this.data.reset({
+      trN_NO: 0,
+      patienT_NAME: '',
+      gender: '',
+      coN_NUMBER: '',
+      address: '',
+      doctoR_CODE: '',
+      totaL_AMOUNT: 0,
+      totaL_PROFIT: 0,
+      discount: 0,
+      paymenT_AMOUNT: 0,
+      paymenT_METHOD: 0,
+      date: '', // optional: can use `new Date()` if needed
+      coM_ID: 101, // static value you set during init
+      paymenT_STATUS: '',
+    });
+  }
 }

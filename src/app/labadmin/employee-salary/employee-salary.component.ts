@@ -1,115 +1,189 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
-import { Modal } from 'bootstrap';
+import { ToastrService } from 'ngx-toastr';
+import { ServicesService } from '../../shared/services.service';
+import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-employee-salary',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule,FormattedDatePipe,NgxPaginationModule],
   templateUrl: './employee-salary.component.html',
   styleUrl: './employee-salary.component.css'
 })
-export class EmployeeSalaryComponent {
+export class EmployeeSalaryComponent implements OnInit {
   employeesalary: any;
-  data: any;
+  data!: FormGroup;
   employee: any;
-  EMP_TRN_ID : any =0;
+  EMP_TRN_ID: number = 0;
   ComId: number = 0;
-  btn: any = '';
-  submitted = false;
-  Reason: any = '';
+  btn: string = '';
+  submitted: boolean = false;
+  Reason: string = '';
+  loadingSalary = false;
 
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) {}
 
-  constructor(private api: ApiService) { }
   ngOnInit(): void {
-    // this.data = new FormGroup({
-    //   EMP_TRN_ID: new FormControl(),
-    //   EMP_PRICE: new FormControl(),
-    //   DATE: new FormControl()
-    // });
+    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
+    this.initForm();
     this.load();
   }
 
+  initForm() {
+    
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
 
-  load() {
-
-  this.data = new FormGroup({
-      EMP_ID: new FormControl(),
-      EMP_PRICE: new FormControl(),
-      DATE: new FormControl(),
+    this.data = new FormGroup({
+      EMP_ID: new FormControl('',Validators.required),
+      EMP_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
+      DATE: new FormControl(formattedDate, Validators.required),
       COM_ID: new FormControl()
     });
+  }
 
-    this.api.get('EmployeeSalary/EmployeeSalary').subscribe((res: any) => {
-      this.employeesalary = res;
-      console.log(this.employeesalary)
+  load() {
+    this.loadingSalary = true;
+    this.api.get('EmployeeSalary/EmployeeSalarys').subscribe({
+      next: (res: any) => {
+        this.employeesalary = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load salary list');
+        console.error(err);
+        this.employeesalary = [];
+      },
+      complete: () => this.loadingSalary = false
     });
+
     this.api.get('Employee/Employees').subscribe((res: any) => {
       this.employee = res;
-      console.log(this.employee);
     });
-
-    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
-
   }
 
-    clearData() {
+  clearData() {
     this.EMP_TRN_ID = 0;
     this.btn = '';
-    this.data.patchValue({
-      EMP_ID: '',
-      EMP_PRICE: ''
-    })
+    this.data.reset();
+    this.initForm();
   }
 
-   submit(employeesalary: any) {
-    this.submitted = false;
-    if (!this.data.valid) {
-      this.submitted = true;
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 2;
+
+  submit(employeesalary: any) {
+    this.submitted = true;
+
+    if (this.data.invalid) {
+      this.toastr.error('Please fix validation errors.');
       return;
     }
-    if (this.EMP_TRN_ID == 0 && this.btn == '') {
-      employeesalary.COM_ID = this.ComId
-        this.api.post('EmployeeSalary/SaveEmployeeSalary', employeesalary).subscribe((res: any) => {
-          this.api.modalClose();
-          this.load();
-       }); 
-    } else if (this.EMP_TRN_ID != 0 && this.btn == 'E') {
-      console.log(this.EMP_TRN_ID);
-      this.api.post('EmployeeSalary/EditEmployeeSalary/' + this.EMP_TRN_ID, employeesalary).subscribe((res: any) => {
-        this.load();
-        console.log(res);
-        
-      });
-    }
-    else if (this.EMP_TRN_ID != 0 && this.btn == 'D') {
-      console.log(this.Reason);
 
-      if (this.Reason != '') {
-        this.api.delete('EmployeeSalary/DeleteEmployeeSalary/' + this.EMP_TRN_ID).subscribe((res: any) => {
+    const rawDate = this.data.get('DATE')?.value;
+    const parts = rawDate.split('-');
+    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    employeesalary.DATE = this.service.getFormattedDate(formatted, 1);
+
+    if (this.EMP_TRN_ID == 0 && this.btn == '') {
+      employeesalary.COM_ID = this.ComId;
+      this.api.post('EmployeeSalary/SaveEmployeeSalary', employeesalary).subscribe({
+        next: () => {
           this.load();
-        })
-      }
-      else {
-        alert("Fill the reason");
+          setTimeout(() => {
+            this.toastr.success('Salary added successfully');
+            this.api.modalClose('EmpSalFormModal');
+            this.clearData();
+          }, 300);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to add salary');
+          console.error(err);
+        }
+      });
+
+    } else if (this.EMP_TRN_ID != 0 && this.btn == 'E') {
+      this.api.post('EmployeeSalary/EditEmployeeSalary/' + this.EMP_TRN_ID, employeesalary).subscribe({
+        next: () => {
+          this.load();
+          setTimeout(() => {
+            this.toastr.success('Salary updated successfully');
+            this.api.modalClose('EmpSalFormModal');
+            this.clearData();
+          }, 200);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to update salary');
+          console.error(err);
+        }
+      });
+
+    } else if (this.EMP_TRN_ID != 0 && this.btn == 'D') {
+      if (this.Reason.trim() !== '') {
+        this.api.delete('EmployeeSalary/DeleteEmployeeSalary/' + this.EMP_TRN_ID).subscribe({
+          next: () => {
+            this.load();
+            setTimeout(() => {
+              this.toastr.success('Salary deleted successfully');
+              this.api.modalClose('EmpSalFormModal');
+              this.clearData();
+              this.Reason = "";
+            }, 200);
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete salary');
+            console.error(err);
+          }
+        });
+      } else {
+        this.toastr.warning('Please fill in the reason before deleting.');
       }
     }
   }
 
-   getDataById(EmpSalCode: number, btn: any) {
+  getDataById(EmpSalCode: number, btn: string) {
     this.btn = btn;
     this.api.get('EmployeeSalary/EmployeeSalary/' + EmpSalCode).subscribe((res: any) => {
-      console.log(res);
-
       this.EMP_TRN_ID = res.emP_TRN_ID;
       this.data.patchValue({
         EMP_ID: res.emP_ID,
         EMP_PRICE: res.emP_PRICE,
-      })
-    })
+        DATE: this.service.getFormattedDate(res.date, 8)
+      });
+    });
   }
 
+  getEmployeeName(id: number): string {
+  const emp = this.employee.find((e:any) => e.emP_ID == id);
+  return emp ? emp.emP_NAME : 'Unknown';
+}
+
+filteredEmpSalary(): any[] {
+  let result = this.employeesalary || [];
+debugger;
+  // Apply search filter if searchTerm exists
+  if (this.searchTerm && this.searchTerm.trim() !== '') {
+    const searchTermLower = this.searchTerm.toLowerCase().trim();
+    result = result.filter((employeesalary: any) => 
+      employeesalary.emP_PRICE?.toLowerCase().includes(searchTermLower)
+    );
+  }
+
+  // Reset to page 1 when search term changes
+  if (this.searchTerm) {
+    this.page = 1;
+  }
+
+  return result;
+}
+
+ onSearch() {
+  // Reset to first page when searching
+  this.page = 1;
+}
 }

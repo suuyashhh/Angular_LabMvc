@@ -1,0 +1,113 @@
+<div class="container" style="max-width: 800px!important;margin: 50px auto!important;">
+    <div class="header-section no-print">
+
+        <div class="date-inputs">
+            <div class="input-group">
+                <label for="fromDate">From Date</label>
+                <div class="input-wrapper">
+                    <input type="date" id="fromDate" (change)="onFromDateChange($event)">
+                    <i class="fas fa-calendar-alt input-icon"></i>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="toDate">To Date</label>
+                <div class="input-wrapper">
+                    <input type="date" id="toDate" (change)="onToDateChange($event)">
+                    <i class="fas fa-calendar-alt input-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-section" id="printableArea">
+        <div class="report-header">
+            <div class="date-display">
+                <span class="date-item">From Date: <span id="displayFromDate">{{displayFromDate}}</span></span>
+                <span class="date-item">To Date: <span id="displayToDate">{{displayToDate}}</span></span>
+            </div>
+        </div>
+
+        <div class="report-content">
+            <div class="turnover-row">
+                <span class="turnover-label">TurnOver</span>
+                <span class="turnover-amount">RS/- {{reportCount.turnover}}</span>
+            </div>
+
+            <div class="expenses-header">
+                <span class="header-name">Name</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+
+            <div class="expenses-list">
+                <div class="expense-item">
+                    <span class="expense-number">1.</span>
+                <span class="expense-name clickable" (click)="navigateToCasePaper()">CasePaper</span>
+                    <span class="expense-amount">{{reportCount.turnover}}</span>
+                </div>
+
+                <div class="expense-item">
+                    <span class="expense-number">2.</span>
+                    <span class="expense-name clickable" (click)="navigateToLabMat()">Lab Materials</span>
+                    <span class="expense-amount">{{reportCount.laB_MATERIALS}}</span>
+                </div>
+
+                <div class="expense-item">
+                    <span class="expense-number">3.</span>
+                    <span class="expense-name clickable" (click)="navigateToBikeFule()">Bike Fuel</span>
+                    <span class="expense-amount">{{reportCount.bikE_FUEL}}</span>
+                </div>
+
+                <div class="expense-item">
+                    <span class="expense-number">4.</span>
+                    <span class="expense-name clickable" (click)="navigateToEmpSalary()">Employee Salary</span>
+                    <span class="expense-amount">{{reportCount.employeE_SALARY}}</span>
+                </div>
+
+                <div class="expense-item">
+                    <span class="expense-number">5.</span>
+                    <span class="expense-name clickable" (click)="navigateToElcBill()">Electricity Bill</span>
+                    <span class="expense-amount">{{reportCount.electricitY_BILL}}</span>
+                </div>
+
+                <div class="expense-item">
+                    <span class="expense-number">6.</span>
+                    <span class="expense-name clickable" (click)="navigateToOtherExp()">Other Expense ....like(Rent, Small events, Food)</span>
+                    <span class="expense-amount">{{reportCount.otheR_EXPENSE}}</span>
+                </div>
+
+                <div class="expense-item">
+                    <span class="expense-number">7.</span>
+                    <span class="expense-name clickable" (click)="navigateToDocCommission()">Doctors Commission</span>
+                    <span class="expense-amount">{{reportCount.doctoR_COMMISSION}}</span>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <div class="summary-item">
+                    <span class="summary-label">TurnOver</span>
+                    <span class="summary-amount positive">{{reportCount.turnover}}</span>
+                </div>
+
+                <div class="summary-item">
+                    <span class="summary-label">Total Expense</span>
+                    <span class="summary-amount negative">-{{reportCount.totaL_EXPENSE}}</span>
+                </div>
+
+                <div class="summary-item net-amount">
+                    <span class="summary-label">Net Amount</span>
+                    <span class="summary-amount net">{{reportCount.neT_AMOUNT}}</span>
+                </div>
+            </div>
+            <div class="action-buttons no-print d-flex justify-content-end" style="margin-top: 100px;">
+                <button id="printBtn" class="btn btn-primary" (click)="handlePrint()">
+                    <i class="fas fa-print"></i>
+                    Print Report
+                </button>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

@@ -1,0 +1,424 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f3e8ff 0%, #ffffff 100%);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Header Section - Not printed */
+.header-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  border-top: 4px solid #9333ea;
+}
+
+.main-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #6b21a8;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.date-inputs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-weight: 600;
+  color: #7c3aed;
+  font-size: 0.875rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border: 2px solid #e9d5ff;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: #9333ea;
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+.input-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c084fc;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: #9333ea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+}
+
+/* Report Section - This will be printed */
+.report-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #e9d5ff;
+}
+
+.report-header {
+  background: #9333ea;
+  color: white;
+  padding: 1.5rem;
+}
+
+.date-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.date-item {
+  font-family: "Courier New", monospace;
+}
+
+.report-content {
+  padding: 2rem;
+}
+
+.turnover-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9d5ff;
+}
+
+.turnover-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #9333ea;
+}
+
+.turnover-amount {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #059669;
+}
+
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.header-name,
+.header-amount {
+  font-weight: 600;
+  color: #9333ea;
+  font-size: 1.1rem;
+}
+
+.expenses-list {
+  margin-bottom: 2rem;
+}
+
+.expense-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.expense-item:last-child {
+  border-bottom: none;
+}
+
+.expense-number {
+  color: #6b7280;
+  margin-right: 0.75rem;
+  font-weight: 500;
+  min-width: 1.5rem;
+}
+
+.expense-name {
+  flex: 1;
+  color: #374151;
+  font-weight: 500;
+}
+
+.expense-amount {
+  color: #dc2626;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+}
+
+.summary-section {
+  border-top: 2px solid #e9d5ff;
+  padding-top: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.summary-item.net-amount {
+  border-top: 1px solid #d1d5db;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.summary-label {
+  font-weight: 600;
+  color: #9333ea;
+  font-size: 1.1rem;
+}
+
+.net-amount .summary-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.summary-amount.positive {
+  color: #059669;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+}
+
+.summary-amount.negative {
+  color: #dc2626;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+}
+
+.summary-amount.net {
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 1.5rem;
+  font-family: "Courier New", monospace;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  body {
+    padding: 2rem;
+  }
+
+  .date-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: row;
+  }
+
+  .date-display {
+    font-size: 1.1rem;
+  }
+}
+
+/* Print Styles - Only print the report section */
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .container {
+    max-width: none !important;
+    margin: 0 auto !important;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 90vh;
+    padding: 2cm 1cm !important;
+  }
+
+  .report-section {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 18cm !important;
+  }
+
+  .report-header {
+    background: #9333ea !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  .date-display {
+    font-size: 14px !important;
+  }
+
+  .report-content {
+    padding: 20px !important;
+  }
+
+  .turnover-label,
+  .header-name,
+  .header-amount,
+  .summary-label {
+    color: #9333ea !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .expense-name {
+    color: #000 !important;
+  }
+
+  .expense-number {
+    color: #666 !important;
+  }
+
+  .turnover-amount,
+  .summary-amount.positive {
+    color: #059669 !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .expense-amount,
+  .summary-amount.negative {
+    color: #dc2626 !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .summary-amount.net {
+    color: #2563eb !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Hide browser print headers and footers */
+  @page {
+    size: A4;
+    margin: 0;
+    padding: 0;
+    /* Hide headers and footers */
+    @top-left {
+      content: "";
+    }
+    @top-center {
+      content: "";
+    }
+    @top-right {
+      content: "";
+    }
+    @bottom-left {
+      content: "";
+    }
+    @bottom-center {
+      content: "";
+    }
+    @bottom-right {
+      content: "";
+    }
+  }
+
+  /* Prevent page breaks inside important sections */
+  .report-header,
+  .turnover-row,
+  .expenses-header,
+  .summary-section {
+    page-break-inside: avoid;
+  }
+
+  .expense-item {
+    page-break-inside: avoid;
+  }
+
+  /* Additional styles to hide browser elements */
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  color: #0056b3;
+}

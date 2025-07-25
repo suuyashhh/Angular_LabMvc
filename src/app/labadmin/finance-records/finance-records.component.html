@@ -1,0 +1,146 @@
+<div class="container" style="max-width: 800px!important;margin: 50px auto!important;">
+
+    <div class="report-section" id="printableArea">
+        
+        <div class="report-header">
+            <div class="date-display">
+                <span class="date-item">From Date: <span id="displayFromDate">01/07/2025</span></span>
+                <span class="date-item">To Date: <span id="displayToDate">01/07/2025</span></span>
+            </div>
+        </div>
+         <div style="padding: 1.5rem;">
+            <div class="date-display">
+                <span class="date-item" *ngIf="type == 'casepaper'">Report:- <span>CasePapers</span></span>
+                <span class="date-item" *ngIf="type == 'labmaterial'">Report:- <span>Lab Materials</span></span>
+                <span class="date-item" *ngIf="type == 'bikefule'">Report:- <span>Bike Fule</span></span>
+                <span class="date-item" *ngIf="type == 'empsalary'">Report:- <span>Employee Salary</span></span>
+                <span class="date-item" *ngIf="type == 'elcbill'">Report:- <span>Electricity Bill</span></span>
+                <span class="date-item" *ngIf="type == 'otherexpense'">Report:- <span>Other Expense</span></span>
+                <span class="date-item" *ngIf="type == 'doccommission'">Report:- <span>Doctor Commission</span></span>
+            </div>
+        </div>
+        <div class="report-content">
+
+            <!-- CasePaper -->
+            <div class="expenses-header" *ngIf="type == 'casepaper'">
+                <span class="header-number">No.</span>
+                <span class="header-name">Name</span>
+                <span class="header-date">Date</span>
+                <span class="header-count">Test Count</span>
+                <span class="header-amount" style="padding-left: 60px!important;">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'casepaper'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
+                    <span class="expense-date">{{_ObjData.date}}</span>
+                    <span class="expense-count">3</span>
+                    <span class="expense-amount">{{_ObjData.totaL_AMOUNT}}</span>
+                </div>
+            </div>
+
+            <!-- LabMaterials -->
+            <div class="expenses-header" *ngIf="type == 'labmaterial'">
+                <span class="header-number">No.</span>
+                <span class="header-name">Material Name</span>
+                <span class="header-date">Date</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'labmaterial'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-name">{{_ObjData.maT_NAME}}</span>
+                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-amount">{{_ObjData.maT_PRICE}}</span>
+                </div>
+            </div>
+
+             <!-- BikeFule -->
+            <div class="expenses-header" *ngIf="type == 'bikefule'">
+                <span class="header-number">No.</span>
+                <span class="header-name">Bike Name</span>
+                <span class="header-date">Date</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'bikefule'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-name">{{_ObjData.bikE_NAME}}</span>
+                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-amount">{{_ObjData.bikE_PRICE}}</span>
+                </div>
+            </div>
+
+             <!-- Employee Salary -->
+            <div class="expenses-header" *ngIf="type == 'empsalary'">
+                <span class="header-number">No.</span>
+                <span class="header-name">Employee Name</span>
+                <span class="header-date">Date</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'empsalary'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
+                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-amount">{{_ObjData.emP_PRICE}}</span>
+                </div>
+            </div>
+
+             <!-- Electricity Bill -->
+            <div class="expenses-header" *ngIf="type == 'elcbill'">
+                <span class="header-number">No.</span>
+                <span class="header-date">Date</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'elcbill'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-amount">{{_ObjData.elC_PRICE}}</span>
+                </div>
+            </div>
+
+             <!-- Other Expense -->
+            <div class="expenses-header" *ngIf="type == 'otherexpense'">
+                <span class="header-number">No.</span>
+                <span class="header-name">Expense Name</span>
+                <span class="header-date">Date</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'otherexpense'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-name">{{_ObjData.otheR_NAME}}</span>
+                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-amount">{{_ObjData.otheR_PRICE}}</span>
+                </div>
+            </div>
+
+             <!-- Doctor Commission -->
+            <div class="expenses-header" *ngIf="type == 'doccommission'">
+                <span class="header-number">No.</span>
+                <span class="header-name">Doctor Name</span>
+                <span class="header-date">Date</span>
+                <span class="header-amount">RS/-</span>
+            </div>
+            <div class="expenses-list" *ngIf="type == 'doccommission'">
+                <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
+                    <span class="expense-number">{{i+1}}</span>
+                    <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
+                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-amount">{{_ObjData.doC_COM_PRICE}}</span>
+                </div>
+            </div>
+
+
+
+            <div class="action-buttons no-print d-flex justify-content-end" style="margin-top: 100px;">
+                <button id="printBtn" class="btn btn-primary" (click)="handlePrint()">
+                    <i class="fas fa-print"></i>
+                    Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

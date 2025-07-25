@@ -1,3 +1,5 @@
+
+
 <div class="dashboard-container">
   <div class="stats-grid">
     <!-- Today Total Patients -->
@@ -9,7 +11,9 @@
           </div>
           <div class="stat-content">
             <h3 class="stat-title">Today Total Patients</h3>
-            <div class="stat-number" data-target="127">0</div>
+            <!-- <div class="stat-number" data-target="{{dashboardCount.patienT_COUNT}}">0</div> -->
+             <div class="stat-number" [attr.data-target]="dashboardCount.patienT_COUNT">0</div>
+
           </div>
           <div class="stat-trend up">
             <i class="fas fa-arrow-up"></i>
@@ -28,7 +32,8 @@
           </div>
           <div class="stat-content">
             <h3 class="stat-title">Home Collection Total</h3>
-            <div class="stat-number" data-target="45">0</div>
+            <!-- <div class="stat-number" data-target="{{dashboardCount.homE_COLLECTION}}">0</div> -->
+            <div class="stat-number" [attr.data-target]="dashboardCount.homE_COLLECTION">0</div>
           </div>
           <div class="stat-trend up">
             <i class="fas fa-arrow-up"></i>
@@ -47,7 +52,9 @@
           </div>
           <div class="stat-content">
             <h3 class="stat-title">Pending Total</h3>
-            <div class="stat-number" data-target="23">0</div>
+            <!-- <div class="stat-number" data-target="{{dashboardCount.pendinG_STATUS}}">0</div> -->
+             <div class="stat-number" [attr.data-target]="dashboardCount.pendinG_STATUS">0</div>
+
           </div>
           <div class="stat-trend down">
             <i class="fas fa-arrow-down"></i>
@@ -66,7 +73,9 @@
           </div>
           <div class="stat-content">
             <h3 class="stat-title">Today Total Bill</h3>
-            <div class="stat-number" data-target="85420">₹0</div>
+            <!-- <div class="stat-number" data-target="{{dashboardCount.totaL_BILL}}">₹0</div> -->
+             <div class="stat-number" [attr.data-target]="dashboardCount.totaL_BILL">0</div>
+
           </div>
           <div class="stat-trend up">
             <i class="fas fa-arrow-up"></i>

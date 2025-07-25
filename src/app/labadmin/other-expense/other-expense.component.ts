@@ -1,103 +1,179 @@
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
-import { Modal } from 'bootstrap';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { ServicesService } from '../../shared/services.service';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-other-expense',
   standalone: true,
-  imports: [HttpClientModule,ReactiveFormsModule,CommonModule,FormsModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormattedDatePipe, FormsModule, NgxPaginationModule],
   templateUrl: './other-expense.component.html',
   styleUrl: './other-expense.component.css'
 })
-export class OtherExpenseComponent {
-  otherexpense:any;
-  data: any;
-  OTHER_ID: any = 0;
+export class OtherExpenseComponent implements OnInit {
+  data!: FormGroup;
+  otherexpense: any;
+  OTHER_ID: number = 0;
   ComId: number = 0;
-  btn: any = '';
-  submitted = false;
-  Reason: any = '';
+  btn: string = '';
+  submitted: boolean = false;
+  loadingExpenses = false;
+  Reason: string = '';
 
-  constructor(private api: ApiService) { }
-
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
-    // this.clearData();
-    this.load();
+    this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
+    this.initForm();
+    this.getExpenses();
   }
 
-  load() {
+  initForm() {
+
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
     this.data = new FormGroup({
+      DATE: new FormControl(formattedDate, Validators.required),
       OTHER_NAME: new FormControl('', Validators.required),
-      OTHER_PRICE: new FormControl('', Validators.required),
-      COM_ID: new FormControl()
+      OTHER_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
+      COM_ID: new FormControl(this.ComId)
     });
+  }
 
-    this.api.get('OtherExpense/OtherExpense').subscribe((res: any) => {
-      this.otherexpense = res;
-      console.log(this.otherexpense)
-    })
-
-    this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
-
+  getExpenses() {
+    this.loadingExpenses = true;
+    this.api.get('OtherExpense/OtherExpenses').subscribe({
+      next: (res: any) => {
+        this.otherexpense = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load expenses list');
+        console.error(err);
+        this.otherexpense = [];
+      },
+      complete: () => this.loadingExpenses = false
+    });
   }
 
   clearData() {
     this.OTHER_ID = 0;
     this.btn = '';
-    this.data.patchValue({
-      OTHER_NAME: '',
-      OTHER_PRICE: '',
-    })
+    this.data.reset();
+    this.initForm();
   }
 
-  submit(OtherEx: any) {
-    this.submitted = false;
-    if (!this.data.valid) {
-      this.submitted = true;
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 2;
+
+  submit(expense: any) {
+    this.submitted = true;
+
+    if (this.data.invalid) {
+      this.toastr.error('Please fix validation errors.');
       return;
     }
-    if (this.OTHER_ID == 0 && this.btn == '') {
-      OtherEx.COM_ID = this.ComId
-        this.api.post('OtherExpense/SaveOtherExpense', OtherEx).subscribe((res: any) => {
-          this.api.modalClose();
-          this.load();
-       }); 
-    } else if (this.OTHER_ID != 0 && this.btn == 'E') {
-      console.log(this.OTHER_ID);
-      this.api.post('OtherExpense/EditOtherExpense/' + this.OTHER_ID, OtherEx).subscribe((res: any) => {
-        this.load();
-        console.log(res);
-        
-      });
-    }
-    else if (this.OTHER_ID != 0 && this.btn == 'D') {
-      console.log(this.Reason);
 
-      if (this.Reason != '') {
-        this.api.delete('OtherExpense/DeleteOtherExpense/' + this.OTHER_ID).subscribe((res: any) => {
-          this.load();
-        })
-      }
-      else {
-        alert("Fill the reason");
+    const rawDate = this.data.get('DATE')?.value;
+    const parts = rawDate.split('-');
+    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    expense.DATE = this.service.getFormattedDate(formatted, 1);
+
+    if (this.OTHER_ID == 0 && this.btn == '') {
+      this.api.post('OtherExpense/SaveOtherExpense', expense).subscribe({
+        next: () => {
+          this.getExpenses();
+          setTimeout(() => {
+            this.toastr.success('Expense added successfully');
+            this.api.modalClose('OEFormModal');
+            this.clearData();
+          }, 300);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to add expense');
+          console.error(err);
+        }
+      });
+
+    } else if (this.OTHER_ID != 0 && this.btn == 'E') {
+      this.api.post('OtherExpense/EditOtherExpense/' + this.OTHER_ID, expense).subscribe({
+        next: () => {
+          this.getExpenses();
+          setTimeout(() => {
+            this.toastr.success('Expense updated successfully');
+            this.api.modalClose('OEFormModal');
+            this.clearData();
+          }, 200);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to update expense');
+          console.error(err);
+        }
+      });
+
+    } else if (this.OTHER_ID != 0 && this.btn == 'D') {
+      if (this.Reason.trim() !== '') {
+        this.api.delete('OtherExpense/DeleteOtherExpense/' + this.OTHER_ID).subscribe({
+          next: () => {
+            this.getExpenses();
+            setTimeout(() => {
+              this.toastr.success('Expense deleted successfully');
+              this.api.modalClose('OEFormModal');
+              this.clearData();
+              this.Reason = "";
+            }, 200);
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete expense');
+            console.error(err);
+          }
+        });
+      } else {
+        this.toastr.warning('Please fill in the reason before deleting.');
       }
     }
   }
 
-  getDataById(OECode: number, btn: any) {
+  getDataById(OECode: number, btn: string) {
     this.btn = btn;
     this.api.get('OtherExpense/OtherExpense/' + OECode).subscribe((res: any) => {
-      console.log(res);
-
       this.OTHER_ID = res.otheR_ID;
       this.data.patchValue({
+        DATE: this.service.getFormattedDate(res.date, 8),
         OTHER_NAME: res.otheR_NAME,
-        OTHER_PRICE: res.otheR_PRICE,
-      })
-    })
+        OTHER_PRICE: res.otheR_PRICE
+      });
+    });
   }
+
+  filteredOthMaterials(): any[] {
+    let result = this.otherexpense || [];
+
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((otherexpense: any) =>
+        otherexpense.otheR_NAME?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
+  }
+
 }
