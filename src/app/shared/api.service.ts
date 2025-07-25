@@ -8,8 +8,8 @@ import * as bootstrap from 'bootstrap';
 })
 export class ApiService {
 
-//  baseurl = 'https://localhost:7193/api/';
- baseurl = 'https://labmvcapi.bsite.net/api/';
+ baseurl = 'https://localhost:7193/api/';
+//  baseurl = 'https://labmvcapi.bsite.net/api/';
 
   constructor(private http: HttpClient) {}
 
@@ -26,6 +26,7 @@ export class ApiService {
   return userDetails.coM_ID || '';
   // return JSON.parse(localStorage.getItem('COM_ID') || '');
 }
+
 
 get(api: string, params: any = {}) {
   params['comId'] = this.getComId();

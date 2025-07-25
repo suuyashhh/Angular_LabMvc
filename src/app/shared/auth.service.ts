@@ -32,7 +32,7 @@ export class AuthService {
 
   // Get current user object
   getUser(): any {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem('userDetails');
     return userJson ? JSON.parse(userJson) : null;
   }
 
