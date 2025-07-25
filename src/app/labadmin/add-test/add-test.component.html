@@ -1,12 +1,28 @@
-<!-- Add Button -->
 <div class="container container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateFormModal" (click)="clearData()">
-    Add Test
-  </button>
+  <div class="row align-items-center justify-content-between g-3">
+    <!-- Add Button - Left Side -->
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#CreateFormModal"
+        (click)="clearData()">
+        <i class="ri-add-line me-2"></i> Add Test
+      </button>
+    </div>
+    
+    <!-- Search - Right Side -->
+    <div class="col-md-4 col-lg-3 ms-md-auto">
+      <div class="form-floating form-floating-outline">
+        <input class="form-control" type="search" placeholder="Search ..." 
+           [(ngModel)]="searchTerm"
+           (ngModelChange)="onSearch()"
+           id="html5-search-input" />
+        <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
+      </div>
+    </div>
+  </div>
 </div>
-
 <!-- Modal -->
-<div class="modal fade custom-modal-fade" id="CreateFormModal" tabindex="-1" aria-labelledby="CreateFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="CreateFormModal" tabindex="-1" aria-labelledby="CreateFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -32,7 +48,8 @@
             <!-- Test Name -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="test-name" class="form-control" formControlName="TEST_NAME" placeholder="Test Name" />
+                <input type="text" id="test-name" class="form-control" formControlName="TEST_NAME"
+                  placeholder="Test Name" />
                 <label for="test-name"><i class="ri-flask-line"></i>Test Name <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('TEST_NAME')?.invalid">
                   <small *ngIf="data.get('TEST_NAME')?.errors?.['required']">Test name is required.</small>
@@ -44,7 +61,8 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="number" id="test-price" class="form-control" formControlName="PRICE" placeholder="Price" />
-                <label for="test-price"><i class="ri-money-rupee-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <label for="test-price"><i class="ri-money-rupee-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('PRICE')?.invalid">
                   <small *ngIf="data.get('PRICE')?.errors?.['required']">Price is required.</small>
                 </div>
@@ -54,7 +72,8 @@
             <!-- Lab Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="lab-price" class="form-control" formControlName="LAB_PRICE" placeholder="Lab Price" />
+                <input type="number" id="lab-price" class="form-control" formControlName="LAB_PRICE"
+                  placeholder="Lab Price" />
                 <label for="lab-price"><i class="ri-money-rupee-circle-line"></i>Lab Price</label>
               </div>
             </div>
@@ -62,8 +81,10 @@
             <!-- Delete Reason -->
             <div class="custom-form-group" *ngIf="TEST_CODE != 0 && btn == 'D'">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="test-reason" class="form-control" placeholder="Delete Reason" [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
-                <label for="test-reason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                <input type="text" id="test-reason" class="form-control" placeholder="Delete Reason"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="test-reason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && Reason == ''">
                   <small>Delete reason is required.</small>
                 </div>
@@ -123,7 +144,10 @@
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
-            <tr *ngFor="let _test of tests">
+            <tr *ngFor="let _test of filteredTests() | paginate: {
+      itemsPerPage: pageSize,
+      currentPage: page
+    };">
               <td style="width: 160px; white-space: nowrap;">
                 <a class="btn btn-sm btn-purple me-2 text-white" href="javascript:void(0);" data-bs-toggle="modal"
                   data-bs-target="#CreateFormModal" (click)="getDataById(_test.tesT_CODE, 'E')">
@@ -143,6 +167,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="d-flex justify-content-center p-3">
+          <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+        </div>
       </div>
 
       <!-- No Data Template -->

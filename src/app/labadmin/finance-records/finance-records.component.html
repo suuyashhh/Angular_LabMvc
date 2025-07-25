@@ -11,7 +11,7 @@
          <div style="padding: 1.5rem;">
             <div class="date-display">
                 <span class="date-item" *ngIf="type == 'casepaper'">Report:- <span>CasePapers</span></span>
-                <span class="date-item" *ngIf="type == 'labmaterials'">Report:- <span>Lab Materials</span></span>
+                <span class="date-item" *ngIf="type == 'labmaterial'">Report:- <span>Lab Materials</span></span>
                 <span class="date-item" *ngIf="type == 'bikefule'">Report:- <span>Bike Fule</span></span>
                 <span class="date-item" *ngIf="type == 'empsalary'">Report:- <span>Employee Salary</span></span>
                 <span class="date-item" *ngIf="type == 'elcbill'">Report:- <span>Electricity Bill</span></span>
@@ -40,13 +40,13 @@
             </div>
 
             <!-- LabMaterials -->
-            <div class="expenses-header" *ngIf="type == 'labmaterials'">
+            <div class="expenses-header" *ngIf="type == 'labmaterial'">
                 <span class="header-number">No.</span>
                 <span class="header-name">Material Name</span>
                 <span class="header-date">Date</span>
                 <span class="header-amount">RS/-</span>
             </div>
-            <div class="expenses-list" *ngIf="type == 'labmaterials'">
+            <div class="expenses-list" *ngIf="type == 'labmaterial'">
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
                     <span class="expense-name">{{_ObjData.maT_NAME}}</span>

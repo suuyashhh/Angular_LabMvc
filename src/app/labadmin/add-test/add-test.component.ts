@@ -4,11 +4,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-add-test',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule, FormsModule],
+  imports: [ReactiveFormsModule, CommonModule, HttpClientModule, FormsModule,NgxPaginationModule],
   templateUrl: './add-test.component.html',
   styleUrl: './add-test.component.css'
 })
@@ -60,6 +61,10 @@ export class AddTestComponent implements OnInit {
     this.initForm();
     this.Reason = '';
   }
+
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 10;
 
   submit(test: any) {
     this.submitted = true;
@@ -141,4 +146,28 @@ export class AddTestComponent implements OnInit {
     });
   }
 
+  
+filteredTests(): any[] {
+  let result = this.tests || [];
+
+  // Apply search filter if searchTerm exists
+  if (this.searchTerm && this.searchTerm.trim() !== '') {
+    const searchTermLower = this.searchTerm.toLowerCase().trim();
+    result = result.filter((test: any) => 
+      test.tesT_NAME?.toLowerCase().includes(searchTermLower)
+    );
+  }
+
+  // Reset to page 1 when search term changes
+  if (this.searchTerm) {
+    this.page = 1;
+  }
+
+  return result;
+}
+
+ onSearch() {
+  // Reset to first page when searching
+  this.page = 1;
+}
 }

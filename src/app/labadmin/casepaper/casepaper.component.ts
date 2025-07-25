@@ -87,7 +87,7 @@ export class CasepaperComponent implements OnInit {
     private api: ApiService,
     private toastr: ToastrService,
     private service: ServicesService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.data = new FormGroup({
@@ -218,7 +218,7 @@ export class CasepaperComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 6;
+  readonly pageSize: number = 15;
 
   submit(data: any): void {
     this.submitted = true;
@@ -290,26 +290,41 @@ export class CasepaperComponent implements OnInit {
   filtered: CasePaper[] = [];
   isDateFiltered = false;
 
-  filteredCases(): CasePaper[] {
-    let result = this.cases;
 
-    if (this.searchTerm) {
-      result = result.filter((c: CasePaper) =>
-        c.patienT_NAME.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
+ filteredCases(): CasePaper[] {
+  let result = this.cases || [];
 
-    if (this.isDateFiltered && this.startDate && this.endDate) {
-      const start = new Date(this.startDate);
-      const end = new Date(this.endDate);
+  // Apply search filter if searchTerm exists
+  if (this.searchTerm) {
+    const searchTermLower = this.searchTerm.toLowerCase();
+    result = result.filter((c: CasePaper) =>
+      c.patienT_NAME.toLowerCase().includes(searchTermLower) || // Name search
+      (c.coN_NUMBER && c.coN_NUMBER.includes(this.searchTerm)) // Contact number search (exact match)
+    );
+  }
 
-      result = result.filter((c: CasePaper) => {
-        const caseDate = new Date(c.date);
-        return caseDate >= start && caseDate <= end;
-      });
-    }
+  // Apply date filter if enabled and dates exist
+  if (this.isDateFiltered && this.startDate && this.endDate) {
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
 
-    return result;
+    result = result.filter((c: CasePaper) => {
+      const caseDate = new Date(c.date);
+      return caseDate >= start && caseDate <= end;
+    });
+  }
+
+  // Reset to page 1 when search term changes
+  if (this.searchTerm) {
+    this.page = 1;
+  }
+
+  return result;
+}
+
+  onSearch() {
+    // Reset to first page when searching
+    this.page = 1;
   }
 
   filterByDate() {
