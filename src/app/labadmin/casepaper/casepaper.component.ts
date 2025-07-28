@@ -34,6 +34,7 @@ interface CasePaper {
   coN_NUMBER: string;
   date: string;
   statuS_CODE: number;
+  paymenT_STATUS?: string;
 }
 
 @Component({
@@ -84,6 +85,16 @@ export class CasepaperComponent implements OnInit {
   trn_no: number = 0;
   Reason: any;
 
+  searchTerm: string = '';
+  page: number = 1;
+  readonly pageSize: number = 15;
+
+  startDate: string = '';
+  endDate: string = '';
+  filtered: CasePaper[] = [];
+  isDateFiltered = false;
+
+
   constructor(
     private api: ApiService,
     private toastr: ToastrService,
@@ -92,7 +103,8 @@ export class CasepaperComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = new FormGroup({
-      trN_NO: new FormControl(0),
+      TRN_NO: new FormControl(0),
+      collectioN_TYPE: new FormControl(0),
       patienT_NAME: new FormControl('', Validators.required),
       gender: new FormControl('', Validators.required),
       coN_NUMBER: new FormControl('', [
@@ -104,7 +116,7 @@ export class CasepaperComponent implements OnInit {
       totaL_AMOUNT: new FormControl(0),
       totaL_PROFIT: new FormControl(0),
       discount: new FormControl(0),
-      paymenT_AMOUNT: new FormControl(0),
+      paymenT_AMOUNT: new FormControl(0, Validators.required),
       paymenT_METHOD: new FormControl(0),
       date: new FormControl(''),
       coM_ID: new FormControl(101),
@@ -112,7 +124,18 @@ export class CasepaperComponent implements OnInit {
     });
 
     this.load();
+    this.data.get('paymenT_AMOUNT')?.valueChanges.subscribe(() => {
+      this.onPaymentAmountChange();
+    });
   }
+
+  // ✅ Checkbox toggle logic
+  onCollectionChange(event: any): void {
+    const checked = event.target.checked;
+    this.data.get('collectioN_TYPE')?.setValue(checked ? 1 : 0);
+  }
+
+
 
   onSearchChange() {
     const query = this.searchText.trim().toLowerCase();
@@ -196,9 +219,15 @@ export class CasepaperComponent implements OnInit {
   }
 
   discount() {
-    this.discount_Amount = (this.test_Amount * (this.dis || 0)) / 100;
+    const discountPercent = this.dis || 0;
+    this.discount_Amount = (this.test_Amount * discountPercent) / 100;
+
+    // Update form control so it never sends null
+    this.data.get('discount')?.setValue(discountPercent);
+
     this.total();
   }
+
 
   total() {
     this.total_Amount = this.test_Amount - (this.discount_Amount || 0);
@@ -224,13 +253,34 @@ export class CasepaperComponent implements OnInit {
     });
   }
 
-  searchTerm: string = '';
-  page: number = 1;
-  readonly pageSize: number = 15;
+  onPaymentAmountChange(): void {
+    const totalAmount = +this.data.get('totaL_AMOUNT')?.value || 0;
+    let paymentAmount = this.data.get('paymenT_AMOUNT')?.value;
+
+    // If paymentAmount is null/empty/undefined, treat it as 0
+    if (paymentAmount === null || paymentAmount === undefined || paymentAmount === '') {
+      paymentAmount = 0;
+      this.data.get('paymenT_AMOUNT')?.setValue(0);
+    }
+
+    const status =
+      paymentAmount === 0
+        ? 'PENDING'
+        : paymentAmount >= totalAmount && totalAmount > 0
+          ? 'COMPLETED'
+          : 'PENDING';
+
+    this.data.get('paymenT_STATUS')?.setValue(status);
+  }
+
 
   submit(data: any): void {
     this.submitted = true;
+    this.onPaymentAmountChange();
 
+    if (!data.discount) data.discount = 0;
+    if (!data.paymenT_AMOUNT) data.paymenT_AMOUNT = 0;
+    if (!data.paymenT_STATUS) data.paymenT_STATUS = 'PENDING';
     // Format the date
     const rawDate = this.data.get('date')?.value;
     if (rawDate) {
@@ -287,7 +337,12 @@ export class CasepaperComponent implements OnInit {
 
     } else if (this.trn_no && this.btn === 'E') {
       // ✏️ Edit CasePaper
-      this.api.post(`CasePaper/EditCasePaper/${this.trn_no}`, payload).subscribe({
+      this.data.get('TRN_NO')?.setValue(this.trn_no);
+      console.log('edit payload:', {
+        ...this.data.value,
+        matIs: this.matIs
+      });
+      this.api.post('CasePaper/EditCasePaper/' + this.trn_no, payload).subscribe({
         next: () => {
           setTimeout(() => {
             this.toastr.success('Case paper updated successfully');
@@ -335,10 +390,6 @@ export class CasepaperComponent implements OnInit {
     this.total_Lab_Profit = 0;
   }
 
-  startDate: string = '';
-  endDate: string = '';
-  filtered: CasePaper[] = [];
-  isDateFiltered = false;
 
 
   filteredCases(): CasePaper[] {
@@ -381,22 +432,22 @@ export class CasepaperComponent implements OnInit {
     this.isDateFiltered = !!(this.startDate && this.endDate);
   }
 
-  edit(trN_NO: any): void {
-    this.api.get(`CasePaper/CasePaper/${trN_NO}`).subscribe({
-      next: (res: any) => {
-        this.trn_no = res.trN_NO;
-        this.data.patchValue(res);
-        this.matIs = res?.matIs || [];
-        this.testAmount();
-        this.discount();
-        this.isCreatingNew = true; // Show form on edit
-      },
-      error: (err) => {
-        console.error('Error loading case paper:', err);
-        alert('Failed to load case paper data.');
-      },
-    });
-  }
+  // edit(trN_NO: any): void {
+  //   this.api.get(`CasePaper/CasePaper/${trN_NO}`).subscribe({
+  //     next: (res: any) => {
+  //       this.trn_no = res.trN_NO;
+  //       this.data.patchValue(res);
+  //       this.matIs = res?.matIs || [];
+  //       this.testAmount();
+  //       this.discount();
+  //       this.isCreatingNew = true; // Show form on edit
+  //     },
+  //     error: (err) => {
+  //       console.error('Error loading case paper:', err);
+  //       alert('Failed to load case paper data.');
+  //     },
+  //   });
+  // }
 
   getTestNameByCode(code: string): string {
     const match = this.tests.find((t: any) => t.tesT_CODE === code);
@@ -437,21 +488,13 @@ export class CasepaperComponent implements OnInit {
         paymenT_STATUS: res.paymenT_STATUS,
         date: this.service.getFormattedDate(res.date, 8),
         doctoR_CODE: res.doctoR_CODE,
-        //"totaL_AMOUNT": 0,
-        // "totaL_PROFIT": 0,
-        // "discount": 0,
-        // "date": "string",
-        // "paymenT_AMOUNT": 0,
-        // "collectioN_TYPE": 0,
-        // "paymenT_METHOD": 0,
-        // "paymenT_STATUS": "string"
-        // patch other fields as needed
       });
+      this.onPaymentAmountChange();
 
       this.matIs = res.matIs.map((item: any) => ({
-    ...item,
-    TEST_NAME: this.getTestNameByCode(item.tesT_CODE)
-  }));
+        ...item,
+        TEST_NAME: this.getTestNameByCode(item.tesT_CODE)
+      }));
       this.testAmount();
       this.discount();
       this.total();
@@ -475,6 +518,7 @@ export class CasepaperComponent implements OnInit {
     // Reset the FormGroup values
     this.data.reset({
       trN_NO: 0,
+      collectioN_TYPE: 0,
       patienT_NAME: '',
       gender: '',
       coN_NUMBER: '',

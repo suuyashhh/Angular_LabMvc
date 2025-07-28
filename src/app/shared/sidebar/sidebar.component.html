@@ -76,7 +76,7 @@
                   <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
                 </a>
               </li>
-              <li class="menu-item" routerLinkActive="active">
+              <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
                 <a routerLink="/LABADMIN/create-employee" class="menu-link">
                   <div data-i18n="create-employee"> Create Employee</div>
                 </a>
