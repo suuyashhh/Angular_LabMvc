@@ -70,7 +70,8 @@
             <!-- Home Collection -->
             <div class="col-md-6 mb-3 d-flex align-items-center">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="home-collection">
+                <input class="form-check-input" type="checkbox" [checked]="data.get('collectioN_TYPE')?.value === 1"
+                  (change)="onCollectionChange($event)" id="home-collection">
                 <label class="form-check-label text-dark ms-2" for="home-collection">
                   Home Collection
                 </label>
@@ -122,10 +123,10 @@
                   formControlName="coN_NUMBER" #formField />
                 <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
                     class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
-                  <!-- <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small> -->
+                <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
+                  <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small>
                   <small *ngIf="data.get('coN_NUMBER')?.errors['pattern']">Enter valid 10-digit number.</small>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -144,7 +145,7 @@
           <div class="form-floating form-floating-outline mb-4 position-relative">
             <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
               placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
-              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating">
+              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #formField>
             </ng-select>
 
             <label for="doctor-reference" class="floating-label">
@@ -304,11 +305,13 @@
           <h4 class="section-heading mb-4"><i class="ri-bank-card-line me-2"></i>Payment Method</h4>
           <div class="mb-4">
             <div class="form-check form-check-inline">
-              <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
+              <input type="radio" name="paymenT_METHOD" formControlName="paymenT_METHOD" [value]="0" id="cash"
+                class="form-check-input" required />
               <label for="cash" class="form-check-label">Cash</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
+              <input type="radio" name="paymenT_METHOD" formControlName="paymenT_METHOD" [value]="1" id="online"
+                class="form-check-input" />
               <label for="online" class="form-check-label">Online</label>
             </div>
           </div>
@@ -318,7 +321,7 @@
             <div class="col-sm-6">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="number" class="form-control text-end " placeholder="₹0" formControlName="paymenT_AMOUNT"
-                  required style="max-width: 300px;" />
+                  (input)="onPaymentAmountChange()" required style="max-width: 300px;" />
                 <label for="paymenT_AMOUNT"><i class="ri-cash-line"></i>Payment Amount<span
                     class="text-danger">*</span></label>
               </div>
@@ -329,9 +332,8 @@
             <div class="col-sm-6">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="test" class="form-control text-end " placeholder="Delete Reason" [(ngModel)]="Reason"
-                  required style="max-width: 300px;" [ngModelOptions]="{standalone: true}"/>
-                <label for="reason"><i class="ri-cash-line"></i>Delete Reason<span
-                    class="text-danger">*</span></label>
+                  required style="max-width: 300px;" [ngModelOptions]="{standalone: true}" />
+                <label for="reason"><i class="ri-cash-line"></i>Delete Reason<span class="text-danger">*</span></label>
               </div>
             </div>
           </div>
@@ -411,8 +413,17 @@
             <td><span>{{ case.patienT_NAME }}</span></td>
             <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
             <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
-            <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
+            <!-- <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
               <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
+            </td> -->
+            <td>
+              <span class="badge" [ngClass]="{
+    'bg-success': case.paymenT_STATUS === 'COMPLETED',
+    'bg-warning text-dark': case.paymenT_STATUS !== 'COMPLETED'
+  }">
+                {{ case.paymenT_STATUS }}
+              </span>
+
             </td>
 
           </tr>
