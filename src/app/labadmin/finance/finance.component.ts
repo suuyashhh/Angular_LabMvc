@@ -103,7 +103,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,
@@ -117,7 +117,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,
@@ -131,7 +131,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,
@@ -145,7 +145,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,
@@ -159,7 +159,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,
@@ -173,7 +173,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,
@@ -187,7 +187,7 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     const fromDate = this.fromDateValue; 
     const toDate = this.toDateValue;
     
-    this.router.navigate(['/labadmin/finance-records'], { 
+    this.router.navigate(['/LABADMIN/finance-records'], { 
       queryParams: { 
         fromDate: fromDate,
         toDate: toDate ,

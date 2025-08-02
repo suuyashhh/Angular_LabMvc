@@ -380,10 +380,10 @@
           <tr>
             <th>sr</th>
             <th>Actions</th>
-            <th>Trn_No</th>
+            <th>Date</th>
             <th>Name</th>
             <th>Contact</th>
-            <th>Date</th>
+            <th>Crt By</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -394,9 +394,6 @@
       };let i = index">
             <td>{{(page - 1) * pageSize + i + 1}}</td>
             <td>
-              <div *ngIf="case.statuS_CODE === 101">
-                <a class="dropdown-item" href="javascript:void(0);"><i class="ri-bill-line me-1"></i>Invoice</a>
-              </div>
 
               <div *ngIf="case.statuS_CODE === 0">
                 <a (click)="openInlineForm(case.trN_NO,'E')" class="btn btn-sm btn-purple me-2 text-white"
@@ -407,12 +404,16 @@
                   href="javascript:void(0);">
                   <i class="ri-delete-bin-6-line me-1"></i> Delete
                 </a>
+                <a class="btn btn-sm btn-success me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#InvoiceModal">
+                  <i class="ri-file-text-line me-1"></i> Invoice
+                </a>
               </div>
             </td>
-            <td><span>{{ case.trN_NO }}</span></td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
             <td><span>{{ case.patienT_NAME }}</span></td>
             <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
+             <td><span>{{ case.crT_BY }}</span></td>
             <!-- <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
               <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
             </td> -->

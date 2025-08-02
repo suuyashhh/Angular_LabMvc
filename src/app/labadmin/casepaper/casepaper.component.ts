@@ -488,6 +488,7 @@ export class CasepaperComponent implements OnInit {
         paymenT_STATUS: res.paymenT_STATUS,
         date: this.service.getFormattedDate(res.date, 8),
         doctoR_CODE: res.doctoR_CODE,
+        crT_BY:res.crT_BY,
       });
       this.onPaymentAmountChange();
 
