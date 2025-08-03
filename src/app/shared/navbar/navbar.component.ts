@@ -8,14 +8,17 @@ import { AuthService } from '../auth.service';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent implements AfterViewInit {
+export class NavbarComponent implements OnInit, AfterViewInit {
 
+  user: any;
+  constructor(private auth: AuthService) { }
+  ngOnInit(): void {
+    this.user = this.auth.getUser();
+  }
 
-  constructor(private auth: AuthService) {}
-
-logout() {
-  this.auth.logout();
-}
+  logout() {
+    this.auth.logout();
+  }
   toggleSidebar(): void {
     if (window.innerWidth < 1200) {
       const layoutMenu = document.querySelector('#layout-menu');

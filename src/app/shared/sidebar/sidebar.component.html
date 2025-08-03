@@ -31,122 +31,126 @@
 
       <ul class="menu-inner py-1 ">
 
-        <li class="menu-item" routerLinkActive="active">
-          <a routerLink="/labadmin/dashboard" class="menu-link">
+        <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.useR_LOGIN == 'EMPLOYEE' || user.lab_Admin == 'Y'">
+          <a routerLink="/LABADMIN/dashboard" class="menu-link">
             <i class="menu-icon tf-icons ri-home-smile-line"></i>
             <div data-i18n="dashboard">Home</div>
           </a>
         </li>
 
-        <li class="menu-item" routerLinkActive="active">
-          <a routerLink="/labadmin/casepaper" class="menu-link">
+        <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.useR_LOGIN == 'EMPLOYEE' || user.lab_Admin == 'Y'">
+          <a routerLink="/LABADMIN/casepaper" class="menu-link">
             <i class="menu-icon ri-profile-line"></i>
             <div data-i18n="casepaper">CasePaper</div>
 
           </a>
         </li>
 
-        <!-- Dashboards -->
-        <li class="menu-item active close">
-          <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon ri-bar-chart-horizontal-fill "></i>
-            <div data-i18n="Dashboards">Master</div>
-            <!-- <div class="badge bg-danger rounded-pill ms-auto">5</div> -->
-          </a>
-          <ul class="menu-sub">
-            <!-- <li class="menu-item">
-              <a
-                href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/dashboards-crm.html"
-                target="_blank"
-                class="menu-link">
-                <div data-i18n="CRM">CRM</div>
-                <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div>
-              </a>
-            </li> -->
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/add-test" class="menu-link">
-                <div data-i18n="add-test">Test</div>
-                <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/doctor" class="menu-link">
-                <div data-i18n="doctor">Doctor</div>
-                <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/create-employee" class="menu-link">
-                <div data-i18n="create-employee"> Create Employee</div>
-              </a>
-            </li>
-            <!-- <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/casepaper" class="menu-link">
-                <div data-i18n="casepaper">Case Paper</div>
-              </a>
-            </li> -->
-            <!-- <li class="menu-item">
-              <a
-                href="#"
-                class="menu-link">
-                <div data-i18n="Logistics">Logistics</div>
-                <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div>
-              </a>
-            </li> -->
-            <!-- <li class="menu-item">
-              <a
-                href="#"
-                class="menu-link">
-                <div data-i18n="Academy">Academy</div>
-                <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div>
-              </a>
-            </li> -->
-          </ul>
-        </li>
+
+          <!-- Master -->
+          <li class="menu-item active close" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.useR_LOGIN == 'EMPLOYEE' || user.lab_Admin == 'Y'">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <i class="menu-icon ri-bar-chart-horizontal-fill "></i>
+              <div data-i18n="Dashboards">Master</div>
+              <!-- <div class="badge bg-danger rounded-pill ms-auto">5</div> -->
+            </a>
+            <ul class="menu-sub">
+              <!-- <li class="menu-item">
+                <a
+                  href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/html/vertical-menu-template/dashboards-crm.html"
+                  target="_blank"
+                  class="menu-link">
+                  <div data-i18n="CRM">CRM</div>
+                  <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div>
+                </a>
+              </li> -->
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="/LABADMIN/add-test" class="menu-link">
+                  <div data-i18n="add-test">Test</div>
+                  <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="/LABADMIN/doctor" class="menu-link">
+                  <div data-i18n="doctor">Doctor</div>
+                  <!-- <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div> -->
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
+                <a routerLink="/LABADMIN/create-employee" class="menu-link">
+                  <div data-i18n="create-employee"> Create Employee</div>
+                </a>
+              </li>
+              <!-- <li class="menu-item" routerLinkActive="active">
+                <a routerLink="/LABADMIN/casepaper" class="menu-link">
+                  <div data-i18n="casepaper">Case Paper</div>
+                </a>
+              </li> -->
+              <!-- <li class="menu-item">
+                <a
+                  href="#"
+                  class="menu-link">
+                  <div data-i18n="Logistics">Logistics</div>
+                  <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div>
+                </a>
+              </li> -->
+              <!-- <li class="menu-item">
+                <a
+                  href="#"
+                  class="menu-link">
+                  <div data-i18n="Academy">Academy</div>
+                  <div class="badge bg-label-primary fs-tiny rounded-pill ms-auto">Pro</div>
+                </a>
+              </li> -->
+            </ul>
+          </li>
 
 
-        <!-- Liabilities START!! -->
-        <li class="menu-item active close">
-          <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ri-uninstall-fill"></i>
-            <div data-i18n="Dashboards">Liabilities</div>
 
-          </a>
-          <ul class="menu-sub">
 
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="lab-materials" class="menu-link">
-                <div data-i18n="casepaper">Lab Materials</div>
+          <!-- Liabilities START!! -->
+          <li class="menu-item active close" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <i class="menu-icon tf-icons ri-uninstall-fill"></i>
+              <div data-i18n="Dashboards">Liabilities</div>
 
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="bike-fule" class="menu-link">
-                <div data-i18n="#">Bike Fule</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="employee-salary" class="menu-link">
-                <div data-i18n="#"> Employee Salary</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="ele-bill" class="menu-link">
-                <div data-i18n="#"> Electricity Bill </div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="other-expense" class="menu-link">
-                <div data-i18n="#">Other Expance</div>
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="doctor-commission" class="menu-link">
-                <div data-i18n="#">Doctors</div>
-              </a>
-            </li>
-          </ul>
-        </li>
+            </a>
+            <ul class="menu-sub">
+
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="lab-materials" class="menu-link">
+                  <div data-i18n="casepaper">Lab Materials</div>
+
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="bike-fule" class="menu-link">
+                  <div data-i18n="#">Bike Fule</div>
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="employee-salary" class="menu-link">
+                  <div data-i18n="#"> Employee Salary</div>
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="ele-bill" class="menu-link">
+                  <div data-i18n="#"> Electricity Bill </div>
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="other-expense" class="menu-link">
+                  <div data-i18n="#">Other Expance</div>
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="doctor-commission" class="menu-link">
+                  <div data-i18n="#">Doctors</div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
         <!-- Liabilities END!! -->
         <!-- EMPLOYEE START!! -->
         <!-- <li class="menu-item active close">
@@ -173,49 +177,62 @@
         <!-- EMPLOYEE END!! -->
 
 
-        <li class="menu-header mt-7"><span class="menu-header-text">Finance</span></li>
+          <li class="menu-header mt-7" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'"><span class="menu-header-text">Finance</span></li>
 
-        <!-- Finance -->
-        <li class="menu-item" routerLinkActive="active">
-          <a routerLink="/labadmin/finance" class="menu-link">
-            <i class="menu-icon ri-money-dollar-circle-line"></i>
-            <div data-i18n="Finance">Finance</div>
+          <!-- Finance -->
+          <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
+            <a routerLink="/LABADMIN/finance" class="menu-link">
+              <i class="menu-icon ri-money-dollar-circle-line"></i>
+              <div data-i18n="Finance">Finance</div>
 
-          </a>
-        </li>
-        <!-- Charts -->
-        <li class="menu-item" routerLinkActive="active">
-          <a routerLink="/labadmin/charts" class="menu-link">
-            <i class="menu-icon ri-stock-line"></i>
-            <div data-i18n="Charts">Charts</div>
+            </a>
+          </li>
 
-          </a>
-        </li>
+          <!-- Charts -->
+          <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
+            <a routerLink="/LABADMIN/charts" class="menu-link">
+              <i class="menu-icon ri-stock-line"></i>
+              <div data-i18n="Charts">Charts</div>
 
-        <li class="menu-header mt-7"><span class="menu-header-text">APPROVE</span></li>
+            </a>
+          </li>
 
-        <!-- APPROVE -->
-        <li class="menu-item active close">
-          <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon ri-checkbox-circle-line"></i>
-            <div data-i18n="Dashboards">Approve</div>
 
-          </a>
-          <ul class="menu-sub">
 
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/approve/casepaper/" class="menu-link">
-                <div data-i18n="approve/casepaper">CasePaper</div>
+          <li class="menu-header mt-7" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'"><span class="menu-header-text">APPROVE</span></li>
 
-              </a>
-            </li>
-            <li class="menu-item" routerLinkActive="active">
-              <a routerLink="/labadmin/approve/test" class="menu-link">
-                <div data-i18n="approve/test">Test</div>
-              </a>
-            </li>
-          </ul>
-        </li>
+          <!-- APPROVE -->
+          <li class="menu-item active close" *ngIf ="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <i class="menu-icon ri-checkbox-circle-line"></i>
+              <div data-i18n="Dashboards">Approve</div>
+
+            </a>
+            <ul class="menu-sub">
+
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="/LABADMIN/approve/casepaper/" class="menu-link">
+                  <div data-i18n="approve/casepaper">CasePaper</div>
+
+                </a>
+              </li>
+              <li class="menu-item" routerLinkActive="active">
+                <a routerLink="/LABADMIN/approve/test" class="menu-link">
+                  <div data-i18n="approve/test">Test</div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Finance -->
+          <li class="menu-item" routerLinkActive="active" *ngIf ="user.useR_LOGIN != 'LABADMIN' && user.useR_LOGIN != 'EMPLOYEE' && user.lab_Admin != 'Y'">
+            <a routerLink="/ADMIN/users" class="menu-link">
+              <i class="menu-icon ri-money-dollar-circle-line"></i>
+              <div data-i18n="Finance">Companies</div>
+
+            </a>
+          </li>
+
 
 
       </ul>
@@ -223,4 +240,3 @@
     <!-- / Menu -->
   </div>
 </div>
-

@@ -70,7 +70,8 @@
             <!-- Home Collection -->
             <div class="col-md-6 mb-3 d-flex align-items-center">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="home-collection">
+                <input class="form-check-input" type="checkbox" [checked]="data.get('collectioN_TYPE')?.value === 1"
+                  (change)="onCollectionChange($event)" id="home-collection">
                 <label class="form-check-label text-dark ms-2" for="home-collection">
                   Home Collection
                 </label>
@@ -122,10 +123,10 @@
                   formControlName="coN_NUMBER" #formField />
                 <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
                     class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
-                  <!-- <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small> -->
+                <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
+                  <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small>
                   <small *ngIf="data.get('coN_NUMBER')?.errors['pattern']">Enter valid 10-digit number.</small>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -144,7 +145,7 @@
           <div class="form-floating form-floating-outline mb-4 position-relative">
             <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
               placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
-              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating">
+              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #formField>
             </ng-select>
 
             <label for="doctor-reference" class="floating-label">
@@ -189,8 +190,8 @@
                       }}</td>
                     <td class="text-success ">₹ {{ data.price }}</td>
                     <td><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
-                    <td>
-                      <button class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-danger rounded-pill align-items-center gap-1"
                         (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
                         <i class="ri-delete-bin-6-line"></i> Delete
                       </button>
@@ -304,11 +305,13 @@
           <h4 class="section-heading mb-4"><i class="ri-bank-card-line me-2"></i>Payment Method</h4>
           <div class="mb-4">
             <div class="form-check form-check-inline">
-              <input type="radio" name="paymentMethod" id="cash" class="form-check-input" required />
+              <input type="radio" name="paymenT_METHOD" formControlName="paymenT_METHOD" [value]="0" id="cash"
+                class="form-check-input" required />
               <label for="cash" class="form-check-label">Cash</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="radio" name="paymentMethod" id="online" class="form-check-input" />
+              <input type="radio" name="paymenT_METHOD" formControlName="paymenT_METHOD" [value]="1" id="online"
+                class="form-check-input" />
               <label for="online" class="form-check-label">Online</label>
             </div>
           </div>
@@ -318,21 +321,49 @@
             <div class="col-sm-6">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="number" class="form-control text-end " placeholder="₹0" formControlName="paymenT_AMOUNT"
-                  required style="max-width: 300px;" />
+                  (input)="onPaymentAmountChange()" required style="max-width: 300px;" />
                 <label for="paymenT_AMOUNT"><i class="ri-cash-line"></i>Payment Amount<span
                     class="text-danger">*</span></label>
               </div>
             </div>
           </div>
 
+          <div class="row mb-5" *ngIf="trn_no !== 0 && btn === 'D'">
+            <div class="col-sm-6">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="test" class="form-control text-end " placeholder="Delete Reason" [(ngModel)]="Reason"
+                  required style="max-width: 300px;" [ngModelOptions]="{standalone: true}" />
+                <label for="reason"><i class="ri-cash-line"></i>Delete Reason<span class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
+
           <!-- Cancel Button -->
           <div class="text-end">
-            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill" *ngIf="trn_no === 0">Save</button>
+            <!-- Save Button -->
             <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
-              *ngIf="trn_no !== 0">Update</button>
-            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill"
-              (click)="isCreatingNew = false">Cancel</button>
+              *ngIf="trn_no === 0 && btn === ''">
+              Save
+            </button>
+
+            <!-- Update Button -->
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
+              *ngIf="trn_no !== 0 && btn === 'E'">
+              Update
+            </button>
+
+            <!-- Delete Confirmation Button (Also labeled Update) -->
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
+              *ngIf="trn_no !== 0 && btn === 'D'">
+              Delete
+            </button>
+
+            <!-- Cancel Button -->
+            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">
+              Cancel
+            </button>
           </div>
+
         </form>
       </div>
     </div>
@@ -349,10 +380,10 @@
           <tr>
             <th>sr</th>
             <th>Actions</th>
-            <th>Trn_No</th>
+            <th>Date</th>
             <th>Name</th>
             <th>Contact</th>
-            <th>Date</th>
+            <th>Crt By</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -363,9 +394,6 @@
       };let i = index">
             <td>{{(page - 1) * pageSize + i + 1}}</td>
             <td>
-              <div *ngIf="case.statuS_CODE === 101">
-                <a class="dropdown-item" href="javascript:void(0);"><i class="ri-bill-line me-1"></i>Invoice</a>
-              </div>
 
               <div *ngIf="case.statuS_CODE === 0">
                 <a (click)="openInlineForm(case.trN_NO,'E')" class="btn btn-sm btn-purple me-2 text-white"
@@ -376,14 +404,27 @@
                   href="javascript:void(0);">
                   <i class="ri-delete-bin-6-line me-1"></i> Delete
                 </a>
+                <a class="btn btn-sm btn-success me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#InvoiceModal">
+                  <i class="ri-file-text-line me-1"></i> Invoice
+                </a>
               </div>
             </td>
-            <td><span>{{ case.trN_NO }}</span></td>
+            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
             <td><span>{{ case.patienT_NAME }}</span></td>
             <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
-            <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
-            <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
+             <td><span>{{ case.crT_BY }}</span></td>
+            <!-- <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
               <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
+            </td> -->
+            <td>
+              <span class="badge" [ngClass]="{
+    'bg-success': case.paymenT_STATUS === 'COMPLETED',
+    'bg-warning text-dark': case.paymenT_STATUS !== 'COMPLETED'
+  }">
+                {{ case.paymenT_STATUS }}
+              </span>
+
             </td>
 
           </tr>

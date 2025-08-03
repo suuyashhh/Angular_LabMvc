@@ -1,14 +1,14 @@
 <div class="container" style="max-width: 800px!important;margin: 50px auto!important;">
 
     <div class="report-section" id="printableArea">
-        
+
         <div class="report-header">
             <div class="date-display">
-                <span class="date-item">From Date: <span id="displayFromDate">01/07/2025</span></span>
-                <span class="date-item">To Date: <span id="displayToDate">01/07/2025</span></span>
+                <span class="date-item">From Date: <span id="displayFromDate">{{displayFromDate}}</span></span>
+                <span class="date-item">To Date: <span id="displayToDate">{{displayToDate}}</span></span>
             </div>
         </div>
-         <div style="padding: 1.5rem;">
+        <div style="padding: 1.5rem;">
             <div class="date-display">
                 <span class="date-item" *ngIf="type == 'casepaper'">Report:- <span>CasePapers</span></span>
                 <span class="date-item" *ngIf="type == 'labmaterial'">Report:- <span>Lab Materials</span></span>
@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-             <!-- BikeFule -->
+            <!-- BikeFule -->
             <div class="expenses-header" *ngIf="type == 'bikefule'">
                 <span class="header-number">No.</span>
                 <span class="header-name">Bike Name</span>
@@ -71,7 +71,7 @@
                 </div>
             </div>
 
-             <!-- Employee Salary -->
+            <!-- Employee Salary -->
             <div class="expenses-header" *ngIf="type == 'empsalary'">
                 <span class="header-number">No.</span>
                 <span class="header-name">Employee Name</span>
@@ -87,7 +87,7 @@
                 </div>
             </div>
 
-             <!-- Electricity Bill -->
+            <!-- Electricity Bill -->
             <div class="expenses-header" *ngIf="type == 'elcbill'">
                 <span class="header-number">No.</span>
                 <span class="header-date">Date</span>
@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-             <!-- Other Expense -->
+            <!-- Other Expense -->
             <div class="expenses-header" *ngIf="type == 'otherexpense'">
                 <span class="header-number">No.</span>
                 <span class="header-name">Expense Name</span>
@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-             <!-- Doctor Commission -->
+            <!-- Doctor Commission -->
             <div class="expenses-header" *ngIf="type == 'doccommission'">
                 <span class="header-number">No.</span>
                 <span class="header-name">Doctor Name</span>
