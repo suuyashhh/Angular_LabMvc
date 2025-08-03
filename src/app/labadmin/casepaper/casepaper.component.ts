@@ -35,6 +35,7 @@ interface CasePaper {
   date: string;
   statuS_CODE: number;
   paymenT_STATUS?: string;
+  crT_BY: string;
 }
 
 @Component({
@@ -533,6 +534,7 @@ export class CasepaperComponent implements OnInit {
       date: '', // optional: can use `new Date()` if needed
       coM_ID: 101, // static value you set during init
       paymenT_STATUS: '',
+      crT_BY:''
     });
   }
 }
