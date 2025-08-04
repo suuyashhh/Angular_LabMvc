@@ -1,0 +1,37 @@
+<!-- Navigation -->
+<nav class="fixed w-full z-50 backdrop-blur-md bg-dark/80 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="#" class="text-2xl font-bold tracking-tight text-cyan-400">&lt;Suyash /&gt;</a>
+            </div>
+
+            <!-- Desktop Menu (increased spacing & font size) -->
+            <div class="hidden md:flex items-center space-x-12">
+                <a routerLink="home" class="nav-link active" (click)="setActiveLink($event)">Home</a>
+                <a routerLink="about" class="nav-link" (click)="setActiveLink($event)">About</a>
+                <a routerLink="projects" class="nav-link" (click)="setActiveLink($event)">Projects</a>
+                <a routerLink="resume" class="nav-link" (click)="setActiveLink($event)">Resume</a>
+                <a routerLink="contact" class="nav-link" (click)="setActiveLink($event)">Contact</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="flex md:hidden items-center">
+                <button (click)="toggleMobileMenu()" class="text-cyan-400 text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu (centered links) -->
+    <div id="mobile-menu"
+        [class.hidden]="!mobileMenuOpen"
+        class="flex flex-col items-center justify-center space-y-6 py-8 bg-dark/95 text-center animate-slideDown">
+        <a routerLink="home" class="nav-link active" (click)="setActiveLink($event)">Home</a>
+        <a routerLink="about" class="nav-link" (click)="setActiveLink($event)">About</a>
+        <a routerLink="projects" class="nav-link" (click)="setActiveLink($event)">Projects</a>
+        <a routerLink="resume" class="nav-link" (click)="setActiveLink($event)">Resume</a>
+        <a routerLink="contact" class="nav-link" (click)="setActiveLink($event)">Contact</a>
+    </div>
+</nav>
