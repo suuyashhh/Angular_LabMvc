@@ -489,7 +489,7 @@ export class CasepaperComponent implements OnInit {
         paymenT_STATUS: res.paymenT_STATUS,
         date: this.service.getFormattedDate(res.date, 8),
         doctoR_CODE: res.doctoR_CODE,
-        crT_BY:res.crT_BY,
+        crT_BY: res.crT_BY,
       });
       this.onPaymentAmountChange();
 
@@ -534,7 +534,7 @@ export class CasepaperComponent implements OnInit {
       date: '', // optional: can use `new Date()` if needed
       coM_ID: 101, // static value you set during init
       paymenT_STATUS: '',
-      crT_BY:''
+      crT_BY: ''
     });
   }
 }
