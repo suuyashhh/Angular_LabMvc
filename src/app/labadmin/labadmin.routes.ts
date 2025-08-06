@@ -36,6 +36,15 @@ export const lABADMIN_ROUTES: Routes = [
     loadComponent: () => import('../labadmin/approve/casepaper/casepaper.component')
         .then(m => m.CasepaperComponent)
  },
+
+
+ {
+    path:'app-approve-casepaper',
+    loadComponent: () => import('../labadmin/approve/approve-casepaper/approve-casepaper.component')
+        .then(m => m.ApproveCasepaperComponent)
+ },
+
+
  {
     path:'approve/test',
     loadComponent: () => import('../labadmin/approve/test/test.component')
