@@ -82,7 +82,8 @@
 
 
         <!-- Liabilities START!! -->
-        <li class="menu-item active close" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.useR_LOGIN == 'EMPLOYEE' || user.lab_Admin == 'Y'">
+        <li class="menu-item active close"
+          *ngIf="user.useR_LOGIN == 'LABADMIN' || user.useR_LOGIN == 'EMPLOYEE' || user.lab_Admin == 'Y'">
           <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons ri-uninstall-fill"></i>
             <div data-i18n="Dashboards">Liabilities</div>
@@ -176,7 +177,7 @@
             </li>
 
             <!--Approve Master -->
-            <li class="menu-item active close"
+            <li class="menu-item active close mb-7"
               *ngIf="user.useR_LOGIN == 'LABADMIN' || user.useR_LOGIN == 'EMPLOYEE' || user.lab_Admin == 'Y'">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon ri-bar-chart-horizontal-fill "></i>
@@ -221,6 +222,9 @@
 
           </a>
         </li>
+
+        <li class="mt-7"></li>
+
       </ul>
     </aside>
     <!-- / Menu -->
