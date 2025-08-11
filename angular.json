@@ -51,7 +51,8 @@
               "src/assets/vendor/js/bootstrap.js",
               "src/assets/vendor/js/menu.js",
               "src/assets/js/main.js",
-              "src/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"
+              "src/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js",
+              "src/assets/js/mobileview.js"
             ]
           },
           "configurations": {

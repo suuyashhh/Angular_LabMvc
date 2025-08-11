@@ -8,31 +8,34 @@
     </div>
 
     <!-- Start Date -->
-    <div class="col-6 col-md-2 mb-3">
-      <mat-form-field appearance="outline" class="custom-datepicker w-100">
-        <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate" [max]="today" />
-        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-        <mat-datepicker #startPicker></mat-datepicker>
-      </mat-form-field>
+    <div class="col-6 col-md-3 mb-4">
+      <div class="form-floating form-floating-outline">
+        <input type="date" class="form-control form-control-lg shadow-sm" formControlName="date" id="date-input"
+          required #formField placeholder="dd-mm-yyyy" style="height: 3.5rem; padding-top: 1.625rem;">
+        <label for="date-input" class="d-flex align-items-center gap-2">
+          <span class="calendar-icon fs-5">📅</span>
+          <span>Start Date<span class="text-danger ms-1">*</span></span>
+        </label>
+      </div>
     </div>
 
     <!-- End Date -->
-    <div class="col-6 col-md-2 mb-3">
-      <mat-form-field appearance="outline" class="custom-datepicker w-100">
-        <mat-label>End Date</mat-label>
-        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" [max]="today" />
-        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-        <mat-datepicker #endPicker></mat-datepicker>
-      </mat-form-field>
+    <div class="col-6 col-md-3 mb-4">
+      <div class="form-floating form-floating-outline">
+        <input type="date" class="form-control form-control-lg shadow-sm" formControlName="date" id="date-input"
+          required #formField placeholder="dd-mm-yyyy" style="height: 3.5rem; padding-top: 1.625rem;">
+        <label for="date-input" class="d-flex align-items-center gap-2">
+          <span class="calendar-icon fs-5">📅</span>
+          <span>End Date<span class="text-danger ms-1">*</span></span>
+        </label>
+      </div>
     </div>
-
     <!-- Search by Date -->
-    <div class="col-12 col-sm-6 col-md-2">
+    <!-- <div class="col-12 col-sm-6 col-md-2">
       <button type="button" class="btn btn-primary m-1" (click)="filterByDate()">
         Search by Date
       </button>
-    </div>
+    </div> -->
 
     <!-- Spacer -->
     <div class="d-none d-md-block col-md-1"></div>
@@ -413,7 +416,7 @@
             <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
             <td><span>{{ case.patienT_NAME }}</span></td>
             <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
-             <td><span>{{ case.crT_BY }}</span></td>
+            <td><span>{{ case.crT_BY }}</span></td>
             <!-- <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
               <span *ngIf="case.statuS_CODE === 0" class="badge bg-warning text-dark">Pending</span>
             </td> -->
