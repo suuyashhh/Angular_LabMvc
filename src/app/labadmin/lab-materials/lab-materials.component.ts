@@ -30,28 +30,60 @@ export class LabMaterialsComponent implements OnInit {
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.getMaterials();
+    this.pageloadDatewiseMat();
   }
 
-  // initForm() {
-  //   this.data = new FormGroup({
-  //     DATE: new FormControl('', Validators.required),
-  //     MAT_NAME: new FormControl('', Validators.required),
-  //     MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
-  //     COM_ID: new FormControl(this.ComId)
-  //   });
-  // }
+  formatDateToYyyyMmDd(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
+    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
+    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
+  }
+
+  pageloadDatewiseMat() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
+    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
+
+    this.getDateWiseLabMaterials(formattedStart, formattedEnd); // Call on page load
+  }
 
   initForm() {
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const now = new Date();
+    // first date
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // last date
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const format = (date: Date): string => {
+      const yyyy = date.getFullYear();
+      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      const dd = ('0' + date.getDate()).slice(-2);
+      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
+    };
 
     this.data = new FormGroup({
-      DATE: new FormControl(formattedDate, Validators.required),
+      startDate: new FormControl(format(startOfMonth), Validators.required),
+      endDate: new FormControl(format(endOfMonth), Validators.required),
+      DATE: new FormControl(format(now), Validators.required),
       MAT_NAME: new FormControl('', Validators.required),
       MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
     });
+  }
+
+  onDateChange() {
+    const start = this.data.get('startDate')?.value;
+    const end = this.data.get('endDate')?.value;
+
+    if (start && end) {
+      const startDate = this.formatDateToYyyyMmDd(new Date(start));
+      const endDate = this.formatDateToYyyyMmDd(new Date(end));
+      this.getDateWiseLabMaterials(startDate, endDate);
+    }
   }
 
   getMaterials() {
@@ -68,6 +100,22 @@ export class LabMaterialsComponent implements OnInit {
       complete: () => this.loadingMaterials = false
     });
   }
+
+  getDateWiseLabMaterials(startDate: string, endDate: string) {
+    this.loadingMaterials = true;
+    this.api.get('LabMaterials/GetDateWiseLabMaterials/' + startDate + ',' + endDate).subscribe({
+      next: (res: any) => {
+        this.material = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.material = [];
+      },
+      complete: () => this.loadingMaterials = false
+    });
+  }
+
 
   clearData() {
     this.MAT_ID = 0;
@@ -96,7 +144,7 @@ export class LabMaterialsComponent implements OnInit {
     if (this.MAT_ID == 0 && this.btn == '') {
       this.api.post('LabMaterials/SaveLabMaterials', material).subscribe({
         next: () => {
-          this.getMaterials();
+          this.pageloadDatewiseMat();
           setTimeout(() => {
             this.toastr.success('Material added successfully');
             this.api.modalClose('labMatFormModal');

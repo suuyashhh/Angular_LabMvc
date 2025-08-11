@@ -11,7 +11,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-doctor-commission',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe,NgxPaginationModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe, NgxPaginationModule],
   templateUrl: './doctor-commission.component.html',
   styleUrl: './doctor-commission.component.css'
 })
@@ -26,25 +26,86 @@ export class DoctorCommissionComponent implements OnInit {
   loadingCommission = false;
   Reason: string = '';
 
-  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) {}
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.loadDoctorCommission();
-    this.loadDoctors();
+    this.pageloadDatewiseDocComm();
   }
+
+
+  formatDateToYyyyMmDd(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
+    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
+    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
+  }
+
+  pageloadDatewiseDocComm() {
+    this.loadDoctors();
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
+    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
+
+    this.getDateWiseDocComm(formattedStart, formattedEnd); // Call on page load
+  }
+
 
   initForm() {
 
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const now = new Date();
+    // first date
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // last date
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const format = (date: Date): string => {
+      const yyyy = date.getFullYear();
+      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      const dd = ('0' + date.getDate()).slice(-2);
+      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
+    };
 
     this.data = new FormGroup({
-      DATE: new FormControl(formattedDate, Validators.required),
+      startDate: new FormControl(format(startOfMonth), Validators.required),
+      endDate: new FormControl(format(endOfMonth), Validators.required),
+      DATE: new FormControl(format(now), Validators.required),
       DOCTOR_ID: new FormControl('', Validators.required),
       DOC_COM_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
+    });
+  }
+
+
+  onDateChange() {
+    const start = this.data.get('startDate')?.value;
+    const end = this.data.get('endDate')?.value;
+
+    if (start && end) {
+      const startDate = this.formatDateToYyyyMmDd(new Date(start));
+      const endDate = this.formatDateToYyyyMmDd(new Date(end));
+      this.getDateWiseDocComm(startDate, endDate);
+    }
+  }
+
+
+  getDateWiseDocComm(startDate: string, endDate: string) {
+    this.loadingCommission = true;
+    this.api.get('DoctorCommission/GetDateWiseDocCommission/' + startDate + ',' + endDate).subscribe({
+      next: (res: any) => {
+        this.doctorcommission = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.doctorcommission = [];
+      },
+      complete: () => this.loadingCommission = false
     });
   }
 
@@ -85,7 +146,7 @@ export class DoctorCommissionComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 2;
+  readonly pageSize: number = 10;
 
   submit(DocCom: any) {
     this.submitted = true;
@@ -168,10 +229,10 @@ export class DoctorCommissionComponent implements OnInit {
   }
 
   getDoctorName(code: number): string {
-  if (!this.doctor || !Array.isArray(this.doctor)) return 'Unknown';
-  const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
-  return doc ? doc.doctoR_NAME : 'Unknown';
-}
+    if (!this.doctor || !Array.isArray(this.doctor)) return 'Unknown';
+    const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
+    return doc ? doc.doctoR_NAME : 'Unknown';
+  }
 
   filteredDocCommission(): any[] {
     let result = this.doctorcommission || [];

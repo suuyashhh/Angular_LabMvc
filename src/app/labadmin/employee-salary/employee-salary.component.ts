@@ -11,7 +11,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-employee-salary',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule,FormattedDatePipe,NgxPaginationModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe, NgxPaginationModule],
   templateUrl: './employee-salary.component.html',
   styleUrl: './employee-salary.component.css'
 })
@@ -26,24 +26,86 @@ export class EmployeeSalaryComponent implements OnInit {
   Reason: string = '';
   loadingSalary = false;
 
-  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) {}
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
     this.initForm();
-    this.load();
+    this.pageloadDatewiseEmpSal();
   }
 
-  initForm() {
-    
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
 
+  formatDateToYyyyMmDd(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
+    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
+    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
+  }
+
+  pageloadDatewiseEmpSal() {
+
+    this.api.get('Employee/Employees').subscribe((res: any) => {
+      this.employee = res;
+    });
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
+    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
+
+    this.getDateWiseEmpSalary(formattedStart, formattedEnd); // Call on page load
+  }
+
+
+  initForm() {
+    const now = new Date();
+    // first date
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // last date
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const format = (date: Date): string => {
+      const yyyy = date.getFullYear();
+      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      const dd = ('0' + date.getDate()).slice(-2);
+      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
+    };
     this.data = new FormGroup({
-      EMP_ID: new FormControl('',Validators.required),
+      startDate: new FormControl(format(startOfMonth), Validators.required),
+      endDate: new FormControl(format(endOfMonth), Validators.required),
+      EMP_ID: new FormControl('', Validators.required),
       EMP_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
-      DATE: new FormControl(formattedDate, Validators.required),
+      DATE: new FormControl(format(now), Validators.required),
       COM_ID: new FormControl()
+    });
+  }
+
+
+  onDateChange() {
+    const start = this.data.get('startDate')?.value;
+    const end = this.data.get('endDate')?.value;
+
+    if (start && end) {
+      const startDate = this.formatDateToYyyyMmDd(new Date(start));
+      const endDate = this.formatDateToYyyyMmDd(new Date(end));
+      this.getDateWiseEmpSalary(startDate, endDate);
+    }
+  }
+
+  getDateWiseEmpSalary(startDate: string, endDate: string) {
+    this.loadingSalary = true;
+    this.api.get('EmployeeSalary/GetDateWiseEmpSalary/' + startDate + ',' + endDate).subscribe({
+      next: (res: any) => {
+        this.employeesalary = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.employeesalary = [];
+      },
+      complete: () => this.loadingSalary = false
     });
   }
 
@@ -61,9 +123,6 @@ export class EmployeeSalaryComponent implements OnInit {
       complete: () => this.loadingSalary = false
     });
 
-    this.api.get('Employee/Employees').subscribe((res: any) => {
-      this.employee = res;
-    });
   }
 
   clearData() {
@@ -75,7 +134,7 @@ export class EmployeeSalaryComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 2;
+  readonly pageSize: number = 10;
 
   submit(employeesalary: any) {
     this.submitted = true;
@@ -94,7 +153,7 @@ export class EmployeeSalaryComponent implements OnInit {
       employeesalary.COM_ID = this.ComId;
       this.api.post('EmployeeSalary/SaveEmployeeSalary', employeesalary).subscribe({
         next: () => {
-          this.load();
+          this.pageloadDatewiseEmpSal();
           setTimeout(() => {
             this.toastr.success('Salary added successfully');
             this.api.modalClose('EmpSalFormModal');
@@ -110,7 +169,7 @@ export class EmployeeSalaryComponent implements OnInit {
     } else if (this.EMP_TRN_ID != 0 && this.btn == 'E') {
       this.api.post('EmployeeSalary/EditEmployeeSalary/' + this.EMP_TRN_ID, employeesalary).subscribe({
         next: () => {
-          this.load();
+          this.pageloadDatewiseEmpSal();
           setTimeout(() => {
             this.toastr.success('Salary updated successfully');
             this.api.modalClose('EmpSalFormModal');
@@ -127,7 +186,7 @@ export class EmployeeSalaryComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('EmployeeSalary/DeleteEmployeeSalary/' + this.EMP_TRN_ID).subscribe({
           next: () => {
-            this.load();
+            this.pageloadDatewiseEmpSal();
             setTimeout(() => {
               this.toastr.success('Salary deleted successfully');
               this.api.modalClose('EmpSalFormModal');
@@ -159,31 +218,32 @@ export class EmployeeSalaryComponent implements OnInit {
   }
 
   getEmployeeName(id: number): string {
-  const emp = this.employee.find((e:any) => e.emP_ID == id);
-  return emp ? emp.emP_NAME : 'Unknown';
-}
-
-filteredEmpSalary(): any[] {
-  let result = this.employeesalary || [];
-debugger;
-  // Apply search filter if searchTerm exists
-  if (this.searchTerm && this.searchTerm.trim() !== '') {
-    const searchTermLower = this.searchTerm.toLowerCase().trim();
-    result = result.filter((employeesalary: any) => 
-      employeesalary.emP_PRICE?.toLowerCase().includes(searchTermLower)
-    );
+    if (!this.employee || !Array.isArray(this.employee)) return 'Unknown';
+    const emp = this.employee.find((e: any) => e.emP_ID == id);
+    return emp ? emp.emP_NAME : 'Unknown';
   }
 
-  // Reset to page 1 when search term changes
-  if (this.searchTerm) {
+  filteredEmpSalary(): any[] {
+    let result = this.employeesalary || [];
+    debugger;
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((employeesalary: any) =>
+        employeesalary.emP_PRICE?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
     this.page = 1;
   }
-
-  return result;
-}
-
- onSearch() {
-  // Reset to first page when searching
-  this.page = 1;
-}
 }

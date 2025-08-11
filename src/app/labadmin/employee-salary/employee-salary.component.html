@@ -1,24 +1,63 @@
 <!-- Add Button -->
+
 <div class="container container-p-y">
-  <div class="row align-items-center justify-content-between g-3">
-    <!-- Add Button - Left Side -->
-    <div class="col-auto">
+  <div class="row g-3 align-items-center flex-column flex-lg-row">
+
+    <!-- Add Button -->
+    <div class="col-12 col-lg-auto">
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EmpSalFormModal"
         (click)="clearData()">
-        <i class="ri-add-line me-2"></i>Add Salary Slip
+        <i class="ri-add-box-fill"></i> &nbsp; Add Salary Slip
       </button>
     </div>
 
-    <!-- Search - Right Side -->
-    <div class="col-md-4 col-lg-3 ms-md-auto">
+
+    <!-- Date Range - Always in one row -->
+    <div class="col-auto">
+      <div class="row g-3">
+        <div class="col-auto">
+          <form [formGroup]="data">
+            <div class="form-floating form-floating-outline">
+              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 180px;"
+                formControlName="startDate" id="start-date-input" required #formField placeholder="dd-mm-yyyy"
+                (change)="onDateChange()">
+              <label for="start-date-input" class="d-flex align-items-center gap-2">
+                <span class="calendar-icon fs-5">📅</span>
+                <span>Start Date<span class="text-danger ms-1">*</span></span>
+              </label>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-auto">
+          <form [formGroup]="data">
+            <div class="form-floating form-floating-outline">
+              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 180px;"
+                formControlName="endDate" id="end-date-input" required #formField placeholder="dd-mm-yyyy"
+                (change)="onDateChange()">
+              <label for="end-date-input" class="d-flex align-items-center gap-2">
+                <span class="calendar-icon fs-5">📅</span>
+                <span>End Date<span class="text-danger ms-1">*</span></span>
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Search Input -->
+    <div class="col-12 col-lg-3 ms-lg-auto">
       <div class="form-floating form-floating-outline">
         <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="searchTerm"
           (ngModelChange)="onSearch()" id="html5-search-input" />
         <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
       </div>
     </div>
+
   </div>
 </div>
+
+
+
 
 <!-- Modal -->
 <div class="modal fade custom-modal-fade" id="EmpSalFormModal" tabindex="-1" aria-labelledby="EmpSalFormModalLabel"

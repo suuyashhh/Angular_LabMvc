@@ -30,19 +30,77 @@ export class OtherExpenseComponent implements OnInit {
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.getExpenses();
+    this.pageloadDatewiseOthExp();
+  }
+
+
+  formatDateToYyyyMmDd(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
+    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
+    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
+  }
+
+  pageloadDatewiseOthExp() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
+    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
+
+    this.getDateWiseOthExpense(formattedStart, formattedEnd); // Call on page load
   }
 
   initForm() {
+    const now = new Date();
+    // first date
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // last date
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const format = (date: Date): string => {
+      const yyyy = date.getFullYear();
+      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      const dd = ('0' + date.getDate()).slice(-2);
+      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
+    };
 
     this.data = new FormGroup({
-      DATE: new FormControl(formattedDate, Validators.required),
+      startDate: new FormControl(format(startOfMonth), Validators.required),
+      endDate: new FormControl(format(endOfMonth), Validators.required),
+      DATE: new FormControl(format(now), Validators.required),
       OTHER_NAME: new FormControl('', Validators.required),
       OTHER_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
+    });
+  }
+
+
+  onDateChange() {
+    const start = this.data.get('startDate')?.value;
+    const end = this.data.get('endDate')?.value;
+
+    if (start && end) {
+      const startDate = this.formatDateToYyyyMmDd(new Date(start));
+      const endDate = this.formatDateToYyyyMmDd(new Date(end));
+      this.getDateWiseOthExpense(startDate, endDate);
+    }
+  }
+
+
+  getDateWiseOthExpense(startDate: string, endDate: string) {
+    this.loadingExpenses = true;
+    this.api.get('OtherExpense/GetDateWiseOthMaterials/' + startDate + ',' + endDate).subscribe({
+      next: (res: any) => {
+        this.otherexpense = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.otherexpense = [];
+      },
+      complete: () => this.loadingExpenses = false
     });
   }
 
@@ -70,7 +128,7 @@ export class OtherExpenseComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 2;
+  readonly pageSize: number = 10;
 
   submit(expense: any) {
     this.submitted = true;
@@ -88,7 +146,7 @@ export class OtherExpenseComponent implements OnInit {
     if (this.OTHER_ID == 0 && this.btn == '') {
       this.api.post('OtherExpense/SaveOtherExpense', expense).subscribe({
         next: () => {
-          this.getExpenses();
+          this.pageloadDatewiseOthExp();
           setTimeout(() => {
             this.toastr.success('Expense added successfully');
             this.api.modalClose('OEFormModal');
@@ -104,7 +162,7 @@ export class OtherExpenseComponent implements OnInit {
     } else if (this.OTHER_ID != 0 && this.btn == 'E') {
       this.api.post('OtherExpense/EditOtherExpense/' + this.OTHER_ID, expense).subscribe({
         next: () => {
-          this.getExpenses();
+          this.pageloadDatewiseOthExp();
           setTimeout(() => {
             this.toastr.success('Expense updated successfully');
             this.api.modalClose('OEFormModal');
@@ -121,7 +179,7 @@ export class OtherExpenseComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('OtherExpense/DeleteOtherExpense/' + this.OTHER_ID).subscribe({
           next: () => {
-            this.getExpenses();
+            this.pageloadDatewiseOthExp();
             setTimeout(() => {
               this.toastr.success('Expense deleted successfully');
               this.api.modalClose('OEFormModal');

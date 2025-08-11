@@ -31,19 +31,77 @@ export class BikeFuleComponent implements OnInit {
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.getBikeFule();
+    this.pageloadDatewiseBike();
+  }
+
+  formatDateToYyyyMmDd(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
+    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
+    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
+  }
+
+  pageloadDatewiseBike() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
+    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
+
+    this.getDateWiseBikeFule(formattedStart, formattedEnd); // Call on page load
   }
 
   initForm() {
 
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const now = new Date();
+    // first date
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // last date
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const format = (date: Date): string => {
+      const yyyy = date.getFullYear();
+      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      const dd = ('0' + date.getDate()).slice(-2);
+      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
+    };
 
     this.data = new FormGroup({
-      DATE: new FormControl(formattedDate, Validators.required),
+      startDate: new FormControl(format(startOfMonth), Validators.required),
+      endDate: new FormControl(format(endOfMonth), Validators.required),
+      DATE: new FormControl(format(now), Validators.required),
       BIKE_NAME: new FormControl('', Validators.required),
       BIKE_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl()
+    });
+  }
+
+
+  onDateChange() {
+    const start = this.data.get('startDate')?.value;
+    const end = this.data.get('endDate')?.value;
+
+    if (start && end) {
+      const startDate = this.formatDateToYyyyMmDd(new Date(start));
+      const endDate = this.formatDateToYyyyMmDd(new Date(end));
+      this.getDateWiseBikeFule(startDate, endDate);
+    }
+  }
+
+
+  getDateWiseBikeFule(startDate: string, endDate: string) {
+    this.loadingBikeFule = true;
+    this.api.get('BikeFule/GetDateWiseBikeFule/' + startDate + ',' + endDate).subscribe({
+      next: (res: any) => {
+        this.bikefule = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.bikefule = [];
+      },
+      complete: () => this.loadingBikeFule = false
     });
   }
 
@@ -90,7 +148,7 @@ export class BikeFuleComponent implements OnInit {
     if (this.BIKE_ID == 0 && this.btn == '') {
       this.api.post('BikeFule/SaveBikeFule', bike).subscribe({
         next: () => {
-          this.getBikeFule();
+          this.pageloadDatewiseBike();
           setTimeout(() => {
             this.toastr.success('Bike fuel added successfully');
             this.api.modalClose('bikeFormModal');
@@ -106,7 +164,7 @@ export class BikeFuleComponent implements OnInit {
     } else if (this.BIKE_ID != 0 && this.btn == 'E') {
       this.api.post('BikeFule/EditBikeFule/' + this.BIKE_ID, bike).subscribe({
         next: () => {
-          this.getBikeFule();
+          this.pageloadDatewiseBike();
           setTimeout(() => {
             this.toastr.success('Bike fuel updated successfully');
             this.api.modalClose('bikeFormModal');
