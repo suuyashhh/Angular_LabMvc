@@ -9,26 +9,32 @@
 
     <!-- Start Date -->
     <div class="col-6 col-md-3 mb-4">
+       <form [formGroup]="data">
       <div class="form-floating form-floating-outline">
-        <input type="date" class="form-control form-control-lg shadow-sm" formControlName="date" id="date-input"
-          required #formField placeholder="dd-mm-yyyy" style="height: 3.5rem; padding-top: 1.625rem;">
-        <label for="date-input" class="d-flex align-items-center gap-2">
-          <span class="calendar-icon fs-5">📅</span>
-          <span>Start Date<span class="text-danger ms-1">*</span></span>
-        </label>
+              <input type="date" class="form-control shadow-sm" style="height: 3.5rem; padding-top: 1.625rem;"
+                formControlName="startDate" id="start-date-input" required #formField placeholder="dd-mm-yyyy"
+                (change)="onDateChange()">
+              <label for="start-date-input" class="d-flex align-items-center gap-2">
+                <span class="calendar-icon fs-5">📅</span>
+                <span>Start Date<span class="text-danger ms-1">*</span></span>
+              </label>
       </div>
+          </form>
     </div>
 
     <!-- End Date -->
     <div class="col-6 col-md-3 mb-4">
+       <form [formGroup]="data">
       <div class="form-floating form-floating-outline">
-        <input type="date" class="form-control form-control-lg shadow-sm" formControlName="date" id="date-input"
-          required #formField placeholder="dd-mm-yyyy" style="height: 3.5rem; padding-top: 1.625rem;">
-        <label for="date-input" class="d-flex align-items-center gap-2">
-          <span class="calendar-icon fs-5">📅</span>
-          <span>End Date<span class="text-danger ms-1">*</span></span>
-        </label>
+       <input type="date" class="form-control shadow-sm" style="height: 3.5rem; padding-top: 1.625rem;"
+                formControlName="endDate" id="end-date-input" required #formField placeholder="dd-mm-yyyy"
+                (change)="onDateChange()">
+              <label for="end-date-input" class="d-flex align-items-center gap-2">
+                <span class="calendar-icon fs-5">📅</span>
+                <span>End Date<span class="text-danger ms-1">*</span></span>
+              </label>
       </div>
+      </form>
     </div>
     <!-- Search by Date -->
     <!-- <div class="col-12 col-sm-6 col-md-2">
