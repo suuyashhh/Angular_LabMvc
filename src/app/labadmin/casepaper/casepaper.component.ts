@@ -103,7 +103,22 @@ export class CasepaperComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+     const now = new Date();
+    // first date
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // last date
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const format = (date: Date): string => {
+      const yyyy = date.getFullYear();
+      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      const dd = ('0' + date.getDate()).slice(-2);
+      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
+    };
+
     this.data = new FormGroup({
+      startDate: new FormControl(format(startOfMonth), Validators.required),
+      endDate: new FormControl(format(endOfMonth), Validators.required),
       TRN_NO: new FormControl(0),
       collectioN_TYPE: new FormControl(0),
       patienT_NAME: new FormControl('', Validators.required),
@@ -119,7 +134,7 @@ export class CasepaperComponent implements OnInit {
       discount: new FormControl(0),
       paymenT_AMOUNT: new FormControl(0, Validators.required),
       paymenT_METHOD: new FormControl(0),
-      date: new FormControl(''),
+      date: new FormControl(format(now), Validators.required),
       coM_ID: new FormControl(101),
       paymenT_STATUS: new FormControl(''),
     });
@@ -237,11 +252,30 @@ export class CasepaperComponent implements OnInit {
     console.log('Lab Profit:', this.total_Lab_Profit);
   }
 
+  
+  formatDateToYyyyMmDd(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
+    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
+    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
+  }
+
   load() {
-    this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
-      this.cases = res;
-      console.log(this.cases);
-    });
+
+ const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
+    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
+
+    this.getDateWiseCasepapers(formattedStart, formattedEnd); // Call on page load
+
+
+    // this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
+    //   this.cases = res;
+    //   console.log(this.cases);
+    // });
 
     this.api.get('Test/Tests').subscribe((res: any) => {
       this.tests = res;
@@ -251,6 +285,32 @@ export class CasepaperComponent implements OnInit {
     this.api.get('Doctor/Doctors').subscribe((res: any) => {
       this.doctor = res;
       console.log(this.doctor);
+    });
+  }
+
+  
+  onDateChange() {
+    const start = this.data.get('startDate')?.value;
+    const end = this.data.get('endDate')?.value;
+
+    if (start && end) {
+      const startDate = this.formatDateToYyyyMmDd(new Date(start));
+      const endDate = this.formatDateToYyyyMmDd(new Date(end));
+      this.getDateWiseCasepapers(startDate, endDate);
+    }
+  }
+
+  
+  getDateWiseCasepapers(startDate: string, endDate: string) {
+    this.api.get('CasePaper/GetDateWiseCasePaper/' + startDate + ',' + endDate).subscribe({
+      next: (res: any) => {
+        this.cases = res;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load material list');
+        console.error(err);
+        this.cases = [];
+      },
     });
   }
 
