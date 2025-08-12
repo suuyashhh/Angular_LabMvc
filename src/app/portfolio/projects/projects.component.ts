@@ -1,16 +1,21 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 declare const particlesJS: any;
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent {
+export class ProjectsComponent implements OnInit {
+  imageIndex: { [key: string]: number } = {
+    dairy: 1,
+    fabrication: 1,
+    laboratory: 1
+  };
 
   ngOnInit(): void {
     // Initialize particles.js
@@ -19,28 +24,11 @@ export class ProjectsComponent {
     });
   }
 
-  // Carousel functionality
-  imageIndex: { [key: string]: number } = {
-    dairyfarm: 1,
-    fabrication: 1
-  };
-
-  showImage(project: string, index: number): void {
-    const images = document.querySelectorAll(`#${project}-img-1, #${project}-img-2, #${project}-img-3, #${project}-img-4`);
-    images.forEach((img: any, i: number) => {
-      img.style.opacity = (i + 1 === index) ? "1" : "0";
-    });
-  }
-
   nextImage(project: string): void {
-    this.imageIndex[project]++;
-    if (this.imageIndex[project] > 4) this.imageIndex[project] = 1;
-    this.showImage(project, this.imageIndex[project]);
+    this.imageIndex[project] = this.imageIndex[project] % 4 + 1;
   }
 
   prevImage(project: string): void {
-    this.imageIndex[project]--;
-    if (this.imageIndex[project] < 1) this.imageIndex[project] = 4;
-    this.showImage(project, this.imageIndex[project]);
+    this.imageIndex[project] = (this.imageIndex[project] - 2 + 4) % 4 + 1;
   }
 }
