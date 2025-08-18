@@ -60,7 +60,7 @@ export class DashboardComponent implements OnInit {
   const today = new Date();
   const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
 
-  this.api.get('Home/Home/' + '20250426' + ',' + '20250426').subscribe((res: any) => {
+  this.api.get('Home/Home/' + '20250728' + ',' + '20250728').subscribe((res: any) => {
     this.dashboardCount = res;
     console.log(res);
 
