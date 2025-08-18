@@ -61,10 +61,12 @@
                     <input type="password" id="password" class="form-control" name="password"
                       [(ngModel)]="loginObj.password"
                       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                      aria-describedby="password" />
+                      aria-describedby="password" #passwordInput />
                     <label for="password">Password</label>
                   </div>
-                  <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
+                  <span class="input-group-text cursor-pointer" (click)="togglePasswordVisibility(passwordInput)">
+                    <i class="ri-eye-off-line ri-20px" #passwordIcon></i>
+                  </span>
                 </div>
               </div>
             </div>
