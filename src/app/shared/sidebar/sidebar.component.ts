@@ -6,21 +6,31 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterModule,CommonModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.css'
+  styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit,AfterViewInit {
+export class SidebarComponent implements OnInit, AfterViewInit {
+  user: any;
 
-  user:any;
-  constructor(private auth:AuthService){}
+  constructor(private auth: AuthService) {}
 
   ngOnInit(): void {
     this.user = this.auth.getUser();
   }
 
   ngAfterViewInit(): void {
-    this.reinitializeSidebarMenu();
+    // Only initialize menu on desktop
+    if (window.innerWidth >= 1200) {
+      this.reinitializeSidebarMenu();
+    }
+    
+    // Add resize listener
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1200) {
+        this.reinitializeSidebarMenu();
+      }
+    });
   }
 
   reinitializeSidebarMenu(): void {
@@ -31,9 +41,7 @@ export class SidebarComponent implements OnInit,AfterViewInit {
           orientation: 'vertical',
           closeChildren: false,
         });
-        // ✅ Removed: menu.init(); — unnecessary and causes TypeError
       }
     }, 50);
   }
-
 }
