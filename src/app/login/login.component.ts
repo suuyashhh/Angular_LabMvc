@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
 import { AuthService } from '../shared/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -23,7 +24,8 @@ export class LoginComponent implements OnInit {
 
   private secretKey: string = 'mySecretKey123';
 
-  constructor(private router: Router, private auth: AuthService) {}
+  constructor(private router: Router, private auth: AuthService,
+      private toastr: ToastrService,) {}
 
   ngOnInit() {
     if (this.auth.isLoggedIn()) {
@@ -59,7 +61,8 @@ export class LoginComponent implements OnInit {
       error: (err: any) => {
         this.isLoading = false; // ✅ Hide loader
         console.error('Login error:', err);
-        alert('Invalid credentials or server error');
+       this.toastr.error('Invalid User', 'Invalid');
+       this.router.navigate(["lab"]);
       }
     });
   }
