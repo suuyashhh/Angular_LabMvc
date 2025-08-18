@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -15,6 +15,8 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+  @ViewChild('passwordIcon') passwordIcon: any;
+
   loginObj: any = {
     contact: '',
     password: ''
@@ -59,12 +61,26 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (err: any) => {
-        this.isLoading = false; // ✅ Hide loader
+        this.isLoading = false; // 
         console.error('Login error:', err);
        this.toastr.error('Invalid User', 'Invalid');
        this.router.navigate(["lab"]);
       }
     });
   }
+
+  togglePasswordVisibility(passwordInput: HTMLInputElement) {
+  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+  passwordInput.setAttribute('type', type);
+  
+  // Toggle the eye icon
+  if (type === 'password') {
+    this.passwordIcon.nativeElement.classList.remove('ri-eye-line');
+    this.passwordIcon.nativeElement.classList.add('ri-eye-off-line');
+  } else {
+    this.passwordIcon.nativeElement.classList.remove('ri-eye-off-line');
+    this.passwordIcon.nativeElement.classList.add('ri-eye-line');
+  }
+}
 }
 
