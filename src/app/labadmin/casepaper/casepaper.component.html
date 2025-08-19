@@ -1,5 +1,5 @@
 <div class="container container-p-y">
-  <div class="row g-3" *ngIf="!isCreatingNew">
+  <div class="row g-3" *ngIf="!isCreatingNew && !isInvoiceNew">
     <!-- New Button -->
     <div class="col-12 col-sm-6 col-md-2">
       <button type="button" (click)="resetCasepaperForm()" class="btn btn-primary m-1">
@@ -379,8 +379,94 @@
   </div>
 </div>
 
+<div *ngIf="isInvoiceNew" class="container-xxl flex-grow-1 mt-n6">
+  <div class="container my-4 invoice-container">
+    <input type="hidden" id="invoiceTrnNo" [value]="trn_no" />
+    <div class="bg-white p-4 rounded shadow-sm">
+
+      <div class="text-center mb-4">
+        <h4 class="fw-bold">Tax Invoice</h4>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-12 col-md-6">
+          <h6>Bill To:</h6>
+          <p class="mb-1" style="color: black!important;">
+            <span *ngIf="data.get('gender')?.value === 'male' || data.get('gender')?.value === 'other'">
+              <strong style="color: black!important;">Mr.</strong>
+            </span>
+            <span *ngIf="data.get('gender')?.value === 'female'">
+              <strong style="color: black!important;">Mrs.</strong>
+            </span>
+            {{ data.get('patienT_NAME')?.value }}
+          </p>
+          <p class="mb-1" style="color: black!important;"><strong>Dr Ref:-</strong> {{ getDoctorName(data.get('doctoR_CODE')?.value) }}</p>
+          <p class="mb-0" style="color: black!important;">Goa, India</p>
+        </div>
+        <div class="col-12 col-md-6 text-md-end mt-3 mt-md-0">
+          <p class="mb-1" style="color: black!important;"><strong>Invoice :</strong> {{ generateInvoiceNumber() }}</p>
+          <p class="mb-0" style="color: black!important;"><strong>Invoice Date:</strong> {{ data.get('date')?.value | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered align-middle invoice-tests-table">
+          <thead class="table-light">
+            <tr>
+              <th style="color: black!important;">Sr.No</th>
+              <th style="color: black!important;">Test Name</th>
+              <th style="color: black!important;" class="text-end">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let test of matIs; let i = index">
+              <td style="color: black!important;">{{ i + 1 }}</td>
+              <td style="color: black!important;">{{ getTestNameByCode(test.tesT_CODE) }}</td>
+              <td class="text-end" style="color: black!important;">₹ {{ test.price | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="row justify-content-between">
+        <div class="col-md-6">
+          <p class="mb-1" style="color: black!important;"><strong>Discount:</strong> {{ data.get('discount')?.value || 0 }}%</p>
+          <p class="mb-0" style="color: black!important;"><strong>Discount Amount:</strong> ₹ {{ discount_Amount | number:'1.2-2' }}</p>
+        </div>
+        <div class="col-md-6 text-end">
+          <p class="mb-1" style="color: black!important;"><strong>Subtotal:</strong> ₹ {{ test_Amount | number:'1.2-2' }}</p>
+          <p class="mb-0" style="color: black!important;"><strong>Total:</strong> ₹ {{ total_Amount | number:'1.2-2' }}</p>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <p style="color:black!important;">
+          <strong>Notes:</strong><br>
+          System generated bill*
+        </p>
+      </div>
+
+      <div class="text-center mt-4 no-print">
+      <button (click)="printInvoice()" class="btn btn-primary px-4">
+        🖨 Print Invoice
+      </button>
+    </div>
+
+    <div class="text-end mt-4 no-print">
+      <button class="btn btn-success px-4" (click)="saveInvoice()">
+        🖨 Save
+      </button>
+      <button class="btn btn-danger px-4 ms-2" (click)="isInvoiceNew = false">
+        ❌ Cancel
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+
 <!-- Case Paper List Table -->
-<div *ngIf="!isCreatingNew" class="container-xxl flex-grow-1 container-p-y mt-n9">
+<div *ngIf="!isCreatingNew && !isInvoiceNew" class="container-xxl flex-grow-1 container-p-y mt-n9">
   <div class="card">
     <h5 class="card-header">Case Paper</h5>
     <div class="table-responsive text-nowrap">
@@ -413,7 +499,7 @@
                   href="javascript:void(0);">
                   <i class="ri-delete-bin-6-line me-1"></i> Delete
                 </a>
-                <a class="btn btn-sm btn-success me-2" href="javascript:void(0);" data-bs-toggle="modal"
+                <a (click)="openInvoiceForm(case.trN_NO,'I')" class="btn btn-sm btn-success me-2" href="javascript:void(0);" data-bs-toggle="modal"
                   data-bs-target="#InvoiceModal">
                   <i class="ri-file-text-line me-1"></i> Invoice
                 </a>

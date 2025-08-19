@@ -61,6 +61,7 @@ export class CasepaperComponent implements OnInit {
   @ViewChildren('formField') formFields!: QueryList<ElementRef>;
 
   isCreatingNew: boolean = false; // ✅ Added
+  isInvoiceNew: boolean = false; // ✅ Added
 
   btn: string = '';
   cases: any;
@@ -103,7 +104,7 @@ export class CasepaperComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-     const now = new Date();
+    const now = new Date();
     // first date
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     // last date
@@ -210,19 +211,6 @@ export class CasepaperComponent implements OnInit {
 
 
 
-  testAmount() {
-    this.test_Amount = 0;
-    this.total_test_LabPrice = 0;
-
-    for (let i = 0; i < this.matIs.length; i++) {
-      const test = this.matIs[i];
-      this.test_Amount += +test.price || 0;
-      this.total_test_LabPrice += +test.laB_PRICE || 0;
-    }
-
-    this.total();
-  }
-
   removeTest(srno: number) {
     this.matIs = this.matIs.filter((item: any) => item.sR_NO !== Number(srno));
 
@@ -234,25 +222,8 @@ export class CasepaperComponent implements OnInit {
     this.testAmount();
   }
 
-  discount() {
-    const discountPercent = this.dis || 0;
-    this.discount_Amount = (this.test_Amount * discountPercent) / 100;
-
-    // Update form control so it never sends null
-    this.data.get('discount')?.setValue(discountPercent);
-
-    this.total();
-  }
-
-
-  total() {
-    this.total_Amount = this.test_Amount - (this.discount_Amount || 0);
-    this.total_Lab_Profit = this.total_Amount - this.total_test_LabPrice;
-    console.log('Total Amount:', this.total_Amount);
-    console.log('Lab Profit:', this.total_Lab_Profit);
-  }
-
   
+
   formatDateToYyyyMmDd(date: Date): string {
     const yyyy = date.getFullYear();
     const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
@@ -262,7 +233,7 @@ export class CasepaperComponent implements OnInit {
 
   load() {
 
- const now = new Date();
+    const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
@@ -288,7 +259,7 @@ export class CasepaperComponent implements OnInit {
     });
   }
 
-  
+
   onDateChange() {
     const start = this.data.get('startDate')?.value;
     const end = this.data.get('endDate')?.value;
@@ -300,7 +271,7 @@ export class CasepaperComponent implements OnInit {
     }
   }
 
-  
+
   getDateWiseCasepapers(startDate: string, endDate: string) {
     this.api.get('CasePaper/GetDateWiseCasePaper/' + startDate + ',' + endDate).subscribe({
       next: (res: any) => {
@@ -384,11 +355,11 @@ export class CasepaperComponent implements OnInit {
       // ➕ Add CasePaper
       this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
         next: () => {
+          this.toastr.success('Case paper added successfully');
           setTimeout(() => {
-            this.toastr.success('Case paper added successfully');
-            this.load();
-            this.cancelCreate();
-          }, 300);
+            window.location.reload();
+          }, 500); // wait before reload
+          this.cancelCreate();
         },
         error: (err) => {
           console.error('Add error:', err);
@@ -405,11 +376,11 @@ export class CasepaperComponent implements OnInit {
       });
       this.api.post('CasePaper/EditCasePaper/' + this.trn_no, payload).subscribe({
         next: () => {
+          this.toastr.success('Case paper updated successfully');
           setTimeout(() => {
-            this.toastr.success('Case paper updated successfully');
-            this.load();
-            this.cancelCreate();
-          }, 200);
+            window.location.reload();
+          }, 500);
+          this.cancelCreate();
         },
         error: (err) => {
           console.error('Edit error:', err);
@@ -422,12 +393,12 @@ export class CasepaperComponent implements OnInit {
       if (this.Reason && this.Reason.trim() !== '') {
         this.api.delete(`CasePaper/DeleteCasePaper/${this.trn_no}`).subscribe({
           next: () => {
+            this.toastr.success('Case paper deleted successfully');
             setTimeout(() => {
-              this.toastr.success('Case paper deleted successfully');
-              this.load();
-              this.cancelCreate();
-              this.Reason = "";
-            }, 200);
+              window.location.reload();
+            }, 500); // wait before reload
+            this.cancelCreate();
+            this.Reason = "";
           },
           error: (err) => {
             console.error('Delete error:', err);
@@ -451,6 +422,9 @@ export class CasepaperComponent implements OnInit {
     this.total_Lab_Profit = 0;
   }
 
+  cancleInvoice() {
+    this.isInvoiceNew = false;
+  }
 
 
   filteredCases(): CasePaper[] {
@@ -525,16 +499,81 @@ export class CasepaperComponent implements OnInit {
 
   openInlineForm(trN_NO: number, action: string) {
     this.isCreatingNew = true;
+    this.isInvoiceNew = false;
     this.btn = action;
     this.getDataById(trN_NO, action);
   }
+
+  openInvoiceForm(trN_NO: number, action: string) {
+    this.isInvoiceNew = true;
+    this.isCreatingNew = false;
+    this.btn = action;
+    this.getDataById(trN_NO, action);
+  }
+
+  testAmount() {
+    this.test_Amount = 0;
+    this.total_test_LabPrice = 0;
+
+    for (let i = 0; i < this.matIs.length; i++) {
+      const test = this.matIs[i];
+      this.test_Amount += +test.price || 0;
+      this.total_test_LabPrice += +test.laB_PRICE || 0;
+    }
+
+    this.total();
+  }
+
+  discount() {
+    const discountPercent = this.data.get('discount')?.value || 0;
+    this.discount_Amount = (this.test_Amount * discountPercent) / 100;
+    this.total();
+  }
+
+  total() {
+    this.total_Amount = this.test_Amount - (this.discount_Amount || 0);
+    this.total_Lab_Profit = this.total_Amount - this.total_test_LabPrice;
+
+    // Update form controls
+    this.data.get('totaL_AMOUNT')?.setValue(this.total_Amount);
+    this.data.get('totaL_PROFIT')?.setValue(this.total_Lab_Profit);
+  }
+
+  printInvoice() {
+    window.print();
+  }
+
+  saveInvoice() {
+    this.api.post('CasePaper/InvoiceSave', {
+      TrnNo: this.trn_no,
+      InvoiceNo: this.generateInvoiceNumber()
+    }).subscribe({
+      next: (res) => {
+        this.toastr.success('Invoice saved successfully');
+      },
+      error: (err) => {
+        this.toastr.error('Failed to save invoice');
+      }
+    });
+  }
+
+  generateInvoiceNumber(): string {
+    return 'INV-' + new Date().getTime();
+  }
+
+  getDoctorName(doctorCode: string): string {
+    const doc = this.doctor.find((d: any) => d.doctoR_CODE === doctorCode);
+    return doc ? doc.doctoR_NAME : 'N/A';
+  }
+
+
 
   getDataById(trN_NO: number, btn: string) {
     this.btn = btn;
     this.api.get('CasePaper/CasePaper/' + trN_NO).subscribe((res: any) => {
       this.trn_no = res.trN_NO;
-      console.log(res);
 
+      // Patch form values
       this.data.patchValue({
         patienT_NAME: res.patienT_NAME,
         gender: res.gender,
@@ -551,17 +590,18 @@ export class CasepaperComponent implements OnInit {
         doctoR_CODE: res.doctoR_CODE,
         crT_BY: res.crT_BY,
       });
-      this.onPaymentAmountChange();
 
+      // Set test items
       this.matIs = res.matIs.map((item: any) => ({
         ...item,
         TEST_NAME: this.getTestNameByCode(item.tesT_CODE)
       }));
+
+      // Recalculate amounts
       this.testAmount();
       this.discount();
       this.total();
-
-
+      this.onPaymentAmountChange();
     });
   }
 
