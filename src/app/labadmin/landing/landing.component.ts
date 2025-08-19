@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../shared/auth.service';
 import { CommonModule } from '@angular/common';
@@ -23,18 +23,48 @@ export class LandingComponent implements OnInit {
   user: any;
   isSidebarVisible: boolean = false;
 
+  @ViewChild('sidebar') sidebar!: ElementRef;
+
   constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.user = this.auth.getUser();
   }
 
-  SideBarMob() {
+  toggleSidebar() {
     this.isSidebarVisible = !this.isSidebarVisible;
   }
 
   closeSidebar() {
     this.isSidebarVisible = false;
+  }
+
+  // Close sidebar when clicking outside of it
+  @HostListener('document:click', ['$event'])
+  onClick(event: Event) {
+    if (this.isSidebarVisible && 
+        !this.isToggleButton(event) && 
+        !this.isSidebarClick(event)) {
+      this.closeSidebar();
+    }
+  }
+
+  // Check if click is on the toggle button
+  private isToggleButton(event: Event): boolean {
+    const target = event.target as HTMLElement;
+    return target.closest('.mobile-menu-toggle') !== null;
+  }
+
+  // Check if click is inside the sidebar
+  private isSidebarClick(event: Event): boolean {
+    const target = event.target as HTMLElement;
+    return target.closest('.layout-menu') !== null;
+  }
+
+  // Optional: Close sidebar when pressing Escape key
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscapeKey(event: KeyboardEvent) {
+    this.closeSidebar();
   }
 
   home() {
