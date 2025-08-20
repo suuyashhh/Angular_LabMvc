@@ -9,31 +9,31 @@
 
     <!-- Start Date -->
     <div class="col-6 col-md-3 mb-4">
-       <form [formGroup]="data">
-      <div class="form-floating form-floating-outline">
-              <input type="date" class="form-control shadow-sm" style="height: 3.5rem; padding-top: 1.625rem;"
-                formControlName="startDate" id="start-date-input" required #formField placeholder="dd-mm-yyyy"
-                (change)="onDateChange()">
-              <label for="start-date-input" class="d-flex align-items-center gap-2">
-                <span class="calendar-icon fs-5">📅</span>
-                <span>Start Date<span class="text-danger ms-1">*</span></span>
-              </label>
-      </div>
-          </form>
+      <form [formGroup]="data">
+        <div class="form-floating form-floating-outline">
+          <input type="date" class="form-control shadow-sm" style="height: 3.5rem; padding-top: 1.625rem;"
+            formControlName="startDate" id="start-date-input" required #formField placeholder="dd-mm-yyyy"
+            (change)="onDateChange()">
+          <label for="start-date-input" class="d-flex align-items-center gap-2">
+            <span class="calendar-icon fs-5">📅</span>
+            <span>Start Date<span class="text-danger ms-1">*</span></span>
+          </label>
+        </div>
+      </form>
     </div>
 
     <!-- End Date -->
     <div class="col-6 col-md-3 mb-4">
-       <form [formGroup]="data">
-      <div class="form-floating form-floating-outline">
-       <input type="date" class="form-control shadow-sm" style="height: 3.5rem; padding-top: 1.625rem;"
-                formControlName="endDate" id="end-date-input" required #formField placeholder="dd-mm-yyyy"
-                (change)="onDateChange()">
-              <label for="end-date-input" class="d-flex align-items-center gap-2">
-                <span class="calendar-icon fs-5">📅</span>
-                <span>End Date<span class="text-danger ms-1">*</span></span>
-              </label>
-      </div>
+      <form [formGroup]="data">
+        <div class="form-floating form-floating-outline">
+          <input type="date" class="form-control shadow-sm" style="height: 3.5rem; padding-top: 1.625rem;"
+            formControlName="endDate" id="end-date-input" required #formField placeholder="dd-mm-yyyy"
+            (change)="onDateChange()">
+          <label for="end-date-input" class="d-flex align-items-center gap-2">
+            <span class="calendar-icon fs-5">📅</span>
+            <span>End Date<span class="text-danger ms-1">*</span></span>
+          </label>
+        </div>
       </form>
     </div>
     <!-- Search by Date -->
@@ -91,8 +91,11 @@
             <div class="col-md-6 text-end">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="date" class="form-control shadow-sm" formControlName="date" id="date-input" required
-                  #formField>
+                  #dateField>
                 <label for="date"><i class="ri-calendar-line"></i>Date<span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('date')?.invalid">
+                  <small *ngIf="data.get('date')?.errors?.['required']">Date is required</small>
+                </div>
               </div>
             </div>
           </div>
@@ -100,69 +103,68 @@
           <!-- Patient Name -->
           <div class="form-floating form-floating-outline mb-4">
             <input type="text" id="patient-name" class="form-control" placeholder="Patient Name"
-              formControlName="patienT_NAME" required #formField />
+              formControlName="patienT_NAME" required #patientNameField />
             <label for="patient-name"> <i class="ri-user-3-line"></i>Patient Name <span
                 class="text-danger">*</span></label>
-            <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('patienT_NAME')?.errors">
-                    <small *ngIf="data.get('patienT_NAME')?.errors['required']">Patient Name is required.</small>
-                  </div> -->
+            <div class="text-danger mt-1" *ngIf="submitted && data.get('patienT_NAME')?.invalid">
+              <small *ngIf="data.get('patienT_NAME')?.errors?.['required']">Patient Name is required</small>
+            </div>
           </div>
 
           <!-- Gender -->
-
-          <div class="row mb-4" style="margin-top: 30px;">
-            <div class="col-sm-6">
-              <div class="form-floating form-floating-outline mb-4">
-                <select class="form-select" id="gender" formControlName="gender" required #formField>
-                  <option value="" disabled selected>Select Gender</option>
-                  <option value="male"><i class="ri-men-line"></i>Male</option>
-                  <option value="female"><i class="ri-women-line"></i>Female</option>
-                  <option value="other"><i class="ri-genderless-line"></i>Other</option>
-                </select>
-                <label for="gender">Gender <span class="text-danger">*</span></label>
-                <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('gender')?.errors">
-                        <small *ngIf="data.get('gender')?.errors['required']">Gender is required.</small>
-                      </div> -->
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <!-- Phone Number -->
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
-                  formControlName="coN_NUMBER" #formField />
-                <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
-                    class="text-danger">*</span></label>
-                <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.errors">
-                  <small *ngIf="data.get('coN_NUMBER')?.errors['required']">Phone number is required.</small>
-                  <small *ngIf="data.get('coN_NUMBER')?.errors['pattern']">Enter valid 10-digit number.</small>
-                </div> -->
+          <div class="col-sm-6">
+            <div class="form-floating form-floating-outline mb-4">
+              <select class="form-select" id="gender" formControlName="gender" required #genderField>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="male"><i class="ri-men-line"></i>Male</option>
+                <option value="female"><i class="ri-women-line"></i>Female</option>
+                <option value="other"><i class="ri-genderless-line"></i>Other</option>
+              </select>
+              <label for="gender">Gender <span class="text-danger">*</span></label>
+              <div class="text-danger mt-1" *ngIf="submitted && data.get('gender')?.invalid">
+                <small *ngIf="data.get('gender')?.errors?.['required']">Gender is required</small>
               </div>
             </div>
           </div>
+
+          <!-- Phone Number -->
+          <div class="col-sm-6">
+            <div class="form-floating form-floating-outline mb-4">
+              <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
+                formControlName="coN_NUMBER" #phoneField />
+              <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
+                  class="text-danger">*</span></label>
+              <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.invalid">
+                <small *ngIf="data.get('coN_NUMBER')?.errors?.['required']">Phone number is required</small>
+                <small *ngIf="data.get('coN_NUMBER')?.errors?.['pattern']">Enter valid 10-digit number</small>
+              </div>
+            </div>
+          </div>
+
           <!-- Address -->
           <div class="form-floating form-floating-outline mb-4">
             <textarea class="form-control h-px-100" id="address" formControlName="address" placeholder="Address"
-              style="height: 113px;" #formField></textarea>
+              style="height: 113px;" #addressField></textarea>
             <label for="address"><i class="ri-map-pin-line"></i>Address <span class="text-danger">*</span></label>
-            <!-- <div class="text-danger mt-1" *ngIf="submitted && data.get('address')?.errors">
-                    <small *ngIf="data.get('address')?.errors['required']">Address is required.</small>
-                  </div> -->
+            <div class="text-danger mt-1" *ngIf="submitted && data.get('address')?.invalid">
+              <small *ngIf="data.get('address')?.errors?.['required']">Address is required</small>
+            </div>
           </div>
 
-          <!-- Doctor Reference -->
+          <!-- Date -->
 
+
+          <!-- Doctor Reference -->
           <div class="form-floating form-floating-outline mb-4 position-relative">
             <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
               placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
-              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #formField>
+              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #doctorField>
             </ng-select>
-
             <label for="doctor-reference" class="floating-label">
               <i class="ri-user-star-line"></i> Doctor Reference <span class="text-danger">*</span>
             </label>
-
-            <div class="text-danger mt-1" *ngIf="data.get('doctoR_CODE')?.touched && data.get('doctoR_CODE')?.invalid">
-              Doctor selection is required.
+            <div class="text-danger mt-1" *ngIf="submitted && data.get('doctoR_CODE')?.invalid">
+              <small *ngIf="data.get('doctoR_CODE')?.errors?.['required']">Doctor selection is required</small>
             </div>
           </div>
 
@@ -400,12 +402,14 @@
             </span>
             {{ data.get('patienT_NAME')?.value }}
           </p>
-          <p class="mb-1" style="color: black!important;"><strong>Dr Ref:-</strong> {{ getDoctorName(data.get('doctoR_CODE')?.value) }}</p>
+          <p class="mb-1" style="color: black!important;"><strong>Dr Ref:-</strong> {{
+            getDoctorName(data.get('doctoR_CODE')?.value) }}</p>
           <p class="mb-0" style="color: black!important;">Goa, India</p>
         </div>
         <div class="col-12 col-md-6 text-md-end mt-3 mt-md-0">
           <p class="mb-1" style="color: black!important;"><strong>Invoice :</strong> {{ generateInvoiceNumber() }}</p>
-          <p class="mb-0" style="color: black!important;"><strong>Invoice Date:</strong> {{ data.get('date')?.value | date:'dd/MM/yyyy' }}</p>
+          <p class="mb-0" style="color: black!important;"><strong>Invoice Date:</strong> {{ data.get('date')?.value |
+            date:'dd/MM/yyyy' }}</p>
         </div>
       </div>
 
@@ -430,12 +434,16 @@
 
       <div class="row justify-content-between">
         <div class="col-md-6">
-          <p class="mb-1" style="color: black!important;"><strong>Discount:</strong> {{ data.get('discount')?.value || 0 }}%</p>
-          <p class="mb-0" style="color: black!important;"><strong>Discount Amount:</strong> ₹ {{ discount_Amount | number:'1.2-2' }}</p>
+          <p class="mb-1" style="color: black!important;"><strong>Discount:</strong> {{ data.get('discount')?.value || 0
+            }}%</p>
+          <p class="mb-0" style="color: black!important;"><strong>Discount Amount:</strong> ₹ {{ discount_Amount |
+            number:'1.2-2' }}</p>
         </div>
         <div class="col-md-6 text-end">
-          <p class="mb-1" style="color: black!important;"><strong>Subtotal:</strong> ₹ {{ test_Amount | number:'1.2-2' }}</p>
-          <p class="mb-0" style="color: black!important;"><strong>Total:</strong> ₹ {{ total_Amount | number:'1.2-2' }}</p>
+          <p class="mb-1" style="color: black!important;"><strong>Subtotal:</strong> ₹ {{ test_Amount | number:'1.2-2'
+            }}</p>
+          <p class="mb-0" style="color: black!important;"><strong>Total:</strong> ₹ {{ total_Amount | number:'1.2-2' }}
+          </p>
         </div>
       </div>
 
@@ -447,21 +455,21 @@
       </div>
 
       <div class="text-center mt-4 no-print">
-      <button (click)="printInvoice()" class="btn btn-primary px-4">
-        🖨 Print Invoice
-      </button>
-    </div>
+        <button (click)="printInvoice()" class="btn btn-primary px-4">
+          🖨 Print Invoice
+        </button>
+      </div>
 
-    <div class="text-end mt-4 no-print">
-      <button class="btn btn-success px-4" (click)="saveInvoice()">
-        🖨 Save
-      </button>
-      <button class="btn btn-danger px-4 ms-2" (click)="isInvoiceNew = false">
-        ❌ Cancel
-      </button>
+      <div class="text-end mt-4 no-print">
+        <button class="btn btn-success px-4" (click)="saveInvoice()">
+          🖨 Save
+        </button>
+        <button class="btn btn-danger px-4 ms-2" (click)="isInvoiceNew = false">
+          ❌ Cancel
+        </button>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 
@@ -499,8 +507,8 @@
                   href="javascript:void(0);">
                   <i class="ri-delete-bin-6-line me-1"></i> Delete
                 </a>
-                <a (click)="openInvoiceForm(case.trN_NO,'I')" class="btn btn-sm btn-success me-2" href="javascript:void(0);" data-bs-toggle="modal"
-                  data-bs-target="#InvoiceModal">
+                <a (click)="openInvoiceForm(case.trN_NO,'I')" class="btn btn-sm btn-success me-2"
+                  href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#InvoiceModal">
                   <i class="ri-file-text-line me-1"></i> Invoice
                 </a>
               </div>
