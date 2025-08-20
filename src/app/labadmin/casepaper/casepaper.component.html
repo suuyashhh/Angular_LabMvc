@@ -111,9 +111,10 @@
             </div>
           </div>
 
-          <!-- Gender -->
-          <div class="col-sm-6">
-            <div class="form-floating form-floating-outline mb-4">
+          <div class="row mb-4 align-items-center">
+            <!-- Home Collection -->
+            <div class="col-md-6 ">
+                <div class="form-floating form-floating-outline mb-4">
               <select class="form-select" id="gender" formControlName="gender" required #genderField>
                 <option value="" disabled selected>Select Gender</option>
                 <option value="male"><i class="ri-men-line"></i>Male</option>
@@ -125,11 +126,11 @@
                 <small *ngIf="data.get('gender')?.errors?.['required']">Gender is required</small>
               </div>
             </div>
-          </div>
+            </div>
 
-          <!-- Phone Number -->
-          <div class="col-sm-6">
-            <div class="form-floating form-floating-outline mb-4">
+            <!-- Date Picker -->
+            <div class="col-md-6 text-end">
+              <div class="form-floating form-floating-outline mb-4">
               <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
                 formControlName="coN_NUMBER" #phoneField />
               <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
@@ -138,6 +139,7 @@
                 <small *ngIf="data.get('coN_NUMBER')?.errors?.['required']">Phone number is required</small>
                 <small *ngIf="data.get('coN_NUMBER')?.errors?.['pattern']">Enter valid 10-digit number</small>
               </div>
+            </div>
             </div>
           </div>
 
@@ -155,18 +157,18 @@
 
 
           <!-- Doctor Reference -->
-          <div class="form-floating form-floating-outline mb-4 position-relative">
-            <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
-              placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
-              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #doctorField>
-            </ng-select>
-            <label for="doctor-reference" class="floating-label">
-              <i class="ri-user-star-line"></i> Doctor Reference <span class="text-danger">*</span>
-            </label>
-            <div class="text-danger mt-1" *ngIf="submitted && data.get('doctoR_CODE')?.invalid">
-              <small *ngIf="data.get('doctoR_CODE')?.errors?.['required']">Doctor selection is required</small>
+            <div class="form-floating form-floating-outline mb-4 position-relative">
+              <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
+                placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
+                formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #doctorField>
+              </ng-select>
+              <label for="doctor-reference" class="floating-label">
+                <i class="ri-user-star-line"></i> Doctor Reference <span class="text-danger">*</span>
+              </label>
+              <div class="text-danger mt-1" *ngIf="submitted && data.get('doctoR_CODE')?.invalid">
+                <small *ngIf="data.get('doctoR_CODE')?.errors?.['required']">Doctor selection is required</small>
+              </div>
             </div>
-          </div>
 
 
           <hr style="border: 2px solid Black; margin: 50px 0;">
