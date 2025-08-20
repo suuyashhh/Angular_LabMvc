@@ -37,7 +37,6 @@ export class FinanceRecordsComponent implements OnInit {
   }
 
   private loadData(): void {
-    debugger;
     this.route.queryParams.subscribe(params => {
       this.fromDate = params['fromDate'];
       this.toDate = params['toDate'];

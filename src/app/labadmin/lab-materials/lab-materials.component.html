@@ -1,5 +1,4 @@
 <!-- Add Button -->
-
 <div class="container container-p-y">
   <div class="row g-3 align-items-center flex-column flex-lg-row">
 
@@ -11,14 +10,13 @@
       </button>
     </div>
 
-
     <!-- Date Range - Always in one row -->
-    <div class="col-auto">
-      <div class="row g-3">
+    <div class="col-12 col-lg-auto">
+      <div class="row g-2 flex-nowrap overflow-auto" style="min-width: min-content;">
         <div class="col-auto">
           <form [formGroup]="data">
             <div class="form-floating form-floating-outline">
-              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 180px;"
+              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;"
                 formControlName="startDate" id="start-date-input" required #formField placeholder="dd-mm-yyyy"
                 (change)="onDateChange()">
               <label for="start-date-input" class="d-flex align-items-center gap-2">
@@ -32,7 +30,7 @@
         <div class="col-auto">
           <form [formGroup]="data">
             <div class="form-floating form-floating-outline">
-              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 180px;"
+              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;"
                 formControlName="endDate" id="end-date-input" required #formField placeholder="dd-mm-yyyy"
                 (change)="onDateChange()">
               <label for="end-date-input" class="d-flex align-items-center gap-2">
@@ -44,6 +42,7 @@
         </div>
       </div>
     </div>
+    
     <!-- Search Input -->
     <div class="col-12 col-lg-3 ms-lg-auto">
       <div class="form-floating form-floating-outline">
@@ -57,7 +56,6 @@
 
   </div>
 </div>
-
 
 
 
