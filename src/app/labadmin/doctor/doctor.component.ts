@@ -150,7 +150,6 @@ export class DoctorComponent implements OnInit {
 
 
   filteredDoctors(): any[] {
-    debugger;
     let result = this.doctor || [];
 
     // Apply search filter if searchTerm exists

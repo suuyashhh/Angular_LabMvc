@@ -225,7 +225,6 @@ export class EmployeeSalaryComponent implements OnInit {
 
   filteredEmpSalary(): any[] {
     let result = this.employeesalary || [];
-    debugger;
     // Apply search filter if searchTerm exists
     if (this.searchTerm && this.searchTerm.trim() !== '') {
       const searchTermLower = this.searchTerm.toLowerCase().trim();
