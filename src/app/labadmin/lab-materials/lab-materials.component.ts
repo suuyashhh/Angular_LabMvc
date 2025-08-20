@@ -24,51 +24,23 @@ export class LabMaterialsComponent implements OnInit {
   submitted: boolean = false;
   loadingMaterials = false;
   Reason: string = '';
+  startDate!: string;
+  endDate!: string;
 
   constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.pageloadDatewiseMat();
-  }
-
-  formatDateToYyyyMmDd(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
-    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
-    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
-  }
-
-  pageloadDatewiseMat() {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
-    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
-
-    this.getDateWiseLabMaterials(formattedStart, formattedEnd); // Call on page load
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
+    this.loadMaterials();
   }
 
   initForm() {
-    const now = new Date();
-    // first date
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    // last date
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const format = (date: Date): string => {
-      const yyyy = date.getFullYear();
-      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
-      const dd = ('0' + date.getDate()).slice(-2);
-      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
-    };
-
     this.data = new FormGroup({
-      startDate: new FormControl(format(startOfMonth), Validators.required),
-      endDate: new FormControl(format(endOfMonth), Validators.required),
-      DATE: new FormControl(format(now), Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       MAT_NAME: new FormControl('', Validators.required),
       MAT_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
@@ -76,14 +48,7 @@ export class LabMaterialsComponent implements OnInit {
   }
 
   onDateChange() {
-    const start = this.data.get('startDate')?.value;
-    const end = this.data.get('endDate')?.value;
-
-    if (start && end) {
-      const startDate = this.formatDateToYyyyMmDd(new Date(start));
-      const endDate = this.formatDateToYyyyMmDd(new Date(end));
-      this.getDateWiseLabMaterials(startDate, endDate);
-    }
+    if (this.startDate && this.endDate) this.loadMaterials();
   }
 
   getMaterials() {
@@ -101,21 +66,16 @@ export class LabMaterialsComponent implements OnInit {
     });
   }
 
-  getDateWiseLabMaterials(startDate: string, endDate: string) {
+  loadMaterials() {
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
     this.loadingMaterials = true;
-    this.api.get('LabMaterials/GetDateWiseLabMaterials/' + startDate + ',' + endDate).subscribe({
-      next: (res: any) => {
-        this.material = res;
-      },
-      error: (err) => {
-        this.toastr.error('Failed to load material list');
-        console.error(err);
-        this.material = [];
-      },
+    this.api.get(`LabMaterials/GetDateWiseLabMaterials/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.material = res,
+      error: () => this.toastr.error('Failed to load materials'),
       complete: () => this.loadingMaterials = false
     });
   }
-
 
   clearData() {
     this.MAT_ID = 0;
@@ -144,7 +104,7 @@ export class LabMaterialsComponent implements OnInit {
     if (this.MAT_ID == 0 && this.btn == '') {
       this.api.post('LabMaterials/SaveLabMaterials', material).subscribe({
         next: () => {
-          this.pageloadDatewiseMat();
+          this.loadMaterials();
           setTimeout(() => {
             this.toastr.success('Material added successfully');
             this.api.modalClose('labMatFormModal');
@@ -160,7 +120,7 @@ export class LabMaterialsComponent implements OnInit {
     } else if (this.MAT_ID != 0 && this.btn == 'E') {
       this.api.post('LabMaterials/EditLabMaterials/' + this.MAT_ID, material).subscribe({
         next: () => {
-          this.getMaterials();
+          this.loadMaterials();
           setTimeout(() => {
             this.toastr.success('Material updated successfully');
             this.api.modalClose('labMatFormModal');
@@ -177,7 +137,7 @@ export class LabMaterialsComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('LabMaterials/DeleteLabMaterials/' + this.MAT_ID).subscribe({
           next: () => {
-            this.getMaterials();
+            this.loadMaterials();
             setTimeout(() => {
               this.toastr.success('Material deleted successfully');
               this.api.modalClose('labMatFormModal');
@@ -235,3 +195,9 @@ export class LabMaterialsComponent implements OnInit {
 
 
 }
+
+
+
+
+
+
