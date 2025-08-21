@@ -70,6 +70,7 @@ export class LabMaterialsComponent implements OnInit {
     const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
     const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
     this.loadingMaterials = true;
+    debugger;
     this.api.get(`LabMaterials/GetDateWiseLabMaterials/${startDate},${endDate}`).subscribe({
       next: (res: any) => this.material = res,
       error: () => this.toastr.error('Failed to load materials'),

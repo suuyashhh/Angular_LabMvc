@@ -25,56 +25,40 @@ export class DoctorCommissionComponent implements OnInit {
   submitted: boolean = false;
   loadingCommission = false;
   Reason: string = '';
+  startDate!: string;
+  endDate!: string;
 
   constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
     this.pageloadDatewiseDocComm();
   }
 
 
-  formatDateToYyyyMmDd(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
-    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
-    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
-  }
-
   pageloadDatewiseDocComm() {
-    this.loadDoctors();
+    this.api.get('Doctor/Doctors').subscribe((res: any) => {
+      this.doctor = res;
+    });
 
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
-    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
-
-    this.getDateWiseDocComm(formattedStart, formattedEnd); // Call on page load
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingCommission = true;
+    this.api.get(`DoctorCommission/GetDateWiseDocCommission/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.doctorcommission = res,
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingCommission = false
+    });
   }
 
 
   initForm() {
-
-    const now = new Date();
-    // first date
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    // last date
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const format = (date: Date): string => {
-      const yyyy = date.getFullYear();
-      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
-      const dd = ('0' + date.getDate()).slice(-2);
-      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
-    };
-
     this.data = new FormGroup({
-      startDate: new FormControl(format(startOfMonth), Validators.required),
-      endDate: new FormControl(format(endOfMonth), Validators.required),
-      DATE: new FormControl(format(now), Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       DOCTOR_ID: new FormControl('', Validators.required),
       DOC_COM_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
@@ -83,30 +67,7 @@ export class DoctorCommissionComponent implements OnInit {
 
 
   onDateChange() {
-    const start = this.data.get('startDate')?.value;
-    const end = this.data.get('endDate')?.value;
-
-    if (start && end) {
-      const startDate = this.formatDateToYyyyMmDd(new Date(start));
-      const endDate = this.formatDateToYyyyMmDd(new Date(end));
-      this.getDateWiseDocComm(startDate, endDate);
-    }
-  }
-
-
-  getDateWiseDocComm(startDate: string, endDate: string) {
-    this.loadingCommission = true;
-    this.api.get('DoctorCommission/GetDateWiseDocCommission/' + startDate + ',' + endDate).subscribe({
-      next: (res: any) => {
-        this.doctorcommission = res;
-      },
-      error: (err) => {
-        this.toastr.error('Failed to load material list');
-        console.error(err);
-        this.doctorcommission = [];
-      },
-      complete: () => this.loadingCommission = false
-    });
+    if (this.startDate && this.endDate) this.pageloadDatewiseDocComm();
   }
 
   loadDoctorCommission() {
@@ -164,7 +125,7 @@ export class DoctorCommissionComponent implements OnInit {
     if (this.DOC_COM_ID == 0 && this.btn == '') {
       this.api.post('DoctorCommission/SaveDoctorCommission', DocCom).subscribe({
         next: () => {
-          this.loadDoctorCommission();
+          this.pageloadDatewiseDocComm();
           setTimeout(() => {
             this.toastr.success('Commission added successfully');
             this.api.modalClose('doctorComFormModal');
@@ -180,7 +141,7 @@ export class DoctorCommissionComponent implements OnInit {
     } else if (this.DOC_COM_ID != 0 && this.btn == 'E') {
       this.api.post('DoctorCommission/EditDoctorCommission/' + this.DOC_COM_ID, DocCom).subscribe({
         next: () => {
-          this.loadDoctorCommission();
+          this.pageloadDatewiseDocComm();
           setTimeout(() => {
             this.toastr.success('Commission updated successfully');
             this.api.modalClose('doctorComFormModal');
@@ -197,7 +158,7 @@ export class DoctorCommissionComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('DoctorCommission/DeleteDoctorCommission/' + this.DOC_COM_ID).subscribe({
           next: () => {
-            this.loadDoctorCommission();
+            this.pageloadDatewiseDocComm();
             setTimeout(() => {
               this.toastr.success('Commission deleted successfully');
               this.api.modalClose('doctorComFormModal');

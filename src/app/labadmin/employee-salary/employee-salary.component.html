@@ -16,31 +16,26 @@
     <div class="col-12 col-lg-auto">
       <div class="row g-2 flex-nowrap overflow-auto" style="min-width: min-content;">
         <div class="col-auto">
-          <form [formGroup]="data">
             <div class="form-floating form-floating-outline">
-              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;"
-                formControlName="startDate" id="start-date-input" required #formField placeholder="dd-mm-yyyy"
-                (change)="onDateChange()">
+               <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;"
+              id="start-date-input" required #formField placeholder="dd-mm-yyyy" [(ngModel)]="startDate"
+              (change)="onDateChange()">
               <label for="start-date-input" class="d-flex align-items-center gap-2">
                 <span class="calendar-icon fs-5">📅</span>
                 <span>Start Date<span class="text-danger ms-1">*</span></span>
               </label>
             </div>
-          </form>
         </div>
 
         <div class="col-auto">
-          <form [formGroup]="data">
             <div class="form-floating form-floating-outline">
-              <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;"
-                formControlName="endDate" id="end-date-input" required #formField placeholder="dd-mm-yyyy"
-                (change)="onDateChange()">
+            <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;" id="end-date-input"
+              required #formField placeholder="dd-mm-yyyy" [(ngModel)]="endDate" (change)="onDateChange()">
               <label for="end-date-input" class="d-flex align-items-center gap-2">
                 <span class="calendar-icon fs-5">📅</span>
                 <span>End Date<span class="text-danger ms-1">*</span></span>
               </label>
             </div>
-          </form>
         </div>
       </div>
     </div>

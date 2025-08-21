@@ -24,52 +24,34 @@ export class OtherExpenseComponent implements OnInit {
   submitted: boolean = false;
   loadingExpenses = false;
   Reason: string = '';
+  startDate!: string;
+  endDate!: string;
 
   constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
     this.pageloadDatewiseOthExp();
   }
 
-
-  formatDateToYyyyMmDd(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
-    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
-    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
-  }
-
   pageloadDatewiseOthExp() {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
-    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
-
-    this.getDateWiseOthExpense(formattedStart, formattedEnd); // Call on page load
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingExpenses = true;
+    this.api.get(`OtherExpense/GetDateWiseOthMaterials/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.otherexpense = res,
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingExpenses = false
+    });
   }
 
   initForm() {
-    const now = new Date();
-    // first date
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    // last date
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const format = (date: Date): string => {
-      const yyyy = date.getFullYear();
-      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
-      const dd = ('0' + date.getDate()).slice(-2);
-      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
-    };
-
     this.data = new FormGroup({
-      startDate: new FormControl(format(startOfMonth), Validators.required),
-      endDate: new FormControl(format(endOfMonth), Validators.required),
-      DATE: new FormControl(format(now), Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       OTHER_NAME: new FormControl('', Validators.required),
       OTHER_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
@@ -78,31 +60,9 @@ export class OtherExpenseComponent implements OnInit {
 
 
   onDateChange() {
-    const start = this.data.get('startDate')?.value;
-    const end = this.data.get('endDate')?.value;
-
-    if (start && end) {
-      const startDate = this.formatDateToYyyyMmDd(new Date(start));
-      const endDate = this.formatDateToYyyyMmDd(new Date(end));
-      this.getDateWiseOthExpense(startDate, endDate);
-    }
+    if (this.startDate && this.endDate) this.pageloadDatewiseOthExp();
   }
 
-
-  getDateWiseOthExpense(startDate: string, endDate: string) {
-    this.loadingExpenses = true;
-    this.api.get('OtherExpense/GetDateWiseOthMaterials/' + startDate + ',' + endDate).subscribe({
-      next: (res: any) => {
-        this.otherexpense = res;
-      },
-      error: (err) => {
-        this.toastr.error('Failed to load material list');
-        console.error(err);
-        this.otherexpense = [];
-      },
-      complete: () => this.loadingExpenses = false
-    });
-  }
 
   getExpenses() {
     this.loadingExpenses = true;

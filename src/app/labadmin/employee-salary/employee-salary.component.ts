@@ -25,88 +25,46 @@ export class EmployeeSalaryComponent implements OnInit {
   submitted: boolean = false;
   Reason: string = '';
   loadingSalary = false;
+  startDate!: string;
+  endDate!: string;
 
   constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
     this.initForm();
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
     this.pageloadDatewiseEmpSal();
   }
 
-
-  formatDateToYyyyMmDd(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
-    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
-    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
-  }
-
   pageloadDatewiseEmpSal() {
-
     this.api.get('Employee/Employees').subscribe((res: any) => {
       this.employee = res;
     });
-
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
-    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
-
-    this.getDateWiseEmpSalary(formattedStart, formattedEnd); // Call on page load
+  const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingSalary = true;
+    this.api.get(`EmployeeSalary/GetDateWiseEmpSalary/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.employeesalary = res,
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingSalary = false
+    });
   }
 
-
-  initForm() {
-    const now = new Date();
-    // first date
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    // last date
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const format = (date: Date): string => {
-      const yyyy = date.getFullYear();
-      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
-      const dd = ('0' + date.getDate()).slice(-2);
-      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
-    };
+  initForm() {    
     this.data = new FormGroup({
-      startDate: new FormControl(format(startOfMonth), Validators.required),
-      endDate: new FormControl(format(endOfMonth), Validators.required),
       EMP_ID: new FormControl('', Validators.required),
       EMP_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
-      DATE: new FormControl(format(now), Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       COM_ID: new FormControl()
     });
   }
 
 
-  onDateChange() {
-    const start = this.data.get('startDate')?.value;
-    const end = this.data.get('endDate')?.value;
-
-    if (start && end) {
-      const startDate = this.formatDateToYyyyMmDd(new Date(start));
-      const endDate = this.formatDateToYyyyMmDd(new Date(end));
-      this.getDateWiseEmpSalary(startDate, endDate);
-    }
-  }
-
-  getDateWiseEmpSalary(startDate: string, endDate: string) {
-    this.loadingSalary = true;
-    this.api.get('EmployeeSalary/GetDateWiseEmpSalary/' + startDate + ',' + endDate).subscribe({
-      next: (res: any) => {
-        this.employeesalary = res;
-      },
-      error: (err) => {
-        this.toastr.error('Failed to load material list');
-        console.error(err);
-        this.employeesalary = [];
-      },
-      complete: () => this.loadingSalary = false
-    });
+  onDateChange() {   
+    if (this.startDate && this.endDate) this.pageloadDatewiseEmpSal();
   }
 
   load() {
@@ -158,7 +116,7 @@ export class EmployeeSalaryComponent implements OnInit {
             this.toastr.success('Salary added successfully');
             this.api.modalClose('EmpSalFormModal');
             this.clearData();
-          }, 300);
+          }, 200);
         },
         error: (err) => {
           this.toastr.error('Failed to add salary');
