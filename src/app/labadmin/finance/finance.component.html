@@ -1,11 +1,10 @@
 <div class="container" style="max-width: 800px!important;margin: 50px auto!important;padding: 0 15px;">
     <div class="header-section no-print">
-
         <div class="date-inputs">
             <div class="input-group">
                 <label for="fromDate">From Date</label>
                 <div class="input-wrapper">
-                    <input type="date" id="fromDate" (change)="onFromDateChange($event)" style="color: black !important;">
+                    <input type="date" id="fromDate" [(ngModel)]="startDate" (change)="onDateChange()" style="color: black !important;">
                     <i class="fas fa-calendar-alt input-icon"></i>
                 </div>
             </div>
@@ -13,7 +12,7 @@
             <div class="input-group">
                 <label for="toDate">To Date</label>
                 <div class="input-wrapper">
-                    <input type="date" id="toDate" (change)="onToDateChange($event)" style="color: black !important;">
+                    <input type="date" id="toDate" [(ngModel)]="endDate" (change)="onDateChange()" style="color: black !important;">
                     <i class="fas fa-calendar-alt input-icon"></i>
                 </div>
             </div>
@@ -106,8 +105,5 @@
                 </button>
             </div>
         </div>
-
-
-
     </div>
 </div>

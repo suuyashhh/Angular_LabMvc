@@ -1,7 +1,25 @@
 <div class="container" style="max-width: 800px!important;margin: 50px auto!important;padding: 0 15px;">
+    <div class="header-section no-print">
+        <div class="date-inputs">
+            <div class="input-group">
+                <label for="fromDate">From Date</label>
+                <div class="input-wrapper">
+                    <input type="date" id="fromDate" [(ngModel)]="startDate" (change)="onDateChange()" style="color: black !important;">
+                    <i class="fas fa-calendar-alt input-icon"></i>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="toDate">To Date</label>
+                <div class="input-wrapper">
+                    <input type="date" id="toDate" [(ngModel)]="endDate" (change)="onDateChange()" style="color: black !important;">
+                    <i class="fas fa-calendar-alt input-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="report-section" id="printableArea">
-
         <div class="report-header">
             <div class="date-display">
                 <span class="date-item">From Date: <span id="displayFromDate">{{displayFromDate}}</span></span>
@@ -132,8 +150,6 @@
                     <span class="expense-amount">{{_ObjData.doC_COM_PRICE}}</span>
                 </div>
             </div>
-
-
 
             <div class="action-buttons no-print d-flex justify-content-end" style="margin-top: 100px;">
                 <button id="printBtn" class="btn btn-primary" (click)="handlePrint()">
