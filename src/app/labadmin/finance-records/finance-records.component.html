@@ -33,7 +33,7 @@
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
                     <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
-                    <span class="expense-date">{{_ObjData.date}}</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-count">3</span>
                     <span class="expense-amount">{{_ObjData.totaL_AMOUNT}}</span>
                 </div>
@@ -50,7 +50,7 @@
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
                     <span class="expense-name">{{_ObjData.maT_NAME}}</span>
-                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-amount">{{_ObjData.maT_PRICE}}</span>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
                     <span class="expense-name">{{_ObjData.bikE_NAME}}</span>
-                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-amount">{{_ObjData.bikE_PRICE}}</span>
                 </div>
             </div>
@@ -81,8 +81,8 @@
             <div class="expenses-list" *ngIf="type == 'empsalary'">
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
-                    <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
-                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-name">{{ getEmployeeName(_ObjData.emP_ID) }}</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-amount">{{_ObjData.emP_PRICE}}</span>
                 </div>
             </div>
@@ -96,7 +96,7 @@
             <div class="expenses-list" *ngIf="type == 'elcbill'">
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
-                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-amount">{{_ObjData.elC_PRICE}}</span>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
                     <span class="expense-name">{{_ObjData.otheR_NAME}}</span>
-                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-amount">{{_ObjData.otheR_PRICE}}</span>
                 </div>
             </div>
@@ -127,8 +127,8 @@
             <div class="expenses-list" *ngIf="type == 'doccommission'">
                 <div class="expense-item" *ngFor="let _ObjData of reportData;let i = index;">
                     <span class="expense-number">{{i+1}}</span>
-                    <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
-                    <span class="expense-date">01/07/2025</span>
+                    <span class="expense-name">{{ getDoctorName(_ObjData.doctoR_ID) }}</span>
+                    <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
                     <span class="expense-amount">{{_ObjData.doC_COM_PRICE}}</span>
                 </div>
             </div>

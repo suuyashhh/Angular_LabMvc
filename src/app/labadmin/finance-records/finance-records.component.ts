@@ -4,11 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ApiService } from '../../shared/api.service';
+import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
 
 @Component({
   selector: 'app-finance-records',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormattedDatePipe],
   templateUrl: './finance-records.component.html',
   styleUrls: ['./finance-records.component.css']
 })
@@ -17,12 +18,20 @@ export class FinanceRecordsComponent implements OnInit {
   fromDate: string = '';
   toDate: string = '';
   type: string = '';
-  displayFromDate: string = ''; 
-  displayToDate: string = '';   
+  displayFromDate: string = '';
+  displayToDate: string = '';
+  doctor: any;
+  employee: any;
 
   constructor(private api: ApiService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.api.get('Doctor/Doctors').subscribe((res: any) => {
+      this.doctor = res;
+    });
+    this.api.get('Employee/Employees').subscribe((res: any) => {
+      this.employee = res;
+    });
     this.loadData();
 
   }
@@ -100,6 +109,18 @@ export class FinanceRecordsComponent implements OnInit {
 
   }
 
+  getDoctorName(code: number): string {
+    debugger;
+    if (!this.doctor || !Array.isArray(this.doctor)) return 'Unknown';
+    const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
+    return doc ? doc.doctoR_NAME : 'Unknown';
+  }
+
+  getEmployeeName(id: number): string {
+    if (!this.employee || !Array.isArray(this.employee)) return 'Unknown';
+    const emp = this.employee.find((e: any) => e.emP_ID == id);
+    return emp ? emp.emP_NAME : 'Unknown';
+  }
 
   handlePrint(): void {
     window.print();
