@@ -101,6 +101,7 @@ export class CasepaperComponent implements OnInit {
   endDate: string = '';
   filtered: CasePaper[] = [];
   isDateFiltered = false;
+  loadingMaterials = false;
 
 
   constructor(
@@ -110,22 +111,7 @@ export class CasepaperComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const now = new Date();
-    // first date
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    // last date
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const format = (date: Date): string => {
-      const yyyy = date.getFullYear();
-      const mm = ('0' + (date.getMonth() + 1)).slice(-2);
-      const dd = ('0' + date.getDate()).slice(-2);
-      return `${yyyy}-${mm}-${dd}`;  // Fixed: using proper template literals
-    };
-
     this.data = new FormGroup({
-      startDate: new FormControl(format(startOfMonth), Validators.required),
-      endDate: new FormControl(format(endOfMonth), Validators.required),
       TRN_NO: new FormControl(0),
       collectioN_TYPE: new FormControl(0),
       patienT_NAME: new FormControl('', Validators.required),
@@ -141,7 +127,7 @@ export class CasepaperComponent implements OnInit {
       discount: new FormControl(0),
       paymenT_AMOUNT: new FormControl(0, Validators.required),
       paymenT_METHOD: new FormControl(0),
-      date: new FormControl(format(now), Validators.required),
+      date: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       coM_ID: new FormControl(101),
       paymenT_STATUS: new FormControl(''),
     });
@@ -230,26 +216,11 @@ export class CasepaperComponent implements OnInit {
   this.discount(); // Add this line to recalculate discount after removing test
 }
 
-  
-
-  formatDateToYyyyMmDd(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = ('0' + (date.getMonth() + 1)).slice(-2); // Fixed: using '0' not 'o'
-    const dd = ('0' + date.getDate()).slice(-2);       // Fixed: using '0' not 'o'
-    return `${yyyy}${mm}${dd}`;                        // Fixed: using proper template literals
-  }
-
   load() {
-
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const formattedStart = this.formatDateToYyyyMmDd(startOfMonth); // e.g. 20250801
-    const formattedEnd = this.formatDateToYyyyMmDd(endOfMonth);     // e.g. 20250831
-
-    this.getDateWiseCasepapers(formattedStart, formattedEnd); // Call on page load
-
+const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
+    this.loadMaterials();
 
     // this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
     //   this.cases = res;
@@ -269,49 +240,50 @@ export class CasepaperComponent implements OnInit {
 
 
   onDateChange() {
-    const start = this.data.get('startDate')?.value;
-    const end = this.data.get('endDate')?.value;
-
-    if (start && end) {
-      const startDate = this.formatDateToYyyyMmDd(new Date(start));
-      const endDate = this.formatDateToYyyyMmDd(new Date(end));
-      this.getDateWiseCasepapers(startDate, endDate);
-    }
+    if (this.startDate && this.endDate) this.loadMaterials();
   }
 
 
-  getDateWiseCasepapers(startDate: string, endDate: string) {
-    this.api.get('CasePaper/GetDateWiseCasePaper/' + startDate + ',' + endDate).subscribe({
+  loadMaterials() {
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingMaterials = true;
+    this.api.get(`CasePaper/GetDateWiseCasePaper/${startDate},${endDate}`).subscribe({
       next: (res: any) => {
         this.cases = res;
+        console.log(res);
       },
-      error: (err) => {
-        this.toastr.error('Failed to load material list');
-        console.error(err);
-        this.cases = [];
-      },
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingMaterials = false
     });
   }
 
   onPaymentAmountChange(): void {
-    const totalAmount = +this.data.get('totaL_AMOUNT')?.value || 0;
-    let paymentAmount = this.data.get('paymenT_AMOUNT')?.value;
+  const totalAmount = +this.data.get('totaL_AMOUNT')?.value || 0;
+  let paymentAmount = this.data.get('paymenT_AMOUNT')?.value;
 
-    // If paymentAmount is null/empty/undefined, treat it as 0
-    if (paymentAmount === null || paymentAmount === undefined || paymentAmount === '') {
-      paymentAmount = 0;
-      this.data.get('paymenT_AMOUNT')?.setValue(0);
-    }
-
-    const status =
-      paymentAmount === 0
-        ? 'PENDING'
-        : paymentAmount >= totalAmount && totalAmount > 0
-          ? 'COMPLETED'
-          : 'PENDING';
-
-    this.data.get('paymenT_STATUS')?.setValue(status);
+  // If paymentAmount is null/empty/undefined, treat it as 0
+  if (paymentAmount === null || paymentAmount === undefined || paymentAmount === '') {
+    paymentAmount = 0;
+    this.data.get('paymenT_AMOUNT')?.setValue(0);
   }
+
+  // Convert to number
+  paymentAmount = +paymentAmount;
+
+  // Allow small difference (like 0.99 → Completed if close enough)
+  const tolerance = 1; // you can set 0.5 or 1 as per your business logic
+
+  const status =
+    paymentAmount === 0
+      ? 'PENDING'
+      : paymentAmount + tolerance >= totalAmount && totalAmount > 0
+        ? 'COMPLETED'
+        : 'PENDING';
+
+  this.data.get('paymenT_STATUS')?.setValue(status);
+}
+
 
 
  submit(data: any): void {
@@ -321,7 +293,7 @@ export class CasepaperComponent implements OnInit {
   if (!data.discount) data.discount = 0;
   if (!data.paymenT_AMOUNT) data.paymenT_AMOUNT = 0;
   if (!data.paymenT_STATUS) data.paymenT_STATUS = 'PENDING';
-  
+
   // Format the date
   const rawDate = this.data.get('date')?.value;
   if (rawDate) {
@@ -583,7 +555,7 @@ export class CasepaperComponent implements OnInit {
   // Update form controls
   this.data.get('totaL_AMOUNT')?.setValue(this.total_Amount);
   this.data.get('totaL_PROFIT')?.setValue(this.total_Lab_Profit);
-  
+
   // Also trigger payment amount validation
   this.onPaymentAmountChange();
 }

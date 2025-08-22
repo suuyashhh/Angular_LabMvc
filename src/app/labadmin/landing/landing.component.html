@@ -114,19 +114,19 @@ router-outlet > * {
   .layout-menu {
     transform: translateX(0);
   }
-  
+
   .layout-page {
     margin-left: 260px;
   }
-  
+
   .mobile-menu-toggle {
     display: none;
   }
-  
+
   .layout-overlay {
     display: none !important;
   }
-  
+
   app-navbar {
     left: 260px;
     width: calc(100% - 260px);
@@ -138,15 +138,15 @@ router-outlet > * {
   .no-print {
     display: none !important;
   }
-  
+
   .layout-menu {
     display: none !important;
   }
-  
+
   .layout-page {
     margin-left: 0 !important;
   }
-  
+
   app-navbar {
     display: none !important;
   }
@@ -156,7 +156,7 @@ router-outlet > * {
 <div class="layout-wrapper layout-content-navbar">
   <!-- Overlay - Placed at the same level as sidebar and content -->
   <div class="layout-overlay" [class.show]="isSidebarVisible" (click)="closeSidebar()"></div>
-  
+
   <div class="layout-container">
     <!-- Menu -->
     <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme" [class.show]="isSidebarVisible">
@@ -188,7 +188,7 @@ router-outlet > * {
 
   <!-- Mobile Toggle Button -->
   <button class="mobile-menu-toggle no-print" (click)="toggleSidebar()">
-    <i class="ri-menu-line"></i>
+    <i [ngClass]="isSidebarVisible ? 'ri-close-line' : 'ri-menu-line'"></i>
   </button>
 
   <div class="floating-home-button no-print" *ngIf="user.lab_Admin == 'Y'">
