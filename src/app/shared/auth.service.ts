@@ -55,10 +55,9 @@ export class AuthService {
 
   // Check if token in localStorage matches cookie
   isTokenValid(): boolean {
-    const localStorageToken = this.getToken();
-    const cookieToken = this.getTokenFromCookies();
-    return !!localStorageToken && localStorageToken === cookieToken;
-  }
+  const token = this.getToken();
+  return !!token; // only rely on localStorage
+}
 
   // Return true if logged in
   isLoggedIn(): boolean {
