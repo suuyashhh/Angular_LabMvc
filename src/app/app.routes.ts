@@ -3,7 +3,7 @@ import { LoginComponent } from './login/login.component';
 import { authGuard } from './shared/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+  { path: '', redirectTo: 'lab', pathMatch: 'full' },
   { path: 'lab', component: LoginComponent },
   {
     path: 'portfolio',
