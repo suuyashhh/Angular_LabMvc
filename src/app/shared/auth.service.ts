@@ -54,6 +54,12 @@ export class AuthService {
   }
 
   // Check if token in localStorage matches cookie
+  // isTokenValid(): boolean {
+  //   const localStorageToken = this.getToken();
+  //   const cookieToken = this.getTokenFromCookies();
+  //   return !!localStorageToken && localStorageToken === cookieToken;
+  // }
+
   isTokenValid(): boolean {
   const token = this.getToken();
   return !!token; // only rely on localStorage
@@ -94,6 +100,6 @@ export class AuthService {
   private clearLocalSession(): void {
     localStorage.clear();
     document.cookie = 'authToken=; path=/; max-age=0';
-    this.router.navigate(['/']);
+    this.router.navigate(['/lab']);
   }
 }
