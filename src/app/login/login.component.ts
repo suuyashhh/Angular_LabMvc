@@ -82,5 +82,10 @@ export class LoginComponent implements OnInit {
     this.passwordIcon.nativeElement.classList.add('ri-eye-line');
   }
 }
+
+impMsg(){
+      this.toastr.success( 'UserName:- Demo , Pass:- 123','For Demo');
+}
+
 }
 
