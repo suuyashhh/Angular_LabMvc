@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 declare const particlesJS: any;
 
@@ -19,6 +20,8 @@ export class ProjectsComponent implements OnInit {
     ecommerce: 1,
     blog: 1
   };
+
+  constructor(private toastr: ToastrService,) {}
 
   ngOnInit(): void {
     // Initialize particles.js
@@ -58,5 +61,12 @@ export class ProjectsComponent implements OnInit {
     document.getElementById('websitesBtn')?.classList.add('bg-purple-600/90', 'text-white');
     document.getElementById('websitesBtn')?.classList.remove('bg-white/10', 'text-black-300');
   }
+}
+
+showToast(event?: Event): void {
+  if (event) {
+    event.preventDefault(); // Prevent default anchor behavior
+  }
+  this.toastr.warning('Comming soon..!');
 }
 }
