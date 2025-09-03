@@ -187,7 +187,7 @@
                     <th style="width: 5%;">Sr No</th>
                     <th class="text-start ps-4" style="width: 45%;">Test Name</th>
                     <th style="width: 15%;">Price (₹)</th>
-                    <th style="width: 15%;">Lab Price (₹)</th>
+                    <th style="width: 15%;" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">Lab Price (₹)</th>
                     <th style="width: 20%;">Actions</th>
                   </tr>
                 </thead>
@@ -198,7 +198,7 @@
                     <td class="text-start ps-4 text-capitalize  text-dark"> {{ getTestNameByCode(data.tesT_CODE)
                       }}</td>
                     <td class="text-success ">₹ {{ data.price }}</td>
-                    <td><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
+                    <td *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'"><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
                     <td class="text-center">
                       <button class="btn btn-sm btn-outline-danger rounded-pill align-items-center gap-1"
                         (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
@@ -214,7 +214,7 @@
                   <tr>
                     <td colspan="2" class="text-end pe-4">Total Amount</td>
                     <td class="text-success">₹ {{ test_Amount }}</td>
-                    <td class="text-info">₹ {{ total_test_LabPrice }}</td>
+                    <td class="text-info" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">₹ {{ total_test_LabPrice }}</td>
                     <td></td>
                   </tr>
                 </tfoot>
@@ -295,7 +295,7 @@
             </div>
 
             <!-- Second input -->
-            <div class="col-sm-3 offset-sm-9">
+            <div class="col-sm-3 offset-sm-9" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
               <div class="form-floating form-floating-outline">
                 <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_PROFIT"
                   [(ngModel)]="total_Lab_Profit" readonly />

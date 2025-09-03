@@ -186,7 +186,7 @@
     </div>
 
     <!-- Today Total Bill -->
-    <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="400" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
       <div class="card-inner">
         <div class="card-front">
           <div class="stat-icon billing">

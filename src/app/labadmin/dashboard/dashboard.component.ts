@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { ServicesService } from '../../shared/services.service';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,6 +13,7 @@ import { ServicesService } from '../../shared/services.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
+user: any;
 
   dashboardCount: any = {
     patienT_COUNT: 0,
@@ -24,7 +26,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   endDate!: string;
   isLoading = true;
 
-  constructor(private api: ApiService, private service: ServicesService) { }
+  constructor(private api: ApiService, private service: ServicesService,private auth: AuthService) { }
 
   ngOnInit(): void {
     // Set both start and end dates to today's date
@@ -34,6 +36,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.load();
     });
+
+    this.user = this.auth.getUser();
   }
 
   // Method to set both start and end dates to today

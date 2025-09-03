@@ -27,6 +27,7 @@ import { NgSelectModule, NgOption } from '@ng-select/ng-select';
 import { log } from 'console';
 import { ServicesService } from '../../shared/services.service';
 import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { AuthService } from '../../shared/auth.service';
 
 interface CasePaper {
   trN_NO: number;
@@ -102,15 +103,18 @@ export class CasepaperComponent implements OnInit {
   filtered: CasePaper[] = [];
   isDateFiltered = false;
   loadingMaterials = false;
+  user:any;
 
 
   constructor(
     private api: ApiService,
     private toastr: ToastrService,
-    private service: ServicesService
+    private service: ServicesService,
+    private auth: AuthService
   ) { }
 
   ngOnInit(): void {
+    this.user = this.auth.getUser();
     this.data = new FormGroup({
       TRN_NO: new FormControl(0),
       collectioN_TYPE: new FormControl(0),
