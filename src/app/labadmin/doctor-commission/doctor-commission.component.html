@@ -1,27 +1,59 @@
+<!-- Add Button -->
 <div class="container container-p-y">
-  <div class="row align-items-center justify-content-between g-3">
-    <!-- Add Button - Left Side -->
-    <div class="col-auto">
-       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorComFormModal" (click)="clearData()">
-    <i class="ri-add-line me-2"></i>Add Doctor Commission
-  </button>
+  <div class="row g-3 align-items-center flex-column flex-lg-row">
+
+    <!-- Add Button -->
+    <div class="col-12 col-lg-auto">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorComFormModal"
+        (click)="clearData()">
+        <i class="ri-add-box-fill"></i> &nbsp; Add Doctor Commission
+      </button>
     </div>
-    
-    <!-- Search - Right Side -->
-    <div class="col-md-4 col-lg-3 ms-md-auto">
+
+
+    <!-- Date Range - Always in one row -->
+<div class="col-12 col-lg-auto">
+      <div class="row g-2 flex-nowrap overflow-auto" style="min-width: min-content;">
+        <div class="col-auto">
+            <div class="form-floating form-floating-outline">
+            <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;"
+              id="start-date-input" required #formField placeholder="dd-mm-yyyy" [(ngModel)]="startDate"
+              (change)="onDateChange()">
+              <label for="start-date-input" class="d-flex align-items-center gap-2">
+                <span class="calendar-icon fs-5">📅</span>
+                <span>Start Date<span class="text-danger ms-1">*</span></span>
+              </label>
+            </div>
+        </div>
+
+        <div class="col-auto">
+            <div class="form-floating form-floating-outline">
+           <input type="date" class="form-control shadow-sm" style="height: 2.8rem; width: 160px;" id="end-date-input"
+              required #formField placeholder="dd-mm-yyyy" [(ngModel)]="endDate" (change)="onDateChange()">              
+              <label for="end-date-input" class="d-flex align-items-center gap-2">
+                <span class="calendar-icon fs-5">📅</span>
+                <span>End Date<span class="text-danger ms-1">*</span></span>
+              </label>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- Search Input -->
+    <div class="col-12 col-lg-3 ms-lg-auto">
       <div class="form-floating form-floating-outline">
-        <input class="form-control" type="search" placeholder="Search ..." 
-           [(ngModel)]="searchTerm"
-           (ngModelChange)="onSearch()"
-           id="html5-search-input" />
+        <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()" id="html5-search-input" />
         <label for="html5-search-input"><i class="ri-search-2-fill me-2"></i>Search by Name</label>
       </div>
     </div>
+
   </div>
 </div>
 
+
 <!-- Modal -->
-<div class="modal fade custom-modal-fade" id="doctorComFormModal" tabindex="-1" aria-labelledby="doctorComFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="doctorComFormModal" tabindex="-1"
+  aria-labelledby="doctorComFormModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -35,7 +67,8 @@
           <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID == 0 && btn == ''">Add Doctor Commission</h5>
           <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'E'">Edit Doctor Commission</h5>
           <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'D'">Delete Doctor Commission</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'dtls'">Doctor Commission Details</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="DOC_COM_ID != 0 && btn == 'dtls'">Doctor Commission Details
+          </h5>
         </div>
         <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -62,7 +95,8 @@
                   <option value="" disabled>Select Doctor</option>
                   <option *ngFor="let doc of doctor" [value]="doc.doctoR_CODE">{{ doc.doctoR_NAME }}</option>
                 </select>
-                <label for="doctor-reference"><i class="ri-group-3-line"></i>Doctor Name <span class="text-danger">*</span></label>
+                <label for="doctor-reference"><i class="ri-group-3-line"></i>Doctor Name <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('DOCTOR_ID')?.invalid">
                   <small *ngIf="data.get('DOCTOR_ID')?.errors?.['required']">Doctor is required.</small>
                 </div>
@@ -72,8 +106,10 @@
             <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="doctorPrice" class="form-control" formControlName="DOC_COM_PRICE" placeholder="Price" />
-                <label for="doctorPrice"><i class="ri-money-rupee-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <input type="number" id="doctorPrice" class="form-control" formControlName="DOC_COM_PRICE"
+                  placeholder="Price" />
+                <label for="doctorPrice"><i class="ri-money-rupee-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('DOC_COM_PRICE')?.invalid">
                   <small *ngIf="data.get('DOC_COM_PRICE')?.errors?.['required']">Price is required.</small>
                   <small *ngIf="data.get('DOC_COM_PRICE')?.errors?.['pattern']">Enter a valid number.</small>
@@ -86,7 +122,8 @@
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="docDeleteReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
-                <label for="docDeleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                <label for="docDeleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                    class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1" *ngIf="submitted && btn == 'D' && Reason == ''">
                 <small>Delete reason is required.</small>

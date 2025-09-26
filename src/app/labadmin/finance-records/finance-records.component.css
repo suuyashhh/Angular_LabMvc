@@ -382,12 +382,11 @@ body {
 
   .container {
     max-width: none !important;
-    margin: 0 auto !important;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 90vh;
-    padding: 2cm 1cm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    display: block;
+    min-height: auto;
     overflow: visible !important;
   }
 
@@ -395,10 +394,12 @@ body {
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
     width: 100% !important;
-    max-width: 18cm !important;
+    max-width: 100% !important;
     overflow: visible !important;
+    page-break-inside: avoid;
   }
 
   .report-header {
@@ -406,15 +407,25 @@ body {
     color: white !important;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
+    padding: 0.5rem 1rem !important;
+    margin: 0 !important;
   }
 
   .date-display {
     font-size: 14px !important;
+    margin: 0 !important;
   }
 
   .report-content {
-    padding: 20px !important;
+    padding: 10px 15px !important;
+    margin: 0 !important;
     overflow: visible !important;
+  }
+
+  /* Reduce the padding in the title section */
+  .report-section > div:not(.report-header):not(.report-content) {
+    padding: 0.5rem 1rem !important;
+    margin: 0 !important;
   }
 
   .expenses-header,
@@ -473,27 +484,16 @@ body {
   /* Hide browser print headers and footers */
   @page {
     size: A4;
-    margin: 0;
+    margin: 0.5cm; /* Reduced from default browser margins */
     padding: 0;
+    
     /* Hide headers and footers */
-    @top-left {
-      content: "";
-    }
-    @top-center {
-      content: "";
-    }
-    @top-right {
-      content: "";
-    }
-    @bottom-left {
-      content: "";
-    }
-    @bottom-center {
-      content: "";
-    }
-    @bottom-right {
-      content: "";
-    }
+    @top-left { content: ""; }
+    @top-center { content: ""; }
+    @top-right { content: ""; }
+    @bottom-left { content: ""; }
+    @bottom-center { content: ""; }
+    @bottom-right { content: ""; }
   }
 
   /* Prevent page breaks inside important sections */

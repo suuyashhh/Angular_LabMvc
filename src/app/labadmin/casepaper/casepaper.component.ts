@@ -27,6 +27,7 @@ import { NgSelectModule, NgOption } from '@ng-select/ng-select';
 import { log } from 'console';
 import { ServicesService } from '../../shared/services.service';
 import { FormattedDatePipe } from '../../shared/pipes/formatted-date.pipe';
+import { AuthService } from '../../shared/auth.service';
 
 interface CasePaper {
   trN_NO: number;
@@ -58,9 +59,16 @@ interface CasePaper {
   styleUrl: './casepaper.component.css',
 })
 export class CasepaperComponent implements OnInit {
-  @ViewChildren('formField') formFields!: QueryList<ElementRef>;
+   @ViewChildren('formField') formFields!: QueryList<ElementRef>;
+  @ViewChild('patientNameField') patientNameField!: ElementRef;
+  @ViewChild('genderField') genderField!: ElementRef;
+  @ViewChild('phoneField') phoneField!: ElementRef;
+  @ViewChild('addressField') addressField!: ElementRef;
+  @ViewChild('dateField') dateField!: ElementRef;
+  @ViewChild('doctorField') doctorField!: ElementRef;
 
   isCreatingNew: boolean = false; // ✅ Added
+  isInvoiceNew: boolean = false; // ✅ Added
 
   btn: string = '';
   cases: any;
@@ -94,15 +102,19 @@ export class CasepaperComponent implements OnInit {
   endDate: string = '';
   filtered: CasePaper[] = [];
   isDateFiltered = false;
+  loadingMaterials = false;
+  user:any;
 
 
   constructor(
     private api: ApiService,
     private toastr: ToastrService,
-    private service: ServicesService
+    private service: ServicesService,
+    private auth: AuthService
   ) { }
 
   ngOnInit(): void {
+    this.user = this.auth.getUser();
     this.data = new FormGroup({
       TRN_NO: new FormControl(0),
       collectioN_TYPE: new FormControl(0),
@@ -119,7 +131,7 @@ export class CasepaperComponent implements OnInit {
       discount: new FormControl(0),
       paymenT_AMOUNT: new FormControl(0, Validators.required),
       paymenT_METHOD: new FormControl(0),
-      date: new FormControl(''),
+      date: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       coM_ID: new FormControl(101),
       paymenT_STATUS: new FormControl(''),
     });
@@ -162,86 +174,62 @@ export class CasepaperComponent implements OnInit {
     }, 150);
   }
 
-  add(Entertest: string) {
-    if (!Entertest) return;
+ add(Entertest: string) {
+  if (!Entertest) return;
 
-    const filteredTests = this.tests.filter(
-      (test: any) => test.tesT_NAME?.toLowerCase() === Entertest?.toLowerCase()
+  const filteredTests = this.tests.filter(
+    (test: any) => test.tesT_NAME?.toLowerCase() === Entertest?.toLowerCase()
+  );
+
+  filteredTests.forEach((test: any) => {
+    const testName = test.tesT_NAME?.toLowerCase();
+    if (!testName) return;
+
+    const alreadyExists = this.matIs.some(
+      (item: any) => item?.tesT_NAME?.toLowerCase() === testName
     );
 
-    filteredTests.forEach((test: any) => {
-      const testName = test.tesT_NAME?.toLowerCase();
-      if (!testName) return;
+    if (alreadyExists) return;
 
-      const alreadyExists = this.matIs.some(
-        (item: any) => item?.tesT_NAME?.toLowerCase() === testName
-      );
+    const srNo = this.matIs.length + 1;
+    const newTest = {
+      ...test,
+      sR_NO: srNo,
+    };
 
-      if (alreadyExists) return;
+    this.matIs.push(newTest);
+  });
 
-      const srNo = this.matIs.length + 1;
-      const newTest = {
-        ...test,
-        sR_NO: srNo,
-      };
-
-      this.matIs.push(newTest);
-    });
-
-    this.searchText = '';
-    this.testAmount();
-    this.total();
-  }
+  this.searchText = '';
+  this.testAmount();
+  this.discount(); // Add this line to recalculate discount after adding test
+  this.total();
+}
 
 
 
-  testAmount() {
-    this.test_Amount = 0;
-    this.total_test_LabPrice = 0;
+ removeTest(srno: number) {
+  this.matIs = this.matIs.filter((item: any) => item.sR_NO !== Number(srno));
 
-    for (let i = 0; i < this.matIs.length; i++) {
-      const test = this.matIs[i];
-      this.test_Amount += +test.price || 0;
-      this.total_test_LabPrice += +test.laB_PRICE || 0;
-    }
+  this.matIs = this.matIs.map((item: any, index: number) => ({
+    ...item,
+    sR_NO: index + 1,
+  }));
 
-    this.total();
-  }
-
-  removeTest(srno: number) {
-    this.matIs = this.matIs.filter((item: any) => item.sR_NO !== Number(srno));
-
-    this.matIs = this.matIs.map((item: any, index: number) => ({
-      ...item,
-      sR_NO: index + 1,
-    }));
-
-    this.testAmount();
-  }
-
-  discount() {
-    const discountPercent = this.dis || 0;
-    this.discount_Amount = (this.test_Amount * discountPercent) / 100;
-
-    // Update form control so it never sends null
-    this.data.get('discount')?.setValue(discountPercent);
-
-    this.total();
-  }
-
-
-  total() {
-    this.total_Amount = this.test_Amount - (this.discount_Amount || 0);
-    this.total_Lab_Profit = this.total_Amount - this.total_test_LabPrice;
-    console.log('Total Amount:', this.total_Amount);
-    console.log('Lab Profit:', this.total_Lab_Profit);
-  }
+  this.testAmount();
+  this.discount(); // Add this line to recalculate discount after removing test
+}
 
   load() {
-    this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
-      this.cases = res;
-      console.log(this.cases);
-    });
+const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
+    this.loadMaterials();
+
+    // this.api.get('CasePaper/CasePapers').subscribe((res: any) => {
+    //   this.cases = res;
+    //   console.log(this.cases);
+    // });
 
     this.api.get('Test/Tests').subscribe((res: any) => {
       this.tests = res;
@@ -254,131 +242,194 @@ export class CasepaperComponent implements OnInit {
     });
   }
 
+
+  onDateChange() {
+    if (this.startDate && this.endDate) this.loadMaterials();
+  }
+
+
+  loadMaterials() {
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingMaterials = true;
+    this.api.get(`CasePaper/GetDateWiseCasePaper/${startDate},${endDate}`).subscribe({
+      next: (res: any) => {
+        this.cases = res;
+        console.log(res);
+      },
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingMaterials = false
+    });
+  }
+
   onPaymentAmountChange(): void {
-    const totalAmount = +this.data.get('totaL_AMOUNT')?.value || 0;
-    let paymentAmount = this.data.get('paymenT_AMOUNT')?.value;
+  const totalAmount = +this.data.get('totaL_AMOUNT')?.value || 0;
+  let paymentAmount = this.data.get('paymenT_AMOUNT')?.value;
 
-    // If paymentAmount is null/empty/undefined, treat it as 0
-    if (paymentAmount === null || paymentAmount === undefined || paymentAmount === '') {
-      paymentAmount = 0;
-      this.data.get('paymenT_AMOUNT')?.setValue(0);
-    }
-
-    const status =
-      paymentAmount === 0
-        ? 'PENDING'
-        : paymentAmount >= totalAmount && totalAmount > 0
-          ? 'COMPLETED'
-          : 'PENDING';
-
-    this.data.get('paymenT_STATUS')?.setValue(status);
+  // If paymentAmount is null/empty/undefined, treat it as 0
+  if (paymentAmount === null || paymentAmount === undefined || paymentAmount === '') {
+    paymentAmount = 0;
+    this.data.get('paymenT_AMOUNT')?.setValue(0);
   }
 
+  // Convert to number
+  paymentAmount = +paymentAmount;
 
-  submit(data: any): void {
-    this.submitted = true;
-    this.onPaymentAmountChange();
+  // Allow small difference (like 0.99 → Completed if close enough)
+  const tolerance = 1; // you can set 0.5 or 1 as per your business logic
 
-    if (!data.discount) data.discount = 0;
-    if (!data.paymenT_AMOUNT) data.paymenT_AMOUNT = 0;
-    if (!data.paymenT_STATUS) data.paymenT_STATUS = 'PENDING';
-    // Format the date
-    const rawDate = this.data.get('date')?.value;
-    if (rawDate) {
-      const parts = rawDate.split('-');
-      const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      data.DATE = this.service.getFormattedDate(formatted, 1);
+  const status =
+    paymentAmount === 0
+      ? 'PENDING'
+      : paymentAmount + tolerance >= totalAmount && totalAmount > 0
+        ? 'COMPLETED'
+        : 'PENDING';
+
+  this.data.get('paymenT_STATUS')?.setValue(status);
+}
+
+
+
+ submit(data: any): void {
+  this.submitted = true;
+  this.onPaymentAmountChange();
+
+  if (!data.discount) data.discount = 0;
+  if (!data.paymenT_AMOUNT) data.paymenT_AMOUNT = 0;
+  if (!data.paymenT_STATUS) data.paymenT_STATUS = 'PENDING';
+
+  // Format the date
+  const rawDate = this.data.get('date')?.value;
+  if (rawDate) {
+    const parts = rawDate.split('-');
+    const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    data.DATE = this.service.getFormattedDate(formatted, 1);
+  }
+
+  // Check if at least one test is added
+  if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
+    this.toastr.error('Please add at least one test!', 'Test Missing');
+    return;
+  }
+
+  // Individual field validation
+  if (this.data.get('patienT_NAME')?.invalid) {
+    this.toastr.error('Please fill patient name field!', 'Patient Name');
+    setTimeout(() => {
+      this.patientNameField.nativeElement.focus();
+      this.patientNameField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+    return;
+  }
+
+  if (this.data.get('gender')?.invalid) {
+    this.toastr.error('Please select gender!', 'Gender');
+    setTimeout(() => {
+      this.genderField.nativeElement.focus();
+      this.genderField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+    return;
+  }
+
+  if (this.data.get('coN_NUMBER')?.invalid) {
+    if (this.data.get('coN_NUMBER')?.errors?.['required']) {
+      this.toastr.error('Please fill phone number field!', 'Phone Number');
+    } else if (this.data.get('coN_NUMBER')?.errors?.['pattern']) {
+      this.toastr.error('Please enter a valid 10-digit phone number!', 'Phone Number');
     }
+    setTimeout(() => {
+      this.phoneField.nativeElement.focus();
+      this.phoneField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+    return;
+  }
 
-    // Validation check
-    if (this.data.invalid) {
-      setTimeout(() => {
-        const firstInvalid = this.formFields.find((el) => {
-          const controlName = el.nativeElement.getAttribute('formControlName');
-          return controlName && this.data.get(controlName)?.invalid;
-        });
+  if (this.data.get('address')?.invalid) {
+    this.toastr.error('Please fill address field!', 'Address');
+    setTimeout(() => {
+      this.addressField.nativeElement.focus();
+      this.addressField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+    return;
+  }
 
-        if (firstInvalid) {
-          firstInvalid.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          firstInvalid.nativeElement.focus();
-        }
-      }, 0);
+  if (this.data.get('date')?.invalid) {
+    this.toastr.error('Please select date!', 'Date');
+    setTimeout(() => {
+      this.dateField.nativeElement.focus();
+      this.dateField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+    return;
+  }
 
-      this.toastr.error('Please fill all required fields!', 'Validation Error');
-      return;
-    }
+  if (this.data.get('doctoR_CODE')?.invalid) {
+    this.toastr.error('Please select a doctor!', 'Doctor Reference');
+    setTimeout(() => {
+      this.doctorField.nativeElement.focus();
+      this.doctorField.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+    return;
+  }
 
-    // Check if at least one test is added
-    if (!Array.isArray(this.matIs) || this.matIs.length === 0) {
-      this.toastr.error('Please add at least one test!', 'Test Missing');
-      return;
-    }
+  const payload = {
+    ...data,
+    matIs: this.matIs,
+  };
 
-    const payload = {
-      ...data,
-      matIs: this.matIs,
-    };
-
-    // Handle Add / Edit logic
-    if (!this.trn_no || this.btn === '') {
-      // ➕ Add CasePaper
-      this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
-        next: () => {
-          setTimeout(() => {
-            this.toastr.success('Case paper added successfully');
-            this.load();
-            this.cancelCreate();
-          }, 300);
-        },
-        error: (err) => {
-          console.error('Add error:', err);
-          this.toastr.error('Failed to add case paper', 'Server Error');
-        }
-      });
-
-    } else if (this.trn_no && this.btn === 'E') {
-      // ✏️ Edit CasePaper
-      this.data.get('TRN_NO')?.setValue(this.trn_no);
-      console.log('edit payload:', {
-        ...this.data.value,
-        matIs: this.matIs
-      });
-      this.api.post('CasePaper/EditCasePaper/' + this.trn_no, payload).subscribe({
-        next: () => {
-          setTimeout(() => {
-            this.toastr.success('Case paper updated successfully');
-            this.load();
-            this.cancelCreate();
-          }, 200);
-        },
-        error: (err) => {
-          console.error('Edit error:', err);
-          this.toastr.error('Failed to update case paper', 'Server Error');
-        }
-      });
-
-    } else if (this.trn_no && this.btn === 'D') {
-      // 🗑️ Delete CasePaper
-      if (this.Reason && this.Reason.trim() !== '') {
-        this.api.delete(`CasePaper/DeleteCasePaper/${this.trn_no}`).subscribe({
-          next: () => {
-            setTimeout(() => {
-              this.toastr.success('Case paper deleted successfully');
-              this.load();
-              this.cancelCreate();
-              this.Reason = "";
-            }, 200);
-          },
-          error: (err) => {
-            console.error('Delete error:', err);
-            this.toastr.error('Failed to delete case paper', 'Server Error');
-          }
-        });
-      } else {
-        this.toastr.warning('Please provide a reason for deletion.', 'Missing Reason');
+  // Handle Add / Edit logic
+  if (!this.trn_no || this.btn === '') {
+    // ➕ Add CasePaper
+    this.api.post('CasePaper/SaveCasePaper', payload).subscribe({
+      next: () => {
+        this.toastr.success('Case paper added successfully');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+        this.cancelCreate();
+      },
+      error: (err) => {
+        console.error('Add error:', err);
+        this.toastr.error('Failed to add case paper', 'Server Error');
       }
+    });
+  } else if (this.trn_no && this.btn === 'E') {
+    // ✏️ Edit CasePaper
+    this.data.get('TRN_NO')?.setValue(this.trn_no);
+    this.api.post('CasePaper/EditCasePaper/' + this.trn_no, payload).subscribe({
+      next: () => {
+        this.toastr.success('Case paper updated successfully');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+        this.cancelCreate();
+      },
+      error: (err) => {
+        console.error('Edit error:', err);
+        this.toastr.error('Failed to update case paper', 'Server Error');
+      }
+    });
+  } else if (this.trn_no && this.btn === 'D') {
+    // 🗑️ Delete CasePaper
+    if (this.Reason && this.Reason.trim() !== '') {
+      this.api.delete(`CasePaper/DeleteCasePaper/${this.trn_no}`).subscribe({
+        next: () => {
+          this.toastr.success('Case paper deleted successfully');
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+          this.cancelCreate();
+          this.Reason = "";
+        },
+        error: (err) => {
+          console.error('Delete error:', err);
+          this.toastr.error('Failed to delete case paper', 'Server Error');
+        }
+      });
+    } else {
+      this.toastr.warning('Please provide a reason for deletion.', 'Missing Reason');
     }
   }
+}
 
 
   cancelCreate() {
@@ -391,6 +442,9 @@ export class CasepaperComponent implements OnInit {
     this.total_Lab_Profit = 0;
   }
 
+  cancleInvoice() {
+    this.isInvoiceNew = false;
+  }
 
 
   filteredCases(): CasePaper[] {
@@ -465,45 +519,116 @@ export class CasepaperComponent implements OnInit {
 
   openInlineForm(trN_NO: number, action: string) {
     this.isCreatingNew = true;
+    this.isInvoiceNew = false;
     this.btn = action;
     this.getDataById(trN_NO, action);
   }
 
-  getDataById(trN_NO: number, btn: string) {
-    this.btn = btn;
-    this.api.get('CasePaper/CasePaper/' + trN_NO).subscribe((res: any) => {
-      this.trn_no = res.trN_NO;
-      console.log(res);
+  openInvoiceForm(trN_NO: number, action: string) {
+    this.isInvoiceNew = true;
+    this.isCreatingNew = false;
+    this.btn = action;
+    this.getDataById(trN_NO, action);
+  }
 
-      this.data.patchValue({
-        patienT_NAME: res.patienT_NAME,
-        gender: res.gender,
-        coN_NUMBER: res.coN_NUMBER,
-        address: res.address,
-        totaL_AMOUNT: res.totaL_AMOUNT,
-        totaL_PROFIT: res.totaL_PROFIT,
-        discount: res.discount,
-        paymenT_AMOUNT: res.paymenT_AMOUNT,
-        collectioN_TYPE: res.collectioN_TYPE,
-        paymenT_METHOD: res.paymenT_METHOD,
-        paymenT_STATUS: res.paymenT_STATUS,
-        date: this.service.getFormattedDate(res.date, 8),
-        doctoR_CODE: res.doctoR_CODE,
-        crT_BY: res.crT_BY,
-      });
-      this.onPaymentAmountChange();
+ testAmount() {
+  this.test_Amount = 0;
+  this.total_test_LabPrice = 0;
 
-      this.matIs = res.matIs.map((item: any) => ({
-        ...item,
-        TEST_NAME: this.getTestNameByCode(item.tesT_CODE)
-      }));
-      this.testAmount();
-      this.discount();
-      this.total();
+  for (let i = 0; i < this.matIs.length; i++) {
+    const test = this.matIs[i];
+    this.test_Amount += +test.price || 0;
+    this.total_test_LabPrice += +test.laB_PRICE || 0;
+  }
 
+  // Also recalculate discount based on new test amount
+  this.discount();
+  this.total();
+}
 
+ discount() {
+  const discountPercent = this.data.get('discount')?.value || 0;
+  this.discount_Amount = (this.test_Amount * discountPercent) / 100;
+  this.total();
+}
+
+ total() {
+  this.total_Amount = this.test_Amount - (this.discount_Amount || 0);
+  this.total_Lab_Profit = this.total_Amount - this.total_test_LabPrice;
+
+  // Update form controls
+  this.data.get('totaL_AMOUNT')?.setValue(this.total_Amount);
+  this.data.get('totaL_PROFIT')?.setValue(this.total_Lab_Profit);
+
+  // Also trigger payment amount validation
+  this.onPaymentAmountChange();
+}
+
+  printInvoice() {
+    window.print();
+  }
+
+  saveInvoice() {
+    this.api.post('CasePaper/InvoiceSave', {
+      TrnNo: this.trn_no,
+      InvoiceNo: this.generateInvoiceNumber()
+    }).subscribe({
+      next: (res) => {
+        this.toastr.success('Invoice saved successfully');
+      },
+      error: (err) => {
+        this.toastr.error('Failed to save invoice');
+      }
     });
   }
+
+  generateInvoiceNumber(): string {
+    return 'INV-' + new Date().getTime();
+  }
+
+  getDoctorName(doctorCode: string): string {
+    const doc = this.doctor.find((d: any) => d.doctoR_CODE === doctorCode);
+    return doc ? doc.doctoR_NAME : 'N/A';
+  }
+
+
+
+  getDataById(trN_NO: number, btn: string) {
+  this.btn = btn;
+  this.api.get('CasePaper/CasePaper/' + trN_NO).subscribe((res: any) => {
+    this.trn_no = res.trN_NO;
+
+    // Patch form values
+    this.data.patchValue({
+      patienT_NAME: res.patienT_NAME,
+      gender: res.gender,
+      coN_NUMBER: res.coN_NUMBER,
+      address: res.address,
+      totaL_AMOUNT: res.totaL_AMOUNT,
+      totaL_PROFIT: res.totaL_PROFIT,
+      discount: res.discount,
+      paymenT_AMOUNT: res.paymenT_AMOUNT,
+      collectioN_TYPE: res.collectioN_TYPE,
+      paymenT_METHOD: res.paymenT_METHOD,
+      paymenT_STATUS: res.paymenT_STATUS,
+      date: this.service.getFormattedDate(res.date, 8),
+      doctoR_CODE: res.doctoR_CODE,
+      crT_BY: res.crT_BY,
+    });
+
+    // Set test items
+    this.matIs = res.matIs.map((item: any) => ({
+      ...item,
+      TEST_NAME: this.getTestNameByCode(item.tesT_CODE)
+    }));
+
+    // Recalculate amounts - call all calculation methods
+    this.testAmount();
+    this.discount();
+    this.total();
+    this.onPaymentAmountChange();
+  });
+}
 
   resetCasepaperForm() {
     this.isCreatingNew = true; // Show the inline form

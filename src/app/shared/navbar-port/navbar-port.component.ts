@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar-port',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './navbar-port.component.html',
   styleUrls: ['./navbar-port.component.css']
 })
 export class NavbarPortComponent {
   mobileMenuOpen = false;
+
+  constructor(private router: Router) {}
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
@@ -19,15 +22,8 @@ export class NavbarPortComponent {
     this.mobileMenuOpen = false;
   }
 
-  setActiveLink(event: Event): void {
-    // Remove active class from all links
-    const links = document.querySelectorAll('.nav-link');
-    links.forEach(link => link.classList.remove('active'));
-    
-    // Add active class to clicked link
-    (event.target as HTMLElement).classList.add('active');
-    
-    // Close mobile menu if open
-    this.closeMobileMenu();
+  isActive(path: string): boolean {
+    return this.router.url.includes(`/portfolio/${path}`) || 
+           (path === 'home' && this.router.url === '/portfolio');
   }
 }

@@ -1,11 +1,166 @@
+<style>
+ /* Main Layout Structure */
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background: transparent;
+}
+
+/* Sidebar Styles */
+.layout-menu {
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000; /* Increased z-index to ensure it's above overlay */
+  background: #fff;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.layout-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.layout-menu.show {
+  transform: translateX(0);
+}
+
+/* Navbar Styles */
+app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900; /* Lower than sidebar but higher than content */
+  height: 60px; /* Added fixed height */
+}
+
+/* Main Content Area */
+.layout-page {
+  margin-top: 70px;
+}
+
+/* Router Outlet - Content Area */
+router-outlet {
+  display: block;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+  margin-top: -60px;
+  padding-top: 60px;
+}
+
+/* Content inside router-outlet */
+router-outlet > * {
+  background: transparent;
+}
+
+/* Mobile Toggle Button */
+.mobile-menu-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1001; /* Higher than sidebar */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #7367f0;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Overlay - Fixed to cover entire screen */
+.layout-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 999; /* Below sidebar but above everything else */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.layout-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Floating Home Button */
+.floating-home-button {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 1001; /* Higher than overlay */
+}
+
+/* Responsive Behavior */
+@media (min-width: 1200px) {
+  .layout-menu {
+    transform: translateX(0);
+  }
+
+  .layout-page {
+    margin-left: 260px;
+  }
+
+  .mobile-menu-toggle {
+    display: none;
+  }
+
+  .layout-overlay {
+    display: none !important;
+  }
+
+  app-navbar {
+    left: 260px;
+    width: calc(100% - 260px);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .layout-menu {
+    display: none !important;
+  }
+
+  .layout-page {
+    margin-left: 0 !important;
+  }
+
+  app-navbar {
+    display: none !important;
+  }
+}
+</style>
+
 <div class="layout-wrapper layout-content-navbar">
+  <!-- Overlay - Placed at the same level as sidebar and content -->
+  <div class="layout-overlay" [class.show]="isSidebarVisible" (click)="closeSidebar()"></div>
+
   <div class="layout-container">
     <!-- Menu -->
-
-    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-
+    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme" [class.show]="isSidebarVisible">
       <div class="menu-inner-shadow"></div>
-
       <app-sidebar></app-sidebar>
     </aside>
     <!-- / Menu -->
@@ -13,25 +168,11 @@
     <!-- Layout container -->
     <div class="layout-page">
       <!-- Navbar -->
-
       <app-navbar></app-navbar>
-
       <!-- / Navbar -->
 
       <!-- Content wrapper -->
-
       <!-- Content -->
-
-      <div class="floating-home-button" *ngIf="user.lab_Admin == 'Y'">
-        <button class="btn btn-primary shadow-lg rounded-pill" (click)="home()">
-          <i class="fas fa-home"></i>
-        </button>
-      </div>
-
-
-
-
-
       <router-outlet></router-outlet>
       <!-- / Content -->
 
@@ -40,12 +181,19 @@
       <!-- / Footer -->
 
       <div class="content-backdrop fade"></div>
-
       <!-- Content wrapper -->
     </div>
     <!-- / Layout page -->
   </div>
 
-  <!-- Overlay -->
-  <div class="layout-overlay layout-menu-toggle"></div>
+  <!-- Mobile Toggle Button -->
+  <button class="mobile-menu-toggle no-print" (click)="toggleSidebar()">
+    <i [ngClass]="isSidebarVisible ? 'ri-close-line' : 'ri-menu-line'"></i>
+  </button>
+
+  <div class="floating-home-button no-print" *ngIf="user.lab_Admin == 'Y'">
+    <button class="btn btn-primary shadow-lg rounded-pill" (click)="home()">
+      <i class="fas fa-home"></i>
+    </button>
+  </div>
 </div>

@@ -1,26 +1,29 @@
-import { Component, AfterViewInit, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { Router, RouterModule } from '@angular/router';
+import { ServicesService } from '../../shared/services.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-finance',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, FormsModule, CommonModule],
   templateUrl: './finance.component.html',
   styleUrl: './finance.component.css'
 })
-export class FinanceComponent implements OnInit, AfterViewInit {
+export class FinanceComponent implements OnInit {
   reportCount: any;
+  startDate!: string;
+  endDate!: string;
+  displayFromDate = '[DD/MM/yyyy]';
+  displayToDate = '[DD/MM/yyyy]';
   
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private service: ServicesService
   ) { }
-
-  fromDateValue = '';
-  toDateValue = '';
-  displayFromDate = '[DD/MM/yyyy]';
-  displayToDate = '[DD/MM/yyyy]';
 
   ngOnInit(): void {
     this.setDefaultDates();
@@ -29,32 +32,35 @@ export class FinanceComponent implements OnInit, AfterViewInit {
 
   // Set default dates to first and last day of current month
   private setDefaultDates(): void {
-    const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
     
-    this.fromDateValue = this.formatDateForInput(firstDay);
-    this.toDateValue = this.formatDateForInput(lastDay);
+    this.displayFromDate = this.service.getFormattedDate(this.startDate, 3);
+    this.displayToDate = this.service.getFormattedDate(this.endDate, 3);
     
-    this.displayFromDate = this.formatDateForDisplay(firstDay);
-    this.displayToDate = this.formatDateForDisplay(lastDay);
-    
+    // Set the input values
     setTimeout(() => {
       const fromDateInput = document.getElementById('fromDate') as HTMLInputElement;
       const toDateInput = document.getElementById('toDate') as HTMLInputElement;
-      if (fromDateInput) fromDateInput.value = this.fromDateValue;
-      if (toDateInput) toDateInput.value = this.toDateValue;
+      if (fromDateInput) fromDateInput.value = this.startDate;
+      if (toDateInput) toDateInput.value = this.endDate;
     });
   }
 
+  onDateChange(): void {
+    if (this.startDate && this.endDate) {
+      this.displayFromDate = this.service.getFormattedDate(this.startDate, 3);
+      this.displayToDate = this.service.getFormattedDate(this.endDate, 3);
+      this.loadData();
+    }
+  }
+
   private loadData(): void {
-    if (!this.fromDateValue || !this.toDateValue) return;
+    if (!this.startDate || !this.endDate) return;
     
-    const fromDateParts = this.fromDateValue.split('-');
-    const toDateParts = this.toDateValue.split('-');
-    
-    const dateFrom = `${fromDateParts[0]}${fromDateParts[1]}${fromDateParts[2]}`;
-    const dateTo = `${toDateParts[0]}${toDateParts[1]}${toDateParts[2]}`;
+    const dateFrom = this.service.formatDate(this.startDate, 1);
+    const dateTo = this.service.formatDate(this.endDate, 1);
     
     this.api.get('Finance/Finance/' + dateFrom + ',' + dateTo).subscribe((res: any) => {
       this.reportCount = res;
@@ -62,138 +68,46 @@ export class FinanceComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onFromDateChange(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.fromDateValue = value;
-    this.displayFromDate = this.formatDateForDisplay(new Date(value));
-    this.loadData();
-  }
-
-  onToDateChange(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.toDateValue = value;
-    this.displayToDate = this.formatDateForDisplay(new Date(value));
-    this.loadData();
-  }
-
-  private formatDateForInput(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  private formatDateForDisplay(date: Date): string {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-
   handlePrint(): void {
     window.print();
   }
 
-  ngAfterViewInit(): void {
-    console.log('FinanceComponent initialized');
-  }
-
-//  Casepaper
+  // Navigation methods
   navigateToCasePaper() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'casepaper'
-      }
-    });
+    this.navigateWithDates('casepaper');
   }
 
-  //  LabMaterial
   navigateToLabMat() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'labmaterial'
-      }
-    });
+    this.navigateWithDates('labmaterial');
   }
 
-  //  BikeFule
   navigateToBikeFule() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'bikefule'
-      }
-    });
+    this.navigateWithDates('bikefule');
   }
 
-  //  Employee salary
   navigateToEmpSalary() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'empsalary'
-      }
-    });
+    this.navigateWithDates('empsalary');
   }
   
-  //  Electricity bill
   navigateToElcBill() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'elcbill'
-      }
-    });
+    this.navigateWithDates('elcbill');
   }
   
-  //  Other Expense
   navigateToOtherExp() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'otherexpense'
-      }
-    });
+    this.navigateWithDates('otherexpense');
   }
   
-  //  DoctorCommission
   navigateToDocCommission() {
-    const fromDate = this.fromDateValue; 
-    const toDate = this.toDateValue;
-    
-    this.router.navigate(['/LABADMIN/finance-records'], { 
-      queryParams: { 
-        fromDate: fromDate,
-        toDate: toDate ,
-        type: 'doccommission'
-      }
-    });
+    this.navigateWithDates('doccommission');
   }
 
+  private navigateWithDates(type: string): void {
+    this.router.navigate(['/LABADMIN/finance-records'], { 
+      queryParams: { 
+        fromDate: this.startDate,
+        toDate: this.endDate,
+        type: type
+      }
+    });
+  }
 }

@@ -1,44 +1,81 @@
-import { Component, OnInit } from '@angular/core';
-import { FooterComponent } from "../../shared/footer/footer.component";
-import { NavbarComponent } from "../../shared/navbar/navbar.component";
-import { SidebarComponent } from "../../shared/sidebar/sidebar.component";
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../shared/auth.service';
 import { CommonModule } from '@angular/common';
+import { NavbarComponent } from "../../shared/navbar/navbar.component";
+import { SidebarComponent } from "../../shared/sidebar/sidebar.component";
+import { FooterComponent } from "../../shared/footer/footer.component";
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [FooterComponent, NavbarComponent, SidebarComponent , RouterOutlet,CommonModule],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    NavbarComponent,
+    SidebarComponent,
+    FooterComponent
+  ],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css'
+  styleUrls: ['./landing.component.css']
 })
-export class LandingComponent implements OnInit{
-  user:any;
+export class LandingComponent implements OnInit {
+  user: any;
+  isSidebarVisible: boolean = false;
 
-  constructor(private auth:AuthService,private router:Router){}
+  @ViewChild('sidebar') sidebar!: ElementRef;
+
+  constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-   this.user = this.auth.getUser();
+    this.user = this.auth.getUser();
   }
-  home(){
+
+  toggleSidebar() {
+    this.isSidebarVisible = !this.isSidebarVisible;
+  }
+
+  closeSidebar() {
+    this.isSidebarVisible = false;
+  }
+
+  // Close sidebar when clicking outside of it
+  @HostListener('document:click', ['$event'])
+  onClick(event: Event) {
+    if (this.isSidebarVisible && 
+        !this.isToggleButton(event) && 
+        !this.isSidebarClick(event)) {
+      this.closeSidebar();
+    }
+  }
+
+  // Check if click is on the toggle button
+  private isToggleButton(event: Event): boolean {
+    const target = event.target as HTMLElement;
+    return target.closest('.mobile-menu-toggle') !== null;
+  }
+
+  // Check if click is inside the sidebar
+  private isSidebarClick(event: Event): boolean {
+    const target = event.target as HTMLElement;
+    return target.closest('.layout-menu') !== null;
+  }
+
+  // Optional: Close sidebar when pressing Escape key
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscapeKey(event: KeyboardEvent) {
+    this.closeSidebar();
+  }
+
+  home() {
     const userJson = localStorage.getItem('userDetails');
-  if (userJson) {
-    const user = JSON.parse(userJson);
-
-    // Update the coM_ID (e.g., set it to "123")
-    user.coM_ID = 0; // or any other value you want
-    user.user_Name = '';
-    user.lab_Admin = '';
-
-    // Save back to localStorage
-    localStorage.setItem('userDetails', JSON.stringify(user));
-
-    console.log('Updated user:', user);
-    this.router.navigate(["ADMIN"]);
-  } else {
-    console.warn('No user found in localStorage');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      user.coM_ID = 0;
+      user.user_Name = '';
+      user.lab_Admin = '';
+      localStorage.setItem('userDetails', JSON.stringify(user));
+      this.router.navigate(["ADMIN"]);
+    }
   }
-  }
-
 }

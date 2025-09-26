@@ -1,16 +1,27 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 declare const particlesJS: any;
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent {
+export class ProjectsComponent implements OnInit {
+  imageIndex: { [key: string]: number } = {
+    dairy: 1,
+    fabrication: 1,
+    laboratory: 1,
+    portfolio: 1,
+    ecommerce: 1,
+    blog: 1
+  };
+
+  constructor(private toastr: ToastrService,) {}
 
   ngOnInit(): void {
     // Initialize particles.js
@@ -19,28 +30,43 @@ export class ProjectsComponent {
     });
   }
 
-  // Carousel functionality
-  imageIndex: { [key: string]: number } = {
-    dairyfarm: 1,
-    fabrication: 1
-  };
-
-  showImage(project: string, index: number): void {
-    const images = document.querySelectorAll(`#${project}-img-1, #${project}-img-2, #${project}-img-3, #${project}-img-4`);
-    images.forEach((img: any, i: number) => {
-      img.style.opacity = (i + 1 === index) ? "1" : "0";
-    });
-  }
-
   nextImage(project: string): void {
-    this.imageIndex[project]++;
-    if (this.imageIndex[project] > 4) this.imageIndex[project] = 1;
-    this.showImage(project, this.imageIndex[project]);
+    const maxImages = project === 'dairy' || project === 'fabrication' || project === 'laboratory' ? 4 : 2;
+    this.imageIndex[project] = this.imageIndex[project] % maxImages + 1;
   }
 
   prevImage(project: string): void {
-    this.imageIndex[project]--;
-    if (this.imageIndex[project] < 1) this.imageIndex[project] = 4;
-    this.showImage(project, this.imageIndex[project]);
+    const maxImages = project === 'dairy' || project === 'fabrication' || project === 'laboratory' ? 4 : 2;
+    this.imageIndex[project] = (this.imageIndex[project] - 2 + maxImages) % maxImages + 1;
   }
+
+ showSection(section: string): void {
+  // Hide all sections
+  document.getElementById('webAppsSection')?.classList.add('hidden');
+  document.getElementById('websitesSection')?.classList.add('hidden');
+  
+  // Reset all buttons to inactive state (white/transparent background)
+  document.getElementById('webAppsBtn')?.classList.remove('bg-purple-600/90', 'text-white');
+  document.getElementById('webAppsBtn')?.classList.add('bg-white/10', 'text-black-300');
+  document.getElementById('websitesBtn')?.classList.remove('bg-purple-600/90', 'text-white');
+  document.getElementById('websitesBtn')?.classList.add('bg-white/10', 'text-black-300');
+  
+  // Show selected section and update button to active state (purple background)
+  if (section === 'webApps') {
+    document.getElementById('webAppsSection')?.classList.remove('hidden');
+    document.getElementById('webAppsBtn')?.classList.add('bg-purple-600/90', 'text-white');
+    document.getElementById('webAppsBtn')?.classList.remove('bg-white/10', 'text-black-300');
+  } else {
+    document.getElementById('websitesSection')?.classList.remove('hidden');
+    document.getElementById('websitesBtn')?.classList.add('bg-purple-600/90', 'text-white');
+    document.getElementById('websitesBtn')?.classList.remove('bg-white/10', 'text-black-300');
+  }
+}
+
+showToast(event?: Event): void {
+  if (event) {
+    event.preventDefault(); // Prevent default anchor behavior
+  }
+  this.toastr.warning('Comming soon..!');
+}
 }

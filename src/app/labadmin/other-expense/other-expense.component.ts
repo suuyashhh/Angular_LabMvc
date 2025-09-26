@@ -24,27 +24,45 @@ export class OtherExpenseComponent implements OnInit {
   submitted: boolean = false;
   loadingExpenses = false;
   Reason: string = '';
+  startDate!: string;
+  endDate!: string;
 
   constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.getExpenses();
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
+    this.pageloadDatewiseOthExp();
+  }
+
+  pageloadDatewiseOthExp() {
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingExpenses = true;
+    this.api.get(`OtherExpense/GetDateWiseOthMaterials/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.otherexpense = res,
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingExpenses = false
+    });
   }
 
   initForm() {
-
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-
     this.data = new FormGroup({
-      DATE: new FormControl(formattedDate, Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       OTHER_NAME: new FormControl('', Validators.required),
       OTHER_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
     });
   }
+
+
+  onDateChange() {
+    if (this.startDate && this.endDate) this.pageloadDatewiseOthExp();
+  }
+
 
   getExpenses() {
     this.loadingExpenses = true;
@@ -70,7 +88,7 @@ export class OtherExpenseComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 2;
+  readonly pageSize: number = 10;
 
   submit(expense: any) {
     this.submitted = true;
@@ -88,7 +106,7 @@ export class OtherExpenseComponent implements OnInit {
     if (this.OTHER_ID == 0 && this.btn == '') {
       this.api.post('OtherExpense/SaveOtherExpense', expense).subscribe({
         next: () => {
-          this.getExpenses();
+          this.pageloadDatewiseOthExp();
           setTimeout(() => {
             this.toastr.success('Expense added successfully');
             this.api.modalClose('OEFormModal');
@@ -104,7 +122,7 @@ export class OtherExpenseComponent implements OnInit {
     } else if (this.OTHER_ID != 0 && this.btn == 'E') {
       this.api.post('OtherExpense/EditOtherExpense/' + this.OTHER_ID, expense).subscribe({
         next: () => {
-          this.getExpenses();
+          this.pageloadDatewiseOthExp();
           setTimeout(() => {
             this.toastr.success('Expense updated successfully');
             this.api.modalClose('OEFormModal');
@@ -121,7 +139,7 @@ export class OtherExpenseComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('OtherExpense/DeleteOtherExpense/' + this.OTHER_ID).subscribe({
           next: () => {
-            this.getExpenses();
+            this.pageloadDatewiseOthExp();
             setTimeout(() => {
               this.toastr.success('Expense deleted successfully');
               this.api.modalClose('OEFormModal');

@@ -1,3 +1,124 @@
+<div class="container" style="padding-top:1.5rem;">
+  <div class="row g-3 align-items-center flex-column flex-lg-row">
+    <!-- Date Range - Always in one row -->
+    <div class="col-12">
+      <div class="date-range-container">
+        <div class="date-range-card">
+          <div class="date-range-fields">
+            <div class="date-field">
+              <div class="form-floating form-floating-outline date-input-group">
+                <input type="date" class="form-control shadow-sm date-input" 
+                       id="start-date-input" required #formField placeholder="dd-mm-yyyy" 
+                       [(ngModel)]="startDate" (change)="onDateChange()">
+                <label for="start-date-input" class="d-flex align-items-center gap-2">
+                  <span class="calendar-icon fs-5">📅</span>
+                  <span>Start Date<span class="text-danger ms-1">*</span></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="date-field">
+              <div class="form-floating form-floating-outline date-input-group">
+                <input type="date" class="form-control shadow-sm date-input" 
+                       id="end-date-input" required #formField placeholder="dd-mm-yyyy" 
+                       [(ngModel)]="endDate" (change)="onDateChange()">
+                <label for="end-date-input" class="d-flex align-items-center gap-2">
+                  <span class="calendar-icon fs-5">📅</span>
+                  <span>End Date<span class="text-danger ms-1">*</span></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.date-range-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.date-range-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  max-width: 600px;
+}
+
+.date-range-fields {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.date-field {
+  flex: 1;
+  min-width: 140px;
+}
+
+.date-input-group {
+  position: relative;
+}
+
+.date-input {
+  height: 2.8rem;
+  width: 100% !important;
+  min-width: 140px;
+}
+
+/* Custom scrollbar for the container */
+.date-range-fields::-webkit-scrollbar {
+  height: 5px;
+}
+
+.date-range-fields::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.date-range-fields::-webkit-scrollbar-thumb {
+  background: #a855f7;
+  border-radius: 10px;
+}
+
+.date-range-fields::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 400px) {
+  .date-range-fields {
+    gap: 10px;
+  }
+  
+  .date-field {
+    min-width: 130px;
+  }
+  
+  .date-input {
+    min-width: 130px;
+  }
+  
+  .calendar-icon {
+    display: none;
+  }
+  
+  .date-input-group label span:not(.calendar-icon) {
+    font-size: 0.85rem;
+  }
+}
+</style>
 
 
 <div class="dashboard-container">
@@ -10,7 +131,7 @@
             <i class="fas fa-users"></i>
           </div>
           <div class="stat-content">
-            <h3 class="stat-title">Today Total Patients</h3>
+            <h3 class="stat-title">Total Patients</h3>
             <!-- <div class="stat-number" data-target="{{dashboardCount.patienT_COUNT}}">0</div> -->
              <div class="stat-number" [attr.data-target]="dashboardCount.patienT_COUNT">0</div>
 
@@ -65,14 +186,14 @@
     </div>
 
     <!-- Today Total Bill -->
-    <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="400" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
       <div class="card-inner">
         <div class="card-front">
           <div class="stat-icon billing">
             <i class="fas fa-rupee-sign"></i>
           </div>
           <div class="stat-content">
-            <h3 class="stat-title">Today Total Bill</h3>
+            <h3 class="stat-title"> Total Profit</h3>
             <!-- <div class="stat-number" data-target="{{dashboardCount.totaL_BILL}}">₹0</div> -->
              <div class="stat-number" [attr.data-target]="dashboardCount.totaL_BILL">0</div>
 

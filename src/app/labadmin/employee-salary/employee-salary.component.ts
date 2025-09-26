@@ -11,7 +11,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-employee-salary',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule,FormattedDatePipe,NgxPaginationModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe, NgxPaginationModule],
   templateUrl: './employee-salary.component.html',
   styleUrl: './employee-salary.component.css'
 })
@@ -25,26 +25,46 @@ export class EmployeeSalaryComponent implements OnInit {
   submitted: boolean = false;
   Reason: string = '';
   loadingSalary = false;
+  startDate!: string;
+  endDate!: string;
 
-  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) {}
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem("COM_ID") || '0');
     this.initForm();
-    this.load();
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
+    this.pageloadDatewiseEmpSal();
   }
 
-  initForm() {
-    
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
+  pageloadDatewiseEmpSal() {
+    this.api.get('Employee/Employees').subscribe((res: any) => {
+      this.employee = res;
+    });
+  const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingSalary = true;
+    this.api.get(`EmployeeSalary/GetDateWiseEmpSalary/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.employeesalary = res,
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingSalary = false
+    });
+  }
 
+  initForm() {    
     this.data = new FormGroup({
-      EMP_ID: new FormControl('',Validators.required),
+      EMP_ID: new FormControl('', Validators.required),
       EMP_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
-      DATE: new FormControl(formattedDate, Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       COM_ID: new FormControl()
     });
+  }
+
+
+  onDateChange() {   
+    if (this.startDate && this.endDate) this.pageloadDatewiseEmpSal();
   }
 
   load() {
@@ -61,9 +81,6 @@ export class EmployeeSalaryComponent implements OnInit {
       complete: () => this.loadingSalary = false
     });
 
-    this.api.get('Employee/Employees').subscribe((res: any) => {
-      this.employee = res;
-    });
   }
 
   clearData() {
@@ -75,7 +92,7 @@ export class EmployeeSalaryComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 2;
+  readonly pageSize: number = 10;
 
   submit(employeesalary: any) {
     this.submitted = true;
@@ -94,12 +111,12 @@ export class EmployeeSalaryComponent implements OnInit {
       employeesalary.COM_ID = this.ComId;
       this.api.post('EmployeeSalary/SaveEmployeeSalary', employeesalary).subscribe({
         next: () => {
-          this.load();
+          this.pageloadDatewiseEmpSal();
           setTimeout(() => {
             this.toastr.success('Salary added successfully');
             this.api.modalClose('EmpSalFormModal');
             this.clearData();
-          }, 300);
+          }, 200);
         },
         error: (err) => {
           this.toastr.error('Failed to add salary');
@@ -110,7 +127,7 @@ export class EmployeeSalaryComponent implements OnInit {
     } else if (this.EMP_TRN_ID != 0 && this.btn == 'E') {
       this.api.post('EmployeeSalary/EditEmployeeSalary/' + this.EMP_TRN_ID, employeesalary).subscribe({
         next: () => {
-          this.load();
+          this.pageloadDatewiseEmpSal();
           setTimeout(() => {
             this.toastr.success('Salary updated successfully');
             this.api.modalClose('EmpSalFormModal');
@@ -127,7 +144,7 @@ export class EmployeeSalaryComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('EmployeeSalary/DeleteEmployeeSalary/' + this.EMP_TRN_ID).subscribe({
           next: () => {
-            this.load();
+            this.pageloadDatewiseEmpSal();
             setTimeout(() => {
               this.toastr.success('Salary deleted successfully');
               this.api.modalClose('EmpSalFormModal');
@@ -159,31 +176,31 @@ export class EmployeeSalaryComponent implements OnInit {
   }
 
   getEmployeeName(id: number): string {
-  const emp = this.employee.find((e:any) => e.emP_ID == id);
-  return emp ? emp.emP_NAME : 'Unknown';
-}
-
-filteredEmpSalary(): any[] {
-  let result = this.employeesalary || [];
-debugger;
-  // Apply search filter if searchTerm exists
-  if (this.searchTerm && this.searchTerm.trim() !== '') {
-    const searchTermLower = this.searchTerm.toLowerCase().trim();
-    result = result.filter((employeesalary: any) => 
-      employeesalary.emP_PRICE?.toLowerCase().includes(searchTermLower)
-    );
+    if (!this.employee || !Array.isArray(this.employee)) return 'Unknown';
+    const emp = this.employee.find((e: any) => e.emP_ID == id);
+    return emp ? emp.emP_NAME : 'Unknown';
   }
 
-  // Reset to page 1 when search term changes
-  if (this.searchTerm) {
+  filteredEmpSalary(): any[] {
+    let result = this.employeesalary || [];
+    // Apply search filter if searchTerm exists
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const searchTermLower = this.searchTerm.toLowerCase().trim();
+      result = result.filter((employeesalary: any) =>
+        employeesalary.emP_PRICE?.toLowerCase().includes(searchTermLower)
+      );
+    }
+
+    // Reset to page 1 when search term changes
+    if (this.searchTerm) {
+      this.page = 1;
+    }
+
+    return result;
+  }
+
+  onSearch() {
+    // Reset to first page when searching
     this.page = 1;
   }
-
-  return result;
-}
-
- onSearch() {
-  // Reset to first page when searching
-  this.page = 1;
-}
 }

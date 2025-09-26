@@ -1,9 +1,7 @@
-<!-- PAGE WRAPPER -->
 <div id="suyash-page">
-
     <!-- Video Background -->
     <div id="suyash-video-container">
-        <video autoplay muted loop playsinline id="suyash-background-video">
+        <video #backgroundVideo autoplay muted loop playsinline preload="auto" id="suyash-background-video">
             <source src="../../../assets/videos/bg.mp4" type="video/mp4">
         </video>
         <div id="suyash-overlay"></div>
@@ -11,37 +9,40 @@
 
     <!-- Main Content -->
     <main id="suyash-container">
-        <div id="suyash-profile-section" aria-labelledby="suyash-profile-heading">
-            <div id="suyash-profile-image" style="margin-top: 50px;">
+        <div id="suyash-profile-section" aria-labelledby="suyash-profile-heading" style="margin-top:50px">
+            <div id="suyash-profile-image" style="width: 100px; height: 100px; border-width: 2px;">
                 <img src="../../../assets/images/suyash.jpg" alt="Suyash Patil" loading="lazy">
             </div>
-            <h1 id="suyash-profile-heading" class="suyash-name" style="color:white">Suyash Patil</h1>
-            <p class="suyash-title">.Net Developer <span class="suyash-emoji">💻</span></p>
-            <div id="suyash-social-icons">
-                <a href="https://github.com/suuyashhh" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
-                <a href="https://www.linkedin.com/in/suyash-patil-877398282/" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
+            <h1 id="suyash-profile-heading" class="suyash-name" style="font-size: 1.6rem;">Suyash Patil</h1>
+            <p class="suyash-title" style="font-size: 0.9rem;">.Net Developer <span class="suyash-emoji">💻</span></p>
+            <div id="suyash-social-icons" style="gap: 12px;">
+                <a href="https://github.com/suuyashhh" target="_blank" aria-label="GitHub Profile">
+                    <i class="fab fa-github" style="font-size: 1.1rem;"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank" aria-label="LinkedIn Profile">
+                    <i class="fab fa-linkedin" style="font-size: 1.1rem;"></i>
+                </a>
+                <a href="https://wa.me/918180821173" aria-label="WhatsApp" target="_blank">
+                    <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i>
+                </a>
             </div>
         </div>
 
         <nav id="suyash-menu-section" aria-label="Portfolio Navigation">
-            <a href="Portfolio.html" class="suyash-menu-item" data-text="Personal Portfolio">
-                <span>Personal Portfolio</span>
+            <a [routerLink]="['/portfolio/about']" class="suyash-menu-item" data-text="About">
+                <span>About</span>
                 <i class="fas fa-chevron-right"></i>
             </a>
-            <a href="https://dairyfarm.revolutionit.in/AllProjects" class="suyash-menu-item" data-text="All Projects Application">
-                <span>All Projects Application</span>
+            <a [routerLink]="['/portfolio/projects']" class="suyash-menu-item" data-text="All Projects Application">
+                <span>All Projects Applications</span>
                 <i class="fas fa-chevron-right"></i>
             </a>
-            <a href="mailto:suyashpatil2113@gmail.com" class="suyash-menu-item" data-text="Email">
-                <span>Email</span>
+            <a [routerLink]="['/portfolio/resume']" class="suyash-menu-item" data-text="Resume">
+                <span>Resume</span>
                 <i class="fas fa-chevron-right"></i>
             </a>
-            <a href="https://github.com/suuyashhh" class="suyash-menu-item" data-text="GitHub">
-                <span>GitHub</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a href="https://www.linkedin.com/in/suyash-patil-877398282/" class="suyash-menu-item" data-text="LinkedIn">
-                <span>LinkedIn</span>
+            <a [routerLink]="['/portfolio/contact']" class="suyash-menu-item" data-text="Contact">
+                <span>Contact</span>
                 <i class="fas fa-chevron-right"></i>
             </a>
         </nav>

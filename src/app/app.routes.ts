@@ -3,8 +3,13 @@ import { LoginComponent } from './login/login.component';
 import { authGuard } from './shared/auth.guard';
 
 export const routes: Routes = [
+
+  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+  { path: 'lab', component: LoginComponent },
+
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+
   {
     path: 'portfolio',
     loadComponent: () => import('./portfolio/landing/landing.component').then(m => m.LandingComponent),

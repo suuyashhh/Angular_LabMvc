@@ -11,7 +11,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-doctor-commission',
   standalone: true,
-  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe,NgxPaginationModule],
+  imports: [HttpClientModule, ReactiveFormsModule, CommonModule, FormsModule, FormattedDatePipe, NgxPaginationModule],
   templateUrl: './doctor-commission.component.html',
   styleUrl: './doctor-commission.component.css'
 })
@@ -25,27 +25,49 @@ export class DoctorCommissionComponent implements OnInit {
   submitted: boolean = false;
   loadingCommission = false;
   Reason: string = '';
+  startDate!: string;
+  endDate!: string;
 
-  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) {}
+  constructor(private api: ApiService, private toastr: ToastrService, private service: ServicesService) { }
 
   ngOnInit(): void {
     this.ComId = parseInt(localStorage.getItem('COM_ID') || '0');
     this.initForm();
-    this.loadDoctorCommission();
-    this.loadDoctors();
+    const { start, end } = this.service.getCurrentMonthRange();
+    this.startDate = start;
+    this.endDate = end;
+    this.pageloadDatewiseDocComm();
   }
 
+
+  pageloadDatewiseDocComm() {
+    this.api.get('Doctor/Doctors').subscribe((res: any) => {
+      this.doctor = res;
+    });
+
+    const startDate = this.service.formatDate(this.startDate, 1);   // yyyyMMdd
+    const endDate = this.service.formatDate(this.endDate, 1);     // yyyyMMdd
+    this.loadingCommission = true;
+    this.api.get(`DoctorCommission/GetDateWiseDocCommission/${startDate},${endDate}`).subscribe({
+      next: (res: any) => this.doctorcommission = res,
+      error: () => this.toastr.error('Failed to load materials'),
+      complete: () => this.loadingCommission = false
+    });
+  }
+
+
   initForm() {
-
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-
     this.data = new FormGroup({
-      DATE: new FormControl(formattedDate, Validators.required),
+      DATE: new FormControl(this.service.getFormattedDate(new Date(), 8), Validators.required),
       DOCTOR_ID: new FormControl('', Validators.required),
       DOC_COM_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl(this.ComId)
     });
+  }
+
+
+  onDateChange() {
+    if (this.startDate && this.endDate) this.pageloadDatewiseDocComm();
   }
 
   loadDoctorCommission() {
@@ -85,7 +107,7 @@ export class DoctorCommissionComponent implements OnInit {
 
   searchTerm: string = '';
   page: number = 1;
-  readonly pageSize: number = 2;
+  readonly pageSize: number = 10;
 
   submit(DocCom: any) {
     this.submitted = true;
@@ -103,7 +125,7 @@ export class DoctorCommissionComponent implements OnInit {
     if (this.DOC_COM_ID == 0 && this.btn == '') {
       this.api.post('DoctorCommission/SaveDoctorCommission', DocCom).subscribe({
         next: () => {
-          this.loadDoctorCommission();
+          this.pageloadDatewiseDocComm();
           setTimeout(() => {
             this.toastr.success('Commission added successfully');
             this.api.modalClose('doctorComFormModal');
@@ -119,7 +141,7 @@ export class DoctorCommissionComponent implements OnInit {
     } else if (this.DOC_COM_ID != 0 && this.btn == 'E') {
       this.api.post('DoctorCommission/EditDoctorCommission/' + this.DOC_COM_ID, DocCom).subscribe({
         next: () => {
-          this.loadDoctorCommission();
+          this.pageloadDatewiseDocComm();
           setTimeout(() => {
             this.toastr.success('Commission updated successfully');
             this.api.modalClose('doctorComFormModal');
@@ -136,7 +158,7 @@ export class DoctorCommissionComponent implements OnInit {
       if (this.Reason.trim() !== '') {
         this.api.delete('DoctorCommission/DeleteDoctorCommission/' + this.DOC_COM_ID).subscribe({
           next: () => {
-            this.loadDoctorCommission();
+            this.pageloadDatewiseDocComm();
             setTimeout(() => {
               this.toastr.success('Commission deleted successfully');
               this.api.modalClose('doctorComFormModal');
@@ -168,10 +190,10 @@ export class DoctorCommissionComponent implements OnInit {
   }
 
   getDoctorName(code: number): string {
-  if (!this.doctor || !Array.isArray(this.doctor)) return 'Unknown';
-  const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
-  return doc ? doc.doctoR_NAME : 'Unknown';
-}
+    if (!this.doctor || !Array.isArray(this.doctor)) return 'Unknown';
+    const doc = this.doctor.find((d: any) => d.doctoR_CODE === code);
+    return doc ? doc.doctoR_NAME : 'Unknown';
+  }
 
   filteredDocCommission(): any[] {
     let result = this.doctorcommission || [];
