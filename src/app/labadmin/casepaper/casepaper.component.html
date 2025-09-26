@@ -495,6 +495,7 @@
               <th>Contact</th>
               <th>Crt By</th>
               <th>Status</th>
+              <th>Total Amount</th>
             </tr>
           </thead>
           <tbody class="table-border-bottom-0" let i=index>
@@ -521,7 +522,7 @@
                 </div>
               </td>
               <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
-              <td><span>{{ case.patienT_NAME }}</span></td>
+              <td><strong>{{ case.patienT_NAME }}</strong></td>
               <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
               <td><span>{{ case.crT_BY }}</span></td>
               <!-- <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
@@ -536,13 +537,23 @@
                 </span>
 
               </td>
-
+              <td>
+                <span class="fw-bold text-success">₹ {{ case.totaL_AMOUNT || 0 }}</span>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="d-flex justify-content-center p-3">
+      
+      <div class="d-flex justify-content-between align-items-center p-3">
+        <div class="text-muted">
+          Showing {{(page - 1) * pageSize + 1}} to {{page * pageSize > filteredCases().length ? filteredCases().length : page * pageSize}} of {{filteredCases().length}} entries
+         
+        </div>
         <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
       </div>
+      <!-- <div class="d-flex justify-content-center p-3">
+        <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+      </div> -->
     </div>
   </div>

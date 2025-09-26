@@ -37,6 +37,7 @@ interface CasePaper {
   statuS_CODE: number;
   paymenT_STATUS?: string;
   crT_BY: string;
+  totaL_AMOUNT : number;
 }
 
 @Component({
