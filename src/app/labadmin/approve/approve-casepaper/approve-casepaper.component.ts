@@ -344,8 +344,10 @@ export class ApproveCasepaperComponent implements OnInit {
   }
 
   loadMaterials() {
+    const startDate = 20200101;   // yyyyMMdd
+    const endDate = 20500101;     // yyyyMMdd
     this.loadingMaterials = true;
-    this.api.get(`CasePaper/CasePapers`).subscribe({
+    this.api.get(`CasePaper/GetDateWiseCasePaper/${startDate},${endDate}`).subscribe({
       next: (res: any) => {
         console.log(res);
         this.cases = res;
