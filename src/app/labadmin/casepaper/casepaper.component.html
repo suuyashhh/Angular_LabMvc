@@ -187,7 +187,8 @@
                     <th style="width: 5%;">Sr No</th>
                     <th class="text-start ps-4" style="width: 45%;">Test Name</th>
                     <th style="width: 15%;">Price (₹)</th>
-                    <th style="width: 15%;" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">Lab Price (₹)</th>
+                    <th style="width: 15%;" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">Lab Price (₹)
+                    </th>
                     <th style="width: 20%;">Actions</th>
                   </tr>
                 </thead>
@@ -198,7 +199,8 @@
                     <td class="text-start ps-4 text-capitalize  text-dark"> {{ getTestNameByCode(data.tesT_CODE)
                       }}</td>
                     <td class="text-success ">₹ {{ data.price }}</td>
-                    <td *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'"><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
+                    <td *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'"><span
+                        class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
                     <td class="text-center">
                       <button class="btn btn-sm btn-outline-danger rounded-pill align-items-center gap-1"
                         (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
@@ -214,7 +216,8 @@
                   <tr>
                     <td colspan="2" class="text-end pe-4">Total Amount</td>
                     <td class="text-success">₹ {{ test_Amount }}</td>
-                    <td class="text-info" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">₹ {{ total_test_LabPrice }}</td>
+                    <td class="text-info" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">₹ {{
+                      total_test_LabPrice }}</td>
                     <td></td>
                   </tr>
                 </tfoot>
@@ -337,47 +340,95 @@
             </div>
           </div>
 
-          <div class="row mb-5" *ngIf="trn_no !== 0 && btn === 'D'">
+          <div class="row mb-5" *ngIf="trn_no !== 0 && btn === 'E'">
             <div class="col-sm-6">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="test" class="form-control text-end " placeholder="Delete Reason" [(ngModel)]="Reason"
-                  required style="max-width: 300px;" [ngModelOptions]="{standalone: true}" />
-                <label for="reason"><i class="ri-cash-line"></i>Delete Reason<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" placeholder="Delete Reason (required for deletion)"
+                  [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
+                <label for="reason"><i class="ri-alert-line"></i> Delete Reason</label>
               </div>
             </div>
           </div>
 
-          <!-- Cancel Button -->
+          <!-- Recommended Responsive Button Layout -->
           <div class="text-end">
-            <!-- Save Button -->
-            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
-              *ngIf="trn_no === 0 && btn === ''">
-              Save
-            </button>
+            <div class="action-buttons-container d-flex flex-column flex-sm-row gap-2 gap-sm-3 justify-content-end">
 
-            <!-- Update Button -->
-            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
-              *ngIf="trn_no !== 0 && btn === 'E'">
-              Update
-            </button>
+              <!-- Save/Update Button -->
+              <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill order-1 order-sm-1"
+                *ngIf="trn_no === 0 && btn === ''">
+                <i class="ri-save-line d-none d-sm-inline me-sm-1"></i>Save
+              </button>
 
-            <!-- Delete Confirmation Button (Also labeled Update) -->
-            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
-              *ngIf="trn_no !== 0 && btn === 'D'">
-              Delete
-            </button>
+              <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill order-1 order-sm-1"
+                *ngIf="trn_no !== 0 && btn === 'E'">
+                <i class="ri-edit-line d-none d-sm-inline me-sm-1"></i>Update
+              </button>
 
-            <!-- Cancel Button -->
-            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">
-              Cancel
-            </button>
+              <!-- Delete Button -->
+              <button type="button" class="btn btn-danger px-4 py-2 rounded-pill order-2 order-sm-2"
+                *ngIf="trn_no !== 0 && btn === 'E'" (click)="deleteCasePaper()">
+                <i class="ri-delete-bin-6-line d-none d-sm-inline me-sm-1"></i>Delete
+              </button>
+
+              <!-- Cancel Button -->
+              <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill order-3 order-sm-3"
+                (click)="isCreatingNew = false">
+                <i class="ri-close-line d-none d-sm-inline me-sm-1"></i>Cancel
+              </button>
+
+            </div>
           </div>
-
         </form>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px; width: 90%;">
+    <div class="modal-content" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+
+      <!-- Header -->
+      <div class="modal-header"
+        style="background-color: #e74c3c; color: #fff; border-bottom: none; padding: 12px 16px;">
+        <h5 class="modal-title" style="font-size: 1rem; margin: 0; display: flex; align-items: center;">
+          <i class="ri-delete-bin-6-line" style="margin-right: 8px; font-size: 1.2rem;"></i> Confirm Deletion
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
+          style="filter: invert(1);"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" style="text-align: center; padding: 24px 16px;">
+        <i class="ri-alert-fill" style="font-size: 3rem; color: #e74c3c;"></i>
+        <h5 style="margin-top: 12px; font-size: 1.25rem; font-weight: 600;">Are you sure?</h5>
+        <p style="margin-top: 8px; color: #6c757d; font-size: 0.9rem;">
+          You are about to delete the case paper for
+          <strong style="color: #e74c3c;">{{ data.get('patienT_NAME')?.value }}</strong>.
+          This action cannot be undone.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer"
+        style="display: flex; justify-content: center; gap: 12px; border-top: none; padding: 16px;">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+          style="padding: 8px 20px; border-radius: 20px; font-weight: 500;">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="executeDelete()" data-bs-dismiss="modal"
+          style="padding: 8px 20px; border-radius: 20px; font-weight: 500; display: flex; align-items: center;">
+          <i class="ri-delete-bin-6-line" style="margin-right: 6px;"></i> Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 <div *ngIf="isInvoiceNew" class="container-xxl flex-grow-1 mt-n6">
   <div class="container my-4 invoice-container">
@@ -495,6 +546,7 @@
               <th>Contact</th>
               <th>Crt By</th>
               <th>Status</th>
+              <th>Total Amount</th>
             </tr>
           </thead>
           <tbody class="table-border-bottom-0" let i=index>
@@ -505,23 +557,59 @@
               <td>{{(page - 1) * pageSize + i + 1}}</td>
               <td>
 
-                <div *ngIf="case.statuS_CODE === 0">
-                  <a (click)="openInlineForm(case.trN_NO,'E')" class="btn btn-sm btn-purple me-2 text-white"
-                    href="javascript:void(0);">
-                    <i class="ri-pencil-line me-1"></i> Edit
+                <div class="btn-group btn-group-sm" role="group" style="gap: 3px;">
+                  <!-- Edit Button -->
+                  <a (click)="openInlineForm(case.trN_NO,'E')"
+                    class="btn btn-purple text-white d-flex align-items-center" href="javascript:void(0);" title="Edit"
+                    style="border-radius: 5px; padding: 0.35rem 0.7rem;">
+                    <i class="ri-pencil-line d-none d-sm-inline me-sm-1"></i>
+                    <span class="d-none d-sm-inline">Edit</span>
+                    <i class="ri-pencil-line d-sm-none"></i>
                   </a>
-                  <a (click)="openInlineForm(case.trN_NO,'D')" class="btn btn-sm btn-danger me-2"
-                    href="javascript:void(0);">
-                    <i class="ri-delete-bin-6-line me-1"></i> Delete
+
+                  <!-- View Button -->
+                  <a (click)="viewCasePaper(case.trN_NO)" class="btn btn-info text-white d-flex align-items-center"
+                    href="javascript:void(0);" title="View" style="border-radius: 5px; padding: 0.35rem 0.7rem;">
+                    <i class="ri-eye-line d-none d-sm-inline me-sm-1"></i>
+                    <span class="d-none d-sm-inline">View</span>
+                    <i class="ri-eye-line d-sm-none"></i>
                   </a>
-                  <a (click)="openInvoiceForm(case.trN_NO,'I')" class="btn btn-sm btn-success me-2"
-                    href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#InvoiceModal">
-                    <i class="ri-file-text-line me-1"></i> Invoice
+
+                  <!-- Invoice Button -->
+                  <a (click)="openInvoiceForm(case.trN_NO,'I')"
+                    class="btn btn-success text-white d-flex align-items-center" href="javascript:void(0);"
+                    data-bs-toggle="modal" data-bs-target="#InvoiceModal" title="Generate Invoice"
+                    style="border-radius: 5px; padding: 0.35rem 0.7rem;">
+                    <i class="ri-file-text-line d-none d-sm-inline me-sm-1"></i>
+                    <span class="d-none d-sm-inline">Invoice</span>
+                    <i class="ri-file-text-line d-sm-none"></i>
                   </a>
                 </div>
+                <style>
+                  .btn-group .btn {
+                    transition: all 0.3s ease;
+                    border: 1px solid transparent;
+                  }
+
+                  .btn-group .btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                  }
+
+                  .btn-purple {
+                    background-color: #6f42c1;
+                    border-color: #6f42c1;
+                  }
+
+                  .btn-purple:hover {
+                    background-color: #5a2d9c;
+                    border-color: #5a2d9c;
+                  }
+                </style>
+
               </td>
               <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date| formattedDate:3 }}</span></td>
-              <td><span>{{ case.patienT_NAME }}</span></td>
+              <td><strong>{{ case.patienT_NAME }}</strong></td>
               <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
               <td><span>{{ case.crT_BY }}</span></td>
               <!-- <td><span *ngIf="case.statuS_CODE === 101" class="badge bg-success">Completed</span>
@@ -536,13 +624,24 @@
                 </span>
 
               </td>
-
+              <td>
+                <span class="fw-bold text-success">₹ {{ case.totaL_AMOUNT || 0 }}</span>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class="d-flex justify-content-center p-3">
+
+      <div class="d-flex justify-content-between align-items-center p-3">
+        <div class="text-muted">
+          Showing {{(page - 1) * pageSize + 1}} to {{page * pageSize > filteredCases().length ? filteredCases().length :
+          page * pageSize}} of {{filteredCases().length}} entries
+
+        </div>
         <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
       </div>
+      <!-- <div class="d-flex justify-content-center p-3">
+        <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+      </div> -->
     </div>
   </div>
