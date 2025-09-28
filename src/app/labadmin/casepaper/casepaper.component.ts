@@ -37,6 +37,7 @@ interface CasePaper {
   statuS_CODE: number;
   paymenT_STATUS?: string;
   crT_BY: string;
+  totaL_AMOUNT : number;
 }
 
 @Component({
@@ -148,7 +149,10 @@ export class CasepaperComponent implements OnInit {
     this.data.get('collectioN_TYPE')?.setValue(checked ? 1 : 0);
   }
 
-
+ // View case paper details
+  viewCasePaper(trnNo: number): void {
+    this.openInlineForm(trnNo, 'V'); // 'V' for view mode
+  }
 
   onSearchChange() {
     const query = this.searchText.trim().toLowerCase();
@@ -432,6 +436,36 @@ const { start, end } = this.service.getCurrentMonthRange();
 }
 
 
+deleteCasePaper(): void {
+  if (!this.Reason || this.Reason.trim() === '') {
+    this.toastr.warning('Please provide a reason for deletion.', 'Missing Reason');
+    return;
+  }
+
+  // Show modal instead of confirm
+  const modal = new (window as any).bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+  modal.show();
+}
+
+executeDelete(): void {
+  this.api.delete(`CasePaper/DeleteCasePaper/${this.trn_no}`).subscribe({
+    next: () => {
+     this.toastr.success('Case paper deleted successfully');
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      this.cancelCreate();
+    },
+    error: (err) => {
+      console.error('Delete error:', err);
+      this.toastr.error('❌ Failed to delete case paper', 'Error', {
+        timeOut: 3000,
+        progressBar: true,
+        positionClass: 'toast-top-center'
+      });
+    }
+  });
+}
   cancelCreate() {
     this.isCreatingNew = false; // ✅ Hide form
     this.data.reset(); // ✅ Reset form data
