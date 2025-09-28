@@ -558,24 +558,23 @@
               <td>
 
                 <div class="btn-group btn-group-sm" role="group" style="gap: 3px;">
-                  <!-- Edit Button -->
+                  
                   <a (click)="openInlineForm(case.trN_NO,'E')"
-                    class="btn btn-purple text-white d-flex align-items-center" href="javascript:void(0);" title="Edit"
+                    *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y' || case.statuS_CODE === 0" class="btn btn-purple text-white d-flex align-items-center" href="javascript:void(0);" title="Edit"
                     style="border-radius: 5px; padding: 0.35rem 0.7rem;">
                     <i class="ri-pencil-line d-none d-sm-inline me-sm-1"></i>
                     <span class="d-none d-sm-inline">Edit</span>
                     <i class="ri-pencil-line d-sm-none"></i>
                   </a>
 
-                  <!-- View Button -->
+                  
                   <a (click)="viewCasePaper(case.trN_NO)" class="btn btn-info text-white d-flex align-items-center"
                     href="javascript:void(0);" title="View" style="border-radius: 5px; padding: 0.35rem 0.7rem;">
                     <i class="ri-eye-line d-none d-sm-inline me-sm-1"></i>
                     <span class="d-none d-sm-inline">View</span>
                     <i class="ri-eye-line d-sm-none"></i>
                   </a>
-
-                  <!-- Invoice Button -->
+                  
                   <a (click)="openInvoiceForm(case.trN_NO,'I')"
                     class="btn btn-success text-white d-flex align-items-center" href="javascript:void(0);"
                     data-bs-toggle="modal" data-bs-target="#InvoiceModal" title="Generate Invoice"

@@ -288,7 +288,7 @@
             <!-- Update Button -->
             <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
               *ngIf="trn_no !== 0 && btn === 'E'">
-              Update
+              Approve
             </button>
             <!-- Cancel Button -->
             <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">
@@ -302,9 +302,46 @@
   </div>
 </div>
 
+<!-- Approve Confirmation Modal -->
+<div class="modal fade" id="approveConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm modal-md modal-lg">
+    <div class="modal-content rounded-3 shadow-lg">
+
+      <!-- Header -->
+      <div class="modal-header bg-success text-white border-0 py-2 px-3">
+        <h5 class="modal-title d-flex align-items-center mb-0 fs-6">
+          <i class="ri-check-line me-2 fs-5"></i> Confirm Approval
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body text-center py-4 px-3">
+        <i class="ri-checkbox-circle-fill fs-1 text-success"></i>
+        <h5 class="mt-3 fs-5 fw-semibold">Are you sure?</h5>
+        <p class="mt-2 text-muted small">
+          You are about to approve
+          <strong class="text-success">{{ selectedCases.length }}</strong>
+          case paper(s).
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer justify-content-center border-0 pb-3">
+        <button type="button" class="btn btn-secondary px-4 rounded-pill fw-medium" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-success px-4 rounded-pill fw-medium d-flex align-items-center"
+          (click)="executeApprove()" data-bs-dismiss="modal">
+          <i class="ri-check-line me-2"></i> Approve
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 
-<!-- Case Paper List Table -->
 <!-- Case Paper List Table -->
 <div *ngIf="!isCreatingNew" class="container-xxl flex-grow-1 container-p-y mt-n9">
   <div class="card" style="margin-top:30px;">
@@ -313,9 +350,6 @@
       <div>
         <button *ngIf="selectedCases.length > 0" class="btn btn-success me-2" (click)="approveSelected()">
           <i class="ri-check-line me-1"></i> Approve Selected ({{selectedCases.length}})
-        </button>
-        <button *ngIf="selectedCases.length > 0" class="btn btn-danger" (click)="rejectSelected()">
-          <i class="ri-close-line me-1"></i> Reject Selected ({{selectedCases.length}})
         </button>
       </div>
     </h5>
@@ -359,11 +393,7 @@
               <td>{{(page - 1) * pageSize + i + 1}}</td>
               <td>
                 <div class="btn-group" role="group">
-                  <a (click)="openInlineForm(case.trN_NO,'E')" class="btn btn-sm btn-purple me-2 text-white"
-                    href="javascript:void(0);" title="Edit">
-                    <i class="ri-pencil-line me-1"></i> Edit
-                  </a>
-                  <a (click)="viewCasePaper(case.trN_NO)" class="btn btn-sm btn-info text-white"
+                  <a (click)="openInlineForm(case.trN_NO,'E')" class="btn btn-sm btn-info text-white"
                     href="javascript:void(0);" title="View">
                     <i class="ri-eye-line me-1"></i> View
                   </a>

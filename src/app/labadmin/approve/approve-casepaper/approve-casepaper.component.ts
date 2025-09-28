@@ -196,65 +196,37 @@ export class ApproveCasepaperComponent implements OnInit {
   }
 
   // Bulk actions
-  approveSelected(): void {
-    if (this.selectedCases.length === 0) {
-      this.toastr.warning('Please select at least one case paper to approve');
-      return;
-    }
-
-    if (confirm(`Are you sure you want to approve ${this.selectedCases.length} case paper(s)?`)) {
-      this.loadingMaterials = true;
-      
-      // Simulate API call - replace with your actual approval endpoint
-      this.api.post('CasePaper/ApproveCasePapers', { trnNumbers: this.selectedCases }).subscribe({
-        next: (res: any) => {
-          this.toastr.success(`Successfully approved ${this.selectedCases.length} case paper(s)`);
-          this.selectedCases = [];
-          this.loadMaterials();
-        },
-        error: (err) => {
-          console.error('Approval error:', err);
-          this.toastr.error('Failed to approve case papers');
-          this.loadingMaterials = false;
-        }
-      });
-    }
+ approveSelected(): void {
+  if (this.selectedCases.length === 0) {
+    this.toastr.warning('Please select at least one case paper to approve');
+    return;
   }
 
-  rejectSelected(): void {
-    if (this.selectedCases.length === 0) {
-      this.toastr.warning('Please select at least one case paper to reject');
-      return;
-    }
+  // Show Bootstrap modal
+  const modal = new (window as any).bootstrap.Modal(
+    document.getElementById('approveConfirmModal')
+  );
+  modal.show();
+}
 
-    const reason = prompt('Please enter reason for rejection:');
-    if (reason === null) return; // User cancelled
+executeApprove(): void {
+  this.loadingMaterials = true;
 
-    if (reason && reason.trim().length > 0) {
-      if (confirm(`Are you sure you want to reject ${this.selectedCases.length} case paper(s)?`)) {
-        this.loadingMaterials = true;
-        
-        // Simulate API call - replace with your actual rejection endpoint
-        this.api.post('CasePaper/RejectCasePapers', { 
-          trnNumbers: this.selectedCases, 
-          reason: reason.trim() 
-        }).subscribe({
-          next: (res: any) => {
-            this.toastr.success(`Successfully rejected ${this.selectedCases.length} case paper(s)`);
-            this.selectedCases = [];
-            this.loadMaterials();
-          },
-          error: (err) => {
-            console.error('Rejection error:', err);
-            this.toastr.error('Failed to reject case papers');
-            this.loadingMaterials = false;
-          }
-        });
-      }
-    } else {
-      this.toastr.warning('Please provide a reason for rejection');
+  this.api.post('CasePaper/ApproveCasePapers', { trnNumbers: this.selectedCases }).subscribe({
+    next: () => {
+      this.toastr.success(`Successfully approved ${this.selectedCases.length} case paper(s)`);
+      this.selectedCases = [];
+      this.loadMaterials();
+    },
+    error: (err) => {
+      console.error('Approval error:', err);
+      this.toastr.error('Failed to approve case papers');
+      this.loadingMaterials = false;
     }
-  }
+  });
+}
+
+
 
   // View case paper details
   viewCasePaper(trnNo: number): void {
@@ -361,33 +333,37 @@ export class ApproveCasepaperComponent implements OnInit {
     });
   }
 
-  filteredCases(): CasePaper[] {
-    if (!this.cases) return [];
-    
-    let filtered = this.cases;
-    
-    // Filter by search term
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(casePaper =>
-        casePaper.patienT_NAME.toLowerCase().includes(term) ||
-        casePaper.coN_NUMBER.includes(term) ||
-        casePaper.crT_BY.toLowerCase().includes(term)
-      );
-    }
-    
-    // Filter by date range if applicable
-    if (this.isDateFiltered && this.startDate && this.endDate) {
-      filtered = filtered.filter(casePaper => {
-        const caseDate = new Date(casePaper.date);
-        const start = new Date(this.startDate);
-        const end = new Date(this.endDate);
-        return caseDate >= start && caseDate <= end;
-      });
-    }
-    
-    return filtered;
+ filteredCases(): CasePaper[] {
+  if (!this.cases) return [];
+  
+  let filtered = this.cases;
+  
+  // 🔹 Filter by search term
+  if (this.searchTerm) {
+    const term = this.searchTerm.toLowerCase();
+    filtered = filtered.filter(casePaper =>
+      casePaper.patienT_NAME.toLowerCase().includes(term) ||
+      casePaper.coN_NUMBER.includes(term) ||
+      casePaper.crT_BY.toLowerCase().includes(term)
+    );
   }
+  
+  // 🔹 Filter by date range if applicable
+  if (this.isDateFiltered && this.startDate && this.endDate) {
+    filtered = filtered.filter(casePaper => {
+      const caseDate = new Date(casePaper.date);
+      const start = new Date(this.startDate);
+      const end = new Date(this.endDate);
+      return caseDate >= start && caseDate <= end;
+    });
+  }
+
+  // 🔹 Filter by status code (only status = 0)
+  filtered = filtered.filter(casePaper => casePaper.statuS_CODE === 0);
+
+  return filtered;
+}
+
 
   onPaymentAmountChange(): void {
     const totalAmount = +this.data.get('totaL_AMOUNT')?.value || 0;
@@ -499,6 +475,7 @@ export class ApproveCasepaperComponent implements OnInit {
 
     if (this.trn_no && this.btn === 'E') {
       this.data.get('TRN_NO')?.setValue(this.trn_no);
+      payload.STATUS_CODE =101;
       this.api.post('CasePaper/EditCasePaper/' + this.trn_no, payload).subscribe({
         next: () => {
           this.toastr.success('Case paper updated successfully');
