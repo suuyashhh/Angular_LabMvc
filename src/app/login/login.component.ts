@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
 import { AuthService } from '../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { LoaderService } from '../services/loader.service';
 
 
 @Component({
@@ -27,7 +28,7 @@ export class LoginComponent implements OnInit {
   private secretKey: string = 'mySecretKey123';
 
   constructor(private router: Router, private auth: AuthService,
-      private toastr: ToastrService,) {}
+    private toastr: ToastrService, private loader: LoaderService) { }
 
   ngOnInit() {
     if (this.auth.isLoggedIn()) {
@@ -35,25 +36,28 @@ export class LoginComponent implements OnInit {
       console.log(user);
 
       // this.router.navigate([user.useR_LOGIN]);
-      if(user.useR_LOGIN == "LABADMIN" || user.useR_LOGIN == "EMPLOYEE"){
-            this.router.navigate(["LABADMIN"]);
-          }else if(user.useR_LOGIN == "ADMIN"){
-            this.router.navigate(["ADMIN"]);
-          }
+      if (user.useR_LOGIN == "LABADMIN" || user.useR_LOGIN == "EMPLOYEE") {
+        this.router.navigate(["LABADMIN"]);
+      } else if (user.useR_LOGIN == "ADMIN") {
+        this.router.navigate(["ADMIN"]);
+      }
     }
   }
 
   login() {
     this.isLoading = true; // ✅ Show loader
+    this.loader.show();
     this.auth.login(this.loginObj).subscribe({
       next: (res: any) => {
         this.isLoading = false; // ✅ Hide loader
+        this.loader.hide();
+        this.toastr.success("Login Successful..!", "Login");
         console.log('Login response:', res);
         if (res.token) {
           this.auth.setToken(res);
-          if(res.userDetails.useR_LOGIN == "LABADMIN" || res.userDetails.useR_LOGIN == "EMPLOYEE" ){
+          if (res.userDetails.useR_LOGIN == "LABADMIN" || res.userDetails.useR_LOGIN == "EMPLOYEE") {
             this.router.navigate(["LABADMIN"]);
-          }else if(res.userDetails.useR_LOGIN == "ADMIN"){
+          } else if (res.userDetails.useR_LOGIN == "ADMIN") {
             this.router.navigate(["ADMIN"]);
           }
         } else {
@@ -62,30 +66,31 @@ export class LoginComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false; // 
+        this.loader.hide();
         console.error('Login error:', err);
-       this.toastr.error('Invalid User', 'Invalid');
-       this.router.navigate(["lab"]);
+        this.toastr.error('Invalid User', 'Invalid');
+        this.router.navigate(["lab"]);
       }
     });
   }
 
   togglePasswordVisibility(passwordInput: HTMLInputElement) {
-  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-  passwordInput.setAttribute('type', type);
-  
-  // Toggle the eye icon
-  if (type === 'password') {
-    this.passwordIcon.nativeElement.classList.remove('ri-eye-line');
-    this.passwordIcon.nativeElement.classList.add('ri-eye-off-line');
-  } else {
-    this.passwordIcon.nativeElement.classList.remove('ri-eye-off-line');
-    this.passwordIcon.nativeElement.classList.add('ri-eye-line');
-  }
-}
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
 
-impMsg(){
-      this.toastr.success( 'UserName:- Demo , Pass:- 123','For Demo');
-}
+    // Toggle the eye icon
+    if (type === 'password') {
+      this.passwordIcon.nativeElement.classList.remove('ri-eye-line');
+      this.passwordIcon.nativeElement.classList.add('ri-eye-off-line');
+    } else {
+      this.passwordIcon.nativeElement.classList.remove('ri-eye-off-line');
+      this.passwordIcon.nativeElement.classList.add('ri-eye-line');
+    }
+  }
+
+  impMsg() {
+    this.toastr.success('UserName:- Demo , Pass:- 123', 'For Demo');
+  }
 
 }
 
