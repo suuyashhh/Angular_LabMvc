@@ -4,6 +4,9 @@ import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiService } from './api.service';
+import { LoaderService } from '../services/loader.service';
+import { finalize } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +18,10 @@ export class AuthService {
   constructor(
     private router: Router,
     private http: HttpClient,
-    private api: ApiService
-  ) {}
+    private api: ApiService,
+    private loader: LoaderService,
+    private toaster: ToastrService
+  ) { }
 
   // Generate UUID (optional utility)
   generateUUIDToken(): string {
@@ -61,9 +66,9 @@ export class AuthService {
   // }
 
   isTokenValid(): boolean {
-  const token = this.getToken();
-  return !!token; // only rely on localStorage
-}
+    const token = this.getToken();
+    return !!token; // only rely on localStorage
+  }
 
   // Return true if logged in
   isLoggedIn(): boolean {
@@ -90,11 +95,23 @@ export class AuthService {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.post(`${this.api.baseurl}Login/Logout`, {}, { headers }).subscribe({
-      next: () => this.clearLocalSession(),
-      error: () => this.clearLocalSession()
-    });
+    this.loader.show();
+
+    this.http.post(`${this.api.baseurl}Login/Logout`, {}, { headers })
+      .pipe(
+        finalize(() => {
+          setTimeout(() => {
+            this.loader.hide();
+            this.toaster.success('Logout Successful!', 'Logout'); // ✅ show after loader hide
+          }, 300);
+        })
+      )
+      .subscribe({
+        next: () => this.clearLocalSession(),
+        error: () => this.clearLocalSession()
+      });
   }
+
 
   // Clear session from browser
   private clearLocalSession(): void {

@@ -4,7 +4,8 @@
             <div class="input-group">
                 <label for="fromDate">From Date</label>
                 <div class="input-wrapper">
-                    <input type="date" id="fromDate" [(ngModel)]="startDate" (change)="onDateChange()" style="color: black !important;">
+                    <input type="date" id="fromDate" [(ngModel)]="startDate" (change)="onDateChange()"
+                        style="color: black !important;">
                     <i class="fas fa-calendar-alt input-icon"></i>
                 </div>
             </div>
@@ -12,7 +13,8 @@
             <div class="input-group">
                 <label for="toDate">To Date</label>
                 <div class="input-wrapper">
-                    <input type="date" id="toDate" [(ngModel)]="endDate" (change)="onDateChange()" style="color: black !important;">
+                    <input type="date" id="toDate" [(ngModel)]="endDate" (change)="onDateChange()"
+                        style="color: black !important;">
                     <i class="fas fa-calendar-alt input-icon"></i>
                 </div>
             </div>
@@ -32,6 +34,12 @@
                 <span class="turnover-label">TurnOver</span>
                 <span class="turnover-amount">RS/- {{reportCount.turnover}}</span>
             </div>
+            <div class="turnover-row">
+                <span class="turnover-label" style="color: darkred; font-weight: 600;">Pending Total</span>
+                <span class="turnover-amount" style="color: darkred; font-weight: 600;">Rs/- {{
+                    reportCount.pendinG_TOTAL }}</span>
+
+            </div>
 
             <div class="expenses-header">
                 <span class="header-name">Name</span>
@@ -41,8 +49,8 @@
             <div class="expenses-list">
                 <div class="expense-item">
                     <span class="expense-number">1.</span>
-                <span class="expense-name clickable" (click)="navigateToCasePaper()">CasePaper</span>
-                    <span class="expense-amount">{{reportCount.turnover}}</span>
+                    <span class="expense-name clickable" (click)="navigateToCasePaper()">CasePaper</span>
+                    <span class="expense-amount">{{reportCount.casepapeR_EXPENSE}}</span>
                 </div>
 
                 <div class="expense-item">
@@ -71,7 +79,8 @@
 
                 <div class="expense-item">
                     <span class="expense-number">6.</span>
-                    <span class="expense-name clickable" (click)="navigateToOtherExp()">Other Expense ....like(Rent, Small events, Food)</span>
+                    <span class="expense-name clickable" (click)="navigateToOtherExp()">Other Expense ....like(Rent,
+                        Small events, Food)</span>
                     <span class="expense-amount">{{reportCount.otheR_EXPENSE}}</span>
                 </div>
 

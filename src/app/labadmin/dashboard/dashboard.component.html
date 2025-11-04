@@ -205,6 +205,27 @@
         </div>
       </div>
     </div>
+
+    <!-- Today Pending Total -->
+    <div class="stat-card" data-aos="fade-up" data-aos-delay="400" *ngIf="user.useR_LOGIN == 'EMPLOYEE' ">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="stat-icon billing">
+            <i class="fas fa-rupee-sign"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-title">Pending Amount</h3>
+            <!-- <div class="stat-number" data-target="{{dashboardCount.totaL_BILL}}">₹0</div> -->
+             <div class="stat-number" [attr.data-target]="dashboardCount.pendinG_TOTAL">0</div>
+
+          </div>
+           <div class="stat-trend down">
+            <i class="fas fa-arrow-down"></i>
+            <span>-5%</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 
