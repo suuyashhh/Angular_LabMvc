@@ -19,6 +19,7 @@ export class ElectricityBillComponent implements OnInit {
   data!: FormGroup;
   elebill: any;
   ELC_TRN_ID: number = 0;
+  ELC_NOTE : string ='';
   ComId: number = 0;
   btn: string = '';
   submitted: boolean = false;
@@ -40,6 +41,7 @@ export class ElectricityBillComponent implements OnInit {
 
     this.data = new FormGroup({
       DATE: new FormControl(formattedDate, Validators.required),
+      ELC_NOTE : new FormControl(),
       ELC_PRICE: new FormControl('', [Validators.required, Validators.pattern('^[0-9]+$')]),
       COM_ID: new FormControl()
     });
@@ -79,7 +81,7 @@ export class ElectricityBillComponent implements OnInit {
     const parts = rawDate.split('-');
     const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
     bill.DATE = this.service.getFormattedDate(formatted, 1);
-
+    
     if (this.ELC_TRN_ID == 0 && this.btn == '') {
       this.api.post('ElectricityBill/SaveElectricityBill', bill).subscribe({
         next: () => {
@@ -141,6 +143,7 @@ export class ElectricityBillComponent implements OnInit {
       this.ELC_TRN_ID = res.elC_TRN_ID;
       this.data.patchValue({
         DATE: this.service.getFormattedDate(res.date, 8),
+        ELC_NOTE: res.elC_NOTE,
         ELC_PRICE: res.elC_PRICE
       });
     });
