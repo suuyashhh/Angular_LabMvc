@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { authGuard } from './shared/auth.guard';
 import { LogindairyComponent } from './LoginDairFarm/logindairy/logindairy.component';
+import { dairyAuthGuard } from './shared/dairy-auth.guard';
 
 export const routes: Routes = [
 
@@ -24,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'SDF',
+    canActivate: [dairyAuthGuard],
     //loadComponent: () => import('./labadmin/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./DairyFarm/dairyfarm.routes').then(m => m.DAIRYFARM_ROUTES)
   },

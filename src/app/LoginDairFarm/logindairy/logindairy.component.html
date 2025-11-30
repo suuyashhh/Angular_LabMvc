@@ -20,74 +20,55 @@
       </div>
 
       <!-- Form -->
-      <form class="space-y-6">
+      <!-- change the <form class="space-y-6"> line to -->
+      <form class="space-y-6" (ngSubmit)="login()" #dairyForm="ngForm">
 
-        <!-- Floating Email -->
+        <!-- Floating Email (here used as contact) -->
         <div class="relative">
-          <input
-            id="email"
-            type="email"
-            required
-            placeholder=" "
-            class="peer block w-full px-3 py-3 border border-slate-300 rounded-lg bg-white
-                   focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none"
-          />
-          <label
-            for="email"
-            class="absolute left-3 top-3 px-1 text-slate-500 bg-white transition-all duration-200
-                   pointer-events-none
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-base
-                   peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600
-                   peer-focus:px-1 peer-focus:bg-white"
-          >
-            Email Address <span class="text-red-600">*</span>
+          <input id="contact" name="contact" type="text" required placeholder=" " [(ngModel)]="loginObj.contact"
+            autocomplete="off" autocapitalize="off" spellcheck="false" class="peer block w-full px-3 py-3 border border-slate-300 rounded-lg bg-white
+           focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none
+           text-slate-800 placeholder-slate-400" />
+
+          <label for="contact" [ngClass]="{
+      '-top-2 text-xs': loginObj.contact,
+      'top-3 text-base': !loginObj.contact
+    }" class="absolute left-3 z-10 px-1 bg-white text-slate-500 transition-all duration-200
+           peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600
+           pointer-events-none">
+            Contact (email/phone) <span class="text-red-600">*</span>
           </label>
         </div>
 
+
+
         <!-- Floating Password -->
-        <div class="relative">
-          <input
-            id="password"
-            type="password"
-            required
-            placeholder=" "
-            class="peer block w-full px-3 py-3 border border-slate-300 rounded-lg bg-white
-                   focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none"
-          />
-          <label
-            for="password"
-            class="absolute left-3 top-3 px-1 text-slate-500 bg-white transition-all duration-200
-                   pointer-events-none
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-base
-                   peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600
-                   peer-focus:px-1 peer-focus:bg-white"
-          >
+        <div class="relative mt-4">
+          <input id="password" name="password" type="password" required placeholder=" " [(ngModel)]="loginObj.password"
+            autocomplete="new-password" spellcheck="false" class="peer block w-full px-3 py-3 border border-slate-300 rounded-lg bg-white
+           focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none
+           text-slate-800 placeholder-slate-400" />
+
+          <label for="password" [ngClass]="{
+      '-top-2 text-xs': loginObj.password,
+      'top-3 text-base': !loginObj.password
+    }" class="absolute left-3 z-10 px-1 bg-white text-slate-500 transition-all duration-200
+           peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600
+           pointer-events-none">
             Password <span class="text-red-600">*</span>
           </label>
         </div>
 
-        <!-- Remember + Forgot -->
-        <div class="flex items-center justify-between">
-          <label class="flex items-center cursor-pointer">
-            <input type="checkbox" class="w-4 h-4 text-green-600 border-slate-300 rounded focus:ring-green-500" />
-            <span class="ml-2 text-sm text-slate-600">Remember me</span>
-          </label>
 
-          <a class="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer">
-            Forgot password?
-          </a>
-        </div>
-
-        <!-- Button -->
-        <button
-          type="submit"
-          class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg
-                 transition duration-200 transform hover:scale-105 active:scale-95"
-        >
-          Sign In
+        <!-- Submit button remains the same -->
+        <button type="submit"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-105 active:scale-95"
+          [disabled]="isLoading">
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading">Signing in...</span>
         </button>
-
       </form>
+
 
       <!-- OR Divider -->
       <div class="relative my-6">

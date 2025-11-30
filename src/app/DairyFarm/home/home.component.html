@@ -6,8 +6,8 @@
       <div class="flex items-center justify-between h-12 md:h-14">
         <!-- Brand / Title -->
         <div class="flex items-center gap-2 md:gap-3">
-          <img src="assets/img/suyash.jpg" alt="logo" class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
-          <span class="font-semibold text-sm md:text-lg">Farm Records</span>
+          <img src="../../assets/img/avatars/1.png" alt="logo" class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
+          <span class="font-semibold text-sm md:text-lg">{{userName}}</span>
         </div>
 
         <!-- Right side (logout) -->
@@ -15,13 +15,14 @@
           <span class="hidden sm:inline text-xs md:text-sm text-green-100"></span>
 
           <!-- Non-functional logout button (no JS) -->
-          <button
-            class="px-2 py-1 rounded-md bg-white text-green-800 font-medium hover:bg-green-100 shadow-sm text-xs md:text-sm"
-            id="logoutButton"
-            type="button"
-          >
-            Logout
-          </button>
+         <button
+  class="px-2 py-1 rounded-md bg-white text-green-800 font-medium hover:bg-green-100 shadow-sm text-xs md:text-sm"
+  type="button"
+  (click)="dairyLogout()"
+>
+  Logout
+</button>
+
 
           <!-- mobile toggler (visual only) -->
           <button class="ml-1 md:hidden inline-flex items-center justify-center p-2 rounded-md text-green-100 hover:bg-green-700/40" type="button" aria-hidden="true">
