@@ -11,5 +11,10 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/home/home.component')
         .then(m => m.HomeComponent)
  },
+ {
+    path:'Masters',
+    loadComponent:()=> import('../DairyFarm/masters/masters.component')
+        .then(m => m.MastersComponent)
+ },
   
 ];

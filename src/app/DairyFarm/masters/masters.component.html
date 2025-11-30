@@ -1,0 +1,96 @@
+<main class="min-h-screen bg-gray-50 p-4">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Animals form -->
+      <div class="col-md-6">
+        <div class="card p-4 mb-4">
+          <h4>Cattle Master</h4>
+          <form (ngSubmit)="submitAnimal()" [formGroup]="animalForm" class="mt-3">
+            <div class="mb-3">
+              <label class="form-label">Cattle Name *</label>
+              <input type="text" formControlName="ANIMAL_NAME" class="form-control" placeholder="Enter cattle name" />
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-success">
+                {{ ANIMAL_ID ? 'Update' : 'Submit' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="cancelEditAnimal()" *ngIf="ANIMAL_ID">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Animals table -->
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h4>Manage Cattle</h4>
+          <div *ngIf="animals.length === 0" class="text-muted p-3">No records found.</div>
+          <table *ngIf="animals.length>0" class="table table-bordered mt-3">
+            <thead>
+              <tr><th>Name</th><th style="width:180px">Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of animals | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }">
+                <td>{{ a.animal_name }}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary me-2" (click)="editAnimal(a)">Edit</button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteAnimal(a.animal_id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="pageAnimal = $event" [autoHide]="true"></pagination-controls>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed Row -->
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h4>Feed Master</h4>
+          <form (ngSubmit)="submitFeed()" [formGroup]="feedForm" class="mt-3">
+            <div class="mb-3">
+              <label class="form-label">Feed Name *</label>
+              <input type="text" formControlName="FEED_NAME" class="form-control" placeholder="Enter feed name" />
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-success">
+                {{ FEED_ID ? 'Update' : 'Submit' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="cancelEditFeed()" *ngIf="FEED_ID">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h4>Manage Feeds</h4>
+          <div *ngIf="feeds.length === 0" class="text-muted p-3">No records found.</div>
+          <table *ngIf="feeds.length>0" class="table table-bordered mt-3">
+            <thead>
+              <tr><th>Name</th><th style="width:180px">Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of feeds | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }">
+                <td>{{ f.feed_name }}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary me-2" (click)="editFeed(f)">Edit</button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteFeed(f.feed_id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
