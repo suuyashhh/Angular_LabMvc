@@ -30,13 +30,28 @@ export class MastersComponent implements OnInit {
   ANIMAL_ID: number = 0;
   FEED_ID: number = 0;
 
+  // Action types for modals
+  btnAnimal: string = ''; // '', 'E', 'D'
+  btnFeed: string = '';   // '', 'E', 'D'
+
+  // Delete reasons
+  animalDeleteReason: string = '';
+  feedDeleteReason: string = '';
+
+  // Loading states
+  loadingAnimals: boolean = false;
+  loadingFeeds: boolean = false;
+
   // paging
   pageAnimal = 1;
   pageFeed = 1;
   readonly pageSize = 10;
 
+  // search
+  searchTerm: string = '';
+
   // misc
-  ComId: number = 0; // preserve parity with other components
+  ComId: number = 0;
   submittedAnimal = false;
   submittedFeed = false;
 
@@ -82,12 +97,58 @@ export class MastersComponent implements OnInit {
   private getDairyUserId(): number {
     const dairy = this.auth.getDairyCredentialsFromCookie();
     if (!dairy) return 0;
-    // try common keys returned by your backend (user_id, userId, user_id etc.)
-    const id = dairy.user_id ?? dairy.userId ?? dairy.userId ?? dairy.userId;
+    const id = dairy.user_id ?? dairy.userId ?? dairy.UserId ?? dairy.id;
     return Number(id) || 0;
   }
 
-  // ----------------- Animals -----------------
+  // ----------------- Modal Methods for Animals -----------------
+  clearAnimalData() {
+    this.ANIMAL_ID = 0;
+    this.btnAnimal = '';
+    this.animalForm.reset();
+    this.animalDeleteReason = '';
+    this.submittedAnimal = false;
+  }
+
+  getAnimalById(id: number, action: string) {
+    this.ANIMAL_ID = id;
+    this.btnAnimal = action;
+    
+    // Find the animal by ID - using the correct property names from API
+    const animal = this.animals.find(a => this.getAnimalId(a) === id);
+    if (animal) {
+      this.animalForm.patchValue({
+        ANIMAL_NAME: this.getAnimalName(animal)
+      });
+    }
+  }
+
+  submitAnimal() {
+    this.submittedAnimal = true;
+
+    if (this.btnAnimal === 'D') {
+      // Delete logic
+      if (this.animalDeleteReason.trim() === '') {
+        this.toastr.error('Please provide delete reason');
+        return;
+      }
+      this.deleteAnimal();
+    } else {
+      // Add/Edit logic
+      if (this.animalForm.invalid) {
+        this.toastr.error('Please fill animal name');
+        return;
+      }
+      
+      if (this.ANIMAL_ID === 0) {
+        this.addAnimal();
+      } else {
+        this.updateAnimal();
+      }
+    }
+  }
+
+  // ----------------- Animals CRUD -----------------
   loadAnimals() {
     if (!this.dairyUserId) {
       this.animals = [];
@@ -95,86 +156,75 @@ export class MastersComponent implements OnInit {
       return;
     }
 
-    // Controller expects userId in the route (Animals/{userId})
+    this.loadingAnimals = true;
     this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
-      next: (res: any) => { this.animals = res || []; },
+      next: (res: any) => { 
+        console.log('Animals API Response:', res); // Debug log
+        this.animals = res || []; 
+        this.loadingAnimals = false;
+      },
       error: (err) => {
         console.error('loadAnimals', err);
         this.toastr.error('Failed to load animal list');
         this.animals = [];
+        this.loadingAnimals = false;
       }
     });
   }
 
-  submitAnimal() {
-    this.submittedAnimal = true;
-    if (this.animalForm.invalid) {
-      this.toastr.error('Please fill animal name');
-      return;
-    }
-
+  addAnimal() {
     const payload: any = {
-      // backend CreateAnimal expects AnimalDto with AnimalName property
-      AnimalName: this.animalForm.value.ANIMAL_NAME.trim()
-      // DO NOT include UserId here: ApiService will inject UserId
+      AnimalName: this.animalForm.value.ANIMAL_NAME.trim(),
+      UserId: this.dairyUserId
     };
 
-    if (this.ANIMAL_ID === 0) {
-      // create (POST api/DairyMasters/Animal)
-      this.api.post('DairyMasters/Animal', payload).subscribe({
-        next: (res: any) => {
-          this.loadAnimals();
-          setTimeout(() => {
-            this.toastr.success('Cattle saved successfully');
-            this.animalForm.reset();
-            this.submittedAnimal = false;
-          }, 200);
-        },
-        error: (err) => {
-          console.error('submitAnimal (create)', err);
-          this.toastr.error('Failed to save cattle');
-        }
-      });
-    } else {
-      // update (PUT api/DairyMasters/Animal/{id})
-      this.api.put(`DairyMasters/Animal/${this.ANIMAL_ID}`, payload).subscribe({
-        next: () => {
-          this.loadAnimals();
-          setTimeout(() => {
-            this.toastr.success('Cattle updated successfully');
-            this.animalForm.reset();
-            this.ANIMAL_ID = 0;
-            this.submittedAnimal = false;
-          }, 200);
-        },
-        error: (err) => {
-          console.error('submitAnimal (update)', err);
-          this.toastr.error('Failed to update cattle');
-        }
-      });
-    }
-  }
-
-  editAnimal(item: any) {
-    this.ANIMAL_ID = item.AnimalId ?? item.animal_id ?? item.animalId ?? 0;
-    this.animalForm.patchValue({ ANIMAL_NAME: item.AnimalName ?? item.animal_name ?? item.animalName });
-  }
-
-  cancelEditAnimal() {
-    this.ANIMAL_ID = 0;
-    this.animalForm.reset();
-    this.submittedAnimal = false;
-  }
-
-  deleteAnimal(id?: number) {
-    if (!id) return;
-    if (!confirm('Are you sure want to delete this cattle?')) return;
-
-    // Controller's delete: DELETE api/DairyMasters/Animal/{id}
-    this.api.delete(`DairyMasters/Animal/${id}`).subscribe({
+    this.api.post('DairyMasters/Animal', payload).subscribe({
       next: () => {
         this.loadAnimals();
-        setTimeout(() => this.toastr.success('Cattle deleted successfully'), 200);
+        this.closeModal('cattleFormModal');
+        setTimeout(() => {
+          this.toastr.success('Cattle saved successfully');
+          this.clearAnimalData();
+        }, 200);
+      },
+      error: (err) => {
+        console.error('submitAnimal (create)', err);
+        this.toastr.error('Failed to save cattle');
+      }
+    });
+  }
+
+  updateAnimal() {
+    const payload: any = {
+      AnimalName: this.animalForm.value.ANIMAL_NAME.trim(),
+      UserId: this.dairyUserId
+    };
+
+    this.api.put(`DairyMasters/Animal/${this.ANIMAL_ID}`, payload).subscribe({
+      next: () => {
+        this.loadAnimals();
+        this.closeModal('cattleFormModal');
+        setTimeout(() => {
+          this.toastr.success('Cattle updated successfully');
+          this.clearAnimalData();
+        }, 200);
+      },
+      error: (err) => {
+        console.error('submitAnimal (update)', err);
+        this.toastr.error('Failed to update cattle');
+      }
+    });
+  }
+
+  deleteAnimal() {
+    this.api.delete(`DairyMasters/Animal/${this.ANIMAL_ID}`).subscribe({
+      next: () => {
+        this.loadAnimals();
+        this.closeModal('cattleFormModal');
+        setTimeout(() => {
+          this.toastr.success('Cattle deleted successfully');
+          this.clearAnimalData();
+        }, 200);
       },
       error: (err) => {
         console.error('deleteAnimal', err);
@@ -183,98 +233,181 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  // ----------------- Feeds -----------------
+  // ----------------- Modal Methods for Feeds -----------------
+  clearFeedData() {
+    this.FEED_ID = 0;
+    this.btnFeed = '';
+    this.feedForm.reset();
+    this.feedDeleteReason = '';
+    this.submittedFeed = false;
+  }
+
+  getFeedById(id: number, action: string) {
+    this.FEED_ID = id;
+    this.btnFeed = action;
+    
+    const feed = this.feeds.find(f => this.getFeedId(f) === id);
+    if (feed) {
+      this.feedForm.patchValue({
+        FEED_NAME: this.getFeedName(feed)
+      });
+    }
+  }
+
+  submitFeed() {
+    this.submittedFeed = true;
+
+    if (this.btnFeed === 'D') {
+      // Delete logic
+      if (this.feedDeleteReason.trim() === '') {
+        this.toastr.error('Please provide delete reason');
+        return;
+      }
+      this.deleteFeed();
+    } else {
+      // Add/Edit logic
+      if (this.feedForm.invalid) {
+        this.toastr.error('Please fill feed name');
+        return;
+      }
+      
+      if (this.FEED_ID === 0) {
+        this.addFeed();
+      } else {
+        this.updateFeed();
+      }
+    }
+  }
+
+  // ----------------- Feeds CRUD -----------------
   loadFeeds() {
     if (!this.dairyUserId) {
       this.feeds = [];
       return;
     }
 
-    // Controller expects userId in the route (Feeds/{userId})
+    this.loadingFeeds = true;
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
-      next: (res: any) => { this.feeds = res || []; },
+      next: (res: any) => { 
+        console.log('Feeds API Response:', res); // Debug log
+        this.feeds = res || []; 
+        this.loadingFeeds = false;
+      },
       error: (err) => {
         console.error('loadFeeds', err);
         this.toastr.error('Failed to load feeds');
         this.feeds = [];
+        this.loadingFeeds = false;
       }
     });
   }
 
-  submitFeed() {
-    this.submittedFeed = true;
-    if (this.feedForm.invalid) {
-      this.toastr.error('Please fill feed name');
-      return;
-    }
-
+  addFeed() {
     const payload: any = {
-      // backend CreateFeed expects FeedDto with FeedName property
-      FeedName: this.feedForm.value.FEED_NAME.trim()
-      // DO NOT include UserId here — ApiService will inject it
+      FeedName: this.feedForm.value.FEED_NAME.trim(),
+      UserId: this.dairyUserId
     };
 
-    if (this.FEED_ID === 0) {
-      // create (POST api/DairyMasters/Feed)
-      this.api.post('DairyMasters/Feed', payload).subscribe({
-        next: () => {
-          this.loadFeeds();
-          setTimeout(() => {
-            this.toastr.success('Feed saved successfully');
-            this.feedForm.reset();
-            this.submittedFeed = false;
-          }, 200);
-        },
-        error: (err) => {
-          console.error('submitFeed (create)', err);
-          this.toastr.error('Failed to save feed');
-        }
-      });
-    } else {
-      // update (PUT api/DairyMasters/Feed/{id})
-      this.api.put(`DairyMasters/Feed/${this.FEED_ID}`, payload).subscribe({
-        next: () => {
-          this.loadFeeds();
-          setTimeout(() => {
-            this.toastr.success('Feed updated successfully');
-            this.feedForm.reset();
-            this.FEED_ID = 0;
-            this.submittedFeed = false;
-          }, 200);
-        },
-        error: (err) => {
-          console.error('submitFeed (update)', err);
-          this.toastr.error('Failed to update feed');
-        }
-      });
-    }
-  }
-
-  editFeed(item: any) {
-    this.FEED_ID = item.FeedId ?? item.feed_id ?? item.feedId ?? 0;
-    this.feedForm.patchValue({ FEED_NAME: item.FeedName ?? item.feed_name ?? item.feedName });
-  }
-
-  cancelEditFeed() {
-    this.FEED_ID = 0;
-    this.feedForm.reset();
-    this.submittedFeed = false;
-  }
-
-  deleteFeed(id?: number) {
-    if (!id) return;
-    if (!confirm('Are you sure want to delete this feed?')) return;
-
-    // Controller's delete: DELETE api/DairyMasters/Feed/{id}
-    this.api.delete(`DairyMasters/Feed/${id}`).subscribe({
+    this.api.post('DairyMasters/Feed', payload).subscribe({
       next: () => {
         this.loadFeeds();
-        setTimeout(() => this.toastr.success('Feed deleted successfully'), 200);
+        this.closeModal('feedFormModal');
+        setTimeout(() => {
+          this.toastr.success('Feed saved successfully');
+          this.clearFeedData();
+        }, 200);
+      },
+      error: (err) => {
+        console.error('submitFeed (create)', err);
+        this.toastr.error('Failed to save feed');
+      }
+    });
+  }
+
+  updateFeed() {
+    const payload: any = {
+      FeedName: this.feedForm.value.FEED_NAME.trim(),
+      UserId: this.dairyUserId
+    };
+
+    this.api.put(`DairyMasters/Feed/${this.FEED_ID}`, payload).subscribe({
+      next: () => {
+        this.loadFeeds();
+        this.closeModal('feedFormModal');
+        setTimeout(() => {
+          this.toastr.success('Feed updated successfully');
+          this.clearFeedData();
+        }, 200);
+      },
+      error: (err) => {
+        console.error('submitFeed (update)', err);
+        this.toastr.error('Failed to update feed');
+      }
+    });
+  }
+
+  deleteFeed() {
+    this.api.delete(`DairyMasters/Feed/${this.FEED_ID}`).subscribe({
+      next: () => {
+        this.loadFeeds();
+        this.closeModal('feedFormModal');
+        setTimeout(() => {
+          this.toastr.success('Feed deleted successfully');
+          this.clearFeedData();
+        }, 200);
       },
       error: (err) => {
         console.error('deleteFeed', err);
         this.toastr.error('Failed to delete feed');
       }
     });
+  }
+
+  // ----------------- Common Methods -----------------
+  onSearch() {
+    // Search functionality - reset pagination
+    this.pageAnimal = 1;
+    this.pageFeed = 1;
+  }
+
+  filteredAnimals() {
+    if (!this.searchTerm) return this.animals;
+    return this.animals.filter(animal => {
+      const name = this.getAnimalName(animal);
+      return name.toLowerCase().includes(this.searchTerm.toLowerCase());
+    });
+  }
+
+  filteredFeeds() {
+    if (!this.searchTerm) return this.feeds;
+    return this.feeds.filter(feed => {
+      const name = this.getFeedName(feed);
+      return name.toLowerCase().includes(this.searchTerm.toLowerCase());
+    });
+  }
+
+  closeModal(modalId: string) {
+    // Use the ApiService modalClose method like in your reference
+    this.api.modalClose(modalId);
+  }
+
+  // Helper method to get animal ID from any object structure
+  getAnimalId(animal: any): number {
+    return animal.AnimalId ?? animal.animal_id ?? animal.animalId ?? animal.id ?? 0;
+  }
+
+  // Helper method to get feed ID from any object structure
+  getFeedId(feed: any): number {
+    return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
+  }
+
+  // Helper method to get animal name from any object structure
+  getAnimalName(animal: any): string {
+    return animal.AnimalName ?? animal.animal_name ?? animal.animalName ?? animal.name ?? '';
+  }
+
+  // Helper method to get feed name from any object structure
+  getFeedName(feed: any): string {
+    return feed.FeedName ?? feed.feed_name ?? feed.feedName ?? feed.name ?? '';
   }
 }
