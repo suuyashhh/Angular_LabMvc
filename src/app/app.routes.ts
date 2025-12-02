@@ -26,7 +26,7 @@ export const routes: Routes = [
   {
     path: 'SDF',
     canActivate: [dairyAuthGuard],
-    //loadComponent: () => import('./labadmin/landing/landing.component').then(m => m.LandingComponent),
+    loadComponent: () => import('./DairyFarm/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./DairyFarm/dairyfarm.routes').then(m => m.DAIRYFARM_ROUTES)
   },
   {
