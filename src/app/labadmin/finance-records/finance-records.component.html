@@ -44,7 +44,7 @@
                 <span class="header-number">No.</span>
                 <span class="header-name">Name</span>
                 <span class="header-date">Date</span>
-                <span class="header-count">Test Count</span>
+                <!-- <span class="header-count">Test Count</span> -->
                 <span class="header-amount" style="padding-left: 60px!important;">RS/-</span>
             </div>
             <div class="expenses-list" *ngIf="type == 'casepaper'">
@@ -52,8 +52,8 @@
                     <span class="expense-number">{{i+1}}</span>
                     <span class="expense-name">{{_ObjData.patienT_NAME}}</span>
                     <span class="expense-date">{{_ObjData.date | formattedDate:3 }}</span>
-                    <span class="expense-count">3</span>
-                    <span class="expense-amount">{{_ObjData.totaL_AMOUNT}}</span>
+                    <!-- <span class="expense-count">3</span> -->
+                    <span class="expense-amount">{{_ObjData.paymenT_AMOUNT}}</span>
                 </div>
             </div>
 

@@ -1,0 +1,440 @@
+<!-- Page Header -->
+<div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
+  
+  <!-- Icon container -->
+  <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner">
+    <img src="../../../assets/DairryFarmImg/cow_9466827.png" 
+         alt="Cattle Icon"
+         class="w-8 h-8 object-contain" />
+  </div>
+
+  <!-- Title -->
+  <div>
+    <h1 class="text-2xl font-semibold text-green-900">Masters</h1>
+    <p class="text-sm text-green-600 -mt-0.5">Manage cattle & feeds</p>
+  </div>
+
+</div>
+
+
+
+
+<main class="min-h-screen bg-green-50 p-6">
+  <div class="max-w-7xl mx-auto space-y-6">
+
+
+
+
+    <!-- Actions + Search -->
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+      <div class="flex flex-col lg:flex-row items-center gap-4">
+
+        <div class="flex gap-3">
+          <button type="button"
+                  class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+                  (click)="clearAnimalData()"
+                  data-bs-toggle="modal" data-bs-target="#cattleFormModal">
+            <i class="ri-add-box-fill"></i> Add Cattle
+          </button>
+
+          <button type="button"
+                  class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+                  (click)="clearFeedData()"
+                  data-bs-toggle="modal" data-bs-target="#feedFormModal">
+            <i class="ri-add-box-fill"></i> Add Feed
+          </button>
+        </div>
+
+        <div class="w-full lg:w-80 lg:ml-auto">
+      <div class="relative">
+  <input
+    class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+           py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
+    type="search"
+    placeholder="Search ..."
+    [(ngModel)]="searchTerm"
+    (ngModelChange)="onSearch()"
+    id="html5-search-input" />
+
+  <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
+    <i class="ri-search-2-fill"></i>
+  </span>
+</div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Grid: Cattle & Feed -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- CATTLE -->
+      <section class="bg-white rounded-2xl shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-medium text-green-800">Cattle Master</h2>
+          <div class="text-sm text-green-600">Total: {{ animals.length || 0 }}</div>
+        </div>
+
+        <div *ngIf="loadingAnimals" class="text-center my-3">
+          <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8"></div>
+        </div>
+
+        <div *ngIf="!loadingAnimals">
+          <!-- Table on md+ -->
+          <div *ngIf="animals && animals.length > 0; else noCattleData" class="hidden md:block overflow-x-auto">
+            <table class="w-full table-auto text-left border-collapse">
+              <thead class="bg-green-600 text-white">
+                <tr>
+                  <th class="px-4 py-3">Name</th>
+                  <th class="px-4 py-3 w-44">Info</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-gray-800">
+                <tr *ngFor="let a of filteredAnimals() | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }"
+                    class="hover:bg-green-50">
+                  <td class="px-4 py-3">
+                    <div class="dropdown w-full">
+                      <button class="w-full text-left flex items-center justify-between dropdown-toggle"
+                              type="button"
+                              id="animalDropdown{{ getAnimalId(a) }}"
+                              data-bs-toggle="dropdown"
+                              aria-expanded="false"
+                              (click)="$event.stopPropagation()">
+                        <div>
+                          <div class="font-medium text-green-800">{{ getAnimalName(a) }}</div>
+                        </div>
+                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                      </button>
+
+                      <ul class="dropdown-menu p-1" [attr.aria-labelledby]="'animalDropdown' + getAnimalId(a)">
+                        <li>
+                          <a class="dropdown-item text-green-700 px-3 py-2 rounded hover:bg-green-50"
+                             href="javascript:void(0);"
+                             (click)="getAnimalById(getAnimalId(a), 'E')"
+                             data-bs-toggle="modal"
+                             data-bs-target="#cattleFormModal">Edit</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item text-red-600 px-3 py-2 rounded hover:bg-red-50"
+                             href="javascript:void(0);"
+                             (click)="getAnimalById(getAnimalId(a), 'D')"
+                             data-bs-toggle="modal"
+                             data-bs-target="#cattleFormModal">Delete</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-green-600">ID: {{ getAnimalId(a) }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="mt-4 flex justify-center">
+              <pagination-controls (pageChange)="pageAnimal = $event" [autoHide]="true"></pagination-controls>
+            </div>
+          </div>
+
+          <!-- Mobile: cards -->
+          <div *ngIf="animals && animals.length > 0" class="space-y-3 md:hidden">
+            <div *ngFor="let a of filteredAnimals() | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }"
+                 class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-green-800 font-medium">{{ getAnimalName(a) }}</div>
+                <div class="text-xs text-green-500 mt-1">ID: {{ getAnimalId(a) }}</div>
+              </div>
+
+              <!-- Dropdown trigger on mobile card -->
+              <div class="dropdown">
+                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle"
+                        type="button"
+                        id="animalCardDropdown{{ getAnimalId(a) }}"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                  Actions
+                </button>
+                <ul class="dropdown-menu" [attr.aria-labelledby]="'animalCardDropdown' + getAnimalId(a)">
+                  <li>
+                    <a class="dropdown-item text-green-700" href="javascript:void(0);"
+                       (click)="getAnimalById(getAnimalId(a), 'E')"
+                       data-bs-toggle="modal" data-bs-target="#cattleFormModal">Edit</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-red-600" href="javascript:void(0);"
+                       (click)="getAnimalById(getAnimalId(a), 'D')"
+                       data-bs-toggle="modal" data-bs-target="#cattleFormModal">Delete</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-4 flex justify-center">
+              <pagination-controls (pageChange)="pageAnimal = $event" [autoHide]="true"></pagination-controls>
+            </div>
+          </div>
+
+          <ng-template #noCattleData>
+            <div class="text-center py-4">
+              <p class="text-sm text-green-600">No cattle records found.</p>
+            </div>
+          </ng-template>
+        </div>
+      </section>
+
+      <!-- FEED -->
+      <section class="bg-white rounded-2xl shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-medium text-green-800">Feed Master</h2>
+          <div class="text-sm text-green-600">Total: {{ feeds.length || 0 }}</div>
+        </div>
+
+        <div *ngIf="loadingFeeds" class="text-center my-3">
+          <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8"></div>
+        </div>
+
+        <div *ngIf="!loadingFeeds">
+          <!-- Table on md+ -->
+          <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="hidden md:block overflow-x-auto">
+            <table class="w-full table-auto text-left border-collapse">
+              <thead class="bg-green-600 text-white">
+                <tr>
+                  <th class="px-4 py-3">Name</th>
+                  <th class="px-4 py-3 w-44">Info</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-gray-800">
+                <tr *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
+                    class="hover:bg-green-50">
+                  <td class="px-4 py-3">
+                    <div class="dropdown w-full">
+                      <button class="w-full text-left flex items-center justify-between dropdown-toggle"
+                              type="button"
+                              id="feedDropdown{{ getFeedId(f) }}"
+                              data-bs-toggle="dropdown"
+                              aria-expanded="false"
+                              (click)="$event.stopPropagation()">
+                        <div>
+                          <div class="font-medium text-green-800">{{ getFeedName(f) }}</div>
+                        </div>
+                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                      </button>
+
+                      <ul class="dropdown-menu p-1" [attr.aria-labelledby]="'feedDropdown' + getFeedId(f)">
+                        <li>
+                          <a class="dropdown-item text-green-700 px-3 py-2 rounded hover:bg-green-50"
+                             href="javascript:void(0);"
+                             (click)="getFeedById(getFeedId(f), 'E')"
+                             data-bs-toggle="modal"
+                             data-bs-target="#feedFormModal">Edit</a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item text-red-600 px-3 py-2 rounded hover:bg-red-50"
+                             href="javascript:void(0);"
+                             (click)="getFeedById(getFeedId(f), 'D')"
+                             data-bs-toggle="modal"
+                             data-bs-target="#feedFormModal">Delete</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-3 text-sm text-green-600">ID: {{ getFeedId(f) }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="mt-4 flex justify-center">
+              <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
+            </div>
+          </div>
+
+          <!-- Mobile: cards -->
+          <div *ngIf="feeds && feeds.length > 0" class="space-y-3 md:hidden">
+            <div *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
+                 class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center justify-between">
+              <div>
+                <div class="text-green-800 font-medium">{{ getFeedName(f) }}</div>
+                <div class="text-xs text-green-500 mt-1">ID: {{ getFeedId(f) }}</div>
+              </div>
+
+              <div class="dropdown">
+                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle"
+                        type="button"
+                        id="feedCardDropdown{{ getFeedId(f) }}"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                  Actions
+                </button>
+                <ul class="dropdown-menu" [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
+                  <li>
+                    <a class="dropdown-item text-green-700" href="javascript:void(0);"
+                       (click)="getFeedById(getFeedId(f), 'E')"
+                       data-bs-toggle="modal" data-bs-target="#feedFormModal">Edit</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-red-600" href="javascript:void(0);"
+                       (click)="getFeedById(getFeedId(f), 'D')"
+                       data-bs-toggle="modal" data-bs-target="#feedFormModal">Delete</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-4 flex justify-center">
+              <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
+            </div>
+          </div>
+
+          <ng-template #noFeedData>
+            <div class="text-center py-4">
+              <p class="text-sm text-green-600">No feed records found.</p>
+            </div>
+          </ng-template>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- Cattle Modal (custom design you provided) -->
+<div class="modal fade custom-modal-fade" id="cattleFormModal" tabindex="-1" aria-labelledby="cattleFormModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="ri-file-add-line" *ngIf="ANIMAL_ID == 0 && btnAnimal == ''"></i>
+            <i class="ri-edit-line" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'"></i>
+            <i class="ri-delete-bin-line" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title" *ngIf="ANIMAL_ID == 0 && btnAnimal == ''">Add Cattle</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'">Edit Cattle</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">Delete Cattle</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body custom-modal-body">
+        <form [formGroup]="animalForm" (ngSubmit)="submitAnimal()" class="custom-form" novalidate>
+          <div class="form-group-wrapper">
+
+            <!-- Cattle Name -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="cattle-name" class="form-control" formControlName="ANIMAL_NAME"
+                       placeholder="Cattle Name" [readonly]="ANIMAL_ID != 0 && btnAnimal == 'D'" />
+                <label for="cattle-name"><i class="ri-box-3-line"></i>Cattle Name <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submittedAnimal && animalForm.get('ANIMAL_NAME')?.invalid">
+                  <small *ngIf="animalForm.get('ANIMAL_NAME')?.errors?.['required']">Cattle name is required.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Reason -->
+            <div class="custom-form-group" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="deleteAnimalReason" class="form-control" placeholder="Delete Reason"
+                       [(ngModel)]="animalDeleteReason" [ngModelOptions]="{standalone: true}" />
+                <label for="deleteAnimalReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+              </div>
+              <div class="text-danger mt-1" *ngIf="submittedAnimal && animalDeleteReason == ''">
+                <small>Delete reason is required.</small>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Modal Footer Buttons -->
+          <div class="modal-footer custom-modal-footer">
+            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+              <i class="ri-close-line"></i> Cancel
+            </button>
+            <button *ngIf="ANIMAL_ID == 0 && btnAnimal == ''" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-save-line"></i> Save
+            </button>
+            <button *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i> Edit Cattle
+            </button>
+            <button *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-delete-bin-line"></i> Delete Cattle
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Feed Modal (custom design you provided) -->
+<div class="modal fade custom-modal-fade" id="feedFormModal" tabindex="-1" aria-labelledby="feedFormModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="ri-file-add-line" *ngIf="FEED_ID == 0 && btnFeed == ''"></i>
+            <i class="ri-edit-line" *ngIf="FEED_ID != 0 && btnFeed == 'E'"></i>
+            <i class="ri-delete-bin-line" *ngIf="FEED_ID != 0 && btnFeed == 'D'"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID == 0 && btnFeed == ''">Add Feed</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID != 0 && btnFeed == 'E'">Edit Feed</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID != 0 && btnFeed == 'D'">Delete Feed</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body custom-modal-body">
+        <form [formGroup]="feedForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
+          <div class="form-group-wrapper">
+
+            <!-- Feed Name -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="feed-name" class="form-control" formControlName="FEED_NAME"
+                       placeholder="Feed Name" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
+                <label for="feed-name"><i class="ri-box-3-line"></i>Feed Name <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submittedFeed && feedForm.get('FEED_NAME')?.invalid">
+                  <small *ngIf="feedForm.get('FEED_NAME')?.errors?.['required']">Feed name is required.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Reason -->
+            <div class="custom-form-group" *ngIf="FEED_ID != 0 && btnFeed == 'D'">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
+                       [(ngModel)]="feedDeleteReason" [ngModelOptions]="{standalone: true}" />
+                <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+              </div>
+              <div class="text-danger mt-1" *ngIf="submittedFeed && feedDeleteReason == ''">
+                <small>Delete reason is required.</small>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Modal Footer Buttons -->
+          <div class="modal-footer custom-modal-footer">
+            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+              <i class="ri-close-line"></i> Cancel
+            </button>
+            <button *ngIf="FEED_ID == 0 && btnFeed == ''" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-save-line"></i> Save
+            </button>
+            <button *ngIf="FEED_ID != 0 && btnFeed == 'E'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i> Edit Feed
+            </button>
+            <button *ngIf="FEED_ID != 0 && btnFeed == 'D'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-delete-bin-line"></i> Delete Feed
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

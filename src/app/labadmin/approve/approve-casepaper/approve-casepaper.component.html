@@ -1,46 +1,438 @@
-<div class="content-wrapper">
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <div class="card">
-            <div class="card overflow-hidden">
-                <h5 class="card-header">Approve New Page Case Papers</h5>
-                <div class="table-responsive text-nowrap">
-                    <table class="table table-dark">
-                        <thead>
-                            <tr>
-                                <th><span ><input type="checkbox" [(ngModel)]="masterSelected" (change)="toggleAllSelection()" /></span></th>
-                                <th> <span class="badge  bg-label-danger me-1">Trn. No</span></th>
-                                <th> <span class="badge  bg-label-danger me-1">Date</span></th>
-                                <th> <span class="badge  bg-label-danger me-1">Name</span></th>
-                                <th> <span class="badge  bg-label-danger me-1">Contact</span></th>
-                                <th> <span class="badge  bg-label-danger me-1">Crt By</span></th>
-                                <th> <span class="badge  bg-label-danger me-1">Status</span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                *ngFor="let row of data | paginate: { itemsPerPage: rowsPerPage, currentPage: currentPage }">
-                                <td><input type="checkbox" [(ngModel)]="row.selected" (change)="checkIfAllSelected()"/></td>
-                                <td>{{ row.trNo }}</td>
-                                <td>{{row.date}}</td>
-                                <td><span>{{ row.name }}</span></td>
-                                <td><span class="badge rounded-pill bg-label-gray me-1">{{ row.contact }}</span></td>
-                                <td><span>{{ row.createdBy }}</span>
-                                </td>
-                                <td><span class="badge rounded-pill bg-label-warning me-1">{{ row.status }}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
 
-                    <!-- Pagination Controls -->
-                    <pagination-controls (pageChange)="currentPage = $event" previousLabel="«" nextLabel="»" [maxSize]="5"
-                        [directionLinks]="true" [autoHide]="false"
-                        class="mt-3 d-flex justify-content-center"></pagination-controls>
-                </div>
+<!-- Inline Form (Visible when isCreatingNew is true) -->
+<div *ngIf="isCreatingNew" class="container-xxl flex-grow-1 mt-n6">
+  <div class="col-xxl">
+    <div class="card shadow mb-5 p-4 rounded-4 border-0" style="margin-top: 40px">
+      <div
+        class="card-header bg-light d-flex justify-content-between align-items-center rounded-3 px-4 py-3 mb-4 shadow-sm">
+        <h5 class="mb-0 text-dark fw-bold">
+          <i class="ri-file-list-3-line me-2 text-primary"></i> Case Paper
+        </h5>
+        <button
+          style="color: rgb(102, 3, 3); font-weight: bold; background-color: rgba(255, 0, 0, 0.05); border-radius: 50%; padding: 0.5rem;"
+          type="button" class="btn-close" aria-label="Close" (click)="isCreatingNew = false"></button>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Example placeholder -->
+        <form [formGroup]="data" (ngSubmit)="submit(data.value)">
+          <div class="row mb-4 align-items-center">
+            <!-- Home Collection -->
+            <div class="col-md-6 mb-3 d-flex align-items-center">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" [checked]="data.get('collectioN_TYPE')?.value === 1"
+                  (change)="onCollectionChange($event)" id="home-collection">
+                <label class="form-check-label text-dark ms-2" for="home-collection">
+                  Home Collection
+                </label>
+              </div>
             </div>
 
+            <!-- Date Picker -->
+            <div class="col-md-6 text-end">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="date" class="form-control shadow-sm" formControlName="date" id="date-input" required
+                  #dateField>
+                <label for="date"><i class="ri-calendar-line"></i>Date<span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('date')?.invalid">
+                  <small *ngIf="data.get('date')?.errors?.['required']">Date is required</small>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        </div>
+          <!-- Patient Name -->
+          <div class="form-floating form-floating-outline mb-4">
+            <input type="text" id="patient-name" class="form-control" placeholder="Patient Name"
+              formControlName="patienT_NAME" required #patientNameField />
+            <label for="patient-name"> <i class="ri-user-3-line"></i>Patient Name <span
+                class="text-danger">*</span></label>
+            <div class="text-danger mt-1" *ngIf="submitted && data.get('patienT_NAME')?.invalid">
+              <small *ngIf="data.get('patienT_NAME')?.errors?.['required']">Patient Name is required</small>
+            </div>
+          </div>
+
+          <div class="row mb-4 align-items-center">
+            <!-- Home Collection -->
+            <div class="col-md-6 ">
+              <div class="form-floating form-floating-outline mb-4">
+                <select class="form-select" id="gender" formControlName="gender" required #genderField>
+                  <option value="" disabled selected>Select Gender</option>
+                  <option value="male"><i class="ri-men-line"></i>Male</option>
+                  <option value="female"><i class="ri-women-line"></i>Female</option>
+                  <option value="other"><i class="ri-genderless-line"></i>Other</option>
+                </select>
+                <label for="gender">Gender <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('gender')?.invalid">
+                  <small *ngIf="data.get('gender')?.errors?.['required']">Gender is required</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Date Picker -->
+            <div class="col-md-6 text-end">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="tel" id="phone" class="form-control" placeholder="Phone Number" maxlength="10"
+                  formControlName="coN_NUMBER" #phoneField />
+                <label for="phone"><i class="ri-smartphone-line"></i> Phone Number <span
+                    class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && data.get('coN_NUMBER')?.invalid">
+                  <small *ngIf="data.get('coN_NUMBER')?.errors?.['required']">Phone number is required</small>
+                  <small *ngIf="data.get('coN_NUMBER')?.errors?.['pattern']">Enter valid 10-digit number</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="form-floating form-floating-outline mb-4">
+            <textarea class="form-control h-px-100" id="address" formControlName="address" placeholder="Address"
+              style="height: 113px;" #addressField></textarea>
+            <label for="address"><i class="ri-map-pin-line"></i>Address <span class="text-danger">*</span></label>
+            <div class="text-danger mt-1" *ngIf="submitted && data.get('address')?.invalid">
+              <small *ngIf="data.get('address')?.errors?.['required']">Address is required</small>
+            </div>
+          </div>
+
+          <!-- Date -->
+
+
+          <!-- Doctor Reference -->
+          <div class="form-floating form-floating-outline mb-4 position-relative">
+            <ng-select [items]="doctor" [searchFn]="customSearchFn" bindLabel="doctoR_NAME" bindValue="doctoR_CODE"
+              placeholder="Select doctor" [(ngModel)]="selectedDoctor" [clearable]="true" id="doctor-reference"
+              formControlName="doctoR_CODE" class="ng-select form-control ng-select-floating" #doctorField>
+            </ng-select>
+            <label for="doctor-reference" class="floating-label">
+              <i class="ri-user-star-line"></i> Doctor Reference <span class="text-danger">*</span>
+            </label>
+            <div class="text-danger mt-1" *ngIf="submitted && data.get('doctoR_CODE')?.invalid">
+              <small *ngIf="data.get('doctoR_CODE')?.errors?.['required']">Doctor selection is required</small>
+            </div>
+          </div>
+
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <!-- Blood Tests Table -->
+          <div class="card shadow-lg rounded-4 mt-5 mb-3 border-0" style="background: #fff; overflow: hidden;">
+            <div
+              class="card-header bg-gradient-primary text-white py-3 d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold text-white">
+                <i class="ri-flask-line me-2"></i>Blood Tests
+              </h5>
+              <span class="badge bg-white text-primary fs-6 px-3 py-2 rounded-pill">{{ matIs.length }}
+                Tests</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table align-middle mb-0 text-center">
+                <thead style="background: linear-gradient(90deg, #4b6cb7, #182848); color: white;">
+                  <tr>
+                    <th style="width: 5%;">Sr No</th>
+                    <th class="text-start ps-4" style="width: 45%;">Test Name</th>
+                    <th style="width: 15%;">Price (₹)</th>
+                    <th style="width: 15%;" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">Lab Price (₹)</th>
+                    <th style="width: 20%;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let data of matIs; let i = index" class="table-row-hover"
+                    style="transition: background-color 0.3s ease;">
+                    <td class=" text-secondary">{{ i + 1 }}</td>
+                    <td class="text-start ps-4 text-capitalize  text-dark"> {{ getTestNameByCode(data.tesT_CODE)
+                      }}</td>
+                    <td class="text-success ">₹ {{ data.price }}</td>
+                    <td *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'"><span class="badge bg-info bg-opacity-75 text-white">₹ {{ data.laB_PRICE }}</span></td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-danger rounded-pill align-items-center gap-1"
+                        (click)="removeTest(data.sR_NO)" aria-label="Delete Test" title="Delete Test">
+                        <i class="ri-delete-bin-6-line"></i> Delete
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="matIs.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4 fst-italic">No tests added yet.</td>
+                  </tr>
+                </tbody>
+                <tfoot class="table-light  text-dark">
+                  <tr>
+                    <td colspan="2" class="text-end pe-4">Total Amount</td>
+                    <td class="text-success">₹ {{ test_Amount }}</td>
+                    <td class="text-info" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">₹ {{ total_test_LabPrice }}</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Add Test -->
+          <div class="row mb-4 align-items-end">
+            <div class="col-sm-8 position-relative mb-2 mb-sm-0">
+              <label class="form-label fw-bold mb-2">Test Name</label>
+              <div class="input-group shadow-sm rounded">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="ri-test-tube-line text-primary"></i>
+                </span>
+                <input type="text" id="test-name" class="form-control border-start-0" placeholder="Enter test name..."
+                  [(ngModel)]="searchText" (input)="onSearchChange()" (focus)="onSearchChange()"
+                  (blur)="hideSuggestions()" [ngModelOptions]="{ standalone: true }" autocomplete="off" />
+              </div>
+
+              <ul *ngIf="showSuggestions && filteredTests.length > 0"
+                class="list-group position-absolute w-100 mt-1 shadow-sm z-3"
+                style="max-height: 240px; overflow-y: auto; border-radius: 0.375rem;background-color: white;">
+                <li *ngFor="let test of filteredTests" (mousedown)="selectTest(test.tesT_NAME)"
+                  class="list-group-item list-group-item-action" style="cursor: pointer;">
+                  {{ test.tesT_NAME }}
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-sm-4 mt-2 mt-sm-0">
+              <button type="button" (click)="add(searchText)" class="btn btn-primary w-100">ADD</button>
+            </div>
+          </div>
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <!-- Discount -->
+          <h4 class="section-heading mb-4"><i class="ri-discount-percent-line me-2"></i>Discount (%)</h4>
+
+          <div class="row mb-4">
+
+            <!-- Discount Percentage -->
+            <div class="col-12 mb-4">
+              <div class="form-floating form-floating-outline" style="max-width: 300px;">
+                <input type="number" class="form-control text-end" placeholder="e.g. 10" min="0" max="100"
+                  formControlName="discount" [(ngModel)]="dis" (input)="discount()" />
+                <label for="discount"><i class="ri-percent-line"></i> Discount (%) <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-floating form-floating-outline" style="max-width: 300px;">
+                <input type="number" class="form-control text-end" placeholder="₹0" min="0"
+                  [(ngModel)]="discount_Amount" [ngModelOptions]="{ standalone: true }" readonly />
+                <label for="discount_Amount"><i class="ri-coupon-2-line"></i> Discount Amount <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+          <!-- Collection -->
+          <h4 class="section-heading mb-4"><i class="ri-hand-coin-line me-2"></i>Collection</h4>
+
+          <div class="row mb-4" style="text-align: right;">
+
+            <!-- First input -->
+            <div class="col-sm-3 offset-sm-9 mb-4">
+              <div class="form-floating form-floating-outline">
+                <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_AMOUNT"
+                  [(ngModel)]="total_Amount" readonly />
+                <label for="totaL_AMOUNT"><i class="ri-wallet-3-line"></i> Total Amount <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+            <!-- Second input -->
+            <div class="col-sm-3 offset-sm-9" *ngIf="user.useR_LOGIN == 'LABADMIN' || user.lab_Admin == 'Y'">
+              <div class="form-floating form-floating-outline">
+                <input type="number" class="form-control text-end" placeholder="₹0" formControlName="totaL_PROFIT"
+                  [(ngModel)]="total_Lab_Profit" readonly />
+                <label for="totaL_PROFIT"><i class="ri-file-list-3-line"></i> Total Lab Profit <span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+
+          </div>
+
+
+          <hr style="border: 2px solid Black; margin: 50px 0;">
+
+
+          <!-- Payment Method -->
+          <h4 class="section-heading mb-4"><i class="ri-bank-card-line me-2"></i>Payment Method</h4>
+          <div class="mb-4">
+            <div class="form-check form-check-inline">
+              <input type="radio" name="paymenT_METHOD" formControlName="paymenT_METHOD" [value]="0" id="cash"
+                class="form-check-input" required />
+              <label for="cash" class="form-check-label">Cash</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="radio" name="paymenT_METHOD" formControlName="paymenT_METHOD" [value]="1" id="online"
+                class="form-check-input" />
+              <label for="online" class="form-check-label">Online</label>
+            </div>
+          </div>
+
+          <!-- Payment Amount -->
+          <div class="row mb-5">
+            <div class="col-sm-6">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="number" class="form-control text-end " placeholder="₹0" formControlName="paymenT_AMOUNT"
+                  (input)="onPaymentAmountChange()" required style="max-width: 300px;" />
+                <label for="paymenT_AMOUNT"><i class="ri-cash-line"></i>Payment Amount<span
+                    class="text-danger">*</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cancel Button -->
+          <div class="text-end">
+            <!-- Update Button -->
+            <button type="submit" class="btn btn-primary me-2 px-4 py-2 rounded-pill"
+              *ngIf="trn_no !== 0 && btn === 'E'">
+              Approve
+            </button>
+            <!-- Cancel Button -->
+            <button type="button" class="btn btn-danger px-4 py-2 rounded-pill" (click)="isCreatingNew = false">
+              Cancel
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Approve Confirmation Modal -->
+<div class="modal fade" id="approveConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm modal-md modal-lg">
+    <div class="modal-content rounded-3 shadow-lg">
+
+      <!-- Header -->
+      <div class="modal-header bg-success text-white border-0 py-2 px-3">
+        <h5 class="modal-title d-flex align-items-center mb-0 fs-6">
+          <i class="ri-check-line me-2 fs-5"></i> Confirm Approval
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body text-center py-4 px-3">
+        <i class="ri-checkbox-circle-fill fs-1 text-success"></i>
+        <h5 class="mt-3 fs-5 fw-semibold">Are you sure?</h5>
+        <p class="mt-2 text-muted small">
+          You are about to approve
+          <strong class="text-success">{{ selectedCases.length }}</strong>
+          case paper(s).
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer justify-content-center border-0 pb-3">
+        <button type="button" class="btn btn-secondary px-4 rounded-pill fw-medium" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-success px-4 rounded-pill fw-medium d-flex align-items-center"
+          (click)="executeApprove()" data-bs-dismiss="modal">
+          <i class="ri-check-line me-2"></i> Approve
+        </button>
+      </div>
 
     </div>
+  </div>
+</div>
 
+
+<!-- Case Paper List Table -->
+<div *ngIf="!isCreatingNew" class="container-xxl flex-grow-1 container-p-y mt-n9">
+  <div class="card" style="margin-top:30px;">
+    <h5 class="card-header d-flex justify-content-between align-items-center">
+      <span>Case Paper</span>
+      <div>
+        <button *ngIf="selectedCases.length > 0" class="btn btn-success me-2" (click)="approveSelected()">
+          <i class="ri-check-line me-1"></i> Approve Selected ({{selectedCases.length}})
+        </button>
+      </div>
+    </h5>
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="loadingMaterials" class="text-center my-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Table Content -->
+    <div *ngIf="!loadingMaterials">
+      <div class="table-responsive text-nowrap">
+        <table class="table">
+          <thead class="table-dark" style="--bs-table-bg: #8c57ff !important;">
+            <tr>
+              <th style="width: 5%;">
+                <input type="checkbox" [checked]="isAllSelected" (change)="toggleSelectAll($event)">
+              </th>
+              <th style="width: 5%;">Sr</th>
+              <th style="width: 15%;">Actions</th>
+              <th style="width: 10%;">Date</th>
+              <th style="width: 15%;">Name</th>
+              <th style="width: 12%;">Contact</th>
+              <th style="width: 12%;">Crt By</th>
+              <th style="width: 10%;">Status</th>
+              <th style="width: 16%;">Total Amount</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            <tr *ngFor="let case of filteredCases() | paginate: {
+              itemsPerPage: pageSize,
+              currentPage: page
+            }; let i = index">
+              <td>
+                <input type="checkbox" 
+                       [checked]="isSelected(case.trN_NO)" 
+                       (change)="toggleSelection(case.trN_NO, $event)">
+              </td>
+              <td>{{(page - 1) * pageSize + i + 1}}</td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a (click)="openInlineForm(case.trN_NO,'E')" class="btn btn-sm btn-info text-white"
+                    href="javascript:void(0);" title="View">
+                    <i class="ri-eye-line me-1"></i> View
+                  </a>
+                </div>
+              </td>
+              <td><span class="badge rounded-pill bg-label-primary me-1">{{ case.date | formattedDate:3 }}</span></td>
+              <td><strong>{{ case.patienT_NAME }}</strong></td>
+              <td><span class="badge bg-label-primary me-1">{{ case.coN_NUMBER }}</span></td>
+              <td><span>{{ case.crT_BY }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': case.paymenT_STATUS === 'COMPLETED',
+                  'bg-warning text-dark': case.paymenT_STATUS !== 'COMPLETED'
+                }">
+                  {{ case.paymenT_STATUS || 'PENDING' }}
+                </span>
+              </td>
+              <td>
+                <span class="fw-bold text-success">₹ {{ case.totaL_AMOUNT || 0 }}</span>
+              </td>
+            </tr>
+            <tr *ngIf="filteredCases().length === 0">
+              <td colspan="9" class="text-center text-muted py-4">
+                <i class="ri-inbox-line display-4 d-block mb-2"></i>
+                No pending case papers found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center p-3">
+        <div class="text-muted">
+          Showing {{(page - 1) * pageSize + 1}} to {{page * pageSize > filteredCases().length ? filteredCases().length : page * pageSize}} of {{filteredCases().length}} entries
+          <span *ngIf="selectedCases.length > 0" class="ms-3 text-primary">
+            • {{selectedCases.length}} selected
+          </span>
+        </div>
+        <pagination-controls (pageChange)="page = $event" [autoHide]="true"></pagination-controls>
+      </div>
+    </div>
+  </div>
 </div>

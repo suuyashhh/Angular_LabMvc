@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { ServicesService } from '../../shared/services.service';
 import { AuthService } from '../../shared/auth.service';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,7 +14,7 @@ import { AuthService } from '../../shared/auth.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
-user: any;
+  user: any;
 
   dashboardCount: any = {
     patienT_COUNT: 0,
@@ -21,17 +22,17 @@ user: any;
     pendinG_STATUS: 0,
     totaL_BILL: 0
   };
-  
+
   startDate!: string;
   endDate!: string;
   isLoading = true;
 
-  constructor(private api: ApiService, private service: ServicesService,private auth: AuthService) { }
+  constructor(private api: ApiService, private service: ServicesService, private auth: AuthService, private loader: LoaderService) { }
 
   ngOnInit(): void {
     // Set both start and end dates to today's date
     this.setTodayAsDateRange();
-    
+
     // Use setTimeout to ensure dates are properly bound before loading data
     setTimeout(() => {
       this.load();
@@ -47,7 +48,7 @@ user: any;
     const month = ('0' + (today.getMonth() + 1)).slice(-2);
     const day = ('0' + today.getDate()).slice(-2);
     const todayFormatted = `${year}-${month}-${day}`;
-    
+
     this.startDate = todayFormatted;
     this.endDate = todayFormatted;
   }
@@ -57,17 +58,16 @@ user: any;
   }
 
   load() {
-    // Validate dates before making API call
     if (!this.startDate || !this.endDate) {
       console.error('Start date or end date is missing');
       return;
     }
-    
+
     this.isLoading = true;
-    
+
     const formattedStartDate = this.service.formatDate(this.startDate, 1);
     const formattedEndDate = this.service.formatDate(this.endDate, 1);
-    
+
     console.log('Loading data with dates:', {
       startDate: this.startDate,
       endDate: this.endDate,
@@ -75,12 +75,15 @@ user: any;
       formattedEndDate
     });
 
+    this.loader.show();
+
     this.api.get('Home/Home/' + formattedStartDate + ',' + formattedEndDate)
       .subscribe({
         next: (res: any) => {
           this.dashboardCount = res;
           this.isLoading = false;
-          
+          this.loader.hide();
+
           // Animate counters after data loads
           setTimeout(() => {
             this.animateAllCounters();
@@ -89,6 +92,11 @@ user: any;
         error: (error) => {
           console.error('Error loading dashboard data:', error);
           this.isLoading = false;
+          // hide loader on error
+          this.loader.hide();
+        },
+        complete: () => {
+          this.loader.hide();
         }
       });
   }
@@ -98,7 +106,7 @@ user: any;
       startDate: this.startDate,
       endDate: this.endDate
     });
-    
+
     if (this.startDate && this.endDate) {
       this.load();
     }

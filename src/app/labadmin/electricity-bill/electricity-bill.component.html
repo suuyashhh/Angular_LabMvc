@@ -1,12 +1,14 @@
 <!-- Add Button -->
 <div class="container container-p-y">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ElcBillFormModal" (click)="clearData()">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ElcBillFormModal"
+    (click)="clearData()">
     Add Electricity Bill
   </button>
 </div>
 
 <!-- Modal -->
-<div class="modal fade custom-modal-fade" id="ElcBillFormModal" tabindex="-1" aria-labelledby="ElcBillFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="ElcBillFormModal" tabindex="-1" aria-labelledby="ElcBillFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -20,7 +22,8 @@
           <h5 class="modal-title custom-modal-title" *ngIf="ELC_TRN_ID == 0 && btn == ''">Add Electricity Bill</h5>
           <h5 class="modal-title custom-modal-title" *ngIf="ELC_TRN_ID != 0 && btn == 'E'">Edit Electricity Bill</h5>
           <h5 class="modal-title custom-modal-title" *ngIf="ELC_TRN_ID != 0 && btn == 'D'">Delete Electricity Bill</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="ELC_TRN_ID != 0 && btn == 'dtls'">Details Electricity Bill</h5>
+          <h5 class="modal-title custom-modal-title" *ngIf="ELC_TRN_ID != 0 && btn == 'dtls'">Details Electricity Bill
+          </h5>
         </div>
         <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -39,12 +42,21 @@
                 </div>
               </div>
             </div>
-
+            <!-- NOTE -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="text" id="note" class="form-control" formControlName="ELC_NOTE" placeholder="Note"
+                  rows="3" />
+                <label for="note"><i class="ri-chat-3-line"></i>Note <span class="text-danger">*</span></label>
+              </div>
+            </div>
             <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="elc-price" class="form-control" formControlName="ELC_PRICE" placeholder="Price" />
-                <label for="elc-price"><i class="ri-money-rupee-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <input type="number" id="elc-price" class="form-control" formControlName="ELC_PRICE"
+                  placeholder="Price" />
+                <label for="elc-price"><i class="ri-money-rupee-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && data.get('ELC_PRICE')?.invalid">
                   <small *ngIf="data.get('ELC_PRICE')?.errors?.['required']">Price is required.</small>
                   <small *ngIf="data.get('ELC_PRICE')?.errors?.['pattern']">Enter a valid number.</small>
@@ -57,7 +69,8 @@
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="elcDeleteReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="Reason" [ngModelOptions]="{standalone: true}" />
-                <label for="elcDeleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                <label for="elcDeleteReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                    class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1" *ngIf="submitted && btn == 'D' && Reason == ''">
                 <small>Delete reason is required.</small>
@@ -111,6 +124,7 @@
             <tr>
               <th>Actions</th>
               <th>Date</th>
+              <th>Note</th>
               <th>Price</th>
             </tr>
           </thead>
@@ -129,6 +143,9 @@
               <td>
                 <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#ElcBillFormModal"
                   (click)="getDataById(_objEB.elC_TRN_ID, 'dtls')">{{ _objEB.date | formattedDate:3 }}</a>
+              </td>
+              <td>
+                <span class="badge rounded-pill bg-label-primary me-1"> {{ _objEB.elC_NOTE }}</span>
               </td>
               <td>
                 <span class="badge rounded-pill bg-label-primary me-1">₹ {{ _objEB.elC_PRICE }}</span>
