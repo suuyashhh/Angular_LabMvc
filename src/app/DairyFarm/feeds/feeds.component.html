@@ -16,12 +16,10 @@
     <!-- Actions + Search -->
     <div class="bg-white rounded-2xl shadow-sm p-4">
       <div class="flex flex-col lg:flex-row items-center gap-4">
-
         <div class="flex gap-3">
           <button type="button"
                   class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
-                  (click)="clearFeedData()"
-                  data-bs-toggle="modal" data-bs-target="#feedFormModal">
+                  (click)="openAddModal()">
             <i class="ri-add-box-fill"></i> Add Feed
           </button>
         </div>
@@ -41,12 +39,11 @@
             </span>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- Feeds Grid -->
-    <section class="bg-white rounded-2xl shadow-sm p-6">
+    <section >
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-medium text-green-800">Feed History</h2>
         <div class="text-sm text-green-600">Total: {{ feeds.length || 0 }}</div>
@@ -58,67 +55,66 @@
 
       <div *ngIf="!loadingFeeds">
         <!-- Table on md+ -->
-        <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="hidden md:block overflow-x-auto">
-          <table class="w-full table-auto text-left border-collapse">
-            <thead class="bg-green-600 text-white">
-              <tr>
-                <th class="px-4 py-3">Feed Name</th>
-                <th class="px-4 py-3">Price</th>
-                <th class="px-4 py-3">Qty</th>
-                <th class="px-4 py-3">Date</th>
-                <th class="px-4 py-3 w-44">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 text-gray-800">
-              <tr *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
-                  class="hover:bg-green-50">
-                <td class="px-4 py-3">
-                  <div class="font-medium text-green-800">{{ getFeedName(f) }}</div>
-                </td>
-                <td class="px-4 py-3">{{ f.price }}</td>
-                <td class="px-4 py-3">{{ f.quantity }}</td>
-                <td class="px-4 py-3 text-sm text-green-600">{{ formatDateDisplay(f.date) }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex gap-2">
-                    <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm"
-                            (click)="getFeedById(getFeedId(f), 'E')"
-                            data-bs-toggle="modal" data-bs-target="#feedFormModal">Edit</button>
-                    <button class="px-3 py-1 rounded bg-red-50 text-red-600 text-sm"
-                            (click)="getFeedById(getFeedId(f), 'D')"
-                            data-bs-toggle="modal" data-bs-target="#feedFormModal">Delete</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="mt-4 flex justify-center">
-            <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
+       <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="space-y-3">
+            <div *ngFor="let f of filteredFeeds"
+              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+              <!-- Image -->
+              <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                <img class="w-full h-full object-cover"
+                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
+              </div>
+              
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="text-green-800 font-medium truncate">{{ f.feed_name }}</div>
+              <div class="text-xs text-green-500 mt-1">Price: {{ f.price }} | Qty: {{ f.quantity }}</div>
+              <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(f.date) }}</div>
+              </div>
+              
+              <!-- Actions Dropdown -->
+              <div class="dropdown flex-shrink-0">
+                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
+                  type="button" id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                  (click)="$event.stopPropagation()">
+                  <span>Actions</span>
+                </button>
+                <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
+                  [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
+                  <li>
+                    <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
+                      href="javascript:void(0);" (click)="openEditModal(f)" data-bs-toggle="modal"
+                      data-bs-target="#feedFormModal">
+                      <i class="ri-edit-line text-sm"></i> Edit
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
+                      href="javascript:void(0);" (click)="openDeleteModal(f)" data-bs-toggle="modal"
+                      data-bs-target="#feedFormModal">
+                      <i class="ri-delete-bin-line text-sm"></i> Delete
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </div>
 
         <!-- Mobile: cards -->
         <div *ngIf="feeds && feeds.length > 0" class="space-y-3 md:hidden">
-          <div *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
+          <div *ngFor="let f of filteredFeeds"
                class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center justify-between">
             <div>
-              <div class="text-green-800 font-medium">{{ getFeedName(f) }}</div>
+              <div class="text-green-800 font-medium">{{ f.feed_name }}</div>
               <div class="text-xs text-green-500 mt-1">Price: {{ f.price }} | Qty: {{ f.quantity }}</div>
               <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(f.date) }}</div>
             </div>
 
             <div class="flex flex-col gap-2">
               <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm"
-                      (click)="getFeedById(getFeedId(f), 'E')"
-                      data-bs-toggle="modal" data-bs-target="#feedFormModal">Edit</button>
+                      (click)="openEditModal(f)">Edit</button>
               <button class="px-3 py-1 rounded bg-red-50 text-red-600 text-sm"
-                      (click)="getFeedById(getFeedId(f), 'D')"
-                      data-bs-toggle="modal" data-bs-target="#feedFormModal">Delete</button>
+                      (click)="openDeleteModal(f)">Delete</button>
             </div>
-          </div>
-
-          <div class="mt-4 flex justify-center">
-            <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
           </div>
         </div>
 
@@ -133,21 +129,22 @@
 </main>
 
 <!-- Feed Modal -->
-<div class="modal fade custom-modal-fade" id="feedFormModal" tabindex="-1" aria-labelledby="feedFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" #feedModal tabindex="-1" aria-labelledby="feedFormModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
         <div class="modal-title-wrapper">
           <div class="modal-icon">
-            <i class="ri-file-add-line" *ngIf="FEED_ID == 0 && btnFeed == ''"></i>
-            <i class="ri-edit-line" *ngIf="FEED_ID != 0 && btnFeed == 'E'"></i>
-            <i class="ri-delete-bin-line" *ngIf="FEED_ID != 0 && btnFeed == 'D'"></i>
+            <i class="ri-file-add-line" *ngIf="modalMode === 'add'"></i>
+            <i class="ri-edit-line" *ngIf="modalMode === 'edit'"></i>
+            <i class="ri-delete-bin-line" *ngIf="modalMode === 'delete'"></i>
           </div>
-          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID == 0 && btnFeed == ''">Add Feed</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID != 0 && btnFeed == 'E'">Edit Feed</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID != 0 && btnFeed == 'D'">Delete Feed</h5>
+          <h5 class="modal-title custom-modal-title">
+            {{ modalMode === 'add' ? 'Add Feed' : 
+               modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
+          </h5>
         </div>
-        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
       </div>
 
       <div class="modal-body custom-modal-body">
@@ -157,22 +154,23 @@
             <!-- Date -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="date" id="feed-date" class="form-control" formControlName="DATE"
-                       placeholder="Date" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
+                <input type="date" id="feed-date" class="form-control" formControlName="date"
+                       placeholder="Date" [readonly]="modalMode === 'delete'" />
                 <label for="feed-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submittedFeed && feedForm.get('DATE')?.invalid">
-                  <small *ngIf="feedForm.get('DATE')?.errors?.['required']">Date is required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('date')?.invalid">
+                  <small *ngIf="feedForm.get('date')?.errors?.['required']">Date is required.</small>
                 </div>
               </div>
             </div>
+
             <!-- Feed Name -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="feed-name" class="form-control" formControlName="FEED_NAME"
-                       placeholder="Feed Name" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
+                <input type="text" id="feed-name" class="form-control" formControlName="feed_name"
+                       placeholder="Feed Name" [readonly]="modalMode === 'delete'" />
                 <label for="feed-name"><i class="ri-box-3-line"></i>Feed Name <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submittedFeed && feedForm.get('FEED_NAME')?.invalid">
-                  <small *ngIf="feedForm.get('FEED_NAME')?.errors?.['required']">Feed name is required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('feed_name')?.invalid">
+                  <small *ngIf="feedForm.get('feed_name')?.errors?.['required']">Feed name is required.</small>
                 </div>
               </div>
             </div>
@@ -180,11 +178,12 @@
             <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="feed-price" class="form-control" formControlName="PRICE"
-                       placeholder="Price" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
+                <input type="number" id="feed-price" class="form-control" formControlName="price"
+                       placeholder="Price" [readonly]="modalMode === 'delete'" />
                 <label for="feed-price"><i class="ri-money-dollar-circle-line"></i>Price <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submittedFeed && feedForm.get('PRICE')?.invalid">
-                  <small *ngIf="feedForm.get('PRICE')?.errors?.['required']">Price is required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('price')?.invalid">
+                  <small *ngIf="feedForm.get('price')?.errors?.['required']">Price is required.</small>
+                  <small *ngIf="feedForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
                 </div>
               </div>
             </div>
@@ -192,23 +191,24 @@
             <!-- Quantity -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="feed-qty" class="form-control" formControlName="QUANTITY"
-                       placeholder="Quantity" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
+                <input type="number" id="feed-qty" class="form-control" formControlName="quantity"
+                       placeholder="Quantity" [readonly]="modalMode === 'delete'" />
                 <label for="feed-qty"><i class="ri-stack-line"></i>Quantity <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submittedFeed && feedForm.get('QUANTITY')?.invalid">
-                  <small *ngIf="feedForm.get('QUANTITY')?.errors?.['required']">Quantity is required.</small>
+                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('quantity')?.invalid">
+                  <small *ngIf="feedForm.get('quantity')?.errors?.['required']">Quantity is required.</small>
+                  <small *ngIf="feedForm.get('quantity')?.errors?.['min']">Quantity must be at least 1.</small>
                 </div>
               </div>
             </div>
 
             <!-- Delete Reason -->
-            <div class="custom-form-group" *ngIf="FEED_ID != 0 && btnFeed == 'D'">
+            <div class="custom-form-group" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
-                       [(ngModel)]="feedDeleteReason" [ngModelOptions]="{standalone: true}" />
+                       [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" />
                 <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
               </div>
-              <div class="text-danger mt-1" *ngIf="submittedFeed && feedDeleteReason == ''">
+              <div class="text-danger mt-1" *ngIf="submitted && !deleteReason">
                 <small>Delete reason is required.</small>
               </div>
             </div>
@@ -217,17 +217,17 @@
 
           <!-- Modal Footer Buttons -->
           <div class="modal-footer custom-modal-footer">
-            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+            <button type="button" class="custom-btn custom-btn-cancel" (click)="closeModal()">
               <i class="ri-close-line"></i> Cancel
             </button>
-            <button *ngIf="FEED_ID == 0 && btnFeed == ''" type="submit" class="custom-btn custom-btn-save">
+            <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save">
               <i class="ri-save-line"></i> Save
             </button>
-            <button *ngIf="FEED_ID != 0 && btnFeed == 'E'" type="submit" class="custom-btn custom-btn-save">
-              <i class="ri-edit-line"></i> Edit Feed
+            <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save">
+              <i class="ri-edit-line"></i> Update
             </button>
-            <button *ngIf="FEED_ID != 0 && btnFeed == 'D'" type="submit" class="custom-btn custom-btn-save">
-              <i class="ri-delete-bin-line"></i> Delete Feed
+            <button *ngIf="modalMode === 'delete'" type="submit" class="custom-btn custom-btn-delete">
+              <i class="ri-delete-bin-line"></i> Delete
             </button>
           </div>
         </form>

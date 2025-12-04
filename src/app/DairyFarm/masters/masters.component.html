@@ -54,84 +54,44 @@
         </div>
 
         <div *ngIf="!loadingAnimals">
-          <!-- Table on md+ -->
-          <div *ngIf="animals && animals.length > 0; else noCattleData" class="hidden md:block overflow-x-auto">
-            <table class="w-full table-auto text-left border-collapse">
-              <thead class="bg-green-600 text-white">
-                <tr>
-                  <th class="px-4 py-3">Image</th>
-                  <th class="px-4 py-3">Name</th>
-                  <th class="px-4 py-3 w-44">Info</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100 text-gray-800">
-                <tr *ngFor="let a of filteredAnimals()" class="hover:bg-green-50">
-                  <td class="px-4 py-3">
-                    <div class="w-10 h-10 rounded-lg overflow-hidden">
-                      <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
-                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yMCAxN0MyMi43NjE0IDE3IDI1IDE0Ljc2MTQgMjUgMTJDMjUgOS4yMzg1OCAyMi43NjE0IDcgMjAgN0MxNy4yMzg2IDcgMTUgOS4yMzg1OCAxNSAxMkMxNSAxNC43NjE0IDE3LjIzODYgMTcgMjAgMTdaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEwLjUgMzJDMTEuMzI4NCAzMiAxMiAzMS4zMjg0IDEyIDMwLjVDMTIgMjkuNjcxNiAxMS4zMjg0IDI5IDEwLjUgMjlDOS42NzE1NyAyOSA5IDI5LjY3MTYgOSAzMC41QzkgMzEuMzI4NCA5LjY3MTU3IDMyIDEwLjUgMzJaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTI4IDMyQzI4IDI2LjQ3NzIgMjQuNzQ2NyAyMiAyMC41IDIyQzE2LjI1MzMgMjIgMTMgMjYuNDc3MiAxMyAzMkgyOFoiIGZpbGw9IiMwREI2NkYiLz48L3N2Zz4='">
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="dropdown w-full">
-                      <button class="w-full text-left flex items-center justify-between dropdown-toggle" type="button"
-                        id="animalDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown" aria-expanded="false"
-                        (click)="$event.stopPropagation()">
-                        <div>
-                          <div class="font-medium text-green-800">{{ getAnimalName(a) }}</div>
-                        </div>
-                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                          viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      <ul class="dropdown-menu p-1" [attr.aria-labelledby]="'animalDropdown' + getAnimalId(a)">
-                        <li>
-                          <a class="dropdown-item text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                            href="javascript:void(0);" (click)="getAnimalById(getAnimalId(a), 'E')"
-                            data-bs-toggle="modal" data-bs-target="#cattleFormModal">Edit</a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                            href="javascript:void(0);" (click)="getAnimalById(getAnimalId(a), 'D')"
-                            data-bs-toggle="modal" data-bs-target="#cattleFormModal">Delete</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3 text-sm text-green-600">ID: {{ getAnimalId(a) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Mobile: cards -->
-          <div *ngIf="animals && animals.length > 0" class="space-y-3 md:hidden">
+          <!-- Card layout for ALL screen sizes -->
+          <div *ngIf="animals && animals.length > 0; else noCattleData" class="space-y-3">
             <div *ngFor="let a of filteredAnimals()"
-              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
+              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+              <!-- Image -->
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                 <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
                   onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yNCAyMEMyOC40MTgzIDIwIDMyIDE2LjQxODMgMzIgMTJDMzIgNy41ODE3MiAyOC40MTgzIDQgMjQgNEMxOS41ODE3IDQgMTYgNy41ODE3MiAxNiAxMkMxNiAxNi40MTgzIDE5LjU4MTcgMjAgMjQgMjBaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEyLjUgMzhDMTMuODgwNyAzOCAxNSAzNi44ODA3IDE1IDM1LjVDMTUgMzQuMTE5MyAxMy44ODA3IDMzIDEyLjUgMzNDMTEuMTE5MyAzMyAxMCAzNC4xMTkzIDEwIDM1LjVDMTAgMzYuODgwNyAxMS4xMTkzIDM4IDEyLjUgMzhaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTM0IDM4QzM0IDMxLjM3MjYgMjkuNjk2IDI2IDI0LjUgMjZDMTkuMzA0IDI2IDE1IDMxLjM3MjYgMTUgMzhIMzRaIiBmaWxsPSIjMERCNjZGIi8+PC9zdmc+'">
               </div>
-              <div class="flex-1">
-                <div class="text-green-800 font-medium">{{ getAnimalName(a) }}</div>
+              
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="text-green-800 font-medium truncate">{{ getAnimalName(a) }}</div>
                 <div class="text-xs text-green-500 mt-1">ID: {{ getAnimalId(a) }}</div>
               </div>
-              <div class="dropdown">
-                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle" type="button"
-                  id="animalCardDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown" aria-expanded="false">
-                  Actions
+              
+              <!-- Actions Dropdown -->
+              <div class="dropdown flex-shrink-0">
+                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
+                  type="button" id="animalCardDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                  (click)="$event.stopPropagation()">
+                  <span>Actions</span>                  
                 </button>
-                <ul class="dropdown-menu" [attr.aria-labelledby]="'animalCardDropdown' + getAnimalId(a)">
+                <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
+                  [attr.aria-labelledby]="'animalCardDropdown' + getAnimalId(a)">
                   <li>
-                    <a class="dropdown-item text-green-700" href="javascript:void(0);"
-                      (click)="getAnimalById(getAnimalId(a), 'E')" data-bs-toggle="modal"
-                      data-bs-target="#cattleFormModal">Edit</a>
+                    <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
+                      href="javascript:void(0);" (click)="getAnimalById(getAnimalId(a), 'E')" data-bs-toggle="modal"
+                      data-bs-target="#cattleFormModal">
+                      <i class="ri-edit-line text-sm"></i> Edit
+                    </a>
                   </li>
                   <li>
-                    <a class="dropdown-item text-red-600" href="javascript:void(0);"
-                      (click)="getAnimalById(getAnimalId(a), 'D')" data-bs-toggle="modal"
-                      data-bs-target="#cattleFormModal">Delete</a>
+                    <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
+                      href="javascript:void(0);" (click)="getAnimalById(getAnimalId(a), 'D')" data-bs-toggle="modal"
+                      data-bs-target="#cattleFormModal">
+                      <i class="ri-delete-bin-line text-sm"></i> Delete
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -139,14 +99,13 @@
           </div>
 
           <ng-template #noCattleData>
-            <div class="text-center py-4">
+            <div class="text-center py-8 border-2 border-dashed border-green-200 rounded-lg bg-white">
+              <i class="ri-cow-line text-4xl text-green-300 mb-3"></i>
               <p class="text-sm text-green-600">No cattle records found.</p>
             </div>
           </ng-template>
         </div>
       </section>
-
-      <div class="w-full h-3 my-4" style="background: #8b5cf6;"></div>
 
       <!-- FEED -->
       <section>
@@ -161,84 +120,44 @@
         </div>
 
         <div *ngIf="!loadingFeeds">
-          <!-- Table on md+ -->
-          <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="hidden md:block overflow-x-auto">
-            <table class="w-full table-auto text-left border-collapse">
-              <thead class="bg-green-600 text-white">
-                <tr>
-                  <th class="px-4 py-3">Image</th>
-                  <th class="px-4 py-3">Name</th>
-                  <th class="px-4 py-3 w-44">Info</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100 text-gray-800">
-                <tr *ngFor="let f of filteredFeeds()" class="hover:bg-green-50">
-                  <td class="px-4 py-3">
-                    <div class="w-10 h-10 rounded-lg overflow-hidden">
-                      <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
-                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xMyAxOUMxMyAyMi4zMDg2IDE1LjY5MTQgMjUgMTguNSAyNUMyMS4zMDg2IDI1IDI0IDIyLjMwODYgMjQgMTlDMjQgMTUuNjkxNCAyMS4zMDg2IDEzIDE4LjUgMTNDMTUuNjkxNCAxMyAxMyAxNS42OTE0IDEzIDE5WiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0yMiAyNkMyMiAyNC4zNDMxIDIwLjY1NjkgMjMgMTkgMjNDMTcuMzQzMSAyMyAxNiAyNC4zNDMxIDE2IDI2SDIyWiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0xOCAyOEMyMy41MjI4IDI4IDI4IDIzLjUyMjggMjggMThDMjggMTIuNDc3MiAyMy41MjI4IDggMTggOEMxMi40NzcyIDggOCAxMi40NzcyIDggMThDOCAyMy41MjI4IDEyLjQ3NzIgMjggMTggMjhaIiBzdHJva2U9IiM1OUEwMjciIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg=='">
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="dropdown w-full">
-                      <button class="w-full text-left flex items-center justify-between dropdown-toggle" type="button"
-                        id="feedDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
-                        (click)="$event.stopPropagation()">
-                        <div>
-                          <div class="font-medium text-green-800">{{ getFeedName(f) }}</div>
-                        </div>
-                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                          viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      <ul class="dropdown-menu p-1" [attr.aria-labelledby]="'feedDropdown' + getFeedId(f)">
-                        <li>
-                          <a class="dropdown-item text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                            href="javascript:void(0);" (click)="getFeedById(getFeedId(f), 'E')" data-bs-toggle="modal"
-                            data-bs-target="#feedFormModal">Edit</a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                            href="javascript:void(0);" (click)="getFeedById(getFeedId(f), 'D')" data-bs-toggle="modal"
-                            data-bs-target="#feedFormModal">Delete</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3 text-sm text-green-600">ID: {{ getFeedId(f) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Mobile: cards -->
-          <div *ngIf="feeds && feeds.length > 0" class="space-y-3 md:hidden">
+          <!-- Card layout for ALL screen sizes -->
+          <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="space-y-3">
             <div *ngFor="let f of filteredFeeds()"
-              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
+              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+              <!-- Image -->
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                 <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
                   onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
               </div>
-              <div class="flex-1">
-                <div class="text-green-800 font-medium">{{ getFeedName(f) }}</div>
+              
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="text-green-800 font-medium truncate">{{ getFeedName(f) }}</div>
                 <div class="text-xs text-green-500 mt-1">ID: {{ getFeedId(f) }}</div>
               </div>
-              <div class="dropdown">
-                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle" type="button"
-                  id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false">
-                  Actions
+              
+              <!-- Actions Dropdown -->
+              <div class="dropdown flex-shrink-0">
+                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
+                  type="button" id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                  (click)="$event.stopPropagation()">
+                  <span>Actions</span>
                 </button>
-                <ul class="dropdown-menu" [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
+                <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
+                  [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
                   <li>
-                    <a class="dropdown-item text-green-700" href="javascript:void(0);"
-                      (click)="getFeedById(getFeedId(f), 'E')" data-bs-toggle="modal"
-                      data-bs-target="#feedFormModal">Edit</a>
+                    <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
+                      href="javascript:void(0);" (click)="getFeedById(getFeedId(f), 'E')" data-bs-toggle="modal"
+                      data-bs-target="#feedFormModal">
+                      <i class="ri-edit-line text-sm"></i> Edit
+                    </a>
                   </li>
                   <li>
-                    <a class="dropdown-item text-red-600" href="javascript:void(0);"
-                      (click)="getFeedById(getFeedId(f), 'D')" data-bs-toggle="modal"
-                      data-bs-target="#feedFormModal">Delete</a>
+                    <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
+                      href="javascript:void(0);" (click)="getFeedById(getFeedId(f), 'D')" data-bs-toggle="modal"
+                      data-bs-target="#feedFormModal">
+                      <i class="ri-delete-bin-line text-sm"></i> Delete
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -246,7 +165,8 @@
           </div>
 
           <ng-template #noFeedData>
-            <div class="text-center py-4">
+            <div class="text-center py-8 border-2 border-dashed border-green-200 rounded-lg bg-white">
+              <i class="ri-bowl-line text-4xl text-green-300 mb-3"></i>
               <p class="text-sm text-green-600">No feed records found.</p>
             </div>
           </ng-template>
@@ -359,7 +279,7 @@
                     <img [src]="animalImagePreview || getAnimalImage(currentAnimal)" alt="Cattle Image Preview"
                       class="w-full h-full object-contain p-2"
                       *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')"
-                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgdmlld0Cb3g9IjAgMCAyNDAgMjQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIiByeD0iMTIiIGZpbGw9IiNGRkYiIHN0cm9rZT0iI0RFRURFRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTEyMCA4MEMxNDUuMjI4IDgwIDE2NiAxMDAuNzcyIDE2NiAxMjZDMTY2IDE1MS4yMjggMTQ1LjIyOCAxNzIgMTIwIDE3MkM5NC43NzI0IDE3MiA3NCAxNTEuMjI4IDc0IDEyNkM3NCAxMDAuNzcyIDk0Ljc3MjQgODAgMTIwIDgwWiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik02MyAxOThDNjYuMzEzNyAxOTggNjkgMTk1LjMxMzcgNjkgMTkyQzY5IDE4OC42ODYzIDY2LjMxMzcgMTg2IDYzIDE4NkM1OS42ODYzIDE4NiA1NyAxODguNjg2MyA1NyAxOTJDNTcgMTk1LjMxMzcgNTkuNjg2MyAxOTggNjMgMTk4WiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik0xNjggMTk4QzE2OCAxNzcuOTA2IDE1MS45NjMgMTYyIDEzMiAxNjJDMTEyLjAzNyAxNjIgOTYgMTc3LjkwNiA5NiAxOThIMTY4WiIgZmlsbD0iIzBEQjY2RiIvPjwvc3ZnPg=='">
+                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgdmlld0Cb3g9IjAgMCAyNDAgMjQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIiByeD0iMTIiIGZpbGw9IiNGRkYiIHN0cm9rZT0iI0RFRURFRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTEyMCA4MEMxNDUuMjI4IDgwIDE2NiAxMDAuNzcyIDE2NiAxMjZDMTY2IDE1MS4yMjggMTQ1LjIyOCAxNzIgMTIwIDE3MkM5NC43NzI0IDE3IgA3NCAxNTEuMjI4IDc0IDEyNkM3NCAxMDAuNzcyIDk0Ljc3MjQgODAgMTIwIDgwWiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik02MyAxOThDNjYuMzEzNyAxOTggNjkgMTk1LjMxMzcgNjkgMTkyQzY5IDE4OC42ODYzIDY2LjMxMzcgMTg2IDYzIDE4NkM1OS42ODYzIDE4NiA1NyAxODguNjg2MyA1NyAxOTJDNTcgMTk1LjMxMzcgNTkuNjg2MyAxOTggNjMgMTk4WiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik0xNjggMTk4QzE2OCAxNzcuOTA2IDE1MS45NjMgMTYyIDEzMiAxNjJDMTEyLjAzNyAxNjIgOTYgMTc3LjkwNiA5NiAxOThIMTY4WiIgZmlsbD0iIzBEQjY2RiIvPjwvc3ZnPg=='">
                     <div *ngIf="!animalImagePreview && (!currentAnimal || !getAnimalImage(currentAnimal))"
                       class="flex flex-col items-center justify-center w-full h-full text-green-400">
                       <i class="ri-image-line text-4xl mb-3"></i>
