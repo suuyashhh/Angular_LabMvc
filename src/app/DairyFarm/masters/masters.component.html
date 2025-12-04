@@ -65,8 +65,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-gray-800">
-                <tr *ngFor="let a of filteredAnimals() | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }"
-                  class="hover:bg-green-50">
+                <tr *ngFor="let a of filteredAnimals()" class="hover:bg-green-50">
                   <td class="px-4 py-3">
                     <div class="w-10 h-10 rounded-lg overflow-hidden">
                       <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
@@ -104,14 +103,11 @@
                 </tr>
               </tbody>
             </table>
-            <div class="mt-4 flex justify-center">
-              <pagination-controls (pageChange)="pageAnimal = $event" [autoHide]="true"></pagination-controls>
-            </div>
           </div>
 
           <!-- Mobile: cards -->
           <div *ngIf="animals && animals.length > 0" class="space-y-3 md:hidden">
-            <div *ngFor="let a of filteredAnimals() | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }"
+            <div *ngFor="let a of filteredAnimals()"
               class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                 <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
@@ -139,9 +135,6 @@
                   </li>
                 </ul>
               </div>
-            </div>
-            <div class="mt-4 flex justify-center">
-              <pagination-controls (pageChange)="pageAnimal = $event" [autoHide]="true"></pagination-controls>
             </div>
           </div>
 
@@ -179,8 +172,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100 text-gray-800">
-                <tr *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
-                  class="hover:bg-green-50">
+                <tr *ngFor="let f of filteredFeeds()" class="hover:bg-green-50">
                   <td class="px-4 py-3">
                     <div class="w-10 h-10 rounded-lg overflow-hidden">
                       <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
@@ -218,14 +210,11 @@
                 </tr>
               </tbody>
             </table>
-            <div class="mt-4 flex justify-center">
-              <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
-            </div>
           </div>
 
           <!-- Mobile: cards -->
           <div *ngIf="feeds && feeds.length > 0" class="space-y-3 md:hidden">
-            <div *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
+            <div *ngFor="let f of filteredFeeds()"
               class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                 <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
@@ -253,9 +242,6 @@
                   </li>
                 </ul>
               </div>
-            </div>
-            <div class="mt-4 flex justify-center">
-              <pagination-controls (pageChange)="pageFeed = $event" [autoHide]="true"></pagination-controls>
             </div>
           </div>
 
@@ -314,20 +300,36 @@
                 </label>
                 <div class="mt-1">
                   <input type="file" id="animalImage" accept="image/*" (change)="onAnimalImageSelect($event)"
-                    [disabled]="ANIMAL_ID != 0 && btnAnimal == 'D'" class="hidden" />
+                    [disabled]="ANIMAL_ID != 0 && btnAnimal == 'D' || compressingImage" class="hidden" />
                   <label for="animalImage"
-                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
+                    [class.opacity-50]="compressingImage" [class.cursor-not-allowed]="compressingImage">
                     <div class="text-center">
-                      <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2"></i>
-                      <p class="text-sm text-green-600">
+                      <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2" *ngIf="!compressingImage"></i>
+                      <div
+                        class="inline-block animate-spin rounded-full border-2 border-green-200 border-t-green-600 h-6 w-6 mb-2"
+                        *ngIf="compressingImage"></div>
+                      <p class="text-sm text-green-600" *ngIf="!compressingImage">
                         <span class="font-medium">Click to upload</span> or drag and drop
                       </p>
-                      <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 5MB</p>
+                      <p class="text-sm text-green-600" *ngIf="compressingImage">
+                        Compressing image...
+                      </p>
+                      <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 10MB (Will be compressed to 1MB)</p>
                     </div>
                   </label>
                 </div>
                 <div class="text-danger mt-1" *ngIf="submittedAnimal && animalImageError">
                   <small>{{ animalImageError }}</small>
+                </div>
+                <div class="text-xs text-green-600 mt-1 flex items-center gap-1"
+                  *ngIf="animalImageSize && !compressingImage">
+                  <i class="ri-information-line"></i>
+                  <span>{{ animalImageSize }}</span>
+                </div>
+                <div class="text-xs text-yellow-600 mt-1 flex items-center gap-1" *ngIf="compressingImage">
+                  <i class="ri-loader-4-line animate-spin"></i>
+                  <span>Compressing image to 1MB...</span>
                 </div>
               </div>
 
@@ -371,7 +373,7 @@
                   </div>
                   <div class="text-xs text-green-500 mt-2 text-center"
                     *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')">
-                    Image will be saved in Base64 format
+                    (compressed to max 1MB)
                   </div>
                 </div>
               </div>
@@ -443,20 +445,36 @@
                 </label>
                 <div class="mt-1">
                   <input type="file" id="feedImage" accept="image/*" (change)="onFeedImageSelect($event)"
-                    [disabled]="FEED_ID != 0 && btnFeed == 'D'" class="hidden" />
+                    [disabled]="FEED_ID != 0 && btnFeed == 'D' || compressingImage" class="hidden" />
                   <label for="feedImage"
-                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
+                    [class.opacity-50]="compressingImage" [class.cursor-not-allowed]="compressingImage">
                     <div class="text-center">
-                      <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2"></i>
-                      <p class="text-sm text-green-600">
+                      <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2" *ngIf="!compressingImage"></i>
+                      <div
+                        class="inline-block animate-spin rounded-full border-2 border-green-200 border-t-green-600 h-6 w-6 mb-2"
+                        *ngIf="compressingImage"></div>
+                      <p class="text-sm text-green-600" *ngIf="!compressingImage">
                         <span class="font-medium">Click to upload</span> or drag and drop
                       </p>
-                      <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 5MB</p>
+                      <p class="text-sm text-green-600" *ngIf="compressingImage">
+                        Compressing image...
+                      </p>
+                      <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 10MB (Will be compressed to 1MB)</p>
                     </div>
                   </label>
                 </div>
                 <div class="text-danger mt-1" *ngIf="submittedFeed && feedImageError">
                   <small>{{ feedImageError }}</small>
+                </div>
+                <div class="text-xs text-green-600 mt-1 flex items-center gap-1"
+                  *ngIf="feedImageSize && !compressingImage">
+                  <i class="ri-information-line"></i>
+                  <span>{{ feedImageSize }}</span>
+                </div>
+                <div class="text-xs text-yellow-600 mt-1 flex items-center gap-1" *ngIf="compressingImage">
+                  <i class="ri-loader-4-line animate-spin"></i>
+                  <span>Compressing image to 1MB...</span>
                 </div>
               </div>
 
@@ -500,7 +518,7 @@
                   </div>
                   <div class="text-xs text-green-500 mt-2 text-center"
                     *ngIf="feedImagePreview || (currentFeed && getFeedImage(currentFeed) !== '')">
-                    Image will be saved in Base64 format
+                    Image will be compressed and saved in Base64 format (max 1MB)
                   </div>
                 </div>
               </div>
