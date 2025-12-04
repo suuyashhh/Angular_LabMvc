@@ -58,6 +58,19 @@ export class MastersComponent implements OnInit {
   // current dairy user id (from cookie)
   dairyUserId: number = 0;
 
+  // Image properties
+  animalImageFile: File | null = null;
+  animalImagePreview: string | null = null;
+  animalImageError: string = '';
+  
+  feedImageFile: File | null = null;
+  feedImagePreview: string | null = null;
+  feedImageError: string = '';
+
+  // Current selected items for edit
+  currentAnimal: any = null;
+  currentFeed: any = null;
+
   constructor(
     private api: ApiService,
     private toastr: ToastrService,
@@ -86,11 +99,13 @@ export class MastersComponent implements OnInit {
 
   initForms() {
     this.animalForm = new FormGroup({
-      ANIMAL_NAME: new FormControl('', Validators.required)
+      ANIMAL_NAME: new FormControl('', Validators.required),
+      ANIMAL_IMAGE: new FormControl('')
     });
 
     this.feedForm = new FormGroup({
-      FEED_NAME: new FormControl('', Validators.required)
+      FEED_NAME: new FormControl('', Validators.required),
+      FEED_IMAGE: new FormControl('')
     });
   }
 
@@ -101,6 +116,80 @@ export class MastersComponent implements OnInit {
     return Number(id) || 0;
   }
 
+  // ----------------- Animal Image Methods -----------------
+  onAnimalImageSelect(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      this.animalImageError = 'Image size should not exceed 5MB';
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.match(/image\/(jpeg|jpg|png|gif|bmp|webp)/)) {
+      this.animalImageError = 'Only image files are allowed (JPEG, JPG, PNG, GIF, BMP, WEBP)';
+      return;
+    }
+
+    this.animalImageFile = file;
+    this.animalImageError = '';
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.animalImagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeAnimalImage(): void {
+    this.animalImageFile = null;
+    this.animalImagePreview = null;
+    this.animalImageError = '';
+    // Clear the file input
+    const fileInput = document.getElementById('animalImage') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
+  // ----------------- Feed Image Methods -----------------
+  onFeedImageSelect(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      this.feedImageError = 'Image size should not exceed 5MB';
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.match(/image\/(jpeg|jpg|png|gif|bmp|webp)/)) {
+      this.feedImageError = 'Only image files are allowed (JPEG, JPG, PNG, GIF, BMP, WEBP)';
+      return;
+    }
+
+    this.feedImageFile = file;
+    this.feedImageError = '';
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.feedImagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeFeedImage(): void {
+    this.feedImageFile = null;
+    this.feedImagePreview = null;
+    this.feedImageError = '';
+    // Clear the file input
+    const fileInput = document.getElementById('feedImage') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
   // ----------------- Modal Methods for Animals -----------------
   clearAnimalData() {
     this.ANIMAL_ID = 0;
@@ -108,22 +197,29 @@ export class MastersComponent implements OnInit {
     this.animalForm.reset();
     this.animalDeleteReason = '';
     this.submittedAnimal = false;
+    this.animalImageFile = null;
+    this.animalImagePreview = null;
+    this.animalImageError = '';
+    this.currentAnimal = null;
   }
 
   getAnimalById(id: number, action: string) {
     this.ANIMAL_ID = id;
     this.btnAnimal = action;
     
-    // Find the animal by ID - using the correct property names from API
-    const animal = this.animals.find(a => this.getAnimalId(a) === id);
-    if (animal) {
+    // Find the animal by ID
+    this.currentAnimal = this.animals.find(a => this.getAnimalId(a) === id);
+    if (this.currentAnimal) {
       this.animalForm.patchValue({
-        ANIMAL_NAME: this.getAnimalName(animal)
+        ANIMAL_NAME: this.getAnimalName(this.currentAnimal)
       });
+      // Clear any existing image preview when editing
+      this.animalImageFile = null;
+      this.animalImagePreview = null;
     }
   }
 
-  submitAnimal() {
+  async submitAnimal() {
     this.submittedAnimal = true;
 
     if (this.btnAnimal === 'D') {
@@ -139,11 +235,20 @@ export class MastersComponent implements OnInit {
         this.toastr.error('Please fill animal name');
         return;
       }
+
+      // Convert image to base64 if new image is selected
+      let animalImageBase64 = null;
+      if (this.animalImageFile) {
+        animalImageBase64 = await this.convertFileToBase64(this.animalImageFile);
+      } else if (this.currentAnimal && !this.animalImagePreview) {
+        // Keep existing image if not changed during edit
+        animalImageBase64 = this.getAnimalImage(this.currentAnimal);
+      }
       
       if (this.ANIMAL_ID === 0) {
-        this.addAnimal();
+        this.addAnimal(animalImageBase64);
       } else {
-        this.updateAnimal();
+        this.updateAnimal(animalImageBase64);
       }
     }
   }
@@ -159,7 +264,6 @@ export class MastersComponent implements OnInit {
     this.loadingAnimals = true;
     this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
       next: (res: any) => { 
-        console.log('Animals API Response:', res); // Debug log
         this.animals = res || []; 
         this.loadingAnimals = false;
       },
@@ -172,10 +276,11 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  addAnimal() {
+  addAnimal(imageBase64: string | null) {
     const payload: any = {
       AnimalName: this.animalForm.value.ANIMAL_NAME.trim(),
-      UserId: this.dairyUserId
+      UserId: this.dairyUserId,
+      AnimalImage: imageBase64
     };
 
     this.api.post('DairyMasters/Animal', payload).subscribe({
@@ -194,10 +299,11 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  updateAnimal() {
+  updateAnimal(imageBase64: string | null) {
     const payload: any = {
       AnimalName: this.animalForm.value.ANIMAL_NAME.trim(),
-      UserId: this.dairyUserId
+      UserId: this.dairyUserId,
+      AnimalImage: imageBase64
     };
 
     this.api.put(`DairyMasters/Animal/${this.ANIMAL_ID}`, payload).subscribe({
@@ -240,21 +346,28 @@ export class MastersComponent implements OnInit {
     this.feedForm.reset();
     this.feedDeleteReason = '';
     this.submittedFeed = false;
+    this.feedImageFile = null;
+    this.feedImagePreview = null;
+    this.feedImageError = '';
+    this.currentFeed = null;
   }
 
   getFeedById(id: number, action: string) {
     this.FEED_ID = id;
     this.btnFeed = action;
     
-    const feed = this.feeds.find(f => this.getFeedId(f) === id);
-    if (feed) {
+    this.currentFeed = this.feeds.find(f => this.getFeedId(f) === id);
+    if (this.currentFeed) {
       this.feedForm.patchValue({
-        FEED_NAME: this.getFeedName(feed)
+        FEED_NAME: this.getFeedName(this.currentFeed)
       });
+      // Clear any existing image preview when editing
+      this.feedImageFile = null;
+      this.feedImagePreview = null;
     }
   }
 
-  submitFeed() {
+  async submitFeed() {
     this.submittedFeed = true;
 
     if (this.btnFeed === 'D') {
@@ -270,11 +383,20 @@ export class MastersComponent implements OnInit {
         this.toastr.error('Please fill feed name');
         return;
       }
+
+      // Convert image to base64 if new image is selected
+      let feedImageBase64 = null;
+      if (this.feedImageFile) {
+        feedImageBase64 = await this.convertFileToBase64(this.feedImageFile);
+      } else if (this.currentFeed && !this.feedImagePreview) {
+        // Keep existing image if not changed during edit
+        feedImageBase64 = this.getFeedImage(this.currentFeed);
+      }
       
       if (this.FEED_ID === 0) {
-        this.addFeed();
+        this.addFeed(feedImageBase64);
       } else {
-        this.updateFeed();
+        this.updateFeed(feedImageBase64);
       }
     }
   }
@@ -289,7 +411,6 @@ export class MastersComponent implements OnInit {
     this.loadingFeeds = true;
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
       next: (res: any) => { 
-        console.log('Feeds API Response:', res); // Debug log
         this.feeds = res || []; 
         this.loadingFeeds = false;
       },
@@ -302,10 +423,11 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  addFeed() {
+  addFeed(imageBase64: string | null) {
     const payload: any = {
       FeedName: this.feedForm.value.FEED_NAME.trim(),
-      UserId: this.dairyUserId
+      UserId: this.dairyUserId,
+      FeedImage: imageBase64
     };
 
     this.api.post('DairyMasters/Feed', payload).subscribe({
@@ -324,10 +446,11 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  updateFeed() {
+  updateFeed(imageBase64: string | null) {
     const payload: any = {
       FeedName: this.feedForm.value.FEED_NAME.trim(),
-      UserId: this.dairyUserId
+      UserId: this.dairyUserId,
+      FeedImage: imageBase64
     };
 
     this.api.put(`DairyMasters/Feed/${this.FEED_ID}`, payload).subscribe({
@@ -391,23 +514,48 @@ export class MastersComponent implements OnInit {
     this.api.modalClose(modalId);
   }
 
-  // Helper method to get animal ID from any object structure
+  // Helper method to convert file to base64
+  private convertFileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  // Helper methods for getting data from objects
   getAnimalId(animal: any): number {
     return animal.AnimalId ?? animal.animal_id ?? animal.animalId ?? animal.id ?? 0;
   }
 
-  // Helper method to get feed ID from any object structure
   getFeedId(feed: any): number {
     return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
   }
 
-  // Helper method to get animal name from any object structure
   getAnimalName(animal: any): string {
     return animal.AnimalName ?? animal.animal_name ?? animal.animalName ?? animal.name ?? '';
   }
 
-  // Helper method to get feed name from any object structure
   getFeedName(feed: any): string {
     return feed.FeedName ?? feed.feed_name ?? feed.feedName ?? feed.name ?? '';
+  }
+
+  getAnimalImage(animal: any): string {
+    // Return the image or a default placeholder
+    const image = animal.AnimalImage ?? animal.animal_image ?? animal.animalImage ?? animal.image;
+    if (image && image.startsWith('data:image')) {
+      return image;
+    }
+    return ''; // Return empty if no image
+  }
+
+  getFeedImage(feed: any): string {
+    // Return the image or a default placeholder
+    const image = feed.FeedImage ?? feed.feed_image ?? feed.feedImage ?? feed.image;
+    if (image && image.startsWith('data:image')) {
+      return image;
+    }
+    return ''; // Return empty if no image
   }
 }
