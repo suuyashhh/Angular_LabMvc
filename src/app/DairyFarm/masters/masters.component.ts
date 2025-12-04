@@ -21,7 +21,8 @@ export class MastersComponent implements OnInit {
   // Forms
   animalForm!: FormGroup;
   feedForm!: FormGroup;
-  // Add these properties to your component class
+  
+  // Image compression properties
   animalImageSize: string = '';
   feedImageSize: string = '';
   compressingImage: boolean = false;
@@ -45,11 +46,6 @@ export class MastersComponent implements OnInit {
   // Loading states
   loadingAnimals: boolean = false;
   loadingFeeds: boolean = false;
-
-  // paging
-  pageAnimal = 1;
-  pageFeed = 1;
-  readonly pageSize = 10;
 
   // search
   searchTerm: string = '';
@@ -163,10 +159,9 @@ export class MastersComponent implements OnInit {
           const compressedSize = this.formatFileSize(compressedFile.size);
           this.animalImageSize = `${this.formatFileSize(file.size)} → ${compressedSize} (compressed)`;
 
-          // Store the Base64 string without the data URL prefix
-          const base64String = e.target.result.split(',')[1];
+          // Store the FULL Base64 data URL (with prefix) in the form
           this.animalForm.patchValue({
-            ANIMAL_IMAGE: base64String
+            ANIMAL_IMAGE: e.target.result
           });
         };
 
@@ -188,9 +183,9 @@ export class MastersComponent implements OnInit {
           reader.onload = (e: any) => {
             this.animalImagePreview = e.target.result;
             this.animalImageError = 'Using original image (already under 1MB)';
-            const base64String = e.target.result.split(',')[1];
+            // Store the FULL Base64 data URL (with prefix) in the form
             this.animalForm.patchValue({
-              ANIMAL_IMAGE: base64String
+              ANIMAL_IMAGE: e.target.result
             });
           };
           reader.readAsDataURL(file);
@@ -198,89 +193,6 @@ export class MastersComponent implements OnInit {
         }
       }
     }
-  }
-
-
-  compressImage(file: File, maxSize: number): Promise<File> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = (event: any) => {
-        const img = new Image();
-        img.src = event.target.result;
-
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          let quality = 0.9;
-
-          // Calculate new dimensions while maintaining aspect ratio
-          const maxDimension = 1200; // Maximum width or height
-
-          if (width > height) {
-            if (width > maxDimension) {
-              height *= maxDimension / width;
-              width = maxDimension;
-            }
-          } else {
-            if (height > maxDimension) {
-              width *= maxDimension / height;
-              height = maxDimension;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Canvas context not available'));
-            return;
-          }
-
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Function to compress with quality adjustment
-          const compressWithQuality = (q: number): Promise<File> => {
-            return new Promise((resolveInner, rejectInner) => {
-              canvas.toBlob(
-                (blob) => {
-                  if (!blob) {
-                    rejectInner(new Error('Failed to create blob'));
-                    return;
-                  }
-
-                  if (blob.size <= maxSize || q <= 0.1) {
-                    const compressedFile = new File([blob], file.name, {
-                      type: 'image/jpeg',
-                      lastModified: Date.now()
-                    });
-                    resolveInner(compressedFile);
-                  } else {
-                    // Reduce quality and try again
-                    compressWithQuality(q - 0.1).then(resolveInner).catch(rejectInner);
-                  }
-                },
-                'image/jpeg',
-                q
-              );
-            });
-          };
-
-          compressWithQuality(quality).then(resolve).catch(reject);
-        };
-
-        img.onerror = () => {
-          reject(new Error('Failed to load image'));
-        };
-      };
-
-      reader.onerror = () => {
-        reject(new Error('Failed to read file'));
-      };
-    });
   }
 
   removeAnimalImage() {
@@ -331,9 +243,9 @@ export class MastersComponent implements OnInit {
           const compressedSize = this.formatFileSize(compressedFile.size);
           this.feedImageSize = `${this.formatFileSize(file.size)} → ${compressedSize} (compressed)`;
 
-          const base64String = e.target.result.split(',')[1];
+          // Store the FULL Base64 data URL (with prefix) in the form
           this.feedForm.patchValue({
-            FEED_IMAGE: base64String
+            FEED_IMAGE: e.target.result
           });
         };
 
@@ -354,9 +266,9 @@ export class MastersComponent implements OnInit {
           reader.onload = (e: any) => {
             this.feedImagePreview = e.target.result;
             this.feedImageError = 'Using original image (already under 1MB)';
-            const base64String = e.target.result.split(',')[1];
+            // Store the FULL Base64 data URL (with prefix) in the form
             this.feedForm.patchValue({
-              FEED_IMAGE: base64String
+              FEED_IMAGE: e.target.result
             });
           };
           reader.readAsDataURL(file);
@@ -365,7 +277,6 @@ export class MastersComponent implements OnInit {
       }
     }
   }
-
 
   // Main compression function - optimized for reliability
   compressImageTo1MB(file: File): Promise<File> {
@@ -474,74 +385,6 @@ export class MastersComponent implements OnInit {
     });
   }
 
-  compressImageSimple(file: File, maxWidth = 800, maxHeight = 800, quality = 0.8): Promise<File> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = (event: any) => {
-        const image = new Image();
-        image.src = event.target.result;
-
-        image.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = image.width;
-          let height = image.height;
-
-          // Calculate new dimensions
-          if (width > height) {
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Canvas context not available'));
-            return;
-          }
-
-          ctx.drawImage(image, 0, 0, width, height);
-
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                reject(new Error('Failed to create blob'));
-                return;
-              }
-
-              const compressedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now()
-              });
-              resolve(compressedFile);
-            },
-            'image/jpeg',
-            quality
-          );
-        };
-
-        image.onerror = () => {
-          reject(new Error('Failed to load image'));
-        };
-      };
-
-      reader.onerror = () => {
-        reject(new Error('Failed to read file'));
-      };
-    });
-  }
-
-
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -549,7 +392,6 @@ export class MastersComponent implements OnInit {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
-
 
   removeFeedImage() {
     this.feedImagePreview = '';
@@ -573,7 +415,9 @@ export class MastersComponent implements OnInit {
     this.animalImageFile = null;
     this.animalImagePreview = null;
     this.animalImageError = '';
+    this.animalImageSize = '';
     this.currentAnimal = null;
+    this.compressingImage = false;
   }
 
   getAnimalById(id: number, action: string) {
@@ -584,11 +428,13 @@ export class MastersComponent implements OnInit {
     this.currentAnimal = this.animals.find(a => this.getAnimalId(a) === id);
     if (this.currentAnimal) {
       this.animalForm.patchValue({
-        ANIMAL_NAME: this.getAnimalName(this.currentAnimal)
+        ANIMAL_NAME: this.getAnimalName(this.currentAnimal),
+        ANIMAL_IMAGE: this.getAnimalImage(this.currentAnimal) || ''
       });
-      // Clear any existing image preview when editing
+      // Set the image preview
+      this.animalImagePreview = this.getAnimalImage(this.currentAnimal);
+      // Clear file object
       this.animalImageFile = null;
-      this.animalImagePreview = null;
     }
   }
 
@@ -609,14 +455,8 @@ export class MastersComponent implements OnInit {
         return;
       }
 
-      // Convert image to base64 if new image is selected
-      let animalImageBase64 = null;
-      if (this.animalImageFile) {
-        animalImageBase64 = await this.convertFileToBase64(this.animalImageFile);
-      } else if (this.currentAnimal && !this.animalImagePreview) {
-        // Keep existing image if not changed during edit
-        animalImageBase64 = this.getAnimalImage(this.currentAnimal);
-      }
+      // Get image from form (it's already base64 data URL)
+      const animalImageBase64 = this.animalForm.value.ANIMAL_IMAGE;
 
       if (this.ANIMAL_ID === 0) {
         this.addAnimal(animalImageBase64);
@@ -655,6 +495,8 @@ export class MastersComponent implements OnInit {
       UserId: this.dairyUserId,
       AnimalImage: imageBase64
     };
+
+    console.log('Saving animal with image length:', imageBase64?.length);
 
     this.api.post('DairyMasters/Animal', payload).subscribe({
       next: () => {
@@ -722,7 +564,9 @@ export class MastersComponent implements OnInit {
     this.feedImageFile = null;
     this.feedImagePreview = null;
     this.feedImageError = '';
+    this.feedImageSize = '';
     this.currentFeed = null;
+    this.compressingImage = false;
   }
 
   getFeedById(id: number, action: string) {
@@ -732,11 +576,13 @@ export class MastersComponent implements OnInit {
     this.currentFeed = this.feeds.find(f => this.getFeedId(f) === id);
     if (this.currentFeed) {
       this.feedForm.patchValue({
-        FEED_NAME: this.getFeedName(this.currentFeed)
+        FEED_NAME: this.getFeedName(this.currentFeed),
+        FEED_IMAGE: this.getFeedImage(this.currentFeed) || ''
       });
-      // Clear any existing image preview when editing
+      // Set the image preview
+      this.feedImagePreview = this.getFeedImage(this.currentFeed);
+      // Clear file object
       this.feedImageFile = null;
-      this.feedImagePreview = null;
     }
   }
 
@@ -757,14 +603,8 @@ export class MastersComponent implements OnInit {
         return;
       }
 
-      // Convert image to base64 if new image is selected
-      let feedImageBase64 = null;
-      if (this.feedImageFile) {
-        feedImageBase64 = await this.convertFileToBase64(this.feedImageFile);
-      } else if (this.currentFeed && !this.feedImagePreview) {
-        // Keep existing image if not changed during edit
-        feedImageBase64 = this.getFeedImage(this.currentFeed);
-      }
+      // Get image from form (it's already base64 data URL)
+      const feedImageBase64 = this.feedForm.value.FEED_IMAGE;
 
       if (this.FEED_ID === 0) {
         this.addFeed(feedImageBase64);
@@ -861,14 +701,9 @@ export class MastersComponent implements OnInit {
 
   // ----------------- Common Methods -----------------
   onSearch() {
-    // Search functionality - reset pagination
-    this.pageAnimal = 1;
-    this.pageFeed = 1;
+    // Search functionality
   }
 
-  // Remove pagination variables and methods
-  // Remove pageAnimal, pageFeed, pageSize variables
-  // Update filteredAnimals() and filteredFeeds() to return all filtered items
   filteredAnimals() {
     if (!this.searchTerm) return this.animals;
     return this.animals.filter(a =>
@@ -888,16 +723,6 @@ export class MastersComponent implements OnInit {
   closeModal(modalId: string) {
     // Use the ApiService modalClose method like in your reference
     this.api.modalClose(modalId);
-  }
-
-  // Helper method to convert file to base64
-  private convertFileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
   }
 
   // Helper methods for getting data from objects

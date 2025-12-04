@@ -294,42 +294,44 @@
               </div>
 
               <!-- Image Upload -->
-             <div class="custom-form-group">
-  <label class="block text-sm font-medium text-green-700 mb-2">
-    <i class="ri-image-line"></i> Cattle Image
-  </label>
-  <div class="mt-1">
-    <input type="file" id="animalImage" accept="image/*" (change)="onAnimalImageSelect($event)"
-      [disabled]="ANIMAL_ID != 0 && btnAnimal == 'D' || compressingImage" class="hidden" />
-    <label for="animalImage"
-      class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
-      [class.opacity-50]="compressingImage"
-      [class.cursor-not-allowed]="compressingImage">
-      <div class="text-center">
-        <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2" *ngIf="!compressingImage"></i>
-        <div class="inline-block animate-spin rounded-full border-2 border-green-200 border-t-green-600 h-6 w-6 mb-2" *ngIf="compressingImage"></div>
-        <p class="text-sm text-green-600" *ngIf="!compressingImage">
-          <span class="font-medium">Click to upload</span> or drag and drop
-        </p>
-        <p class="text-sm text-green-600" *ngIf="compressingImage">
-          Compressing image...
-        </p>
-        <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 10MB (Will be compressed to 1MB)</p>
-      </div>
-    </label>
-  </div>
-  <div class="text-danger mt-1" *ngIf="submittedAnimal && animalImageError">
-    <small>{{ animalImageError }}</small>
-  </div>
-  <div class="text-xs text-green-600 mt-1 flex items-center gap-1" *ngIf="animalImageSize && !compressingImage">
-    <i class="ri-information-line"></i> 
-    <span>{{ animalImageSize }}</span>
-  </div>
-  <div class="text-xs text-yellow-600 mt-1 flex items-center gap-1" *ngIf="compressingImage">
-    <i class="ri-loader-4-line animate-spin"></i>
-    <span>Compressing image to 1MB...</span>
-  </div>
-</div>
+              <div class="custom-form-group">
+                <label class="block text-sm font-medium text-green-700 mb-2">
+                  <i class="ri-image-line"></i> Cattle Image
+                </label>
+                <div class="mt-1">
+                  <input type="file" id="animalImage" accept="image/*" (change)="onAnimalImageSelect($event)"
+                    [disabled]="ANIMAL_ID != 0 && btnAnimal == 'D' || compressingImage" class="hidden" />
+                  <label for="animalImage"
+                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
+                    [class.opacity-50]="compressingImage" [class.cursor-not-allowed]="compressingImage">
+                    <div class="text-center">
+                      <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2" *ngIf="!compressingImage"></i>
+                      <div
+                        class="inline-block animate-spin rounded-full border-2 border-green-200 border-t-green-600 h-6 w-6 mb-2"
+                        *ngIf="compressingImage"></div>
+                      <p class="text-sm text-green-600" *ngIf="!compressingImage">
+                        <span class="font-medium">Click to upload</span> or drag and drop
+                      </p>
+                      <p class="text-sm text-green-600" *ngIf="compressingImage">
+                        Compressing image...
+                      </p>
+                      <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 10MB (Will be compressed to 1MB)</p>
+                    </div>
+                  </label>
+                </div>
+                <div class="text-danger mt-1" *ngIf="submittedAnimal && animalImageError">
+                  <small>{{ animalImageError }}</small>
+                </div>
+                <div class="text-xs text-green-600 mt-1 flex items-center gap-1"
+                  *ngIf="animalImageSize && !compressingImage">
+                  <i class="ri-information-line"></i>
+                  <span>{{ animalImageSize }}</span>
+                </div>
+                <div class="text-xs text-yellow-600 mt-1 flex items-center gap-1" *ngIf="compressingImage">
+                  <i class="ri-loader-4-line animate-spin"></i>
+                  <span>Compressing image to 1MB...</span>
+                </div>
+              </div>
 
               <!-- Delete Reason -->
               <div class="custom-form-group" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">
@@ -369,10 +371,10 @@
                       <i class="ri-close-line text-sm"></i>
                     </button>
                   </div>
-                <div class="text-xs text-green-500 mt-2 text-center"
-  *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')">
-  (compressed to max 1MB)
-</div>
+                  <div class="text-xs text-green-500 mt-2 text-center"
+                    *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')">
+                    (compressed to max 1MB)
+                  </div>
                 </div>
               </div>
             </div>
@@ -437,42 +439,44 @@
               </div>
 
               <!-- Image Upload -->
-             <div class="custom-form-group">
-  <label class="block text-sm font-medium text-green-700 mb-2">
-    <i class="ri-image-line"></i> Feed Image
-  </label>
-  <div class="mt-1">
-    <input type="file" id="feedImage" accept="image/*" (change)="onFeedImageSelect($event)"
-      [disabled]="FEED_ID != 0 && btnFeed == 'D' || compressingImage" class="hidden" />
-    <label for="feedImage"
-      class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
-      [class.opacity-50]="compressingImage"
-      [class.cursor-not-allowed]="compressingImage">
-      <div class="text-center">
-        <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2" *ngIf="!compressingImage"></i>
-        <div class="inline-block animate-spin rounded-full border-2 border-green-200 border-t-green-600 h-6 w-6 mb-2" *ngIf="compressingImage"></div>
-        <p class="text-sm text-green-600" *ngIf="!compressingImage">
-          <span class="font-medium">Click to upload</span> or drag and drop
-        </p>
-        <p class="text-sm text-green-600" *ngIf="compressingImage">
-          Compressing image...
-        </p>
-        <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 10MB (Will be compressed to 1MB)</p>
-      </div>
-    </label>
-  </div>
-  <div class="text-danger mt-1" *ngIf="submittedFeed && feedImageError">
-    <small>{{ feedImageError }}</small>
-  </div>
-  <div class="text-xs text-green-600 mt-1 flex items-center gap-1" *ngIf="feedImageSize && !compressingImage">
-    <i class="ri-information-line"></i> 
-    <span>{{ feedImageSize }}</span>
-  </div>
-  <div class="text-xs text-yellow-600 mt-1 flex items-center gap-1" *ngIf="compressingImage">
-    <i class="ri-loader-4-line animate-spin"></i>
-    <span>Compressing image to 1MB...</span>
-  </div>
-</div>
+              <div class="custom-form-group">
+                <label class="block text-sm font-medium text-green-700 mb-2">
+                  <i class="ri-image-line"></i> Feed Image
+                </label>
+                <div class="mt-1">
+                  <input type="file" id="feedImage" accept="image/*" (change)="onFeedImageSelect($event)"
+                    [disabled]="FEED_ID != 0 && btnFeed == 'D' || compressingImage" class="hidden" />
+                  <label for="feedImage"
+                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
+                    [class.opacity-50]="compressingImage" [class.cursor-not-allowed]="compressingImage">
+                    <div class="text-center">
+                      <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2" *ngIf="!compressingImage"></i>
+                      <div
+                        class="inline-block animate-spin rounded-full border-2 border-green-200 border-t-green-600 h-6 w-6 mb-2"
+                        *ngIf="compressingImage"></div>
+                      <p class="text-sm text-green-600" *ngIf="!compressingImage">
+                        <span class="font-medium">Click to upload</span> or drag and drop
+                      </p>
+                      <p class="text-sm text-green-600" *ngIf="compressingImage">
+                        Compressing image...
+                      </p>
+                      <p class="text-xs text-green-500 mt-1">PNG, JPG, JPEG up to 10MB (Will be compressed to 1MB)</p>
+                    </div>
+                  </label>
+                </div>
+                <div class="text-danger mt-1" *ngIf="submittedFeed && feedImageError">
+                  <small>{{ feedImageError }}</small>
+                </div>
+                <div class="text-xs text-green-600 mt-1 flex items-center gap-1"
+                  *ngIf="feedImageSize && !compressingImage">
+                  <i class="ri-information-line"></i>
+                  <span>{{ feedImageSize }}</span>
+                </div>
+                <div class="text-xs text-yellow-600 mt-1 flex items-center gap-1" *ngIf="compressingImage">
+                  <i class="ri-loader-4-line animate-spin"></i>
+                  <span>Compressing image to 1MB...</span>
+                </div>
+              </div>
 
               <!-- Delete Reason -->
               <div class="custom-form-group" *ngIf="FEED_ID != 0 && btnFeed == 'D'">
