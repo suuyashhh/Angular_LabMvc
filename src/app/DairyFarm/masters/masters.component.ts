@@ -21,6 +21,10 @@ export class MastersComponent implements OnInit {
   // Forms
   animalForm!: FormGroup;
   feedForm!: FormGroup;
+  // Add these properties to your component class
+  animalImageSize: string = '';
+  feedImageSize: string = '';
+  compressingImage: boolean = false;
 
   // Data lists
   animals: any[] = [];
@@ -62,7 +66,7 @@ export class MastersComponent implements OnInit {
   animalImageFile: File | null = null;
   animalImagePreview: string | null = null;
   animalImageError: string = '';
-  
+
   feedImageFile: File | null = null;
   feedImagePreview: string | null = null;
   feedImageError: string = '';
@@ -77,7 +81,7 @@ export class MastersComponent implements OnInit {
     private service: ServicesService,
     private auth: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // redirect to dairy login if not logged in to dairy
@@ -117,75 +121,444 @@ export class MastersComponent implements OnInit {
   }
 
   // ----------------- Animal Image Methods -----------------
-  onAnimalImageSelect(event: any): void {
+  async onAnimalImageSelect(event: any) {
     const file = event.target.files[0];
-    if (!file) return;
+    if (file) {
+      this.compressingImage = true;
+      this.animalImageSize = this.formatFileSize(file.size);
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      this.animalImageError = 'Image size should not exceed 5MB';
-      return;
+      // Check file type
+      if (!file.type.match(/image\/(jpeg|png|jpg)/)) {
+        this.animalImageError = 'Only JPG, JPEG, and PNG images are allowed';
+        this.compressingImage = false;
+        return;
+      }
+
+      // Check initial size (allow up to 10MB for compression)
+      if (file.size > 10 * 1024 * 1024) {
+        this.animalImageError = 'File size must be less than 10MB';
+        this.compressingImage = false;
+        return;
+      }
+
+      try {
+        // Show compressing message
+        this.animalImageError = 'Compressing image...';
+
+        // Compress the image
+        const compressedFile = await this.compressImageTo1MB(file);
+
+        if (!compressedFile) {
+          throw new Error('Compression failed');
+        }
+
+        // Read the compressed file
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.animalImagePreview = e.target.result;
+          this.animalImageError = '';
+          this.compressingImage = false;
+
+          // Show compressed size
+          const compressedSize = this.formatFileSize(compressedFile.size);
+          this.animalImageSize = `${this.formatFileSize(file.size)} → ${compressedSize} (compressed)`;
+
+          // Store the Base64 string without the data URL prefix
+          const base64String = e.target.result.split(',')[1];
+          this.animalForm.patchValue({
+            ANIMAL_IMAGE: base64String
+          });
+        };
+
+        reader.onerror = () => {
+          this.animalImageError = 'Failed to read compressed image';
+          this.compressingImage = false;
+        };
+
+        reader.readAsDataURL(compressedFile);
+
+      } catch (error: any) {
+        console.error('Image compression error:', error);
+        this.animalImageError = error.message || 'Failed to compress image';
+        this.compressingImage = false;
+
+        // Fallback: use original image if compression fails but size is small
+        if (file.size <= 1024 * 1024) {
+          const reader = new FileReader();
+          reader.onload = (e: any) => {
+            this.animalImagePreview = e.target.result;
+            this.animalImageError = 'Using original image (already under 1MB)';
+            const base64String = e.target.result.split(',')[1];
+            this.animalForm.patchValue({
+              ANIMAL_IMAGE: base64String
+            });
+          };
+          reader.readAsDataURL(file);
+          this.compressingImage = false;
+        }
+      }
     }
-
-    // Validate file type
-    if (!file.type.match(/image\/(jpeg|jpg|png|gif|bmp|webp)/)) {
-      this.animalImageError = 'Only image files are allowed (JPEG, JPG, PNG, GIF, BMP, WEBP)';
-      return;
-    }
-
-    this.animalImageFile = file;
-    this.animalImageError = '';
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.animalImagePreview = e.target.result;
-    };
-    reader.readAsDataURL(file);
   }
 
-  removeAnimalImage(): void {
-    this.animalImageFile = null;
-    this.animalImagePreview = null;
+
+  compressImage(file: File, maxSize: number): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = (event: any) => {
+        const img = new Image();
+        img.src = event.target.result;
+
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          let quality = 0.9;
+
+          // Calculate new dimensions while maintaining aspect ratio
+          const maxDimension = 1200; // Maximum width or height
+
+          if (width > height) {
+            if (width > maxDimension) {
+              height *= maxDimension / width;
+              width = maxDimension;
+            }
+          } else {
+            if (height > maxDimension) {
+              width *= maxDimension / height;
+              height = maxDimension;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas context not available'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Function to compress with quality adjustment
+          const compressWithQuality = (q: number): Promise<File> => {
+            return new Promise((resolveInner, rejectInner) => {
+              canvas.toBlob(
+                (blob) => {
+                  if (!blob) {
+                    rejectInner(new Error('Failed to create blob'));
+                    return;
+                  }
+
+                  if (blob.size <= maxSize || q <= 0.1) {
+                    const compressedFile = new File([blob], file.name, {
+                      type: 'image/jpeg',
+                      lastModified: Date.now()
+                    });
+                    resolveInner(compressedFile);
+                  } else {
+                    // Reduce quality and try again
+                    compressWithQuality(q - 0.1).then(resolveInner).catch(rejectInner);
+                  }
+                },
+                'image/jpeg',
+                q
+              );
+            });
+          };
+
+          compressWithQuality(quality).then(resolve).catch(reject);
+        };
+
+        img.onerror = () => {
+          reject(new Error('Failed to load image'));
+        };
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+    });
+  }
+
+  removeAnimalImage() {
+    this.animalImagePreview = '';
+    this.animalImageSize = '';
     this.animalImageError = '';
-    // Clear the file input
+    this.animalForm.patchValue({
+      ANIMAL_IMAGE: ''
+    });
+    // Clear file input
     const fileInput = document.getElementById('animalImage') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
 
   // ----------------- Feed Image Methods -----------------
-  onFeedImageSelect(event: any): void {
+  async onFeedImageSelect(event: any) {
     const file = event.target.files[0];
-    if (!file) return;
+    if (file) {
+      this.compressingImage = true;
+      this.feedImageSize = this.formatFileSize(file.size);
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      this.feedImageError = 'Image size should not exceed 5MB';
-      return;
+      if (!file.type.match(/image\/(jpeg|png|jpg)/)) {
+        this.feedImageError = 'Only JPG, JPEG, and PNG images are allowed';
+        this.compressingImage = false;
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        this.feedImageError = 'File size must be less than 10MB';
+        this.compressingImage = false;
+        return;
+      }
+
+      try {
+        this.feedImageError = 'Compressing image...';
+        const compressedFile = await this.compressImageTo1MB(file);
+
+        if (!compressedFile) {
+          throw new Error('Compression failed');
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.feedImagePreview = e.target.result;
+          this.feedImageError = '';
+          this.compressingImage = false;
+
+          const compressedSize = this.formatFileSize(compressedFile.size);
+          this.feedImageSize = `${this.formatFileSize(file.size)} → ${compressedSize} (compressed)`;
+
+          const base64String = e.target.result.split(',')[1];
+          this.feedForm.patchValue({
+            FEED_IMAGE: base64String
+          });
+        };
+
+        reader.onerror = () => {
+          this.feedImageError = 'Failed to read compressed image';
+          this.compressingImage = false;
+        };
+
+        reader.readAsDataURL(compressedFile);
+
+      } catch (error: any) {
+        console.error('Image compression error:', error);
+        this.feedImageError = error.message || 'Failed to compress image';
+        this.compressingImage = false;
+
+        if (file.size <= 1024 * 1024) {
+          const reader = new FileReader();
+          reader.onload = (e: any) => {
+            this.feedImagePreview = e.target.result;
+            this.feedImageError = 'Using original image (already under 1MB)';
+            const base64String = e.target.result.split(',')[1];
+            this.feedForm.patchValue({
+              FEED_IMAGE: base64String
+            });
+          };
+          reader.readAsDataURL(file);
+          this.compressingImage = false;
+        }
+      }
     }
-
-    // Validate file type
-    if (!file.type.match(/image\/(jpeg|jpg|png|gif|bmp|webp)/)) {
-      this.feedImageError = 'Only image files are allowed (JPEG, JPG, PNG, GIF, BMP, WEBP)';
-      return;
-    }
-
-    this.feedImageFile = file;
-    this.feedImageError = '';
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.feedImagePreview = e.target.result;
-    };
-    reader.readAsDataURL(file);
   }
 
-  removeFeedImage(): void {
-    this.feedImageFile = null;
-    this.feedImagePreview = null;
+
+  // Main compression function - optimized for reliability
+  compressImageTo1MB(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        img.src = e.target.result;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+
+        // Set maximum dimensions
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image with higher quality for resizing
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Function to compress with quality adjustment
+        const compressWithQuality = (quality: number): Promise<File> => {
+          return new Promise((resolveQuality, rejectQuality) => {
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) {
+                  rejectQuality(new Error('Failed to create blob'));
+                  return;
+                }
+
+                // Check if size is under 1MB
+                if (blob.size <= 1024 * 1024) {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolveQuality(compressedFile);
+                } else if (quality > 0.3) {
+                  // Reduce quality and try again
+                  compressWithQuality(quality - 0.1).then(resolveQuality).catch(rejectQuality);
+                } else {
+                  // If still too large, resize more aggressively
+                  if (width > 400 || height > 400) {
+                    width = Math.round(width * 0.8);
+                    height = Math.round(height * 0.8);
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    compressWithQuality(0.7).then(resolveQuality).catch(rejectQuality);
+                  } else {
+                    // Last resort: use the smallest possible
+                    const finalFile = new File([blob], file.name, {
+                      type: 'image/jpeg',
+                      lastModified: Date.now()
+                    });
+                    resolveQuality(finalFile);
+                  }
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          });
+        };
+
+        // Start compression with 0.9 quality
+        compressWithQuality(0.9).then(resolve).catch(reject);
+      };
+
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  compressImageSimple(file: File, maxWidth = 800, maxHeight = 800, quality = 0.8): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = (event: any) => {
+        const image = new Image();
+        image.src = event.target.result;
+
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = image.width;
+          let height = image.height;
+
+          // Calculate new dimensions
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas context not available'));
+            return;
+          }
+
+          ctx.drawImage(image, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Failed to create blob'));
+                return;
+              }
+
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+
+        image.onerror = () => {
+          reject(new Error('Failed to load image'));
+        };
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+    });
+  }
+
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+
+  removeFeedImage() {
+    this.feedImagePreview = '';
+    this.feedImageSize = '';
     this.feedImageError = '';
-    // Clear the file input
+    this.feedForm.patchValue({
+      FEED_IMAGE: ''
+    });
+    // Clear file input
     const fileInput = document.getElementById('feedImage') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
@@ -206,7 +579,7 @@ export class MastersComponent implements OnInit {
   getAnimalById(id: number, action: string) {
     this.ANIMAL_ID = id;
     this.btnAnimal = action;
-    
+
     // Find the animal by ID
     this.currentAnimal = this.animals.find(a => this.getAnimalId(a) === id);
     if (this.currentAnimal) {
@@ -244,7 +617,7 @@ export class MastersComponent implements OnInit {
         // Keep existing image if not changed during edit
         animalImageBase64 = this.getAnimalImage(this.currentAnimal);
       }
-      
+
       if (this.ANIMAL_ID === 0) {
         this.addAnimal(animalImageBase64);
       } else {
@@ -263,8 +636,8 @@ export class MastersComponent implements OnInit {
 
     this.loadingAnimals = true;
     this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
-      next: (res: any) => { 
-        this.animals = res || []; 
+      next: (res: any) => {
+        this.animals = res || [];
         this.loadingAnimals = false;
       },
       error: (err) => {
@@ -355,7 +728,7 @@ export class MastersComponent implements OnInit {
   getFeedById(id: number, action: string) {
     this.FEED_ID = id;
     this.btnFeed = action;
-    
+
     this.currentFeed = this.feeds.find(f => this.getFeedId(f) === id);
     if (this.currentFeed) {
       this.feedForm.patchValue({
@@ -392,7 +765,7 @@ export class MastersComponent implements OnInit {
         // Keep existing image if not changed during edit
         feedImageBase64 = this.getFeedImage(this.currentFeed);
       }
-      
+
       if (this.FEED_ID === 0) {
         this.addFeed(feedImageBase64);
       } else {
@@ -410,8 +783,8 @@ export class MastersComponent implements OnInit {
 
     this.loadingFeeds = true;
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
-      next: (res: any) => { 
-        this.feeds = res || []; 
+      next: (res: any) => {
+        this.feeds = res || [];
         this.loadingFeeds = false;
       },
       error: (err) => {
@@ -493,20 +866,23 @@ export class MastersComponent implements OnInit {
     this.pageFeed = 1;
   }
 
+  // Remove pagination variables and methods
+  // Remove pageAnimal, pageFeed, pageSize variables
+  // Update filteredAnimals() and filteredFeeds() to return all filtered items
   filteredAnimals() {
     if (!this.searchTerm) return this.animals;
-    return this.animals.filter(animal => {
-      const name = this.getAnimalName(animal);
-      return name.toLowerCase().includes(this.searchTerm.toLowerCase());
-    });
+    return this.animals.filter(a =>
+      this.getAnimalName(a).toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      this.getAnimalId(a).toString().includes(this.searchTerm)
+    );
   }
 
   filteredFeeds() {
     if (!this.searchTerm) return this.feeds;
-    return this.feeds.filter(feed => {
-      const name = this.getFeedName(feed);
-      return name.toLowerCase().includes(this.searchTerm.toLowerCase());
-    });
+    return this.feeds.filter(f =>
+      this.getFeedName(f).toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      this.getFeedId(f).toString().includes(this.searchTerm)
+    );
   }
 
   closeModal(modalId: string) {
