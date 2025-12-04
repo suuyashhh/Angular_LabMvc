@@ -56,7 +56,8 @@
       <div *ngIf="!loadingFeeds">
         <!-- Table on md+ -->
        <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="space-y-3">
-            <div *ngFor="let f of filteredFeeds"
+        
+            <div *ngFor="let f of filteredFeeds" id="feedCardDropdown{{ getFeedId(f) }}" (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
               class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
               <!-- Image -->
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
@@ -97,26 +98,9 @@
                 </ul>
               </div>
             </div>
+           
           </div>
-
-        <!-- Mobile: cards -->
-        <div *ngIf="feeds && feeds.length > 0" class="space-y-3 md:hidden">
-          <div *ngFor="let f of filteredFeeds"
-               class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center justify-between">
-            <div>
-              <div class="text-green-800 font-medium">{{ f.feed_name }}</div>
-              <div class="text-xs text-green-500 mt-1">Price: {{ f.price }} | Qty: {{ f.quantity }}</div>
-              <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(f.date) }}</div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm"
-                      (click)="openEditModal(f)">Edit</button>
-              <button class="px-3 py-1 rounded bg-red-50 text-red-600 text-sm"
-                      (click)="openDeleteModal(f)">Delete</button>
-            </div>
-          </div>
-        </div>
+       
 
         <ng-template #noFeedData>
           <div class="text-center py-4">
