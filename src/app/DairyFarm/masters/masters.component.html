@@ -1,9 +1,7 @@
 <!-- Page Header -->
 <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
   <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner">
-    <img src="../../../assets/DairryFarmImg/cow_9466827.png" 
-         alt="Cattle Icon"
-         class="w-8 h-8 object-contain" />
+    <img src="../../../assets/DairryFarmImg/cow_9466827.png" alt="Cattle Icon" class="w-8 h-8 object-contain" />
   </div>
   <div>
     <h1 class="text-2xl font-semibold text-green-900">Masters</h1>
@@ -18,28 +16,21 @@
       <div class="flex flex-col lg:flex-row items-center gap-4">
         <div class="flex gap-3">
           <button type="button"
-                  class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
-                  (click)="clearAnimalData()"
-                  data-bs-toggle="modal" data-bs-target="#cattleFormModal">
+            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+            (click)="clearAnimalData()" data-bs-toggle="modal" data-bs-target="#cattleFormModal">
             <i class="ri-add-box-fill"></i> Add Cattle
           </button>
           <button type="button"
-                  class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
-                  (click)="clearFeedData()"
-                  data-bs-toggle="modal" data-bs-target="#feedFormModal">
+            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+            (click)="clearFeedData()" data-bs-toggle="modal" data-bs-target="#feedFormModal">
             <i class="ri-add-box-fill"></i> Add Feed
           </button>
         </div>
         <div class="w-full lg:w-80 lg:ml-auto">
           <div class="relative">
-            <input
-              class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
-                     py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
-              type="search"
-              placeholder="Search ..."
-              [(ngModel)]="searchTerm"
-              (ngModelChange)="onSearch()"
-              id="html5-search-input" />
+            <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+                     py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" type="search"
+              placeholder="Search ..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" id="html5-search-input" />
             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
               <i class="ri-search-2-fill"></i>
             </span>
@@ -51,14 +42,15 @@
     <!-- Grid: Cattle & Feed -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- CATTLE -->
-      <section class="bg-white rounded-2xl shadow-sm p-6">
+      <section>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-medium text-green-800">Cattle Master</h2>
           <div class="text-sm text-green-600">Total: {{ animals.length || 0 }}</div>
         </div>
 
         <div *ngIf="loadingAnimals" class="text-center my-3">
-          <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8"></div>
+          <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8">
+          </div>
         </div>
 
         <div *ngIf="!loadingAnimals">
@@ -74,44 +66,36 @@
               </thead>
               <tbody class="divide-y divide-gray-100 text-gray-800">
                 <tr *ngFor="let a of filteredAnimals() | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }"
-                    class="hover:bg-green-50">
+                  class="hover:bg-green-50">
                   <td class="px-4 py-3">
                     <div class="w-10 h-10 rounded-lg overflow-hidden">
-                      <img [src]="getAnimalImage(a)" 
-                           alt="{{ getAnimalName(a) }}"
-                           class="w-full h-full object-cover"
-                           onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yMCAxN0MyMi43NjE0IDE3IDI1IDE0Ljc2MTQgMjUgMTJDMjUgOS4yMzg1OCAyMi43NjE0IDcgMjAgN0MxNy4yMzg2IDcgMTUgOS4yMzg1OCAxNSAxMkMxNSAxNC43NjE0IDE3LjIzODYgMTcgMjAgMTdaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEwLjUgMzJDMTEuMzI4NCAzMiAxMiAzMS4zMjg0IDEyIDMwLjVDMTIgMjkuNjcxNiAxMS4zMjg0IDI5IDEwLjUgMjlDOS42NzE1NyAyOSA5IDI5LjY3MTYgOSAzMC41QzkgMzEuMzI4NCA5LjY3MTU3IDMyIDEwLjUgMzJaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTI4IDMyQzI4IDI2LjQ3NzIgMjQuNzQ2NyAyMiAyMC41IDIyQzE2LjI1MzMgMjIgMTMgMjYuNDc3MiAxMyAzMkgyOFoiIGZpbGw9IiMwREI2NkYiLz48L3N2Zz4='">
+                      <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yMCAxN0MyMi43NjE0IDE3IDI1IDE0Ljc2MTQgMjUgMTJDMjUgOS4yMzg1OCAyMi43NjE0IDcgMjAgN0MxNy4yMzg2IDcgMTUgOS4yMzg1OCAxNSAxMkMxNSAxNC43NjE0IDE3LjIzODYgMTcgMjAgMTdaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEwLjUgMzJDMTEuMzI4NCAzMiAxMiAzMS4zMjg0IDEyIDMwLjVDMTIgMjkuNjcxNiAxMS4zMjg0IDI5IDEwLjUgMjlDOS42NzE1NyAyOSA5IDI5LjY3MTYgOSAzMC41QzkgMzEuMzI4NCA5LjY3MTU3IDMyIDEwLjUgMzJaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTI4IDMyQzI4IDI2LjQ3NzIgMjQuNzQ2NyAyMiAyMC41IDIyQzE2LjI1MzMgMjIgMTMgMjYuNDc3MiAxMyAzMkgyOFoiIGZpbGw9IiMwREI2NkYiLz48L3N2Zz4='">
                     </div>
                   </td>
                   <td class="px-4 py-3">
                     <div class="dropdown w-full">
-                      <button class="w-full text-left flex items-center justify-between dropdown-toggle"
-                              type="button"
-                              id="animalDropdown{{ getAnimalId(a) }}"
-                              data-bs-toggle="dropdown"
-                              aria-expanded="false"
-                              (click)="$event.stopPropagation()">
+                      <button class="w-full text-left flex items-center justify-between dropdown-toggle" type="button"
+                        id="animalDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                        (click)="$event.stopPropagation()">
                         <div>
                           <div class="font-medium text-green-800">{{ getAnimalName(a) }}</div>
                         </div>
-                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                       </button>
                       <ul class="dropdown-menu p-1" [attr.aria-labelledby]="'animalDropdown' + getAnimalId(a)">
                         <li>
                           <a class="dropdown-item text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                             href="javascript:void(0);"
-                             (click)="getAnimalById(getAnimalId(a), 'E')"
-                             data-bs-toggle="modal"
-                             data-bs-target="#cattleFormModal">Edit</a>
+                            href="javascript:void(0);" (click)="getAnimalById(getAnimalId(a), 'E')"
+                            data-bs-toggle="modal" data-bs-target="#cattleFormModal">Edit</a>
                         </li>
                         <li>
                           <a class="dropdown-item text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                             href="javascript:void(0);"
-                             (click)="getAnimalById(getAnimalId(a), 'D')"
-                             data-bs-toggle="modal"
-                             data-bs-target="#cattleFormModal">Delete</a>
+                            href="javascript:void(0);" (click)="getAnimalById(getAnimalId(a), 'D')"
+                            data-bs-toggle="modal" data-bs-target="#cattleFormModal">Delete</a>
                         </li>
                       </ul>
                     </div>
@@ -128,35 +112,30 @@
           <!-- Mobile: cards -->
           <div *ngIf="animals && animals.length > 0" class="space-y-3 md:hidden">
             <div *ngFor="let a of filteredAnimals() | paginate: { itemsPerPage: pageSize, currentPage: pageAnimal }"
-                 class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
+              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img [src]="getAnimalImage(a)" 
-                     alt="{{ getAnimalName(a) }}"
-                     class="w-full h-full object-cover"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yNCAyMEMyOC40MTgzIDIwIDMyIDE2LjQxODMgMzIgMTJDMzIgNy41ODE3MiAyOC40MTgzIDQgMjQgNEMxOS41ODE3IDQgMTYgNy41ODE3MiAxNiAxMkMxNiAxNi40MTgzIDE5LjU4MTcgMjAgMjQgMjBaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEyLjUgMzhDMTMuODgwNyAzOCAxNSAzNi44ODA3IDE1IDM1LjVDMTUgMzQuMTE5MyAxMy44ODA3IDMzIDEyLjUgMzNDMTEuMTE5MyAzMyAxMCAzNC4xMTkzIDEwIDM1LjVDMTAgMzYuODgwNyAxMS4xMTkzIDM4IDEyLjUgMzhaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTM0IDM4QzM0IDMxLjM3MjYgMjkuNjk2IDI2IDI0LjUgMjZDMTkuMzA0IDI2IDE1IDMxLjM3MjYgMTUgMzhIMzRaIiBmaWxsPSIjMERCNjZGIi8+PC9zdmc+'">
+                <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
+                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yNCAyMEMyOC40MTgzIDIwIDMyIDE2LjQxODMgMzIgMTJDMzIgNy41ODE3MiAyOC40MTgzIDQgMjQgNEMxOS41ODE3IDQgMTYgNy41ODE3MiAxNiAxMkMxNiAxNi40MTgzIDE5LjU4MTcgMjAgMjQgMjBaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEyLjUgMzhDMTMuODgwNyAzOCAxNSAzNi44ODA3IDE1IDM1LjVDMTUgMzQuMTE5MyAxMy44ODA3IDMzIDEyLjUgMzNDMTEuMTE5MyAzMyAxMCAzNC4xMTkzIDEwIDM1LjVDMTAgMzYuODgwNyAxMS4xMTkzIDM4IDEyLjUgMzhaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTM0IDM4QzM0IDMxLjM3MjYgMjkuNjk2IDI2IDI0LjUgMjZDMTkuMzA0IDI2IDE1IDMxLjM3MjYgMTUgMzhIMzRaIiBmaWxsPSIjMERCNjZGIi8+PC9zdmc+'">
               </div>
               <div class="flex-1">
                 <div class="text-green-800 font-medium">{{ getAnimalName(a) }}</div>
                 <div class="text-xs text-green-500 mt-1">ID: {{ getAnimalId(a) }}</div>
               </div>
               <div class="dropdown">
-                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle"
-                        type="button"
-                        id="animalCardDropdown{{ getAnimalId(a) }}"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle" type="button"
+                  id="animalCardDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown" aria-expanded="false">
                   Actions
                 </button>
                 <ul class="dropdown-menu" [attr.aria-labelledby]="'animalCardDropdown' + getAnimalId(a)">
                   <li>
                     <a class="dropdown-item text-green-700" href="javascript:void(0);"
-                       (click)="getAnimalById(getAnimalId(a), 'E')"
-                       data-bs-toggle="modal" data-bs-target="#cattleFormModal">Edit</a>
+                      (click)="getAnimalById(getAnimalId(a), 'E')" data-bs-toggle="modal"
+                      data-bs-target="#cattleFormModal">Edit</a>
                   </li>
                   <li>
                     <a class="dropdown-item text-red-600" href="javascript:void(0);"
-                       (click)="getAnimalById(getAnimalId(a), 'D')"
-                       data-bs-toggle="modal" data-bs-target="#cattleFormModal">Delete</a>
+                      (click)="getAnimalById(getAnimalId(a), 'D')" data-bs-toggle="modal"
+                      data-bs-target="#cattleFormModal">Delete</a>
                   </li>
                 </ul>
               </div>
@@ -174,15 +153,18 @@
         </div>
       </section>
 
+      <div class="w-full h-3 my-4" style="background: #8b5cf6;"></div>
+
       <!-- FEED -->
-      <section class="bg-white rounded-2xl shadow-sm p-6">
+      <section>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-medium text-green-800">Feed Master</h2>
           <div class="text-sm text-green-600">Total: {{ feeds.length || 0 }}</div>
         </div>
 
         <div *ngIf="loadingFeeds" class="text-center my-3">
-          <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8"></div>
+          <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8">
+          </div>
         </div>
 
         <div *ngIf="!loadingFeeds">
@@ -198,44 +180,36 @@
               </thead>
               <tbody class="divide-y divide-gray-100 text-gray-800">
                 <tr *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
-                    class="hover:bg-green-50">
+                  class="hover:bg-green-50">
                   <td class="px-4 py-3">
                     <div class="w-10 h-10 rounded-lg overflow-hidden">
-                      <img [src]="getFeedImage(f)" 
-                           alt="{{ getFeedName(f) }}"
-                           class="w-full h-full object-cover"
-                           onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xMyAxOUMxMyAyMi4zMDg2IDE1LjY5MTQgMjUgMTguNSAyNUMyMS4zMDg2IDI1IDI0IDIyLjMwODYgMjQgMTlDMjQgMTUuNjkxNCAyMS4zMDg2IDEzIDE4LjUgMTNDMTUuNjkxNCAxMyAxMyAxNS42OTE0IDEzIDE5WiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0yMiAyNkMyMiAyNC4zNDMxIDIwLjY1NjkgMjMgMTkgMjNDMTcuMzQzMSAyMyAxNiAyNC4zNDMxIDE2IDI2SDIyWiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0xOCAyOEMyMy41MjI4IDI4IDI4IDIzLjUyMjggMjggMThDMjggMTIuNDc3MiAyMy41MjI4IDggMTggOEMxMi40NzcyIDggOCAxMi40NzcyIDggMThDOCAyMy41MjI4IDEyLjQ3NzIgMjggMTggMjhaIiBzdHJva2U9IiM1OUEwMjciIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg=='">
+                      <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xMyAxOUMxMyAyMi4zMDg2IDE1LjY5MTQgMjUgMTguNSAyNUMyMS4zMDg2IDI1IDI0IDIyLjMwODYgMjQgMTlDMjQgMTUuNjkxNCAyMS4zMDg2IDEzIDE4LjUgMTNDMTUuNjkxNCAxMyAxMyAxNS42OTE0IDEzIDE5WiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0yMiAyNkMyMiAyNC4zNDMxIDIwLjY1NjkgMjMgMTkgMjNDMTcuMzQzMSAyMyAxNiAyNC4zNDMxIDE2IDI2SDIyWiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0xOCAyOEMyMy41MjI4IDI4IDI4IDIzLjUyMjggMjggMThDMjggMTIuNDc3MiAyMy41MjI4IDggMTggOEMxMi40NzcyIDggOCAxMi40NzcyIDggMThDOCAyMy41MjI4IDEyLjQ3NzIgMjggMTggMjhaIiBzdHJva2U9IiM1OUEwMjciIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg=='">
                     </div>
                   </td>
                   <td class="px-4 py-3">
                     <div class="dropdown w-full">
-                      <button class="w-full text-left flex items-center justify-between dropdown-toggle"
-                              type="button"
-                              id="feedDropdown{{ getFeedId(f) }}"
-                              data-bs-toggle="dropdown"
-                              aria-expanded="false"
-                              (click)="$event.stopPropagation()">
+                      <button class="w-full text-left flex items-center justify-between dropdown-toggle" type="button"
+                        id="feedDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                        (click)="$event.stopPropagation()">
                         <div>
                           <div class="font-medium text-green-800">{{ getFeedName(f) }}</div>
                         </div>
-                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        <svg class="h-4 w-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                          viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                       </button>
                       <ul class="dropdown-menu p-1" [attr.aria-labelledby]="'feedDropdown' + getFeedId(f)">
                         <li>
                           <a class="dropdown-item text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                             href="javascript:void(0);"
-                             (click)="getFeedById(getFeedId(f), 'E')"
-                             data-bs-toggle="modal"
-                             data-bs-target="#feedFormModal">Edit</a>
+                            href="javascript:void(0);" (click)="getFeedById(getFeedId(f), 'E')" data-bs-toggle="modal"
+                            data-bs-target="#feedFormModal">Edit</a>
                         </li>
                         <li>
                           <a class="dropdown-item text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                             href="javascript:void(0);"
-                             (click)="getFeedById(getFeedId(f), 'D')"
-                             data-bs-toggle="modal"
-                             data-bs-target="#feedFormModal">Delete</a>
+                            href="javascript:void(0);" (click)="getFeedById(getFeedId(f), 'D')" data-bs-toggle="modal"
+                            data-bs-target="#feedFormModal">Delete</a>
                         </li>
                       </ul>
                     </div>
@@ -252,35 +226,30 @@
           <!-- Mobile: cards -->
           <div *ngIf="feeds && feeds.length > 0" class="space-y-3 md:hidden">
             <div *ngFor="let f of filteredFeeds() | paginate: { itemsPerPage: pageSize, currentPage: pageFeed }"
-                 class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
+              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3">
               <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img [src]="getFeedImage(f)" 
-                     alt="{{ getFeedName(f) }}"
-                     class="w-full h-full object-cover"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
+                <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
+                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
               </div>
               <div class="flex-1">
                 <div class="text-green-800 font-medium">{{ getFeedName(f) }}</div>
                 <div class="text-xs text-green-500 mt-1">ID: {{ getFeedId(f) }}</div>
               </div>
               <div class="dropdown">
-                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle"
-                        type="button"
-                        id="feedCardDropdown{{ getFeedId(f) }}"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                <button class="px-3 py-1 rounded bg-green-50 text-green-700 text-sm dropdown-toggle" type="button"
+                  id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false">
                   Actions
                 </button>
                 <ul class="dropdown-menu" [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
                   <li>
                     <a class="dropdown-item text-green-700" href="javascript:void(0);"
-                       (click)="getFeedById(getFeedId(f), 'E')"
-                       data-bs-toggle="modal" data-bs-target="#feedFormModal">Edit</a>
+                      (click)="getFeedById(getFeedId(f), 'E')" data-bs-toggle="modal"
+                      data-bs-target="#feedFormModal">Edit</a>
                   </li>
                   <li>
                     <a class="dropdown-item text-red-600" href="javascript:void(0);"
-                       (click)="getFeedById(getFeedId(f), 'D')"
-                       data-bs-toggle="modal" data-bs-target="#feedFormModal">Delete</a>
+                      (click)="getFeedById(getFeedId(f), 'D')" data-bs-toggle="modal"
+                      data-bs-target="#feedFormModal">Delete</a>
                   </li>
                 </ul>
               </div>
@@ -302,7 +271,8 @@
 </main>
 
 <!-- Cattle Modal -->
-<div class="modal fade custom-modal-fade" id="cattleFormModal" tabindex="-1" aria-labelledby="cattleFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="cattleFormModal" tabindex="-1" aria-labelledby="cattleFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-lg">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -328,8 +298,9 @@
               <div class="custom-form-group">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="cattle-name" class="form-control" formControlName="ANIMAL_NAME"
-                         placeholder="Cattle Name" [readonly]="ANIMAL_ID != 0 && btnAnimal == 'D'" />
-                  <label for="cattle-name"><i class="ri-box-3-line"></i>Cattle Name <span class="text-danger">*</span></label>
+                    placeholder="Cattle Name" [readonly]="ANIMAL_ID != 0 && btnAnimal == 'D'" />
+                  <label for="cattle-name"><i class="ri-box-3-line"></i>Cattle Name <span
+                      class="text-danger">*</span></label>
                   <div class="text-danger mt-1" *ngIf="submittedAnimal && animalForm.get('ANIMAL_NAME')?.invalid">
                     <small *ngIf="animalForm.get('ANIMAL_NAME')?.errors?.['required']">Cattle name is required.</small>
                   </div>
@@ -342,14 +313,10 @@
                   <i class="ri-image-line"></i> Cattle Image
                 </label>
                 <div class="mt-1">
-                  <input type="file"
-                         id="animalImage"
-                         accept="image/*"
-                         (change)="onAnimalImageSelect($event)"
-                         [disabled]="ANIMAL_ID != 0 && btnAnimal == 'D'"
-                         class="hidden" />
-                  <label for="animalImage" 
-                         class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+                  <input type="file" id="animalImage" accept="image/*" (change)="onAnimalImageSelect($event)"
+                    [disabled]="ANIMAL_ID != 0 && btnAnimal == 'D'" class="hidden" />
+                  <label for="animalImage"
+                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
                     <div class="text-center">
                       <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2"></i>
                       <p class="text-sm text-green-600">
@@ -368,8 +335,9 @@
               <div class="custom-form-group" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="deleteAnimalReason" class="form-control" placeholder="Delete Reason"
-                         [(ngModel)]="animalDeleteReason" [ngModelOptions]="{standalone: true}" />
-                  <label for="deleteAnimalReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                    [(ngModel)]="animalDeleteReason" [ngModelOptions]="{standalone: true}" />
+                  <label for="deleteAnimalReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                      class="text-danger">*</span></label>
                 </div>
                 <div class="text-danger mt-1" *ngIf="submittedAnimal && animalDeleteReason == ''">
                   <small>Delete reason is required.</small>
@@ -384,26 +352,25 @@
                   <i class="ri-eye-line"></i> Image Preview
                 </label>
                 <div class="mt-1">
-                  <div class="relative w-full h-64 bg-green-50 rounded-lg border-2 border-dashed border-green-200 overflow-hidden">
-                    <img [src]="animalImagePreview || getAnimalImage(currentAnimal)" 
-                         alt="Cattle Image Preview"
-                         class="w-full h-full object-contain p-2"
-                         *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')"
-                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgdmlld0Cb3g9IjAgMCAyNDAgMjQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIiByeD0iMTIiIGZpbGw9IiNGRkYiIHN0cm9rZT0iI0RFRURFRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTEyMCA4MEMxNDUuMjI4IDgwIDE2NiAxMDAuNzcyIDE2NiAxMjZDMTY2IDE1MS4yMjggMTQ1LjIyOCAxNzIgMTIwIDE3MkM5NC43NzI0IDE3MiA3NCAxNTEuMjI4IDc0IDEyNkM3NCAxMDAuNzcyIDk0Ljc3MjQgODAgMTIwIDgwWiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik02MyAxOThDNjYuMzEzNyAxOTggNjkgMTk1LjMxMzcgNjkgMTkyQzY5IDE4OC42ODYzIDY2LjMxMzcgMTg2IDYzIDE4NkM1OS42ODYzIDE4NiA1NyAxODguNjg2MyA1NyAxOTJDNTcgMTk1LjMxMzcgNTkuNjg2MyAxOTggNjMgMTk4WiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik0xNjggMTk4QzE2OCAxNzcuOTA2IDE1MS45NjMgMTYyIDEzMiAxNjJDMTEyLjAzNyAxNjIgOTYgMTc3LjkwNiA5NiAxOThIMTY4WiIgZmlsbD0iIzBEQjY2RiIvPjwvc3ZnPg=='">
-                    <div *ngIf="!animalImagePreview && (!currentAnimal || !getAnimalImage(currentAnimal))" 
-                         class="flex flex-col items-center justify-center w-full h-full text-green-400">
+                  <div
+                    class="relative w-full h-64 bg-green-50 rounded-lg border-2 border-dashed border-green-200 overflow-hidden">
+                    <img [src]="animalImagePreview || getAnimalImage(currentAnimal)" alt="Cattle Image Preview"
+                      class="w-full h-full object-contain p-2"
+                      *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')"
+                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgdmlld0Cb3g9IjAgMCAyNDAgMjQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIiByeD0iMTIiIGZpbGw9IiNGRkYiIHN0cm9rZT0iI0RFRURFRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTEyMCA4MEMxNDUuMjI4IDgwIDE2NiAxMDAuNzcyIDE2NiAxMjZDMTY2IDE1MS4yMjggMTQ1LjIyOCAxNzIgMTIwIDE3MkM5NC43NzI0IDE3MiA3NCAxNTEuMjI4IDc0IDEyNkM3NCAxMDAuNzcyIDk0Ljc3MjQgODAgMTIwIDgwWiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik02MyAxOThDNjYuMzEzNyAxOTggNjkgMTk1LjMxMzcgNjkgMTkyQzY5IDE4OC42ODYzIDY2LjMxMzcgMTg2IDYzIDE4NkM1OS42ODYzIDE4NiA1NyAxODguNjg2MyA1NyAxOTJDNTcgMTk1LjMxMzcgNTkuNjg2MyAxOTggNjMgMTk4WiIgZmlsbD0iIzBEQjY2RiIvPjxwYXRoIGQ9Ik0xNjggMTk4QzE2OCAxNzcuOTA2IDE1MS45NjMgMTYyIDEzMiAxNjJDMTEyLjAzNyAxNjIgOTYgMTc3LjkwNiA5NiAxOThIMTY4WiIgZmlsbD0iIzBEQjY2RiIvPjwvc3ZnPg=='">
+                    <div *ngIf="!animalImagePreview && (!currentAnimal || !getAnimalImage(currentAnimal))"
+                      class="flex flex-col items-center justify-center w-full h-full text-green-400">
                       <i class="ri-image-line text-4xl mb-3"></i>
                       <p class="text-sm">No image selected</p>
                     </div>
-                    <button type="button" 
-                            *ngIf="animalImagePreview && ANIMAL_ID != 0 && btnAnimal != 'D'"
-                            (click)="removeAnimalImage()"
-                            class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                    <button type="button" *ngIf="animalImagePreview && ANIMAL_ID != 0 && btnAnimal != 'D'"
+                      (click)="removeAnimalImage()"
+                      class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
                       <i class="ri-close-line text-sm"></i>
                     </button>
                   </div>
-                  <div class="text-xs text-green-500 mt-2 text-center" 
-                       *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')">
+                  <div class="text-xs text-green-500 mt-2 text-center"
+                    *ngIf="animalImagePreview || (currentAnimal && getAnimalImage(currentAnimal) !== '')">
                     Image will be saved in Base64 format
                   </div>
                 </div>
@@ -433,7 +400,8 @@
 </div>
 
 <!-- Feed Modal -->
-<div class="modal fade custom-modal-fade" id="feedFormModal" tabindex="-1" aria-labelledby="feedFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" id="feedFormModal" tabindex="-1" aria-labelledby="feedFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-lg">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -459,8 +427,9 @@
               <div class="custom-form-group">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="feed-name" class="form-control" formControlName="FEED_NAME"
-                         placeholder="Feed Name" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
-                  <label for="feed-name"><i class="ri-box-3-line"></i>Feed Name <span class="text-danger">*</span></label>
+                    placeholder="Feed Name" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
+                  <label for="feed-name"><i class="ri-box-3-line"></i>Feed Name <span
+                      class="text-danger">*</span></label>
                   <div class="text-danger mt-1" *ngIf="submittedFeed && feedForm.get('FEED_NAME')?.invalid">
                     <small *ngIf="feedForm.get('FEED_NAME')?.errors?.['required']">Feed name is required.</small>
                   </div>
@@ -473,14 +442,10 @@
                   <i class="ri-image-line"></i> Feed Image
                 </label>
                 <div class="mt-1">
-                  <input type="file"
-                         id="feedImage"
-                         accept="image/*"
-                         (change)="onFeedImageSelect($event)"
-                         [disabled]="FEED_ID != 0 && btnFeed == 'D'"
-                         class="hidden" />
-                  <label for="feedImage" 
-                         class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+                  <input type="file" id="feedImage" accept="image/*" (change)="onFeedImageSelect($event)"
+                    [disabled]="FEED_ID != 0 && btnFeed == 'D'" class="hidden" />
+                  <label for="feedImage"
+                    class="cursor-pointer flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
                     <div class="text-center">
                       <i class="ri-upload-cloud-2-line text-2xl text-green-400 mb-2"></i>
                       <p class="text-sm text-green-600">
@@ -499,8 +464,9 @@
               <div class="custom-form-group" *ngIf="FEED_ID != 0 && btnFeed == 'D'">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
-                         [(ngModel)]="feedDeleteReason" [ngModelOptions]="{standalone: true}" />
-                  <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                    [(ngModel)]="feedDeleteReason" [ngModelOptions]="{standalone: true}" />
+                  <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                      class="text-danger">*</span></label>
                 </div>
                 <div class="text-danger mt-1" *ngIf="submittedFeed && feedDeleteReason == ''">
                   <small>Delete reason is required.</small>
@@ -515,26 +481,25 @@
                   <i class="ri-eye-line"></i> Image Preview
                 </label>
                 <div class="mt-1">
-                  <div class="relative w-full h-64 bg-green-50 rounded-lg border-2 border-dashed border-green-200 overflow-hidden">
-                    <img [src]="feedImagePreview || getFeedImage(currentFeed)" 
-                         alt="Feed Image Preview"
-                         class="w-full h-full object-contain p-2"
-                         *ngIf="feedImagePreview || (currentFeed && getFeedImage(currentFeed) !== '')"
-                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgdmlld0Cb3g9IjAgMCAyNDAgMjQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIiByeD0iMTIiIGZpbGw9IiNGRkYiIHN0cm9rZT0iI0RFRURFRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE0NCAxMTBDMTQ0IDEzMC44NzIgMTI2Ljg3MiAxNDggMTA2IDE0OEM4NS4xMjggMTQ4IDY4IDEzMC44NzIgNjggMTEwQzY4IDg5LjEyOCA4NS4xMjggNzIgMTA2IDcyQzEyNi44NzIgNzIgMTQ0IDg5LjEyOCAxNDQgMTEwWiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0xMzIgMTU2QzEzMiAxNTMuNzkxIDEzMC4yMDkgMTUyIDEyOCAxNTJDMTI1Ljc5MSAxNTIgMTI0IDE1My43OTEgMTI0IDE1NkgxMzJaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTEwOCAxNjBDMTM0LjUxNCAxNjAgMTU2IDEzOC41MTQgMTU2IDExMkMxNTYgODUuNDg2IDEzNC41MTQgNjQgMTA4IDY0QzgxLjQ4NiA2NCA2MCA4NS40ODYgNjAgMTEyQzYwIDEzOC41MTQgODEuNDg2IDE2MCAxMDggMTYwWiIgc3Ryb2tlPSIjNTlBMDI3IiBzdHJva2Utd2lkdGg9IjQiLz48L3N2Zz4='">
-                    <div *ngIf="!feedImagePreview && (!currentFeed || !getFeedImage(currentFeed))" 
-                         class="flex flex-col items-center justify-center w-full h-full text-green-400">
+                  <div
+                    class="relative w-full h-64 bg-green-50 rounded-lg border-2 border-dashed border-green-200 overflow-hidden">
+                    <img [src]="feedImagePreview || getFeedImage(currentFeed)" alt="Feed Image Preview"
+                      class="w-full h-full object-contain p-2"
+                      *ngIf="feedImagePreview || (currentFeed && getFeedImage(currentFeed) !== '')"
+                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgdmlld0Cb3g9IjAgMCAyNDAgMjQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIiByeD0iMTIiIGZpbGw9IiNGRkYiIHN0cm9rZT0iI0RFRURFRSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE0NCAxMTBDMTQ0IDEzMC44NzIgMTI2Ljg3MiAxNDggMTA2IDE0OEM4NS4xMjggMTQ4IDY4IDEzMC44NzIgNjggMTEwQzY4IDg5LjEyOCA4NS4xMjggNzIgMTA2IDcyQzEyNi44NzIgNzIgMTQ0IDg5LjEyOCAxNDQgMTEwWiIgZmlsbD0iIzU5QTAyNyIvPjxwYXRoIGQ9Ik0xMzIgMTU2QzEzMiAxNTMuNzkxIDEzMC4yMDkgMTUyIDEyOCAxNTJDMTI1Ljc5MSAxNTIgMTI0IDE1My43OTEgMTI0IDE1NkgxMzJaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTEwOCAxNjBDMTM0LjUxNCAxNjAgMTU2IDEzOC41MTQgMTU2IDExMkMxNTYgODUuNDg2IDEzNC41MTQgNjQgMTA4IDY0QzgxLjQ4NiA2NCA2MCA4NS40ODYgNjAgMTEyQzYwIDEzOC41MTQgODEuNDg2IDE2MCAxMDggMTYwWiIgc3Ryb2tlPSIjNTlBMDI3IiBzdHJva2Utd2lkdGg9IjQiLz48L3N2Zz4='">
+                    <div *ngIf="!feedImagePreview && (!currentFeed || !getFeedImage(currentFeed))"
+                      class="flex flex-col items-center justify-center w-full h-full text-green-400">
                       <i class="ri-image-line text-4xl mb-3"></i>
                       <p class="text-sm">No image selected</p>
                     </div>
-                    <button type="button" 
-                            *ngIf="feedImagePreview && FEED_ID != 0 && btnFeed != 'D'"
-                            (click)="removeFeedImage()"
-                            class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                    <button type="button" *ngIf="feedImagePreview && FEED_ID != 0 && btnFeed != 'D'"
+                      (click)="removeFeedImage()"
+                      class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
                       <i class="ri-close-line text-sm"></i>
                     </button>
                   </div>
-                  <div class="text-xs text-green-500 mt-2 text-center" 
-                       *ngIf="feedImagePreview || (currentFeed && getFeedImage(currentFeed) !== '')">
+                  <div class="text-xs text-green-500 mt-2 text-center"
+                    *ngIf="feedImagePreview || (currentFeed && getFeedImage(currentFeed) !== '')">
                     Image will be saved in Base64 format
                   </div>
                 </div>
