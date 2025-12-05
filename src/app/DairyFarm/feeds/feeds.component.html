@@ -18,21 +18,17 @@
       <div class="flex flex-col lg:flex-row items-center gap-4">
         <div class="flex gap-3">
           <button type="button"
-                  class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
-                  (click)="openAddModal()">
+            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+            (click)="openAddModal()">
             <i class="ri-add-box-fill"></i> Add Feed
           </button>
         </div>
 
         <div class="w-full lg:w-80 lg:ml-auto">
           <div class="relative">
-            <input
-              class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
-                     py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
-              type="search"
-              placeholder="Search feed name..."
-              [(ngModel)]="searchTerm"
-              (ngModelChange)="onSearch()"
+            <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+                     py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" type="search"
+              placeholder="Search feed name..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"
               id="feeds-search-input" />
             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
               <i class="ri-search-2-fill"></i>
@@ -43,7 +39,7 @@
     </div>
 
     <!-- Feeds Grid -->
-    <section >
+    <section>
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-medium text-green-800">Feed History</h2>
         <div class="text-sm text-green-600">Total: {{ feeds.length || 0 }}</div>
@@ -55,52 +51,54 @@
 
       <div *ngIf="!loadingFeeds">
         <!-- Table on md+ -->
-       <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="space-y-3">
-        
-            <div *ngFor="let f of filteredFeeds" id="feedCardDropdown{{ getFeedId(f) }}" (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
-              class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
-              <!-- Image -->
-              <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img class="w-full h-full object-cover"
-                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
-              </div>
-              
-              <!-- Info -->
-              <div class="flex-1 min-w-0">
-                <div class="text-green-800 font-medium truncate">{{ f.feed_name }}</div>
+        <div *ngIf="feeds && feeds.length > 0; else noFeedData" class="space-y-3">
+
+          <div *ngFor="let f of filteredFeeds" id="feedCardDropdown{{ getFeedId(f) }}"
+            (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
+            class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
+            <!-- Image -->
+            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+              <img [src]="f.feedImage" class="w-full h-full object-cover"
+                onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="text-green-800 font-medium truncate">{{ f.feed_name }}</div>
               <div class="text-xs text-green-500 mt-1">Price: {{ f.price }} | Qty: {{ f.quantity }}</div>
               <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(f.date) }}</div>
-              </div>
-              
-              <!-- Actions Dropdown -->
-              <div class="dropdown flex-shrink-0">
-                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
-                  type="button" id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
-                  (click)="$event.stopPropagation()">
-                  <span>Actions</span>
-                </button>
-                <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                  [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
-                  <li>
-                    <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                      href="javascript:void(0);" (click)="openEditModal(f)" data-bs-toggle="modal"
-                      data-bs-target="#feedFormModal">
-                      <i class="ri-edit-line text-sm"></i> Edit
-                    </a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                      href="javascript:void(0);" (click)="openDeleteModal(f)" data-bs-toggle="modal"
-                      data-bs-target="#feedFormModal">
-                      <i class="ri-delete-bin-line text-sm"></i> Delete
-                    </a>
-                  </li>
-                </ul>
-              </div>
             </div>
-           
+
+            <!-- Actions Dropdown -->
+            <div class="dropdown flex-shrink-0">
+              <button
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
+                type="button" id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                (click)="$event.stopPropagation()">
+                <span>Actions</span>
+              </button>
+              <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
+                [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(f)">
+                <li>
+                  <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
+                    href="javascript:void(0);" (click)="openEditModal(f)" data-bs-toggle="modal"
+                    data-bs-target="#feedFormModal">
+                    <i class="ri-edit-line text-sm"></i> Edit
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
+                    href="javascript:void(0);" (click)="openDeleteModal(f)" data-bs-toggle="modal"
+                    data-bs-target="#feedFormModal">
+                    <i class="ri-delete-bin-line text-sm"></i> Delete
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-       
+
+        </div>
+
 
         <ng-template #noFeedData>
           <div class="text-center py-4">
@@ -112,8 +110,10 @@
   </div>
 </main>
 
+
 <!-- Feed Modal -->
-<div class="modal fade custom-modal-fade" #feedModal tabindex="-1" aria-labelledby="feedFormModalLabel" aria-hidden="true">
+<div class="modal fade custom-modal-fade" #feedModal tabindex="-1" aria-labelledby="feedFormModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
@@ -124,8 +124,8 @@
             <i class="ri-delete-bin-line" *ngIf="modalMode === 'delete'"></i>
           </div>
           <h5 class="modal-title custom-modal-title">
-            {{ modalMode === 'add' ? 'Add Feed' : 
-               modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
+            {{ modalMode === 'add' ? 'Add Feed' :
+            modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
           </h5>
         </div>
         <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
@@ -138,8 +138,8 @@
             <!-- Date -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="date" id="feed-date" class="form-control" formControlName="date"
-                       placeholder="Date" [readonly]="modalMode === 'delete'" />
+                <input type="date" id="feed-date" class="form-control" formControlName="date" placeholder="Date"
+                  [readonly]="modalMode === 'delete'" />
                 <label for="feed-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('date')?.invalid">
                   <small *ngIf="feedForm.get('date')?.errors?.['required']">Date is required.</small>
@@ -147,24 +147,253 @@
               </div>
             </div>
 
-            <!-- Feed Name -->
-            <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="feed-name" class="form-control" formControlName="feed_name"
-                       placeholder="Feed Name" [readonly]="modalMode === 'delete'" />
-                <label for="feed-name"><i class="ri-box-3-line"></i>Feed Name <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('feed_name')?.invalid">
-                  <small *ngIf="feedForm.get('feed_name')?.errors?.['required']">Feed name is required.</small>
-                </div>
-              </div>
+      <div class="custom-form-group">
+  <div class="form-floating form-floating-outline mb-0 position-relative">
+    <!-- SEARCH BAR -->
+    <input 
+      #feedSearchInput 
+      id="Feed-input" 
+      type="text" 
+      class="form-control branch-input" 
+      name="FeedSearch"
+      [(ngModel)]="selectedFeedName" 
+      (input)="onFeedSearch($event)" 
+      (focus)="showFeedDropdown = true"
+      autocomplete="off" 
+      [value]="selectedFeedName || ''" 
+      placeholder="Feed" 
+      required 
+    />
+
+    <label for="Feed-input">
+      <i class="ri-box-3-line"></i>
+      Feed Name <span class="text-danger">*</span>
+    </label>
+
+    <!-- CARET -->
+    <button 
+      type="button" 
+      class="dropdown-caret-button" 
+      (click)="toggleFeedDropdown()"
+      aria-label="Toggle Feeds"
+    >
+      <i [ngClass]="showFeedDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+    </button>
+
+    <!-- Hidden input for feed_id -->
+    <input type="hidden" name="feed_id" [(ngModel)]="selectedFeedId" />
+  </div>
+
+  <!-- DROPDOWN LIST -->
+  <div 
+    class="dropdown-panel" 
+    *ngIf="showFeedDropdown" 
+    (click)="$event.stopPropagation()"
+    [style.display]="showFeedDropdown ? 'block' : 'none'"
+  >
+    <div class="dropdown-list-container">
+      <!-- Loading state -->
+      <div *ngIf="loadingFeedOptions" class="dropdown-loading">
+        <div class="spinner-border text-primary spinner-sm"></div>
+        <span class="loading-text">Loading feeds...</span>
+      </div>
+
+      <!-- Feed options -->
+      <div 
+        *ngIf="!loadingFeedOptions && feedOptions.length > 0"
+        class="dropdown-items-wrapper"
+      >
+        <div 
+          class="dropdown-item" 
+          *ngFor="let feed of feedOptions" 
+          (click)="selectFeed(feed)"
+          [class.dropdown-item-selected]="selectedFeedId === feed.feedId"
+        >
+          <div class="dropdown-item-content">
+            <!-- FEED NAME -->
+            <div class="item-name truncate">
+              {{ feed.feedName }}
             </div>
+            
+            <!-- FEED META - Show ID below name -->
+            <div class="item-meta truncate">
+              ID: {{ feed.feedId }}
+            </div>
+          </div>
+
+          <!-- CHECK ICON -->
+          <i 
+            class="ri-check-line dropdown-check-icon" 
+            *ngIf="selectedFeedId === feed.feedId"
+          ></i>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div 
+        class="dropdown-empty-state" 
+        *ngIf="!loadingFeedOptions && feedOptions.length === 0"
+      >
+        <i class="ri-search-line empty-icon"></i>
+        <div class="empty-text">
+          {{ selectedFeedName ? 'No feeds found for "' + selectedFeedName + '"' : 'Start typing to search feeds' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>/* Dropdown Panel */
+.dropdown-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-list-container {
+  padding: 8px;
+}
+
+/* Loading State */
+.dropdown-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 12px;
+}
+
+.spinner-sm {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+.loading-text {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Dropdown Items */
+.dropdown-items-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-item-selected {
+  background-color: #eff6ff;
+  border-left: 3px solid #3b82f6;
+}
+
+.dropdown-item-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.item-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Check Icon */
+.dropdown-check-icon {
+  color: #10b981;
+  font-size: 18px;
+  margin-left: 8px;
+}
+
+/* Empty State */
+.dropdown-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #9ca3af;
+}
+
+.empty-text {
+  font-size: 14px;
+}
+
+/* Form Input Improvements */
+.branch-input {
+  padding-right: 40px !important;
+}
+
+.dropdown-caret-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.dropdown-caret-button:hover {
+  color: #374151;
+}</style>
 
             <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="feed-price" class="form-control" formControlName="price"
-                       placeholder="Price" [readonly]="modalMode === 'delete'" />
-                <label for="feed-price"><i class="ri-money-dollar-circle-line"></i>Price <span class="text-danger">*</span></label>
+                <input type="number" id="feed-price" class="form-control" formControlName="price" placeholder="Price"
+                  [readonly]="modalMode === 'delete'" />
+                <label for="feed-price"><i class="ri-money-dollar-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('price')?.invalid">
                   <small *ngIf="feedForm.get('price')?.errors?.['required']">Price is required.</small>
                   <small *ngIf="feedForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
@@ -176,7 +405,7 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="number" id="feed-qty" class="form-control" formControlName="quantity"
-                       placeholder="Quantity" [readonly]="modalMode === 'delete'" />
+                  placeholder="Quantity" [readonly]="modalMode === 'delete'" />
                 <label for="feed-qty"><i class="ri-stack-line"></i>Quantity <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('quantity')?.invalid">
                   <small *ngIf="feedForm.get('quantity')?.errors?.['required']">Quantity is required.</small>
@@ -189,8 +418,9 @@
             <div class="custom-form-group" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
-                       [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" />
-                <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span class="text-danger">*</span></label>
+                  [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" />
+                <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                    class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1" *ngIf="submitted && !deleteReason">
                 <small>Delete reason is required.</small>

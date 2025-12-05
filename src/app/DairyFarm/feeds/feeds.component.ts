@@ -17,6 +17,7 @@ import { AuthService } from '../../shared/auth.service';
 })
 export class FeedsComponent implements OnInit {
   @ViewChild('feedModal') feedModal!: ElementRef;
+  @ViewChild('feedInput') feedInput!: ElementRef;
   
   // Form
   feedForm!: FormGroup;
@@ -24,6 +25,15 @@ export class FeedsComponent implements OnInit {
   // Data
   feeds: any[] = [];
   filteredFeeds: any[] = [];
+  
+  // Feed dropdown
+  feedOptions: any[] = [];
+  selectedFeedId: number = 0;
+  selectedFeedName: string = '';
+  feedSearchTerm: string = '';
+  showFeedDropdown: boolean = false;
+  loadingFeedOptions: boolean = false;
+  feedSearchTimeout: any;
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
@@ -57,10 +67,13 @@ export class FeedsComponent implements OnInit {
     this.dairyUserId = this.getDairyUserId();
     this.initForm();
     this.loadFeeds();
+    // Load initial feeds for dropdown
+    this.loadFeedOptions();
   }
 
   initForm(): void {
     this.feedForm = new FormGroup({
+      feed_id: new FormControl('', [Validators.required]),
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       quantity: new FormControl('', [Validators.required, Validators.min(1)]),
@@ -70,7 +83,79 @@ export class FeedsComponent implements OnInit {
 
   private getDairyUserId(): number {
     const dairy = this.auth.getDairyCredentialsFromCookie();
-    return dairy?.user_id ? Number(dairy.user_id) : 0;
+    if (!dairy) return 0;
+    const id = dairy.user_id ?? dairy.userId ?? dairy.UserId ?? dairy.id;
+    return Number(id) || 0;
+  }
+
+  // ==================== FEED DROPDOWN METHODS ====================
+  loadFeedOptions(searchTerm: string = ''): void {
+    if (!this.dairyUserId) return;
+
+    this.loadingFeedOptions = true;
+    
+    this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
+      next: (response: any) => {
+        let feeds = Array.isArray(response) ? response : [];
+        
+        // Filter by search term if provided
+        if (searchTerm.trim()) {
+          const term = searchTerm.toLowerCase();
+          feeds = feeds.filter(feed => 
+            feed.feedName?.toLowerCase().includes(term)
+          );
+        }
+        
+        this.feedOptions = feeds;
+        this.loadingFeedOptions = false;
+      },
+      error: (error: any) => {
+        console.error('Failed to load feed options:', error);
+        this.feedOptions = [];
+        this.loadingFeedOptions = false;
+      }
+    });
+  }
+
+  onFeedSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.feedSearchTerm = input.value;
+    
+    // Clear previous timeout
+    if (this.feedSearchTimeout) {
+      clearTimeout(this.feedSearchTimeout);
+    }
+    
+    // Debounce search
+    this.feedSearchTimeout = setTimeout(() => {
+      this.loadFeedOptions(this.feedSearchTerm);
+    }, 300);
+  }
+
+  selectFeed(feed: any): void {
+    this.selectedFeedId = feed.feedId;
+    this.selectedFeedName = feed.feedName;
+    this.showFeedDropdown = false;
+    
+    // Update form controls
+    this.feedForm.patchValue({
+      feed_id: feed.feedId,
+      feed_name: feed.feedName
+    });
+  }
+
+  toggleFeedDropdown(): void {
+    this.showFeedDropdown = !this.showFeedDropdown;
+    if (this.showFeedDropdown && this.feedOptions.length === 0) {
+      this.loadFeedOptions();
+    }
+  }
+
+  onFeedBlur(): void {
+    // Small delay to allow click events on dropdown items
+    setTimeout(() => {
+      this.showFeedDropdown = false;
+    }, 200);
   }
 
   // ==================== MODAL METHODS ====================
@@ -79,8 +164,22 @@ export class FeedsComponent implements OnInit {
     this.selectedFeed = null;
     this.deleteReason = '';
     this.submitted = false;
+    
+    // Reset feed selection
+    this.selectedFeedId = 0;
+    this.selectedFeedName = '';
+    this.feedSearchTerm = '';
+    
     this.feedForm.reset();
-    this.feedForm.patchValue({ date: this.getTodayDate() });
+    this.feedForm.patchValue({ 
+      date: this.getTodayDate(),
+      feed_id: '',
+      feed_name: ''
+    });
+    
+    // Load fresh feed options
+    this.loadFeedOptions();
+    
     this.showModal();
   }
 
@@ -90,12 +189,18 @@ export class FeedsComponent implements OnInit {
     this.deleteReason = '';
     this.submitted = false;
     
+    // Set feed selection
+    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
+    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+    
     this.feedForm.patchValue({
-      feed_name: feed.feed_name,
+      feed_id: this.selectedFeedId,
+      feed_name: this.selectedFeedName,
       price: feed.price,
       quantity: feed.quantity,
       date: this.formatDateForInput(feed.date)
     });
+    
     this.showModal();
   }
 
@@ -106,7 +211,7 @@ export class FeedsComponent implements OnInit {
     this.submitted = false;
     
     this.feedForm.patchValue({
-      feed_name: feed.feed_name,
+      feed_name: feed.feed_name || feed.feedName,
       price: feed.price,
       quantity: feed.quantity,
       date: this.formatDateForInput(feed.date)
@@ -181,6 +286,12 @@ export class FeedsComponent implements OnInit {
       return;
     }
 
+    // Validate feed selection
+    if (!this.selectedFeedId) {
+      this.toastr.error('Please select a feed from the dropdown');
+      return;
+    }
+
     if (this.modalMode === 'add') {
       this.addFeed();
     } else if (this.modalMode === 'edit') {
@@ -191,8 +302,9 @@ export class FeedsComponent implements OnInit {
   addFeed(): void {
     const payload = {
       user_id: this.dairyUserId,
+      feed_id: this.selectedFeedId,
       expense_name: 'Feeds',
-      feed_name: this.feedForm.value.feed_name.trim(),
+      feed_name: this.selectedFeedName,
       price: Number(this.feedForm.value.price),
       quantity: Number(this.feedForm.value.quantity),
       date: this.formatDateForAPI(this.feedForm.value.date)
@@ -220,8 +332,9 @@ export class FeedsComponent implements OnInit {
     const payload = {
       expense_id: this.selectedFeed.expense_id,
       user_id: this.dairyUserId,
+      feed_id: this.selectedFeedId,
       expense_name: 'Feeds',
-      feed_name: this.feedForm.value.feed_name.trim(),
+      feed_name: this.selectedFeedName,
       price: Number(this.feedForm.value.price),
       quantity: Number(this.feedForm.value.quantity),
       date: this.formatDateForAPI(this.feedForm.value.date)
@@ -333,12 +446,11 @@ export class FeedsComponent implements OnInit {
   }
 
   private tryParseDate(search: string): string | null {
-    // Try to parse various date formats
     const formats = [
-      /^\d{2}\/\d{2}\/\d{4}$/, // dd/mm/yyyy
-      /^\d{2}-\d{2}-\d{4}$/, // dd-mm-yyyy
-      /^\d{4}-\d{2}-\d{2}$/, // yyyy-mm-dd
-      /^\d{1,2}\/\d{1,2}\/\d{2,4}$/ // d/m/yy or d/m/yyyy
+      /^\d{2}\/\d{2}\/\d{4}$/,
+      /^\d{2}-\d{2}-\d{4}$/,
+      /^\d{4}-\d{2}-\d{2}$/,
+      /^\d{1,2}\/\d{1,2}\/\d{2,4}$/
     ];
 
     for (const format of formats) {
@@ -348,5 +460,12 @@ export class FeedsComponent implements OnInit {
     }
     
     return null;
+  }
+
+  // Add this method to clean up timeouts
+  ngOnDestroy(): void {
+    if (this.feedSearchTimeout) {
+      clearTimeout(this.feedSearchTimeout);
+    }
   }
 }
