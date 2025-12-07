@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -15,17 +15,19 @@ import { AuthService } from '../../shared/auth.service';
   templateUrl: './feeds.component.html',
   styleUrls: ['./feeds.component.css']
 })
-export class FeedsComponent implements OnInit {
+export class FeedsComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
   @ViewChild('feedInput') feedInput!: ElementRef;
-  
+  @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+
+
   // Form
   feedForm!: FormGroup;
 
   // Data
   feeds: any[] = [];
   filteredFeeds: any[] = [];
-  
+
   // Feed dropdown
   feedOptions: any[] = [];
   selectedFeedId: number = 0;
@@ -50,13 +52,19 @@ export class FeedsComponent implements OnInit {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
+
+  // Image Preview
+  previewImageUrl: string = '';
+  isImagePreviewOpen: boolean = false;
+
+
   constructor(
     private http: HttpClient,
     private api: ApiService,
     private toastr: ToastrService,
     private auth: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (!this.auth.isDairyLoggedIn()) {
@@ -67,8 +75,13 @@ export class FeedsComponent implements OnInit {
     this.dairyUserId = this.getDairyUserId();
     this.initForm();
     this.loadFeeds();
-    // Load initial feeds for dropdown
     this.loadFeedOptions();
+  }
+
+  OnDestroy(): void {
+    if (this.feedSearchTimeout) {
+      clearTimeout(this.feedSearchTimeout);
+    }
   }
 
   initForm(): void {
@@ -77,7 +90,8 @@ export class FeedsComponent implements OnInit {
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       quantity: new FormControl('', [Validators.required, Validators.min(1)]),
-      date: new FormControl(this.getTodayDate(), [Validators.required])
+      date: new FormControl(this.getTodayDate(), [Validators.required]),
+      feedImage: new FormControl('')
     });
   }
 
@@ -88,24 +102,71 @@ export class FeedsComponent implements OnInit {
     return Number(id) || 0;
   }
 
+
+
+  openImagePreview(): void {
+    const imageUrl = this.feedForm.get('feedImage')?.value;
+    this.previewImageUrl = imageUrl || 'assets/images/default-feed.png';
+
+    this.isImagePreviewOpen = true;
+    this.showImagePreviewModal();
+  }
+
+  closeImagePreview(): void {
+    this.isImagePreviewOpen = false;
+    this.hideImagePreviewModal();
+  }
+
+  showImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      // Add backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      backdrop.addEventListener('click', () => this.closeImagePreview());
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  hideImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/default-feed.png';
+  }
+
   // ==================== FEED DROPDOWN METHODS ====================
   loadFeedOptions(searchTerm: string = ''): void {
     if (!this.dairyUserId) return;
 
     this.loadingFeedOptions = true;
-    
+
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
       next: (response: any) => {
         let feeds = Array.isArray(response) ? response : [];
-        
-        // Filter by search term if provided
+
         if (searchTerm.trim()) {
           const term = searchTerm.toLowerCase();
-          feeds = feeds.filter(feed => 
+          feeds = feeds.filter(feed =>
             feed.feedName?.toLowerCase().includes(term)
           );
         }
-        
+
         this.feedOptions = feeds;
         this.loadingFeedOptions = false;
       },
@@ -120,12 +181,12 @@ export class FeedsComponent implements OnInit {
   onFeedSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.feedSearchTerm = input.value;
-    
+
     // Clear previous timeout
     if (this.feedSearchTimeout) {
       clearTimeout(this.feedSearchTimeout);
     }
-    
+
     // Debounce search
     this.feedSearchTimeout = setTimeout(() => {
       this.loadFeedOptions(this.feedSearchTerm);
@@ -136,7 +197,7 @@ export class FeedsComponent implements OnInit {
     this.selectedFeedId = feed.feedId;
     this.selectedFeedName = feed.feedName;
     this.showFeedDropdown = false;
-    
+
     // Update form controls
     this.feedForm.patchValue({
       feed_id: feed.feedId,
@@ -164,22 +225,22 @@ export class FeedsComponent implements OnInit {
     this.selectedFeed = null;
     this.deleteReason = '';
     this.submitted = false;
-    
+
     // Reset feed selection
     this.selectedFeedId = 0;
     this.selectedFeedName = '';
     this.feedSearchTerm = '';
-    
+
     this.feedForm.reset();
-    this.feedForm.patchValue({ 
+    this.feedForm.patchValue({
       date: this.getTodayDate(),
       feed_id: '',
       feed_name: ''
     });
-    
+
     // Load fresh feed options
     this.loadFeedOptions();
-    
+
     this.showModal();
   }
 
@@ -188,20 +249,43 @@ export class FeedsComponent implements OnInit {
     this.selectedFeed = feed;
     this.deleteReason = '';
     this.submitted = false;
-    
+
+    const expenseId = feed.expense_id;
+
+    if (!expenseId) {
+      this.toastr.error('Invalid feed data');
+      return;
+    }
+
     // Set feed selection
     this.selectedFeedId = feed.feed_id || feed.feedId || 0;
     this.selectedFeedName = feed.feed_name || feed.feedName || '';
-    
+
+    // FIRST PATCH BASIC DATA (without image)
     this.feedForm.patchValue({
       feed_id: this.selectedFeedId,
       feed_name: this.selectedFeedName,
       price: feed.price,
       quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date)
+      date: this.formatDateForInput(feed.date),
+      feedImage: ''
     });
-    
-    this.showModal();
+
+    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+      next: (res: any) => {
+        const image = res?.feedImage || res?.FeedImage;
+        if (image) {
+          this.feedForm.patchValue({ feedImage: image });
+        }
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load feed image");
+        this.showModal();
+      }
+    });
+
   }
 
   openDeleteModal(feed: any): void {
@@ -209,14 +293,43 @@ export class FeedsComponent implements OnInit {
     this.selectedFeed = feed;
     this.deleteReason = '';
     this.submitted = false;
-    
+
+    const expenseId = feed.expense_id;
+
+    if (!expenseId) {
+      this.toastr.error('Invalid feed data');
+      return;
+    }
+
+    // Set feed selection
+    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
+    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+
+    // FIRST PATCH BASIC DATA (without image)
     this.feedForm.patchValue({
-      feed_name: feed.feed_name || feed.feedName,
+      feed_id: this.selectedFeedId,
+      feed_name: this.selectedFeedName,
       price: feed.price,
       quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date)
+      date: this.formatDateForInput(feed.date),
+      feedImage: ''
     });
-    this.showModal();
+
+    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+      next: (res: any) => {
+        const image = res?.feedImage || res?.FeedImage;
+        if (image) {
+          this.feedForm.patchValue({ feedImage: image });
+        }
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load feed image");
+        this.showModal();
+      }
+    });
+
   }
 
   closeModal(): void {
@@ -236,7 +349,7 @@ export class FeedsComponent implements OnInit {
       modalElement.classList.add('show');
       modalElement.style.display = 'block';
       document.body.classList.add('modal-open');
-      
+
       // Add backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
@@ -252,7 +365,7 @@ export class FeedsComponent implements OnInit {
     }
 
     this.loadingFeeds = true;
-    
+
     this.api.get(`Feeds/History/${this.dairyUserId}`).subscribe({
       next: (response: any) => {
         this.feeds = Array.isArray(response) ? response : [];
@@ -372,7 +485,7 @@ export class FeedsComponent implements OnInit {
     });
   }
 
-  
+
   getFeedId(feed: any): number {
     return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
   }
@@ -380,7 +493,7 @@ export class FeedsComponent implements OnInit {
   // ==================== SEARCH & FILTER ====================
   onSearch(): void {
     const search = this.searchTerm.toLowerCase().trim();
-    
+
     if (!search) {
       this.filteredFeeds = [...this.feeds];
       return;
@@ -397,7 +510,7 @@ export class FeedsComponent implements OnInit {
     }
 
     // Then match by feed name
-    this.filteredFeeds = this.feeds.filter(feed => 
+    this.filteredFeeds = this.feeds.filter(feed =>
       feed.feed_name.toLowerCase().includes(search)
     );
   }
@@ -410,18 +523,18 @@ export class FeedsComponent implements OnInit {
 
   formatDateForInput(date: any): string {
     if (!date) return '';
-    
+
     if (typeof date === 'string') {
       if (date.includes('T')) {
         return date.split('T')[0];
       }
       return date;
     }
-    
+
     if (date instanceof Date) {
       return date.toISOString().split('T')[0];
     }
-    
+
     return '';
   }
 
@@ -432,7 +545,7 @@ export class FeedsComponent implements OnInit {
 
   formatDateDisplay(date: any): string {
     if (!date) return '';
-    
+
     try {
       const dateObj = new Date(date);
       return dateObj.toLocaleDateString('en-IN', {
@@ -458,7 +571,7 @@ export class FeedsComponent implements OnInit {
         return search;
       }
     }
-    
+
     return null;
   }
 
