@@ -77,7 +77,8 @@ export class FeedsComponent implements OnInit {
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       quantity: new FormControl('', [Validators.required, Validators.min(1)]),
-      date: new FormControl(this.getTodayDate(), [Validators.required])
+      date: new FormControl(this.getTodayDate(), [Validators.required]), 
+      feedImage: new FormControl('')
     });
   }
 
@@ -181,28 +182,51 @@ export class FeedsComponent implements OnInit {
     this.loadFeedOptions();
     
     this.showModal();
+  }openEditModal(feed: any): void {
+  this.modalMode = 'edit';
+  this.selectedFeed = feed;
+  this.deleteReason = '';
+  this.submitted = false;
+
+  const expenseId = feed.expense_id;
+
+  if (!expenseId) {
+    this.toastr.error('Invalid feed data');
+    return;
   }
 
-  openEditModal(feed: any): void {
-    this.modalMode = 'edit';
-    this.selectedFeed = feed;
-    this.deleteReason = '';
-    this.submitted = false;
-    
-    // Set feed selection
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
-    
-    this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
-      price: feed.price,
-      quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date)
-    });
-    
+  // Set feed selection
+  this.selectedFeedId = feed.feed_id || feed.feedId || 0;
+  this.selectedFeedName = feed.feed_name || feed.feedName || '';
+
+  // FIRST PATCH BASIC DATA (without image)
+  this.feedForm.patchValue({
+    feed_id: this.selectedFeedId,
+    feed_name: this.selectedFeedName,
+    price: feed.price,
+    quantity: feed.quantity,
+    date: this.formatDateForInput(feed.date),
+    feedImage: ''   
+  });
+
+  this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+  next: (res: any) => {
+    const image = res?.feedImage || res?.FeedImage;
+    if (image) {
+      this.feedForm.patchValue({ feedImage: image });
+    }
+    this.showModal();
+  },
+  error: (err) => {
+    console.error(err);
+    this.toastr.error("Failed to load feed image");
     this.showModal();
   }
+});
+
+}
+
+
 
   openDeleteModal(feed: any): void {
     this.modalMode = 'delete';
@@ -214,6 +238,7 @@ export class FeedsComponent implements OnInit {
       feed_name: feed.feed_name || feed.feedName,
       price: feed.price,
       quantity: feed.quantity,
+      feedImage:feed.feedImage,
       date: this.formatDateForInput(feed.date)
     });
     this.showModal();

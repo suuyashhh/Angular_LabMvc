@@ -58,8 +58,8 @@
             class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
             <!-- Image -->
             <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-              <img [src]="f.feedImage" class="w-full h-full object-cover"
-                onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
+              <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png"  class="w-full h-full object-cover"
+                >
             </div>
 
             <!-- Info -->
@@ -116,20 +116,38 @@
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
-      <div class="modal-header custom-modal-header">
-        <div class="modal-title-wrapper">
-          <div class="modal-icon">
-            <i class="ri-file-add-line" *ngIf="modalMode === 'add'"></i>
-            <i class="ri-edit-line" *ngIf="modalMode === 'edit'"></i>
-            <i class="ri-delete-bin-line" *ngIf="modalMode === 'delete'"></i>
-          </div>
-          <h5 class="modal-title custom-modal-title">
-            {{ modalMode === 'add' ? 'Add Feed' :
-            modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
-          </h5>
-        </div>
-        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
+ 
+      
+   <div class="modal-header custom-modal-header">
+  <div class="modal-title-wrapper flex items-center">
+    <!-- Image Container - Slightly larger to match button prominence -->
+    <div class="w-12 h-12 flex items-center justify-center rounded-xl  ">
+      <img
+        [src]="feedForm.get('feedImage')?.value || 'assets/images/default-feed.png'"
+        alt="Feed Icon"
+        class="w-10 h-10 object-contain"
+        onerror="this.src='assets/images/default-feed.png'"
+      />
+    </div>
+    
+    <div class="flex items-center">
+      <div class="modal-icon mr-2">
+        <i class="ri-file-add-line text-2xl" *ngIf="modalMode === 'add'"></i>
+        <i class="ri-edit-line text-2xl" *ngIf="modalMode === 'edit'"></i>
+        <i class="ri-delete-bin-line text-2xl" *ngIf="modalMode === 'delete'"></i>
       </div>
+      <h5 class="modal-title custom-modal-title">
+        {{ modalMode === 'add' ? 'Add Feed' :
+        modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
+      </h5>
+    </div>
+  </div>
+
+  <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
+</div>
+
+
+
 
       <div class="modal-body custom-modal-body">
         <form [formGroup]="feedForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
