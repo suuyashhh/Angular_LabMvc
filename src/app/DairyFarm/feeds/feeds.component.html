@@ -58,8 +58,7 @@
             class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
             <!-- Image -->
             <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-              <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png"  class="w-full h-full object-cover"
-                >
+              <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png" class="w-full h-full object-cover">
             </div>
 
             <!-- Info -->
@@ -116,39 +115,33 @@
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
- 
-      
-   <div class="modal-header custom-modal-header">
-  <div class="modal-title-wrapper flex items-center">
-    <!-- Image Container - Slightly larger to match button prominence -->
-     <div 
-            class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
-            (click)="openImagePreview()"
-            title="Click to view full image"
-          >
-            <img
-              [src]="feedForm.get('feedImage')?.value || 'assets/images/default-feed.png'"
-              alt="Feed Icon"
-              class="w-10 h-10 object-contain"
-              onerror="this.src='assets/images/default-feed.png'"
-            />
-          </div>
-    
-    <div class="flex items-center">
-      <div class="modal-icon mr-2">
-        <i class="ri-file-add-line text-2xl" *ngIf="modalMode === 'add'"></i>
-        <i class="ri-edit-line text-2xl" *ngIf="modalMode === 'edit'"></i>
-        <i class="ri-delete-bin-line text-2xl" *ngIf="modalMode === 'delete'"></i>
-      </div>
-      <h5 class="modal-title custom-modal-title">
-        {{ modalMode === 'add' ? 'Add Feed' :
-        modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
-      </h5>
-    </div>
-  </div>
 
-  <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
-</div>
+
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper flex items-center">
+          <!-- Image Container - Slightly larger to match button prominence -->
+          <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
+            class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
+            (click)="openImagePreview()" title="Click to view full image">
+            <img [src]="feedForm.get('feedImage')?.value || '../../../assets/DairryFarmImg/seed-bag_12627079.png'"
+              alt="Feed Icon" class="w-10 h-10 object-contain" onerror="this.src='assets/images/default-feed.png'" />
+          </div>
+
+          <div class="flex items-center">
+            <div class="modal-icon mr-2">
+              <i class="ri-file-add-line text-2xl" *ngIf="modalMode === 'add'"></i>
+              <i class="ri-edit-line text-2xl" *ngIf="modalMode === 'edit'"></i>
+              <i class="ri-delete-bin-line text-2xl" *ngIf="modalMode === 'delete'"></i>
+            </div>
+            <h5 class="modal-title custom-modal-title">
+              {{ modalMode === 'add' ? 'Add Feed' :
+              modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
+            </h5>
+          </div>
+        </div>
+
+        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
 
 
 
@@ -169,245 +162,216 @@
               </div>
             </div>
 
-      <div class="custom-form-group">
-  <div class="form-floating form-floating-outline mb-0 position-relative">
-    <!-- SEARCH BAR -->
-    <input 
-      #feedSearchInput 
-      id="Feed-input" 
-      type="text" 
-      class="form-control branch-input" 
-      name="FeedSearch"
-      [(ngModel)]="selectedFeedName" 
-      (input)="onFeedSearch($event)" 
-      (focus)="showFeedDropdown = true"
-      autocomplete="off" 
-      [value]="selectedFeedName || ''" 
-      placeholder="Feed" 
-      required 
-    />
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-0 position-relative">
+                <!-- SEARCH BAR -->
+                <input #feedSearchInput id="Feed-input" type="text" class="form-control branch-input" name="FeedSearch"
+                  [(ngModel)]="selectedFeedName" (input)="onFeedSearch($event)" (focus)="showFeedDropdown = true"
+                  autocomplete="off" [value]="selectedFeedName || ''" placeholder="Feed" required />
 
-    <label for="Feed-input">
-      <i class="ri-box-3-line"></i>
-      Feed Name <span class="text-danger">*</span>
-    </label>
+                <label for="Feed-input">
+                  <i class="ri-box-3-line"></i>
+                  Feed Name <span class="text-danger">*</span>
+                </label>
 
-    <!-- CARET -->
-    <button 
-      type="button" 
-      class="dropdown-caret-button" 
-      (click)="toggleFeedDropdown()"
-      aria-label="Toggle Feeds"
-    >
-      <i [ngClass]="showFeedDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-    </button>
+                <!-- CARET -->
+                <button type="button" class="dropdown-caret-button" (click)="toggleFeedDropdown()"
+                  aria-label="Toggle Feeds">
+                  <i [ngClass]="showFeedDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                </button>
 
-    <!-- Hidden input for feed_id -->
-    <input type="hidden" name="feed_id" [(ngModel)]="selectedFeedId" />
-  </div>
+                <!-- Hidden input for feed_id -->
+                <input type="hidden" name="feed_id" [(ngModel)]="selectedFeedId" />
+              </div>
 
-  <!-- DROPDOWN LIST -->
-  <div 
-    class="dropdown-panel" 
-    *ngIf="showFeedDropdown" 
-    (click)="$event.stopPropagation()"
-    [style.display]="showFeedDropdown ? 'block' : 'none'"
-  >
-    <div class="dropdown-list-container">
-      <!-- Loading state -->
-      <div *ngIf="loadingFeedOptions" class="dropdown-loading">
-        <div class="spinner-border text-primary spinner-sm"></div>
-        <span class="loading-text">Loading feeds...</span>
-      </div>
+              <!-- DROPDOWN LIST -->
+              <div class="dropdown-panel" *ngIf="showFeedDropdown" (click)="$event.stopPropagation()"
+                [style.display]="showFeedDropdown ? 'block' : 'none'">
+                <div class="dropdown-list-container">
+                  <!-- Loading state -->
+                  <div *ngIf="loadingFeedOptions" class="dropdown-loading">
+                    <div class="spinner-border text-primary spinner-sm"></div>
+                    <span class="loading-text">Loading feeds...</span>
+                  </div>
 
-      <!-- Feed options -->
-      <div 
-        *ngIf="!loadingFeedOptions && feedOptions.length > 0"
-        class="dropdown-items-wrapper"
-      >
-        <div 
-          class="dropdown-item" 
-          *ngFor="let feed of feedOptions" 
-          (click)="selectFeed(feed)"
-          [class.dropdown-item-selected]="selectedFeedId === feed.feedId"
-        >
-          <div class="dropdown-item-content">
-            <!-- FEED NAME -->
-            <div class="item-name truncate">
-              {{ feed.feedName }}
+                  <!-- Feed options -->
+                  <div *ngIf="!loadingFeedOptions && feedOptions.length > 0" class="dropdown-items-wrapper">
+                    <div class="dropdown-item" *ngFor="let feed of feedOptions" (click)="selectFeed(feed)"
+                      [class.dropdown-item-selected]="selectedFeedId === feed.feedId">
+                      <div class="dropdown-item-content">
+                        <!-- FEED NAME -->
+                        <div class="item-name truncate">
+                          {{ feed.feedName }}
+                        </div>
+
+                        <!-- FEED META - Show ID below name -->
+                        <div class="item-meta truncate">
+                          ID: {{ feed.feedId }}
+                        </div>
+                      </div>
+
+                      <!-- CHECK ICON -->
+                      <i class="ri-check-line dropdown-check-icon" *ngIf="selectedFeedId === feed.feedId"></i>
+                    </div>
+                  </div>
+
+                  <!-- EMPTY STATE -->
+                  <div class="dropdown-empty-state" *ngIf="!loadingFeedOptions && feedOptions.length === 0">
+                    <i class="ri-search-line empty-icon"></i>
+                    <div class="empty-text">
+                      {{ selectedFeedName ? 'No feeds found for "' + selectedFeedName + '"' : 'Start typing to search
+                      feeds' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <!-- FEED META - Show ID below name -->
-            <div class="item-meta truncate">
-              ID: {{ feed.feedId }}
-            </div>
-          </div>
 
-          <!-- CHECK ICON -->
-          <i 
-            class="ri-check-line dropdown-check-icon" 
-            *ngIf="selectedFeedId === feed.feedId"
-          ></i>
-        </div>
-      </div>
+            <style>
+              /* Dropdown Panel */
+              .dropdown-panel {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                margin-top: 4px;
+                max-height: 300px;
+                overflow-y: auto;
+              }
 
-      <!-- EMPTY STATE -->
-      <div 
-        class="dropdown-empty-state" 
-        *ngIf="!loadingFeedOptions && feedOptions.length === 0"
-      >
-        <i class="ri-search-line empty-icon"></i>
-        <div class="empty-text">
-          {{ selectedFeedName ? 'No feeds found for "' + selectedFeedName + '"' : 'Start typing to search feeds' }}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+              .dropdown-list-container {
+                padding: 8px;
+              }
 
-<style>/* Dropdown Panel */
-.dropdown-panel {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 4px;
-  max-height: 300px;
-  overflow-y: auto;
-}
+              /* Loading State */
+              .dropdown-loading {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                gap: 12px;
+              }
 
-.dropdown-list-container {
-  padding: 8px;
-}
+              .spinner-sm {
+                width: 18px;
+                height: 18px;
+                border-width: 2px;
+              }
 
-/* Loading State */
-.dropdown-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 12px;
-}
+              .loading-text {
+                color: #6b7280;
+                font-size: 14px;
+              }
 
-.spinner-sm {
-  width: 18px;
-  height: 18px;
-  border-width: 2px;
-}
+              /* Dropdown Items */
+              .dropdown-items-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+              }
 
-.loading-text {
-  color: #6b7280;
-  font-size: 14px;
-}
+              .dropdown-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+              }
 
-/* Dropdown Items */
-.dropdown-items-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+              .dropdown-item:hover {
+                background-color: #f3f4f6;
+              }
 
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+              .dropdown-item-selected {
+                background-color: #eff6ff;
+                border-left: 3px solid #3b82f6;
+              }
 
-.dropdown-item:hover {
-  background-color: #f3f4f6;
-}
+              .dropdown-item-content {
+                flex: 1;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+              }
 
-.dropdown-item-selected {
-  background-color: #eff6ff;
-  border-left: 3px solid #3b82f6;
-}
+              .item-name {
+                font-size: 14px;
+                font-weight: 500;
+                color: #111827;
+              }
 
-.dropdown-item-content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+              .item-meta {
+                font-size: 12px;
+                color: #6b7280;
+              }
 
-.item-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #111827;
-}
+              .truncate {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
 
-.item-meta {
-  font-size: 12px;
-  color: #6b7280;
-}
+              /* Check Icon */
+              .dropdown-check-icon {
+                color: #10b981;
+                font-size: 18px;
+                margin-left: 8px;
+              }
 
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+              /* Empty State */
+              .dropdown-empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 32px 16px;
+                text-align: center;
+                color: #6b7280;
+              }
 
-/* Check Icon */
-.dropdown-check-icon {
-  color: #10b981;
-  font-size: 18px;
-  margin-left: 8px;
-}
+              .empty-icon {
+                font-size: 24px;
+                margin-bottom: 8px;
+                color: #9ca3af;
+              }
 
-/* Empty State */
-.dropdown-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-  text-align: center;
-  color: #6b7280;
-}
+              .empty-text {
+                font-size: 14px;
+              }
 
-.empty-icon {
-  font-size: 24px;
-  margin-bottom: 8px;
-  color: #9ca3af;
-}
+              /* Form Input Improvements */
+              .branch-input {
+                padding-right: 40px !important;
+              }
 
-.empty-text {
-  font-size: 14px;
-}
+              .dropdown-caret-button {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                color: #6b7280;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+              }
 
-/* Form Input Improvements */
-.branch-input {
-  padding-right: 40px !important;
-}
-
-.dropdown-caret-button {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.dropdown-caret-button:hover {
-  color: #374151;
-}</style>
+              .dropdown-caret-button:hover {
+                color: #374151;
+              }
+            </style>
 
             <!-- Price -->
             <div class="custom-form-group">
@@ -479,22 +443,18 @@
       <div class="modal-body p-0 position-relative">
         <!-- Large Image -->
         <div class="flex justify-center items-center min-h-[70vh]">
-          <img
-            [src]="previewImageUrl || 'assets/images/default-feed.png'"
-            alt="Feed Image Preview"
-            class="max-w-full max-h-[70vh] rounded-lg shadow-2xl"
-            (error)="onImageError($event)"
-          />
+          <img [src]="previewImageUrl || 'assets/images/default-feed.png'" alt="Feed Image Preview"
+            class="max-w-full max-h-[70vh] rounded-lg shadow-2xl" (error)="onImageError($event)" />
         </div>
-        
+
         <!-- Close Button -->
-        <button 
-          type="button" 
+        <button type="button"
           class="absolute top-4 right-4 bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
-          (click)="closeImagePreview()"
-          aria-label="Close"
-        >
+          (click)="closeImagePreview()" aria-label="Close">
           <i class="ri-close-line text-xl"></i>
         </button>
-        
-        <!-- Click anywhere to close hint -->
+
+      </div>
+    </div>
+  </div>
+</div>

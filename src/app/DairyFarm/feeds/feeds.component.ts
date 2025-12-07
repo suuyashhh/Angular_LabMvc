@@ -1,4 +1,4 @@
-import { Component, OnInit,OnDestroy, ViewChild, ElementRef,HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -17,17 +17,17 @@ import { AuthService } from '../../shared/auth.service';
 })
 export class FeedsComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
-  @ViewChild('feedInput') feedInput!: ElementRef;  
+  @ViewChild('feedInput') feedInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
 
-  
+
   // Form
   feedForm!: FormGroup;
 
   // Data
   feeds: any[] = [];
   filteredFeeds: any[] = [];
-  
+
   // Feed dropdown
   feedOptions: any[] = [];
   selectedFeedId: number = 0;
@@ -52,7 +52,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
-  
+
   // Image Preview
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
@@ -64,7 +64,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private auth: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (!this.auth.isDairyLoggedIn()) {
@@ -75,7 +75,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.dairyUserId = this.getDairyUserId();
     this.initForm();
     this.loadFeeds();
-    // Load initial feeds for dropdown
     this.loadFeedOptions();
   }
 
@@ -83,7 +82,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     if (this.feedSearchTimeout) {
       clearTimeout(this.feedSearchTimeout);
     }
-  } 
+  }
 
   initForm(): void {
     this.feedForm = new FormGroup({
@@ -91,7 +90,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       quantity: new FormControl('', [Validators.required, Validators.min(1)]),
-      date: new FormControl(this.getTodayDate(), [Validators.required]), 
+      date: new FormControl(this.getTodayDate(), [Validators.required]),
       feedImage: new FormControl('')
     });
   }
@@ -103,9 +102,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-  
 
-openImagePreview(): void {
+
+  openImagePreview(): void {
     const imageUrl = this.feedForm.get('feedImage')?.value;
     this.previewImageUrl = imageUrl || 'assets/images/default-feed.png';
 
@@ -151,33 +150,23 @@ openImagePreview(): void {
     img.src = 'assets/images/default-feed.png';
   }
 
-  // ESC key to close preview
-  @HostListener('document:keydown.escape', ['$event'])
-  handleEscapeKey(event: KeyboardEvent): void {
-    if (this.isImagePreviewOpen) {
-      this.closeImagePreview();
-    }
-  }
-
-
   // ==================== FEED DROPDOWN METHODS ====================
   loadFeedOptions(searchTerm: string = ''): void {
     if (!this.dairyUserId) return;
 
     this.loadingFeedOptions = true;
-    
+
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
       next: (response: any) => {
         let feeds = Array.isArray(response) ? response : [];
-        
-        // Filter by search term if provided
+
         if (searchTerm.trim()) {
           const term = searchTerm.toLowerCase();
-          feeds = feeds.filter(feed => 
+          feeds = feeds.filter(feed =>
             feed.feedName?.toLowerCase().includes(term)
           );
         }
-        
+
         this.feedOptions = feeds;
         this.loadingFeedOptions = false;
       },
@@ -192,12 +181,12 @@ openImagePreview(): void {
   onFeedSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.feedSearchTerm = input.value;
-    
+
     // Clear previous timeout
     if (this.feedSearchTimeout) {
       clearTimeout(this.feedSearchTimeout);
     }
-    
+
     // Debounce search
     this.feedSearchTimeout = setTimeout(() => {
       this.loadFeedOptions(this.feedSearchTerm);
@@ -208,7 +197,7 @@ openImagePreview(): void {
     this.selectedFeedId = feed.feedId;
     this.selectedFeedName = feed.feedName;
     this.showFeedDropdown = false;
-    
+
     // Update form controls
     this.feedForm.patchValue({
       feed_id: feed.feedId,
@@ -236,83 +225,111 @@ openImagePreview(): void {
     this.selectedFeed = null;
     this.deleteReason = '';
     this.submitted = false;
-    
+
     // Reset feed selection
     this.selectedFeedId = 0;
     this.selectedFeedName = '';
     this.feedSearchTerm = '';
-    
+
     this.feedForm.reset();
-    this.feedForm.patchValue({ 
+    this.feedForm.patchValue({
       date: this.getTodayDate(),
       feed_id: '',
       feed_name: ''
     });
-    
+
     // Load fresh feed options
     this.loadFeedOptions();
-    
+
     this.showModal();
-  }openEditModal(feed: any): void {
-  this.modalMode = 'edit';
-  this.selectedFeed = feed;
-  this.deleteReason = '';
-  this.submitted = false;
-
-  const expenseId = feed.expense_id;
-
-  if (!expenseId) {
-    this.toastr.error('Invalid feed data');
-    return;
   }
 
-  // Set feed selection
-  this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-  this.selectedFeedName = feed.feed_name || feed.feedName || '';
+  openEditModal(feed: any): void {
+    this.modalMode = 'edit';
+    this.selectedFeed = feed;
+    this.deleteReason = '';
+    this.submitted = false;
 
-  // FIRST PATCH BASIC DATA (without image)
-  this.feedForm.patchValue({
-    feed_id: this.selectedFeedId,
-    feed_name: this.selectedFeedName,
-    price: feed.price,
-    quantity: feed.quantity,
-    date: this.formatDateForInput(feed.date),
-    feedImage: ''   
-  });
+    const expenseId = feed.expense_id;
 
-  this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
-  next: (res: any) => {
-    const image = res?.feedImage || res?.FeedImage;
-    if (image) {
-      this.feedForm.patchValue({ feedImage: image });
+    if (!expenseId) {
+      this.toastr.error('Invalid feed data');
+      return;
     }
-    this.showModal();
-  },
-  error: (err) => {
-    console.error(err);
-    this.toastr.error("Failed to load feed image");
-    this.showModal();
+
+    // Set feed selection
+    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
+    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+
+    // FIRST PATCH BASIC DATA (without image)
+    this.feedForm.patchValue({
+      feed_id: this.selectedFeedId,
+      feed_name: this.selectedFeedName,
+      price: feed.price,
+      quantity: feed.quantity,
+      date: this.formatDateForInput(feed.date),
+      feedImage: ''
+    });
+
+    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+      next: (res: any) => {
+        const image = res?.feedImage || res?.FeedImage;
+        if (image) {
+          this.feedForm.patchValue({ feedImage: image });
+        }
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load feed image");
+        this.showModal();
+      }
+    });
+
   }
-});
-
-}
-
-
 
   openDeleteModal(feed: any): void {
     this.modalMode = 'delete';
     this.selectedFeed = feed;
     this.deleteReason = '';
     this.submitted = false;
-    
+
+    const expenseId = feed.expense_id;
+
+    if (!expenseId) {
+      this.toastr.error('Invalid feed data');
+      return;
+    }
+
+    // Set feed selection
+    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
+    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+
+    // FIRST PATCH BASIC DATA (without image)
     this.feedForm.patchValue({
-      feed_name: feed.feed_name || feed.feedName,
+      feed_id: this.selectedFeedId,
+      feed_name: this.selectedFeedName,
       price: feed.price,
       quantity: feed.quantity,
-      feedImage:feed.feedImage,
-      date: this.formatDateForInput(feed.date)
+      date: this.formatDateForInput(feed.date),
+      feedImage: ''
     });
-    this.showModal();
+
+    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+      next: (res: any) => {
+        const image = res?.feedImage || res?.FeedImage;
+        if (image) {
+          this.feedForm.patchValue({ feedImage: image });
+        }
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load feed image");
+        this.showModal();
+      }
+    });
+
   }
 
   closeModal(): void {
@@ -332,7 +349,7 @@ openImagePreview(): void {
       modalElement.classList.add('show');
       modalElement.style.display = 'block';
       document.body.classList.add('modal-open');
-      
+
       // Add backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
@@ -348,7 +365,7 @@ openImagePreview(): void {
     }
 
     this.loadingFeeds = true;
-    
+
     this.api.get(`Feeds/History/${this.dairyUserId}`).subscribe({
       next: (response: any) => {
         this.feeds = Array.isArray(response) ? response : [];
@@ -468,7 +485,7 @@ openImagePreview(): void {
     });
   }
 
-  
+
   getFeedId(feed: any): number {
     return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
   }
@@ -476,7 +493,7 @@ openImagePreview(): void {
   // ==================== SEARCH & FILTER ====================
   onSearch(): void {
     const search = this.searchTerm.toLowerCase().trim();
-    
+
     if (!search) {
       this.filteredFeeds = [...this.feeds];
       return;
@@ -493,7 +510,7 @@ openImagePreview(): void {
     }
 
     // Then match by feed name
-    this.filteredFeeds = this.feeds.filter(feed => 
+    this.filteredFeeds = this.feeds.filter(feed =>
       feed.feed_name.toLowerCase().includes(search)
     );
   }
@@ -506,18 +523,18 @@ openImagePreview(): void {
 
   formatDateForInput(date: any): string {
     if (!date) return '';
-    
+
     if (typeof date === 'string') {
       if (date.includes('T')) {
         return date.split('T')[0];
       }
       return date;
     }
-    
+
     if (date instanceof Date) {
       return date.toISOString().split('T')[0];
     }
-    
+
     return '';
   }
 
@@ -528,7 +545,7 @@ openImagePreview(): void {
 
   formatDateDisplay(date: any): string {
     if (!date) return '';
-    
+
     try {
       const dateObj = new Date(date);
       return dateObj.toLocaleDateString('en-IN', {
@@ -554,7 +571,7 @@ openImagePreview(): void {
         return search;
       }
     }
-    
+
     return null;
   }
 
