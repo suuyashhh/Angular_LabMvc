@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit,OnDestroy, ViewChild, ElementRef,HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -15,9 +15,11 @@ import { AuthService } from '../../shared/auth.service';
   templateUrl: './feeds.component.html',
   styleUrls: ['./feeds.component.css']
 })
-export class FeedsComponent implements OnInit {
+export class FeedsComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
-  @ViewChild('feedInput') feedInput!: ElementRef;
+  @ViewChild('feedInput') feedInput!: ElementRef;  
+  @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+
   
   // Form
   feedForm!: FormGroup;
@@ -50,6 +52,12 @@ export class FeedsComponent implements OnInit {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
+  
+  // Image Preview
+  previewImageUrl: string = '';
+  isImagePreviewOpen: boolean = false;
+
+
   constructor(
     private http: HttpClient,
     private api: ApiService,
@@ -71,6 +79,12 @@ export class FeedsComponent implements OnInit {
     this.loadFeedOptions();
   }
 
+  OnDestroy(): void {
+    if (this.feedSearchTimeout) {
+      clearTimeout(this.feedSearchTimeout);
+    }
+  } 
+
   initForm(): void {
     this.feedForm = new FormGroup({
       feed_id: new FormControl('', [Validators.required]),
@@ -88,6 +102,63 @@ export class FeedsComponent implements OnInit {
     const id = dairy.user_id ?? dairy.userId ?? dairy.UserId ?? dairy.id;
     return Number(id) || 0;
   }
+
+  
+
+openImagePreview(): void {
+    const imageUrl = this.feedForm.get('feedImage')?.value;
+    this.previewImageUrl = imageUrl || 'assets/images/default-feed.png';
+
+    this.isImagePreviewOpen = true;
+    this.showImagePreviewModal();
+  }
+
+  closeImagePreview(): void {
+    this.isImagePreviewOpen = false;
+    this.hideImagePreviewModal();
+  }
+
+  showImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      // Add backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      backdrop.addEventListener('click', () => this.closeImagePreview());
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  hideImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/default-feed.png';
+  }
+
+  // ESC key to close preview
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscapeKey(event: KeyboardEvent): void {
+    if (this.isImagePreviewOpen) {
+      this.closeImagePreview();
+    }
+  }
+
 
   // ==================== FEED DROPDOWN METHODS ====================
   loadFeedOptions(searchTerm: string = ''): void {

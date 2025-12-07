@@ -121,14 +121,18 @@
    <div class="modal-header custom-modal-header">
   <div class="modal-title-wrapper flex items-center">
     <!-- Image Container - Slightly larger to match button prominence -->
-    <div class="w-12 h-12 flex items-center justify-center rounded-xl  ">
-      <img
-        [src]="feedForm.get('feedImage')?.value || 'assets/images/default-feed.png'"
-        alt="Feed Icon"
-        class="w-10 h-10 object-contain"
-        onerror="this.src='assets/images/default-feed.png'"
-      />
-    </div>
+     <div 
+            class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
+            (click)="openImagePreview()"
+            title="Click to view full image"
+          >
+            <img
+              [src]="feedForm.get('feedImage')?.value || 'assets/images/default-feed.png'"
+              alt="Feed Icon"
+              class="w-10 h-10 object-contain"
+              onerror="this.src='assets/images/default-feed.png'"
+            />
+          </div>
     
     <div class="flex items-center">
       <div class="modal-icon mr-2">
@@ -467,3 +471,30 @@
     </div>
   </div>
 </div>
+
+<!-- Image Preview Modal - Simple Version -->
+<div class="modal fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-transparent border-0 shadow-none">
+      <div class="modal-body p-0 position-relative">
+        <!-- Large Image -->
+        <div class="flex justify-center items-center min-h-[70vh]">
+          <img
+            [src]="previewImageUrl || 'assets/images/default-feed.png'"
+            alt="Feed Image Preview"
+            class="max-w-full max-h-[70vh] rounded-lg shadow-2xl"
+            (error)="onImageError($event)"
+          />
+        </div>
+        
+        <!-- Close Button -->
+        <button 
+          type="button" 
+          class="absolute top-4 right-4 bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
+          (click)="closeImagePreview()"
+          aria-label="Close"
+        >
+          <i class="ri-close-line text-xl"></i>
+        </button>
+        
+        <!-- Click anywhere to close hint -->
