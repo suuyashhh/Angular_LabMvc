@@ -11,36 +11,36 @@ import { AuthService } from '../../shared/auth.service';
 import { LoaderService } from '../../services/loader.service';
 
 @Component({
-  selector: 'app-feeds',
+  selector: 'app-doctor-dairy',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
-  templateUrl: './feeds.component.html',
-  styleUrls: ['./feeds.component.css']
+  templateUrl: './doctor-dairy.component.html',
+  styleUrl: './doctor-dairy.component.css'
 })
-export class FeedsComponent implements OnInit, OnDestroy {
-  @ViewChild('feedModal') feedModal!: ElementRef;
-  @ViewChild('feedInput') feedInput!: ElementRef;
+export class DoctorDairyComponent implements OnInit, OnDestroy {
+  @ViewChild('DoctorModal') DoctorModal!: ElementRef;
+  @ViewChild('doctorInput') doctorInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
 
   // Form
-  feedForm!: FormGroup;
+  doctorForm!: FormGroup;
 
   // Data
-  feeds: any[] = [];
-  filteredFeeds: any[] = [];
+  Animals: any[] = [];
+  filteredDoctor: any[] = [];
 
-  // Feed dropdown
-  feedOptions: any[] = [];
-  selectedFeedId: number = 0;
-  selectedFeedName: string = '';
-  feedSearchTerm: string = '';
-  showFeedDropdown: boolean = false;
-  loadingFeedOptions: boolean = false;
-  feedSearchTimeout: any;
+  // Animal dropdown
+  AnimalOptions: any[] = [];
+  selectedAnimalId: number = 0;
+  selectedAnimalName: string = '';
+  AnimalSearchTerm: string = '';
+  showAnimalDropdown: boolean = false;
+  loadingAnimalOptions: boolean = false;
+  AnimalSearchTimeout: any;
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
-  selectedFeed: any = null;
+  selectedDoctor: any = null;
   deleteReason: string = '';
 
   // Search
@@ -76,24 +76,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.dairyUserId = this.getDairyUserId();
     this.initForm();
-    this.loadFeeds();
-    this.loadFeedOptions();
+    this.loadDoctorHistory();
+    this.loadAnimalsOptions();
   }
 
   ngOnDestroy(): void {
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
+    if (this.AnimalSearchTimeout) {
+      clearTimeout(this.AnimalSearchTimeout);
     }
   }
 
   initForm(): void {
-    this.feedForm = new FormGroup({
-      feed_id: new FormControl('', [Validators.required]),
-      feed_name: new FormControl('', [Validators.required]),
+    this.doctorForm = new FormGroup({
+      Animal_id: new FormControl('', [Validators.required]),
+      animal_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
-      quantity: new FormControl('', [Validators.required, Validators.min(1)]),
+      reason: new FormControl('', [Validators.required]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
-      feedImage: new FormControl('')
+      AnimalImage: new FormControl('')
     });
   }
 
@@ -105,8 +105,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   openImagePreview(): void {
-    const imageUrl = this.feedForm.get('feedImage')?.value;
-    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    const imageUrl = this.doctorForm.get('AnimalImage')?.value;
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/doctor_16802630.png';
 
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
@@ -146,203 +146,210 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
-    img.src = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    img.src = '../../../assets/DairryFarmImg/doctor_16802630.png';
   }
 
-  // ==================== FEED DROPDOWN METHODS ====================
-  loadFeedOptions(searchTerm: string = ''): void {
+  // ==================== ANIMAL DROPDOWN METHODS ====================
+  loadAnimalsOptions(searchTerm: string = ''): void {
     if (!this.dairyUserId) return;
 
-    this.loadingFeedOptions = true;
+    this.loadingAnimalOptions = true;
 
-    this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
+    this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
       next: (response: any) => {
-        let feeds = Array.isArray(response) ? response : [];
+        let animals = Array.isArray(response) ? response : [];
 
         if (searchTerm.trim()) {
           const term = searchTerm.toLowerCase();
-          feeds = feeds.filter(feed =>
-            feed.feedName?.toLowerCase().includes(term)
+          animals = animals.filter(animal =>
+            animal.animalName?.toLowerCase().includes(term) ||
+            animal.animalId?.toString().includes(term)
           );
         }
 
-        this.feedOptions = feeds;
-        this.loadingFeedOptions = false;
+        this.AnimalOptions = animals;
+        this.loadingAnimalOptions = false;
       },
       error: (error: any) => {
-        console.error('Failed to load feed options:', error);
-        this.feedOptions = [];
-        this.loadingFeedOptions = false;
+        console.error('Failed to load animal options:', error);
+        this.AnimalOptions = [];
+        this.loadingAnimalOptions = false;
       }
     });
   }
 
   onFeedSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.feedSearchTerm = input.value;
+    this.AnimalSearchTerm = input.value;
+    this.selectedAnimalName = input.value;
 
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
+    if (this.AnimalSearchTimeout) {
+      clearTimeout(this.AnimalSearchTimeout);
     }
 
-    this.feedSearchTimeout = setTimeout(() => {
-      this.loadFeedOptions(this.feedSearchTerm);
+    this.AnimalSearchTimeout = setTimeout(() => {
+      this.loadAnimalsOptions(this.AnimalSearchTerm);
     }, 300);
   }
 
-  selectFeed(feed: any): void {
-    this.selectedFeedId = feed.feedId;
-    this.selectedFeedName = feed.feedName;
-    this.showFeedDropdown = false;
+  selectFeed(animal: any): void {
+    this.selectedAnimalId = animal.animalId;
+    this.selectedAnimalName = animal.animalName;
+    this.showAnimalDropdown = false;
 
-    this.feedForm.patchValue({
-      feed_id: feed.feedId,
-      feed_name: feed.feedName
+    this.doctorForm.patchValue({
+      Animal_id: animal.animalId,
+      animal_name: animal.animalName
     });
   }
 
   toggleFeedDropdown(): void {
-    this.showFeedDropdown = !this.showFeedDropdown;
-    if (this.showFeedDropdown && this.feedOptions.length === 0) {
-      this.loadFeedOptions();
+    this.showAnimalDropdown = !this.showAnimalDropdown;
+    if (this.showAnimalDropdown && this.AnimalOptions.length === 0) {
+      this.loadAnimalsOptions();
     }
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.showFeedDropdown) return;
+    if (!this.showAnimalDropdown) return;
     
     const target = event.target as HTMLElement;
-    const isClickInside = this.feedInput?.nativeElement?.contains(target);
+    const isClickInside = this.doctorInput?.nativeElement?.contains(target);
     
     if (!isClickInside) {
-      this.showFeedDropdown = false;
+      this.showAnimalDropdown = false;
     }
   }
 
   // ==================== MODAL METHODS ====================
   openAddModal(): void {
     this.modalMode = 'add';
-    this.selectedFeed = null;
+    this.selectedDoctor = null;
     this.deleteReason = '';
     this.submitted = false;
     this.isSaving = false;
     this.isUpdating = false;
     this.isDeleting = false;
 
-    this.selectedFeedId = 0;
-    this.selectedFeedName = '';
-    this.feedSearchTerm = '';
+    this.selectedAnimalId = 0;
+    this.selectedAnimalName = '';
+    this.AnimalSearchTerm = '';
 
-    this.feedForm.reset();
-    this.feedForm.patchValue({
+    this.doctorForm.reset();
+    this.doctorForm.patchValue({
       date: this.getTodayDate(),
-      feed_id: '',
-      feed_name: ''
+      Animal_id: '',
+      animal_name: '',
+      price: '',
+      reason: '',
+      AnimalImage: ''
     });
 
-    this.loadFeedOptions();
+    this.loadAnimalsOptions();
     this.showModal();
   }
 
-  openEditModal(feed: any): void {
-    this.modalMode = 'edit';
-    this.selectedFeed = feed;
-    this.deleteReason = '';
-    this.submitted = false;
-    this.isSaving = false;
-    this.isUpdating = false;
-    this.isDeleting = false;
+ openEditModal(doctor: any): void {
+  this.modalMode = 'edit';
+  this.selectedDoctor = doctor;
+  this.deleteReason = '';
+  this.submitted = false;
+  this.isSaving = false;
+  this.isUpdating = false;
+  this.isDeleting = false;
 
-    const expenseId = feed.expense_id;
+  const expenseId = doctor.expense_id;
 
-    if (!expenseId) {
-      this.toastr.error('Invalid feed data');
-      return;
-    }
-
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
-
-    this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
-      price: feed.price,
-      quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date),
-      feedImage: ''
-    });
-
-    this.loader.show();
-
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
-      .pipe(finalize(() => this.loader.hide()))
-      .subscribe({
-        next: (res: any) => {
-          const image = res?.feedImage || res?.FeedImage;
-          if (image) {
-            this.feedForm.patchValue({ feedImage: image });
-          }
-          this.showModal();
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error("Failed to load feed image");
-          this.showModal();
-        }
-      });
+  if (!expenseId) {
+    this.toastr.error('Invalid doctor data');
+    return;
   }
 
-  openDeleteModal(feed: any): void {
-    this.modalMode = 'delete';
-    this.selectedFeed = feed;
-    this.deleteReason = '';
-    this.submitted = false;
-    this.isSaving = false;
-    this.isUpdating = false;
-    this.isDeleting = false;
+  this.selectedAnimalId = doctor.Animal_id || 0;
+  this.selectedAnimalName = doctor.animal_name || '';
 
-    const expenseId = feed.expense_id;
+  this.doctorForm.patchValue({
+    Animal_id: this.selectedAnimalId,
+    animal_name: this.selectedAnimalName,
+    price: doctor.price,
+    reason: doctor.reason,
+    date: this.formatDateForInput(doctor.date),
+    AnimalImage: ''
+  });
 
-    if (!expenseId) {
-      this.toastr.error('Invalid feed data');
-      return;
-    }
+  // Show loader before API call
+  this.loader.show();
 
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
-
-    this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
-      price: feed.price,
-      quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date),
-      feedImage: ''
-    });
-
-    this.loader.show();
-
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
-      .pipe(finalize(() => this.loader.hide()))
-      .subscribe({
-        next: (res: any) => {
-          const image = res?.feedImage || res?.FeedImage;
-          if (image) {
-            this.feedForm.patchValue({ feedImage: image });
-          }
-          this.showModal();
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastr.error("Failed to load feed image");
-          this.showModal();
+  this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
+    .pipe(finalize(() => this.loader.hide()))
+    .subscribe({
+      next: (res: any) => {
+        const image = res?.AnimalImage || res?.animalImage;
+        if (image) {
+          this.doctorForm.patchValue({ AnimalImage: image });
         }
-      });
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load animal image");
+        this.showModal();
+      }
+    });
+}
+
+openDeleteModal(doctor: any): void {
+  this.modalMode = 'delete';
+  this.selectedDoctor = doctor;
+  this.deleteReason = '';
+  this.submitted = false;
+  this.isSaving = false;
+  this.isUpdating = false;
+  this.isDeleting = false;
+
+  const expenseId = doctor.expense_id;
+
+  if (!expenseId) {
+    this.toastr.error('Invalid doctor data');
+    return;
   }
+
+  this.selectedAnimalId = doctor.Animal_id || 0;
+  this.selectedAnimalName = doctor.animal_name || '';
+
+  this.doctorForm.patchValue({
+    Animal_id: this.selectedAnimalId,
+    animal_name: this.selectedAnimalName,
+    price: doctor.price,
+    reason: doctor.reason,
+    date: this.formatDateForInput(doctor.date),
+    AnimalImage: ''
+  });
+
+  // Show loader before API call
+  this.loader.show();
+
+  this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
+    .pipe(finalize(() => this.loader.hide()))
+    .subscribe({
+      next: (res: any) => {
+        const image = res?.AnimalImage || res?.animalImage;
+        if (image) {
+          this.doctorForm.patchValue({ AnimalImage: image });
+        }
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load animal image");
+        this.showModal();
+      }
+    });
+}
 
   closeModal(): void {
-    const modalElement = this.feedModal?.nativeElement;
+    const modalElement = this.DoctorModal?.nativeElement;
     if (modalElement) {
       modalElement.classList.remove('show');
       modalElement.style.display = 'none';
@@ -353,7 +360,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   showModal(): void {
-    const modalElement = this.feedModal?.nativeElement;
+    const modalElement = this.DoctorModal?.nativeElement;
     if (modalElement) {
       modalElement.classList.add('show');
       modalElement.style.display = 'block';
@@ -366,7 +373,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   // ==================== CRUD OPERATIONS ====================
-  loadFeeds(): void {
+  loadDoctorHistory(): void {
     if (!this.dairyUserId) {
       this.toastr.warning('Please login to Dairy Farm');
       return;
@@ -374,18 +381,18 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.loader.show();
 
-    this.api.get(`Feeds/History/${this.dairyUserId}`)
+    this.api.get(`DoctorDairy/History/${this.dairyUserId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (response: any) => {
-          this.feeds = Array.isArray(response) ? response : [];
-          this.filteredFeeds = [...this.feeds];
+          this.Animals = Array.isArray(response) ? response : [];
+          this.filteredDoctor = [...this.Animals];
         },
         error: (error: any) => {
-          console.error('Failed to load feeds:', error);
-          this.toastr.error('Failed to load feeds');
-          this.feeds = [];
-          this.filteredFeeds = [];
+          console.error('Failed to load doctor history:', error);
+          this.toastr.error('Failed to load doctor history');
+          this.Animals = [];
+          this.filteredDoctor = [];
         }
       });
   }
@@ -398,102 +405,104 @@ export class FeedsComponent implements OnInit, OnDestroy {
         this.toastr.error('Please provide delete reason');
         return;
       }
-      this.deleteFeed();
+      this.deleteDoctor();
       return;
     }
 
-    if (this.feedForm.invalid) {
+    if (this.doctorForm.invalid) {
       this.toastr.error('Please fill all required fields correctly');
       return;
     }
 
-    if (!this.selectedFeedId) {
-      this.toastr.error('Please select a feed from the dropdown');
+    if (!this.selectedAnimalId) {
+      this.toastr.error('Please select an animal from the dropdown');
       return;
     }
 
     if (this.modalMode === 'add') {
-      this.addFeed();
+      this.addDoctor();
     } else if (this.modalMode === 'edit') {
-      this.updateFeed();
+      this.updateDoctor();
     }
   }
 
-  addFeed(): void {
+  addDoctor(): void {
     this.isSaving = true;
-
+    
     const payload = {
       user_id: this.dairyUserId,
-      feed_id: this.selectedFeedId,
-      expense_name: 'Feeds',
-      feed_name: this.selectedFeedName,
-      price: Number(this.feedForm.value.price),
-      quantity: Number(this.feedForm.value.quantity),
-      date: this.formatDateForAPI(this.feedForm.value.date)
+      Animal_id: this.selectedAnimalId,
+      expense_name: 'Doctor',
+      animal_name: this.selectedAnimalName,
+      price: Number(this.doctorForm.value.price),
+      reason: this.doctorForm.value.reason,
+      date: this.formatDateForAPI(this.doctorForm.value.date),
+      Switch: 1
     };
 
     this.loader.show();
 
-    this.api.post('Feeds/Save', payload)
+    this.api.post('DoctorDairy/Save', payload)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isSaving = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed saved successfully');
+          this.toastr.success('Doctor record saved successfully');
           this.closeModal();
-          this.loadFeeds();
+          this.loadDoctorHistory();
         },
         error: (error: any) => {
           console.error('Save error:', error);
-          this.toastr.error('Failed to save feed');
+          this.toastr.error('Failed to save doctor record');
         }
       });
   }
 
-  updateFeed(): void {
-    if (!this.selectedFeed?.expense_id) {
-      this.toastr.error('Invalid feed data');
+  updateDoctor(): void {
+    if (!this.selectedDoctor?.expense_id) {
+      this.toastr.error('Invalid doctor data');
       return;
     }
 
     this.isUpdating = true;
 
     const payload = {
-      expense_id: this.selectedFeed.expense_id,
+      expense_id: this.selectedDoctor.expense_id,
       user_id: this.dairyUserId,
-      feed_id: this.selectedFeedId,
-      expense_name: 'Feeds',
-      feed_name: this.selectedFeedName,
-      price: Number(this.feedForm.value.price),
-      quantity: Number(this.feedForm.value.quantity),
-      date: this.formatDateForAPI(this.feedForm.value.date)
+      Animal_id: this.selectedAnimalId,
+      expense_name: 'Doctor',
+      animal_name: this.selectedAnimalName,
+      price: Number(this.doctorForm.value.price),
+      reason: this.doctorForm.value.reason,
+      date: this.formatDateForAPI(this.doctorForm.value.date),
+      Switch: 1
     };
 
     this.loader.show();
 
-    this.api.put('Feeds/Edit', payload)
+    this.api.put('DoctorDairy/Edit', payload)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isUpdating = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed updated successfully');
+          this.toastr.success('Doctor record updated successfully');
           this.closeModal();
-          this.loadFeeds();
+          this.loadDoctorHistory();
         },
         error: (error: any) => {
           console.error('Update error:', error);
-          this.toastr.error('Failed to update feed');
+          this.toastr.error('Failed to update doctor record');
         }
       });
   }
 
-  deleteFeed(): void {
-    if (!this.selectedFeed?.expense_id) {
-      this.toastr.error('Invalid feed data');
+  deleteDoctor(): void {
+    if (!this.selectedDoctor?.expense_id) {
+      this.toastr.error('Invalid doctor data');
       return;
     }
 
@@ -501,26 +510,26 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.loader.show();
 
-    this.api.delete(`Feeds/${this.selectedFeed.expense_id}`)
+    this.api.delete(`DoctorDairy/${this.selectedDoctor.expense_id}`)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isDeleting = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed deleted successfully');
+          this.toastr.success('Doctor record deleted successfully');
           this.closeModal();
-          this.loadFeeds();
+          this.loadDoctorHistory();
         },
         error: (error: any) => {
           console.error('Delete error:', error);
-          this.toastr.error('Failed to delete feed');
+          this.toastr.error('Failed to delete doctor record');
         }
       });
   }
 
-  getFeedId(feed: any): number {
-    return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
+  getAnimalId(doctor: any): number {
+    return doctor.expense_id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================
@@ -528,21 +537,22 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const search = this.searchTerm.toLowerCase().trim();
 
     if (!search) {
-      this.filteredFeeds = [...this.feeds];
+      this.filteredDoctor = [...this.Animals];
       return;
     }
 
     const dateMatch = this.tryParseDate(search);
     if (dateMatch) {
-      this.filteredFeeds = this.feeds.filter(feed => {
-        const feedDate = this.formatDateDisplay(feed.date).toLowerCase();
-        return feedDate.includes(dateMatch);
+      this.filteredDoctor = this.Animals.filter(doctor => {
+        const doctorDate = this.formatDateDisplay(doctor.date).toLowerCase();
+        return doctorDate.includes(dateMatch);
       });
       return;
     }
 
-    this.filteredFeeds = this.feeds.filter(feed =>
-      feed.feed_name.toLowerCase().includes(search)
+    this.filteredDoctor = this.Animals.filter(doctor =>
+      doctor.animal_name?.toLowerCase().includes(search) ||
+      doctor.reason?.toLowerCase().includes(search)
     );
   }
 
