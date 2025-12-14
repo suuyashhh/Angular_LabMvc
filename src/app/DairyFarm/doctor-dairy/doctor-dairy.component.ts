@@ -17,9 +17,8 @@ import { AuthService } from '../../shared/auth.service';
 })
 export class DoctorDairyComponent implements OnInit, OnDestroy {
   @ViewChild('DoctorModal') DoctorModal!: ElementRef;
-  @ViewChild('DoctorInput') DoctorInput!: ElementRef;
+  @ViewChild('doctorInput') doctorInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
-
 
   // Form
   doctorForm!: FormGroup;
@@ -28,7 +27,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   Animals: any[] = [];
   filteredDoctor: any[] = [];
 
-  // Feed dropdown
+  // Animal dropdown
   AnimalOptions: any[] = [];
   selectedAnimalId: number = 0;
   selectedAnimalName: string = '';
@@ -39,7 +38,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
-  selectedAnimal: any = null;
+  selectedDoctor: any = null;
   deleteReason: string = '';
 
   // Loading
@@ -52,11 +51,9 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
-
   // Image Preview
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
-
 
   constructor(
     private http: HttpClient,
@@ -78,7 +75,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.loadAnimalsOptions();
   }
 
-  OnDestroy(): void {
+  ngOnDestroy(): void {
     if (this.AnimalSearchTimeout) {
       clearTimeout(this.AnimalSearchTimeout);
     }
@@ -89,9 +86,9 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       Animal_id: new FormControl('', [Validators.required]),
       animal_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
-      Reason: new FormControl('', [Validators.required, Validators.min(1)]),
+      reason: new FormControl('', [Validators.required]), // Changed from 'Reason' to 'reason'
       date: new FormControl(this.getTodayDate(), [Validators.required]),
-      feedImage: new FormControl('')
+      AnimalImage: new FormControl('') // Changed from 'feedImage' to 'AnimalImage'
     });
   }
 
@@ -102,11 +99,9 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-
-
   openImagePreview(): void {
-    const imageUrl = this.doctorForm.get('feedImage')?.value;
-    this.previewImageUrl = imageUrl || 'assets/images/default-animal.png';
+    const imageUrl = this.doctorForm.get('AnimalImage')?.value;
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/doctor_16802630.png';
 
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
@@ -124,7 +119,6 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       modalElement.style.display = 'block';
       document.body.classList.add('modal-open');
 
-      // Add backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
       backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
@@ -147,10 +141,10 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
-    img.src = 'assets/images/default-animal.png';
+    img.src = '../../../assets/DairryFarmImg/doctor_16802630.png';
   }
 
-  // ==================== FEED DROPDOWN METHODS ====================
+  // ==================== ANIMAL DROPDOWN METHODS ====================
   loadAnimalsOptions(searchTerm: string = ''): void {
     if (!this.dairyUserId) return;
 
@@ -158,16 +152,17 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
 
     this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
       next: (response: any) => {
-        let Animals = Array.isArray(response) ? response : [];
+        let animals = Array.isArray(response) ? response : [];
 
         if (searchTerm.trim()) {
           const term = searchTerm.toLowerCase();
-          Animals = Animals.filter(animal =>
-            animal.animalName?.toLowerCase().includes(term)
+          animals = animals.filter(animal =>
+            animal.animalName?.toLowerCase().includes(term) ||
+            animal.animalId?.toString().includes(term)
           );
         }
 
-        this.AnimalOptions = Animals;
+        this.AnimalOptions = animals;
         this.loadingAnimalOptions = false;
       },
       error: (error: any) => {
@@ -181,26 +176,24 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   onFeedSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.AnimalSearchTerm = input.value;
+    this.selectedAnimalName = input.value;
 
-    // Clear previous timeout
     if (this.AnimalSearchTimeout) {
       clearTimeout(this.AnimalSearchTimeout);
     }
 
-    // Debounce search
     this.AnimalSearchTimeout = setTimeout(() => {
       this.loadAnimalsOptions(this.AnimalSearchTerm);
     }, 300);
   }
 
   selectFeed(animal: any): void {
-    this.selectedAnimalId = animal.feedId;
+    this.selectedAnimalId = animal.animalId;
     this.selectedAnimalName = animal.animalName;
     this.showAnimalDropdown = false;
 
-    // Update form controls
     this.doctorForm.patchValue({
-      animalId: animal.animalId,
+      Animal_id: animal.animalId,
       animal_name: animal.animalName
     });
   }
@@ -212,21 +205,25 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFeedBlur(): void {
-    // Small delay to allow click events on dropdown items
-    setTimeout(() => {
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.showAnimalDropdown) return;
+    
+    const target = event.target as HTMLElement;
+    const isClickInside = this.doctorInput?.nativeElement?.contains(target);
+    
+    if (!isClickInside) {
       this.showAnimalDropdown = false;
-    }, 200);
+    }
   }
 
   // ==================== MODAL METHODS ====================
   openAddModal(): void {
     this.modalMode = 'add';
-    this.selectedAnimal = null;
+    this.selectedDoctor = null;
     this.deleteReason = '';
     this.submitted = false;
 
-    // Reset animal selection
     this.selectedAnimalId = 0;
     this.selectedAnimalName = '';
     this.AnimalSearchTerm = '';
@@ -234,48 +231,48 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.doctorForm.reset();
     this.doctorForm.patchValue({
       date: this.getTodayDate(),
-      animalId: '',
-      animal_name: ''
+      Animal_id: '',
+      animal_name: '',
+      price: '',
+      reason: '',
+      AnimalImage: ''
     });
 
-    // Load fresh animal options
     this.loadAnimalsOptions();
-
     this.showModal();
   }
 
-  openEditModal(animal: any): void {
+  openEditModal(doctor: any): void {
     this.modalMode = 'edit';
-    this.selectedAnimal = animal;
+    this.selectedDoctor = doctor;
     this.deleteReason = '';
     this.submitted = false;
 
-    const expenseId = animal.expense_id;
+    const expenseId = doctor.expense_id;
 
     if (!expenseId) {
-      this.toastr.error('Invalid animal data');
+      this.toastr.error('Invalid doctor data');
       return;
     }
 
-    // Set animal selection
-    this.selectedAnimalId = animal.animalId || 0;
-    this.selectedAnimalName = animal.animalName || '';
+    this.selectedAnimalId = doctor.Animal_id || 0;
+    this.selectedAnimalName = doctor.animal_name || '';
 
-    // FIRST PATCH BASIC DATA (without image)
     this.doctorForm.patchValue({
       Animal_id: this.selectedAnimalId,
       animal_name: this.selectedAnimalName,
-      price: animal.price,
-      Reason: animal.reason,
-      date: this.formatDateForInput(animal.date),
-      feedImage: ''
+      price: doctor.price,
+      reason: doctor.reason,
+      date: this.formatDateForInput(doctor.date),
+      AnimalImage: ''
     });
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+    this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`).subscribe({
       next: (res: any) => {
-        const image = res?.feedImage || res?.FeedImage;
+        const image = res?.AnimalImage || res?.animalImage;
+        debugger;
         if (image) {
-          this.doctorForm.patchValue({ feedImage: image });
+          this.doctorForm.patchValue({ AnimalImage: image });
         }
         this.showModal();
       },
@@ -285,41 +282,38 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
         this.showModal();
       }
     });
-
   }
 
-  openDeleteModal(animal: any): void {
+  openDeleteModal(doctor: any): void {
     this.modalMode = 'delete';
-    this.selectedAnimal = animal;
+    this.selectedDoctor = doctor;
     this.deleteReason = '';
     this.submitted = false;
 
-    const expenseId = animal.expense_id;
+    const expenseId = doctor.expense_id;
 
     if (!expenseId) {
-      this.toastr.error('Invalid animal data');
+      this.toastr.error('Invalid doctor data');
       return;
     }
 
-    // Set animal selection
-    this.selectedAnimalId = animal.animalId || 0;
-    this.selectedAnimalName = animal.animalName || '';
+    this.selectedAnimalId = doctor.Animal_id || 0;
+    this.selectedAnimalName = doctor.animal_name || '';
 
-    // FIRST PATCH BASIC DATA (without image)
     this.doctorForm.patchValue({
       Animal_id: this.selectedAnimalId,
       animal_name: this.selectedAnimalName,
-      price: animal.price,
-      Reason: animal.reason,
-      date: this.formatDateForInput(animal.date),
-      feedImage: ''
+      price: doctor.price,
+      reason: doctor.reason,
+      date: this.formatDateForInput(doctor.date),
+      AnimalImage: ''
     });
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+    this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`).subscribe({
       next: (res: any) => {
-        const image = res?.feedImage || res?.FeedImage;
+        const image = res?.AnimalImage || res?.animalImage;
         if (image) {
-          this.doctorForm.patchValue({ feedImage: image });
+          this.doctorForm.patchValue({ AnimalImage: image });
         }
         this.showModal();
       },
@@ -329,7 +323,6 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
         this.showModal();
       }
     });
-
   }
 
   closeModal(): void {
@@ -350,7 +343,6 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       modalElement.style.display = 'block';
       document.body.classList.add('modal-open');
 
-      // Add backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
       document.body.appendChild(backdrop);
@@ -373,8 +365,8 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
         this.loadingDoctorHistory = false;
       },
       error: (error: any) => {
-        console.error('Failed to load Animals:', error);
-        this.toastr.error('Failed to load Animals');
+        console.error('Failed to load doctor history:', error);
+        this.toastr.error('Failed to load doctor history');
         this.loadingDoctorHistory = false;
         this.Animals = [];
         this.filteredDoctor = [];
@@ -390,7 +382,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
         this.toastr.error('Please provide delete reason');
         return;
       }
-      this.deleteFeed();
+      this.deleteDoctor();
       return;
     }
 
@@ -399,95 +391,95 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validate animal selection
     if (!this.selectedAnimalId) {
-      this.toastr.error('Please select a animal from the dropdown');
+      this.toastr.error('Please select an animal from the dropdown');
       return;
     }
 
     if (this.modalMode === 'add') {
-      this.addFeed();
+      this.addDoctor();
     } else if (this.modalMode === 'edit') {
-      this.updateFeed();
+      this.updateDoctor();
     }
   }
 
-  addFeed(): void {
+  addDoctor(): void {
     const payload = {
       user_id: this.dairyUserId,
       Animal_id: this.selectedAnimalId,
-      expense_name: 'Feeds',
+      expense_name: 'Doctor', // Changed from 'Feeds' to 'Doctor'
       animal_name: this.selectedAnimalName,
       price: Number(this.doctorForm.value.price),
-      Reason: Number(this.doctorForm.value.Reason),
-      date: this.formatDateForAPI(this.doctorForm.value.date)
+      reason: this.doctorForm.value.reason, // Changed from Reason to reason
+      date: this.formatDateForAPI(this.doctorForm.value.date),
+      Switch: 1 // Added Switch field as per DTO
     };
 
-    this.api.post('Feeds/Save', payload).subscribe({
+    this.api.post('DoctorDairy/Save', payload).subscribe({ // Changed endpoint
       next: () => {
-        this.toastr.success('Feed saved successfully');
+        this.toastr.success('Doctor record saved successfully');
         this.closeModal();
         this.loadDoctorHistory();
       },
       error: (error: any) => {
         console.error('Save error:', error);
-        this.toastr.error('Failed to save animal');
+        this.toastr.error('Failed to save doctor record');
       }
     });
   }
 
-  updateFeed(): void {
-    if (!this.selectedAnimal?.expense_id) {
-      this.toastr.error('Invalid animal data');
+  updateDoctor(): void {
+    if (!this.selectedDoctor?.expense_id) {
+      this.toastr.error('Invalid doctor data');
       return;
     }
 
     const payload = {
-      expense_id: this.selectedAnimal.expense_id,
+      expense_id: this.selectedDoctor.expense_id,
       user_id: this.dairyUserId,
       Animal_id: this.selectedAnimalId,
-      expense_name: 'Feeds',
+      expense_name: 'Doctor', // Changed from 'Feeds' to 'Doctor'
       animal_name: this.selectedAnimalName,
       price: Number(this.doctorForm.value.price),
-      Reason: Number(this.doctorForm.value.Reason),
-      date: this.formatDateForAPI(this.doctorForm.value.date)
+      reason: this.doctorForm.value.reason, // Changed from Reason to reason
+      date: this.formatDateForAPI(this.doctorForm.value.date),
+      Switch: 1 // Added Switch field
     };
-
-    this.api.put('Feeds/Edit', payload).subscribe({
+debugger;
+    this.api.put('DoctorDairy/Edit', payload).subscribe({ // Changed endpoint
       next: () => {
-        this.toastr.success('Feed updated successfully');
+        this.toastr.success('Doctor record updated successfully');
         this.closeModal();
         this.loadDoctorHistory();
       },
       error: (error: any) => {
         console.error('Update error:', error);
-        this.toastr.error('Failed to update animal');
+        this.toastr.error('Failed to update doctor record');
       }
     });
   }
 
-  deleteFeed(): void {
-    if (!this.selectedAnimal?.expense_id) {
-      this.toastr.error('Invalid animal data');
+  deleteDoctor(): void {
+    if (!this.selectedDoctor?.expense_id) {
+      this.toastr.error('Invalid doctor data');
       return;
     }
 
-    this.api.delete(`Feeds/${this.selectedAnimal.expense_id}`).subscribe({
+    this.api.delete(`DoctorDairy/${this.selectedDoctor.expense_id}`).subscribe({ // Changed endpoint
       next: () => {
-        this.toastr.success('Feed deleted successfully');
+        this.toastr.success('Doctor record deleted successfully');
         this.closeModal();
         this.loadDoctorHistory();
       },
       error: (error: any) => {
         console.error('Delete error:', error);
-        this.toastr.error('Failed to delete animal');
+        this.toastr.error('Failed to delete doctor record');
       }
     });
   }
 
-
-  getAnimalId(animal: any): number {
-    return animal.animalId ?? 0;
+  getAnimalId(doctor: any): number {
+    return doctor.expense_id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================
@@ -499,19 +491,18 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Try to match date first
     const dateMatch = this.tryParseDate(search);
     if (dateMatch) {
-      this.filteredDoctor = this.Animals.filter(animal => {
-        const feedDate = this.formatDateDisplay(animal.date).toLowerCase();
-        return feedDate.includes(dateMatch);
+      this.filteredDoctor = this.Animals.filter(doctor => {
+        const doctorDate = this.formatDateDisplay(doctor.date).toLowerCase();
+        return doctorDate.includes(dateMatch);
       });
       return;
     }
 
-    // Then match by animal name
-    this.filteredDoctor = this.Animals.filter(animal =>
-      animal.animal_name.toLowerCase().includes(search)
+    this.filteredDoctor = this.Animals.filter(doctor =>
+      doctor.animal_name?.toLowerCase().includes(search) ||
+      doctor.reason?.toLowerCase().includes(search)
     );
   }
 
@@ -573,12 +564,5 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     }
 
     return null;
-  }
-
-  // Add this method to clean up timeouts
-  ngOnDestroy(): void {
-    if (this.AnimalSearchTimeout) {
-      clearTimeout(this.AnimalSearchTimeout);
-    }
   }
 }

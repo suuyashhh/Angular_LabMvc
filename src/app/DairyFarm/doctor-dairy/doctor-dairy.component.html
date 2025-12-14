@@ -29,7 +29,7 @@
             <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
                      py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" type="search"
               placeholder="Search doctor name..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"
-              id="Animals-search-input" />
+              id="doctor-search-input" />
             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
               <i class="ri-search-2-fill"></i>
             </span>
@@ -51,44 +51,45 @@
 
       <div *ngIf="!loadingDoctorHistory">
         <!-- Table on md+ -->
-        <div *ngIf="Animals && Animals.length > 0; else noFeedData" class="space-y-3">
+        <div *ngIf="Animals && Animals.length > 0; else noDoctorData" class="space-y-3">
 
-          <div *ngFor="let f of filteredDoctor" id="feedCardDropdown{{ getAnimalId(f) }}"
+          <div *ngFor="let doctor of filteredDoctor" id="doctorCardDropdown{{ getAnimalId(doctor) }}"
             (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
             class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
             <!-- Image -->
             <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-              <img src="../../../assets/DairryFarmImg/doctor_16802630.png" class="w-full h-full object-cover">
+              <img [src]="doctor.AnimalImage || '../../../assets/DairryFarmImg/doctor_16802630.png'" 
+                   class="w-full h-full object-cover"
+                   (error)="doctor.AnimalImage = '../../../assets/DairryFarmImg/doctor_16802630.png'">
             </div>
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
-              <div class="text-green-800 font-medium truncate">{{ f.animal_name }}</div>
-              <div class="text-xs text-green-500 mt-1">Price: {{ f.price }} </div>
-              <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(f.date) }}</div>
+              <div class="text-green-800 font-medium truncate">{{ doctor.animal_name }}</div>
+              <div class="text-xs text-green-500 mt-1">Price: {{ doctor.price }}</div>
+              <div class="text-xs text-green-500 mt-1">Reason: {{ doctor.reason }}</div>
+              <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(doctor.date) }}</div>
             </div>
 
             <!-- Actions Dropdown -->
             <div class="dropdown flex-shrink-0">
               <button
                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
-                type="button" id="feedCardDropdown{{ getAnimalId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
+                type="button" id="doctorCardDropdown{{ getAnimalId(doctor) }}" data-bs-toggle="dropdown" aria-expanded="false"
                 (click)="$event.stopPropagation()">
                 <span>Actions</span>
               </button>
               <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                [attr.aria-labelledby]="'feedCardDropdown' + getAnimalId(f)">
+                [attr.aria-labelledby]="'doctorCardDropdown' + getAnimalId(doctor)">
                 <li>
                   <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                    href="javascript:void(0);" (click)="openEditModal(f)" data-bs-toggle="modal"
-                    data-bs-target="#feedFormModal">
+                    href="javascript:void(0);" (click)="openEditModal(doctor)">
                     <i class="ri-edit-line text-sm"></i> Edit
                   </a>
                 </li>
                 <li>
                   <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                    href="javascript:void(0);" (click)="openDeleteModal(f)" data-bs-toggle="modal"
-                    data-bs-target="#feedFormModal">
+                    href="javascript:void(0);" (click)="openDeleteModal(doctor)">
                     <i class="ri-delete-bin-line text-sm"></i> Delete
                   </a>
                 </li>
@@ -98,8 +99,7 @@
 
         </div>
 
-
-        <ng-template #noFeedData>
+        <ng-template #noDoctorData>
           <div class="text-center py-4">
             <p class="text-sm text-green-600">No doctor history found.</p>
           </div>
@@ -109,22 +109,21 @@
   </div>
 </main>
 
-
 <!-- Doctor Modal -->
-<div class="modal fade custom-modal-fade" #DoctorModal tabindex="-1" aria-labelledby="feedFormModalLabel"
+<div class="modal fade custom-modal-fade" #DoctorModal tabindex="-1" aria-labelledby="doctorFormModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
 
-
       <div class="modal-header custom-modal-header">
         <div class="modal-title-wrapper flex items-center">
-          <!-- Image Container - Slightly larger to match button prominence -->
+          <!-- Image Container -->
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
             class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
             (click)="openImagePreview()" title="Click to view full image">
-            <img [src]="doctorForm.get('feedImage')?.value || '../../../assets/DairryFarmImg/doctor_16802630.png'"
-              alt="Doctor Icon" class="w-10 h-10 object-contain" onerror="this.src='assets/images/default-doctor.png'" />
+            <img [src]="doctorForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/doctor_16802630.png'"
+              alt="Animal Image" class="w-10 h-10 object-contain" 
+              onerror="this.src='../../../assets/DairryFarmImg/doctor_16802630.png'" />
           </div>
 
           <div class="flex items-center">
@@ -143,9 +142,6 @@
         <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
       </div>
 
-
-
-
       <div class="modal-body custom-modal-body">
         <form [formGroup]="doctorForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
@@ -162,31 +158,34 @@
               </div>
             </div>
 
-            <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-0 position-relative">
-                <!-- SEARCH BAR -->
-                <input #feedSearchInput id="Doctor-input" type="text" class="form-control branch-input" name="FeedSearch"
-                  [(ngModel)]="selectedAnimalName" (input)="onFeedSearch($event)" (focus)="showAnimalDropdown = true"
-                  autocomplete="off" [value]="selectedAnimalName || ''" placeholder="Cattle" required />
+            <!-- Animal Search -->
+            <div class="custom-form-group position-relative">
+              <div class="form-floating form-floating-outline mb-0">
+                <input #doctorInput id="doctor-animal-input" type="text" class="form-control branch-input" 
+                  name="animalSearch" [(ngModel)]="selectedAnimalName" 
+                  (input)="onFeedSearch($event)" (focus)="showAnimalDropdown = true"
+                  autocomplete="off" placeholder="Select Animal" 
+                  [ngModelOptions]="{standalone: true}" 
+                  [readonly]="modalMode === 'delete'" />
 
-                <label for="Doctor-input">
+                <label for="doctor-animal-input">
                   <i class="ri-box-3-line"></i>
-                  Cattle Name <span class="text-danger">*</span>
+                  Animal Name <span class="text-danger">*</span>
                 </label>
+
+                <!-- Hidden input for Animal_id -->
+                <input type="hidden" formControlName="Animal_id" />
+                <input type="hidden" formControlName="animal_name" />
 
                 <!-- CARET -->
                 <button type="button" class="dropdown-caret-button" (click)="toggleFeedDropdown()"
-                  aria-label="Toggle Doctors">
+                  aria-label="Toggle Animals" [disabled]="modalMode === 'delete'">
                   <i [ngClass]="showAnimalDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
                 </button>
-
-                <!-- Hidden input for Animal_id -->
-                <input type="hidden" name="Animal_id" [(ngModel)]="selectedAnimalId" />
               </div>
 
               <!-- DROPDOWN LIST -->
-              <div class="dropdown-panel" *ngIf="showAnimalDropdown" (click)="$event.stopPropagation()"
-                [style.display]="showAnimalDropdown ? 'block' : 'none'">
+              <div class="dropdown-panel" *ngIf="showAnimalDropdown" (click)="$event.stopPropagation()">
                 <div class="dropdown-list-container">
                   <!-- Loading state -->
                   <div *ngIf="loadingAnimalOptions" class="dropdown-loading">
@@ -194,17 +193,17 @@
                     <span class="loading-text">Loading Animals...</span>
                   </div>
 
-                  <!-- Doctor options -->
+                  <!-- Animal options -->
                   <div *ngIf="!loadingAnimalOptions && AnimalOptions.length > 0" class="dropdown-items-wrapper">
                     <div class="dropdown-item" *ngFor="let animal of AnimalOptions" (click)="selectFeed(animal)"
                       [class.dropdown-item-selected]="selectedAnimalId === animal.animalId">
                       <div class="dropdown-item-content">
-                        <!-- FEED NAME -->
+                        <!-- ANIMAL NAME -->
                         <div class="item-name truncate">
                           {{ animal.animalName }}
                         </div>
 
-                        <!-- FEED META - Show ID below name -->
+                        <!-- ANIMAL META -->
                         <div class="item-meta truncate">
                           ID: {{ animal.animalId }}
                         </div>
@@ -225,7 +224,7 @@
                 </div>
               </div>
             </div>
-
+            
             <style>
               /* Dropdown Panel */
               .dropdown-panel {
@@ -375,12 +374,11 @@
             <!-- Reason -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="doctor-qty" class="form-control" formControlName="quantity"
+                <input type="text" id="doctor-reason" class="form-control" formControlName="reason"
                   placeholder="Reason" [readonly]="modalMode === 'delete'" />
-                <label for="doctor-qty"><i class="ri-stack-line"></i>Reason <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('Reason')?.invalid">
-                  <small *ngIf="doctorForm.get('Reason')?.errors?.['required']">Quantity is required.</small>
-                  <small *ngIf="doctorForm.get('Reason')?.errors?.['min']">Quantity must be at least 1.</small>
+                <label for="doctor-reason"><i class="ri-file-text-line"></i>Reason <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('reason')?.invalid">
+                  <small *ngIf="doctorForm.get('reason')?.errors?.['required']">Reason is required.</small>
                 </div>
               </div>
             </div>
@@ -389,7 +387,7 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="number" id="doctor-price" class="form-control" formControlName="price" placeholder="Price"
-                  [readonly]="modalMode === 'delete'" />
+                  [readonly]="modalMode === 'delete'" min="1" />
                 <label for="doctor-price"><i class="ri-money-dollar-circle-line"></i>Price <span
                     class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('price')?.invalid">
@@ -399,13 +397,12 @@
               </div>
             </div>
 
-
             <!-- Delete Reason -->
             <div class="custom-form-group" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
+                <input type="text" id="deleteDoctorReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" />
-                <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                <label for="deleteDoctorReason"><i class="ri-chat-3-line"></i>Delete Reason <span
                     class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1" *ngIf="submitted && !deleteReason">
@@ -436,15 +433,16 @@
   </div>
 </div>
 
-<!-- Image Preview Modal - Simple Version -->
+<!-- Image Preview Modal -->
 <div class="modal fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content bg-transparent border-0 shadow-none">
       <div class="modal-body p-0 position-relative">
         <!-- Large Image -->
         <div class="flex justify-center items-center min-h-[70vh]">
-          <img [src]="previewImageUrl || 'assets/images/default-doctor.png'" alt="Doctor Image Preview"
-            class="max-w-full max-h-[70vh] rounded-lg shadow-2xl" (error)="onImageError($event)" />
+          <img [src]="previewImageUrl" alt="Animal Image Preview"
+            class="max-w-full max-h-[70vh] rounded-lg shadow-2xl" 
+            (error)="previewImageUrl = '../../../assets/DairryFarmImg/doctor_16802630.png'" />
         </div>
 
         <!-- Close Button -->
@@ -453,7 +451,6 @@
           (click)="closeImagePreview()" aria-label="Close">
           <i class="ri-close-line text-xl"></i>
         </button>
-
       </div>
     </div>
   </div>
