@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../shared/api.service';
 import { ServicesService } from '../../shared/services.service';
 import { AuthService } from '../../shared/auth.service';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-masters',
@@ -76,7 +77,8 @@ export class MastersComponent implements OnInit {
     private toastr: ToastrService,
     private service: ServicesService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+        private loader: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -474,17 +476,20 @@ export class MastersComponent implements OnInit {
       return;
     }
 
-    this.loadingAnimals = true;
+    
+    this.loader.show();
     this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
       next: (res: any) => {
         this.animals = res || [];
-        this.loadingAnimals = false;
+      
+    this.loader.hide();
       },
       error: (err) => {
         console.error('loadAnimals', err);
         this.toastr.error('Failed to load animal list');
         this.animals = [];
-        this.loadingAnimals = false;
+       
+    this.loader.hide();
       }
     });
   }
@@ -621,17 +626,19 @@ export class MastersComponent implements OnInit {
       return;
     }
 
-    this.loadingFeeds = true;
+    
+    this.loader.show();
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
       next: (res: any) => {
         this.feeds = res || [];
-        this.loadingFeeds = false;
+       
+    this.loader.hide();
       },
       error: (err) => {
         console.error('loadFeeds', err);
         this.toastr.error('Failed to load feeds');
         this.feeds = [];
-        this.loadingFeeds = false;
+    this.loader.hide();
       }
     });
   }

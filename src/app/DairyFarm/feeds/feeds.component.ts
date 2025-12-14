@@ -4,9 +4,11 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-feeds',
@@ -19,7 +21,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
   @ViewChild('feedInput') feedInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
-
 
   // Form
   feedForm!: FormGroup;
@@ -42,9 +43,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
   selectedFeed: any = null;
   deleteReason: string = '';
 
-  // Loading
-  loadingFeeds: boolean = false;
-
   // Search
   searchTerm: string = '';
 
@@ -52,18 +50,22 @@ export class FeedsComponent implements OnInit, OnDestroy {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
-
   // Image Preview
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
 
+  // Button loading states
+  isSaving: boolean = false;
+  isUpdating: boolean = false;
+  isDeleting: boolean = false;
 
   constructor(
     private http: HttpClient,
     private api: ApiService,
     private toastr: ToastrService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private loader: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -78,7 +80,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.loadFeedOptions();
   }
 
-  OnDestroy(): void {
+  ngOnDestroy(): void {
     if (this.feedSearchTimeout) {
       clearTimeout(this.feedSearchTimeout);
     }
@@ -102,11 +104,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-
-
   openImagePreview(): void {
     const imageUrl = this.feedForm.get('feedImage')?.value;
-    this.previewImageUrl = imageUrl || 'assets/images/default-feed.png';
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/seed-bag_12627079.png';
 
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
@@ -124,7 +124,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
       modalElement.style.display = 'block';
       document.body.classList.add('modal-open');
 
-      // Add backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
       backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
@@ -147,7 +146,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
-    img.src = 'assets/images/default-feed.png';
+    img.src = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
   }
 
   // ==================== FEED DROPDOWN METHODS ====================
@@ -182,12 +181,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     this.feedSearchTerm = input.value;
 
-    // Clear previous timeout
     if (this.feedSearchTimeout) {
       clearTimeout(this.feedSearchTimeout);
     }
 
-    // Debounce search
     this.feedSearchTimeout = setTimeout(() => {
       this.loadFeedOptions(this.feedSearchTerm);
     }, 300);
@@ -198,7 +195,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.selectedFeedName = feed.feedName;
     this.showFeedDropdown = false;
 
-    // Update form controls
     this.feedForm.patchValue({
       feed_id: feed.feedId,
       feed_name: feed.feedName
@@ -212,11 +208,16 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFeedBlur(): void {
-    // Small delay to allow click events on dropdown items
-    setTimeout(() => {
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.showFeedDropdown) return;
+    
+    const target = event.target as HTMLElement;
+    const isClickInside = this.feedInput?.nativeElement?.contains(target);
+    
+    if (!isClickInside) {
       this.showFeedDropdown = false;
-    }, 200);
+    }
   }
 
   // ==================== MODAL METHODS ====================
@@ -225,8 +226,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.selectedFeed = null;
     this.deleteReason = '';
     this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
-    // Reset feed selection
     this.selectedFeedId = 0;
     this.selectedFeedName = '';
     this.feedSearchTerm = '';
@@ -238,9 +241,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feed_name: ''
     });
 
-    // Load fresh feed options
     this.loadFeedOptions();
-
     this.showModal();
   }
 
@@ -249,6 +250,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.selectedFeed = feed;
     this.deleteReason = '';
     this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
     const expenseId = feed.expense_id;
 
@@ -257,11 +261,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Set feed selection
     this.selectedFeedId = feed.feed_id || feed.feedId || 0;
     this.selectedFeedName = feed.feed_name || feed.feedName || '';
 
-    // FIRST PATCH BASIC DATA (without image)
     this.feedForm.patchValue({
       feed_id: this.selectedFeedId,
       feed_name: this.selectedFeedName,
@@ -271,21 +273,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feedImage: ''
     });
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
-      next: (res: any) => {
-        const image = res?.feedImage || res?.FeedImage;
-        if (image) {
-          this.feedForm.patchValue({ feedImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load feed image");
-        this.showModal();
-      }
-    });
+    this.loader.show();
 
+    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res: any) => {
+          const image = res?.feedImage || res?.FeedImage;
+          if (image) {
+            this.feedForm.patchValue({ feedImage: image });
+          }
+          this.showModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error("Failed to load feed image");
+          this.showModal();
+        }
+      });
   }
 
   openDeleteModal(feed: any): void {
@@ -293,6 +298,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.selectedFeed = feed;
     this.deleteReason = '';
     this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
     const expenseId = feed.expense_id;
 
@@ -301,11 +309,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Set feed selection
     this.selectedFeedId = feed.feed_id || feed.feedId || 0;
     this.selectedFeedName = feed.feed_name || feed.feedName || '';
 
-    // FIRST PATCH BASIC DATA (without image)
     this.feedForm.patchValue({
       feed_id: this.selectedFeedId,
       feed_name: this.selectedFeedName,
@@ -315,21 +321,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feedImage: ''
     });
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
-      next: (res: any) => {
-        const image = res?.feedImage || res?.FeedImage;
-        if (image) {
-          this.feedForm.patchValue({ feedImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load feed image");
-        this.showModal();
-      }
-    });
+    this.loader.show();
 
+    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res: any) => {
+          const image = res?.feedImage || res?.FeedImage;
+          if (image) {
+            this.feedForm.patchValue({ feedImage: image });
+          }
+          this.showModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error("Failed to load feed image");
+          this.showModal();
+        }
+      });
   }
 
   closeModal(): void {
@@ -350,7 +359,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
       modalElement.style.display = 'block';
       document.body.classList.add('modal-open');
 
-      // Add backdrop
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
       document.body.appendChild(backdrop);
@@ -364,22 +372,22 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loadingFeeds = true;
+    this.loader.show();
 
-    this.api.get(`Feeds/History/${this.dairyUserId}`).subscribe({
-      next: (response: any) => {
-        this.feeds = Array.isArray(response) ? response : [];
-        this.filteredFeeds = [...this.feeds];
-        this.loadingFeeds = false;
-      },
-      error: (error: any) => {
-        console.error('Failed to load feeds:', error);
-        this.toastr.error('Failed to load feeds');
-        this.loadingFeeds = false;
-        this.feeds = [];
-        this.filteredFeeds = [];
-      }
-    });
+    this.api.get(`Feeds/History/${this.dairyUserId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (response: any) => {
+          this.feeds = Array.isArray(response) ? response : [];
+          this.filteredFeeds = [...this.feeds];
+        },
+        error: (error: any) => {
+          console.error('Failed to load feeds:', error);
+          this.toastr.error('Failed to load feeds');
+          this.feeds = [];
+          this.filteredFeeds = [];
+        }
+      });
   }
 
   submitFeed(): void {
@@ -399,7 +407,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validate feed selection
     if (!this.selectedFeedId) {
       this.toastr.error('Please select a feed from the dropdown');
       return;
@@ -413,6 +420,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   addFeed(): void {
+    this.isSaving = true;
+
     const payload = {
       user_id: this.dairyUserId,
       feed_id: this.selectedFeedId,
@@ -423,17 +432,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
       date: this.formatDateForAPI(this.feedForm.value.date)
     };
 
-    this.api.post('Feeds/Save', payload).subscribe({
-      next: () => {
-        this.toastr.success('Feed saved successfully');
-        this.closeModal();
-        this.loadFeeds();
-      },
-      error: (error: any) => {
-        console.error('Save error:', error);
-        this.toastr.error('Failed to save feed');
-      }
-    });
+    this.loader.show();
+
+    this.api.post('Feeds/Save', payload)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isSaving = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Feed saved successfully');
+          this.closeModal();
+          this.loadFeeds();
+        },
+        error: (error: any) => {
+          console.error('Save error:', error);
+          this.toastr.error('Failed to save feed');
+        }
+      });
   }
 
   updateFeed(): void {
@@ -441,6 +457,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
       this.toastr.error('Invalid feed data');
       return;
     }
+
+    this.isUpdating = true;
 
     const payload = {
       expense_id: this.selectedFeed.expense_id,
@@ -453,17 +471,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
       date: this.formatDateForAPI(this.feedForm.value.date)
     };
 
-    this.api.put('Feeds/Edit', payload).subscribe({
-      next: () => {
-        this.toastr.success('Feed updated successfully');
-        this.closeModal();
-        this.loadFeeds();
-      },
-      error: (error: any) => {
-        console.error('Update error:', error);
-        this.toastr.error('Failed to update feed');
-      }
-    });
+    this.loader.show();
+
+    this.api.put('Feeds/Edit', payload)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isUpdating = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Feed updated successfully');
+          this.closeModal();
+          this.loadFeeds();
+        },
+        error: (error: any) => {
+          console.error('Update error:', error);
+          this.toastr.error('Failed to update feed');
+        }
+      });
   }
 
   deleteFeed(): void {
@@ -472,19 +497,27 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.api.delete(`Feeds/${this.selectedFeed.expense_id}`).subscribe({
-      next: () => {
-        this.toastr.success('Feed deleted successfully');
-        this.closeModal();
-        this.loadFeeds();
-      },
-      error: (error: any) => {
-        console.error('Delete error:', error);
-        this.toastr.error('Failed to delete feed');
-      }
-    });
-  }
+    this.isDeleting = true;
 
+    this.loader.show();
+
+    this.api.delete(`Feeds/${this.selectedFeed.expense_id}`)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isDeleting = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Feed deleted successfully');
+          this.closeModal();
+          this.loadFeeds();
+        },
+        error: (error: any) => {
+          console.error('Delete error:', error);
+          this.toastr.error('Failed to delete feed');
+        }
+      });
+  }
 
   getFeedId(feed: any): number {
     return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
@@ -499,7 +532,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Try to match date first
     const dateMatch = this.tryParseDate(search);
     if (dateMatch) {
       this.filteredFeeds = this.feeds.filter(feed => {
@@ -509,7 +541,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Then match by feed name
     this.filteredFeeds = this.feeds.filter(feed =>
       feed.feed_name.toLowerCase().includes(search)
     );
@@ -573,12 +604,5 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
 
     return null;
-  }
-
-  // Add this method to clean up timeouts
-  ngOnDestroy(): void {
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
-    }
   }
 }

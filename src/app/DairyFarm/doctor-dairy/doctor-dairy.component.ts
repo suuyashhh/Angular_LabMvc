@@ -4,9 +4,11 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-doctor-dairy',
@@ -41,9 +43,6 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   selectedDoctor: any = null;
   deleteReason: string = '';
 
-  // Loading
-  loadingDoctorHistory: boolean = false;
-
   // Search
   searchTerm: string = '';
 
@@ -55,12 +54,18 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
 
+  // Button loading states
+  isSaving: boolean = false;
+  isUpdating: boolean = false;
+  isDeleting: boolean = false;
+
   constructor(
     private http: HttpClient,
     private api: ApiService,
     private toastr: ToastrService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private loader: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -86,9 +91,9 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       Animal_id: new FormControl('', [Validators.required]),
       animal_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
-      reason: new FormControl('', [Validators.required]), // Changed from 'Reason' to 'reason'
+      reason: new FormControl('', [Validators.required]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
-      AnimalImage: new FormControl('') // Changed from 'feedImage' to 'AnimalImage'
+      AnimalImage: new FormControl('')
     });
   }
 
@@ -223,6 +228,9 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.selectedDoctor = null;
     this.deleteReason = '';
     this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
     this.selectedAnimalId = 0;
     this.selectedAnimalName = '';
@@ -242,74 +250,40 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.showModal();
   }
 
-  openEditModal(doctor: any): void {
-    this.modalMode = 'edit';
-    this.selectedDoctor = doctor;
-    this.deleteReason = '';
-    this.submitted = false;
+ openEditModal(doctor: any): void {
+  this.modalMode = 'edit';
+  this.selectedDoctor = doctor;
+  this.deleteReason = '';
+  this.submitted = false;
+  this.isSaving = false;
+  this.isUpdating = false;
+  this.isDeleting = false;
 
-    const expenseId = doctor.expense_id;
+  const expenseId = doctor.expense_id;
 
-    if (!expenseId) {
-      this.toastr.error('Invalid doctor data');
-      return;
-    }
-
-    this.selectedAnimalId = doctor.Animal_id || 0;
-    this.selectedAnimalName = doctor.animal_name || '';
-
-    this.doctorForm.patchValue({
-      Animal_id: this.selectedAnimalId,
-      animal_name: this.selectedAnimalName,
-      price: doctor.price,
-      reason: doctor.reason,
-      date: this.formatDateForInput(doctor.date),
-      AnimalImage: ''
-    });
-
-    this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`).subscribe({
-      next: (res: any) => {
-        const image = res?.AnimalImage || res?.animalImage;
-        debugger;
-        if (image) {
-          this.doctorForm.patchValue({ AnimalImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load animal image");
-        this.showModal();
-      }
-    });
+  if (!expenseId) {
+    this.toastr.error('Invalid doctor data');
+    return;
   }
 
-  openDeleteModal(doctor: any): void {
-    this.modalMode = 'delete';
-    this.selectedDoctor = doctor;
-    this.deleteReason = '';
-    this.submitted = false;
+  this.selectedAnimalId = doctor.Animal_id || 0;
+  this.selectedAnimalName = doctor.animal_name || '';
 
-    const expenseId = doctor.expense_id;
+  this.doctorForm.patchValue({
+    Animal_id: this.selectedAnimalId,
+    animal_name: this.selectedAnimalName,
+    price: doctor.price,
+    reason: doctor.reason,
+    date: this.formatDateForInput(doctor.date),
+    AnimalImage: ''
+  });
 
-    if (!expenseId) {
-      this.toastr.error('Invalid doctor data');
-      return;
-    }
+  // Show loader before API call
+  this.loader.show();
 
-    this.selectedAnimalId = doctor.Animal_id || 0;
-    this.selectedAnimalName = doctor.animal_name || '';
-
-    this.doctorForm.patchValue({
-      Animal_id: this.selectedAnimalId,
-      animal_name: this.selectedAnimalName,
-      price: doctor.price,
-      reason: doctor.reason,
-      date: this.formatDateForInput(doctor.date),
-      AnimalImage: ''
-    });
-
-    this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`).subscribe({
+  this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
+    .pipe(finalize(() => this.loader.hide()))
+    .subscribe({
       next: (res: any) => {
         const image = res?.AnimalImage || res?.animalImage;
         if (image) {
@@ -323,7 +297,56 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
         this.showModal();
       }
     });
+}
+
+openDeleteModal(doctor: any): void {
+  this.modalMode = 'delete';
+  this.selectedDoctor = doctor;
+  this.deleteReason = '';
+  this.submitted = false;
+  this.isSaving = false;
+  this.isUpdating = false;
+  this.isDeleting = false;
+
+  const expenseId = doctor.expense_id;
+
+  if (!expenseId) {
+    this.toastr.error('Invalid doctor data');
+    return;
   }
+
+  this.selectedAnimalId = doctor.Animal_id || 0;
+  this.selectedAnimalName = doctor.animal_name || '';
+
+  this.doctorForm.patchValue({
+    Animal_id: this.selectedAnimalId,
+    animal_name: this.selectedAnimalName,
+    price: doctor.price,
+    reason: doctor.reason,
+    date: this.formatDateForInput(doctor.date),
+    AnimalImage: ''
+  });
+
+  // Show loader before API call
+  this.loader.show();
+
+  this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
+    .pipe(finalize(() => this.loader.hide()))
+    .subscribe({
+      next: (res: any) => {
+        const image = res?.AnimalImage || res?.animalImage;
+        if (image) {
+          this.doctorForm.patchValue({ AnimalImage: image });
+        }
+        this.showModal();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to load animal image");
+        this.showModal();
+      }
+    });
+}
 
   closeModal(): void {
     const modalElement = this.DoctorModal?.nativeElement;
@@ -356,22 +379,22 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loadingDoctorHistory = true;
+    this.loader.show();
 
-    this.api.get(`DoctorDairy/History/${this.dairyUserId}`).subscribe({
-      next: (response: any) => {
-        this.Animals = Array.isArray(response) ? response : [];
-        this.filteredDoctor = [...this.Animals];
-        this.loadingDoctorHistory = false;
-      },
-      error: (error: any) => {
-        console.error('Failed to load doctor history:', error);
-        this.toastr.error('Failed to load doctor history');
-        this.loadingDoctorHistory = false;
-        this.Animals = [];
-        this.filteredDoctor = [];
-      }
-    });
+    this.api.get(`DoctorDairy/History/${this.dairyUserId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (response: any) => {
+          this.Animals = Array.isArray(response) ? response : [];
+          this.filteredDoctor = [...this.Animals];
+        },
+        error: (error: any) => {
+          console.error('Failed to load doctor history:', error);
+          this.toastr.error('Failed to load doctor history');
+          this.Animals = [];
+          this.filteredDoctor = [];
+        }
+      });
   }
 
   submitFeed(): void {
@@ -404,28 +427,37 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   }
 
   addDoctor(): void {
+    this.isSaving = true;
+    
     const payload = {
       user_id: this.dairyUserId,
       Animal_id: this.selectedAnimalId,
-      expense_name: 'Doctor', // Changed from 'Feeds' to 'Doctor'
+      expense_name: 'Doctor',
       animal_name: this.selectedAnimalName,
       price: Number(this.doctorForm.value.price),
-      reason: this.doctorForm.value.reason, // Changed from Reason to reason
+      reason: this.doctorForm.value.reason,
       date: this.formatDateForAPI(this.doctorForm.value.date),
-      Switch: 1 // Added Switch field as per DTO
+      Switch: 1
     };
 
-    this.api.post('DoctorDairy/Save', payload).subscribe({ // Changed endpoint
-      next: () => {
-        this.toastr.success('Doctor record saved successfully');
-        this.closeModal();
-        this.loadDoctorHistory();
-      },
-      error: (error: any) => {
-        console.error('Save error:', error);
-        this.toastr.error('Failed to save doctor record');
-      }
-    });
+    this.loader.show();
+
+    this.api.post('DoctorDairy/Save', payload)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isSaving = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Doctor record saved successfully');
+          this.closeModal();
+          this.loadDoctorHistory();
+        },
+        error: (error: any) => {
+          console.error('Save error:', error);
+          this.toastr.error('Failed to save doctor record');
+        }
+      });
   }
 
   updateDoctor(): void {
@@ -434,29 +466,38 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isUpdating = true;
+
     const payload = {
       expense_id: this.selectedDoctor.expense_id,
       user_id: this.dairyUserId,
       Animal_id: this.selectedAnimalId,
-      expense_name: 'Doctor', // Changed from 'Feeds' to 'Doctor'
+      expense_name: 'Doctor',
       animal_name: this.selectedAnimalName,
       price: Number(this.doctorForm.value.price),
-      reason: this.doctorForm.value.reason, // Changed from Reason to reason
+      reason: this.doctorForm.value.reason,
       date: this.formatDateForAPI(this.doctorForm.value.date),
-      Switch: 1 // Added Switch field
+      Switch: 1
     };
-debugger;
-    this.api.put('DoctorDairy/Edit', payload).subscribe({ // Changed endpoint
-      next: () => {
-        this.toastr.success('Doctor record updated successfully');
-        this.closeModal();
-        this.loadDoctorHistory();
-      },
-      error: (error: any) => {
-        console.error('Update error:', error);
-        this.toastr.error('Failed to update doctor record');
-      }
-    });
+
+    this.loader.show();
+
+    this.api.put('DoctorDairy/Edit', payload)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isUpdating = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Doctor record updated successfully');
+          this.closeModal();
+          this.loadDoctorHistory();
+        },
+        error: (error: any) => {
+          console.error('Update error:', error);
+          this.toastr.error('Failed to update doctor record');
+        }
+      });
   }
 
   deleteDoctor(): void {
@@ -465,17 +506,26 @@ debugger;
       return;
     }
 
-    this.api.delete(`DoctorDairy/${this.selectedDoctor.expense_id}`).subscribe({ // Changed endpoint
-      next: () => {
-        this.toastr.success('Doctor record deleted successfully');
-        this.closeModal();
-        this.loadDoctorHistory();
-      },
-      error: (error: any) => {
-        console.error('Delete error:', error);
-        this.toastr.error('Failed to delete doctor record');
-      }
-    });
+    this.isDeleting = true;
+
+    this.loader.show();
+
+    this.api.delete(`DoctorDairy/${this.selectedDoctor.expense_id}`)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isDeleting = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Doctor record deleted successfully');
+          this.closeModal();
+          this.loadDoctorHistory();
+        },
+        error: (error: any) => {
+          console.error('Delete error:', error);
+          this.toastr.error('Failed to delete doctor record');
+        }
+      });
   }
 
   getAnimalId(doctor: any): number {

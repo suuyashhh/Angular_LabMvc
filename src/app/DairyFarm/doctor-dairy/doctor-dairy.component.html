@@ -18,7 +18,7 @@
       <div class="flex flex-col lg:flex-row items-center gap-4">
         <div class="flex gap-3">
           <button type="button"
-            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2"
+            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
             (click)="openAddModal()">
             <i class="ri-add-box-fill"></i> Add Doctor
           </button>
@@ -45,11 +45,12 @@
         <div class="text-sm text-green-600">Total: {{ Animals.length || 0 }}</div>
       </div>
 
-      <div *ngIf="loadingDoctorHistory" class="text-center my-3">
-        <div class="inline-block animate-spin rounded-full border-4 border-green-200 border-t-green-600 h-8 w-8"></div>
+      <!-- Loading indicator for doctor history -->
+      <div class="text-center my-3">
+        <!-- LoaderService will handle the global loader -->
       </div>
 
-      <div *ngIf="!loadingDoctorHistory">
+      <div>
         <!-- Table on md+ -->
         <div *ngIf="Animals && Animals.length > 0; else noDoctorData" class="space-y-3">
 
@@ -65,9 +66,9 @@
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
-              <div class="text-green-800 font-medium truncate">{{ doctor.animal_name }}</div>
+              <div class="text-green-800 font-medium truncate">{{ doctor.reason}}</div>
               <div class="text-xs text-green-500 mt-1">Price: {{ doctor.price }}</div>
-              <div class="text-xs text-green-500 mt-1">Reason: {{ doctor.reason }}</div>
+              <div class="text-xs text-green-500 mt-1">Cattle: {{ doctor.animal_name }}</div>
               <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(doctor.date) }}</div>
             </div>
 
@@ -139,7 +140,8 @@
           </div>
         </div>
 
-        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"></button>
+        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close" 
+                [disabled]="isSaving || isUpdating || isDeleting"></button>
       </div>
 
       <div class="modal-body custom-modal-body">
@@ -150,7 +152,8 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="date" id="doctor-date" class="form-control" formControlName="date" placeholder="Date"
-                  [readonly]="modalMode === 'delete'" />
+                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting" 
+                  [disabled]="isSaving || isUpdating || isDeleting" />
                 <label for="doctor-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('date')?.invalid">
                   <small *ngIf="doctorForm.get('date')?.errors?.['required']">Date is required.</small>
@@ -166,7 +169,8 @@
                   (input)="onFeedSearch($event)" (focus)="showAnimalDropdown = true"
                   autocomplete="off" placeholder="Select Animal" 
                   [ngModelOptions]="{standalone: true}" 
-                  [readonly]="modalMode === 'delete'" />
+                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
+                  [disabled]="isSaving || isUpdating || isDeleting" />
 
                 <label for="doctor-animal-input">
                   <i class="ri-box-3-line"></i>
@@ -179,7 +183,8 @@
 
                 <!-- CARET -->
                 <button type="button" class="dropdown-caret-button" (click)="toggleFeedDropdown()"
-                  aria-label="Toggle Animals" [disabled]="modalMode === 'delete'">
+                  aria-label="Toggle Animals" 
+                  [disabled]="modalMode === 'delete' || isSaving || isUpdating || isDeleting">
                   <i [ngClass]="showAnimalDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
                 </button>
               </div>
@@ -375,7 +380,9 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="doctor-reason" class="form-control" formControlName="reason"
-                  placeholder="Reason" [readonly]="modalMode === 'delete'" />
+                  placeholder="Reason" 
+                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
+                  [disabled]="isSaving || isUpdating || isDeleting" />
                 <label for="doctor-reason"><i class="ri-file-text-line"></i>Reason <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('reason')?.invalid">
                   <small *ngIf="doctorForm.get('reason')?.errors?.['required']">Reason is required.</small>
@@ -387,7 +394,8 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="number" id="doctor-price" class="form-control" formControlName="price" placeholder="Price"
-                  [readonly]="modalMode === 'delete'" min="1" />
+                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
+                  [disabled]="isSaving || isUpdating || isDeleting" min="1" />
                 <label for="doctor-price"><i class="ri-money-dollar-circle-line"></i>Price <span
                     class="text-danger">*</span></label>
                 <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('price')?.invalid">
@@ -401,7 +409,8 @@
             <div class="custom-form-group" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-4">
                 <input type="text" id="deleteDoctorReason" class="form-control" placeholder="Delete Reason"
-                  [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" />
+                  [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}"
+                  [disabled]="isDeleting" />
                 <label for="deleteDoctorReason"><i class="ri-chat-3-line"></i>Delete Reason <span
                     class="text-danger">*</span></label>
               </div>
@@ -414,17 +423,45 @@
 
           <!-- Modal Footer Buttons -->
           <div class="modal-footer custom-modal-footer">
-            <button type="button" class="custom-btn custom-btn-cancel" (click)="closeModal()">
+            <button type="button" class="custom-btn custom-btn-cancel" (click)="closeModal()"
+                    [disabled]="isSaving || isUpdating || isDeleting">
               <i class="ri-close-line"></i> Cancel
             </button>
-            <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save">
-              <i class="ri-save-line"></i> Save
+            
+            <!-- Save Button with loading -->
+            <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save"
+                    [disabled]="isSaving || doctorForm.invalid">
+              <span *ngIf="!isSaving">
+                <i class="ri-save-line"></i> Save
+              </span>
+              <span *ngIf="isSaving" class="inline-flex items-center">
+                <div class="spinner-border spinner-border-sm mr-2"></div>
+                Saving...
+              </span>
             </button>
-            <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save">
-              <i class="ri-edit-line"></i> Update
+            
+            <!-- Update Button with loading -->
+            <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save"
+                    [disabled]="isUpdating || doctorForm.invalid">
+              <span *ngIf="!isUpdating">
+                <i class="ri-edit-line"></i> Update
+              </span>
+              <span *ngIf="isUpdating" class="inline-flex items-center">
+                <div class="spinner-border spinner-border-sm mr-2"></div>
+                Updating...
+              </span>
             </button>
-            <button *ngIf="modalMode === 'delete'" type="submit" class="custom-btn custom-btn-delete">
-              <i class="ri-delete-bin-line"></i> Delete
+            
+            <!-- Delete Button with loading -->
+            <button *ngIf="modalMode === 'delete'" type="submit" class="custom-btn custom-btn-delete"
+                    [disabled]="isDeleting || !deleteReason">
+              <span *ngIf="!isDeleting">
+                <i class="ri-delete-bin-line"></i> Delete
+              </span>
+              <span *ngIf="isDeleting" class="inline-flex items-center">
+                <div class="spinner-border spinner-border-sm mr-2"></div>
+                Deleting...
+              </span>
             </button>
           </div>
         </form>
