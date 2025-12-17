@@ -117,9 +117,9 @@ export class MedicienComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      this.imageError = 'Image size should be less than 5MB';
+    // Validate file size (1MB max)
+    if (file.size > 1 * 1024 * 1024) {
+      this.imageError = 'Image size should be less than 1MB';
       this.selectedFile = null;
       this.imagePreview = null;
       return;
@@ -137,7 +137,72 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.imageError = '';
     this.selectedFile = file;
     
-    // Create preview
+    // Create preview and compress if needed
+    this.compressAndPreviewImage(file);
+  }
+
+  compressAndPreviewImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.src = e.target.result;
+      
+      img.onload = () => {
+        // Create canvas for compression
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          this.createBasicPreview(file);
+          return;
+        }
+
+        // Set maximum dimensions
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        
+        let width = img.width;
+        let height = img.height;
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Get compressed base64 with quality 0.7 (70% quality)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        this.imagePreview = compressedBase64;
+      };
+      
+      img.onerror = () => {
+        this.createBasicPreview(file);
+      };
+    };
+    
+    reader.onerror = () => {
+      this.imageError = 'Failed to read image file';
+      this.selectedFile = null;
+      this.imagePreview = null;
+    };
+    
+    reader.readAsDataURL(file);
+  }
+
+  createBasicPreview(file: File): void {
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
@@ -518,8 +583,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
     }
 
     try {
-      // Upload image if a new one is selected
-      if (this.selectedFile) {
+      // Use the compressed preview image if available
+      if (this.imagePreview) {
+        this.doctorForm.patchValue({ AnimalImage: this.imagePreview });
+      } else if (this.selectedFile) {
+        // Fallback to regular upload if no preview
         const base64Image = await this.uploadImage();
         this.doctorForm.patchValue({ AnimalImage: base64Image });
       }
