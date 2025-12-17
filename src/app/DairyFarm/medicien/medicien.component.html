@@ -12,7 +12,6 @@
 
 <main class="min-h-screen bg-green-50 p-6">
   <div class="max-w-7xl mx-auto space-y-6">
-
     <!-- Actions + Search -->
     <div class="bg-white rounded-2xl shadow-sm p-4">
       <div class="flex flex-col lg:flex-row items-center gap-4">
@@ -53,15 +52,16 @@
       <div>
         <!-- Table on md+ -->
         <div *ngIf="Animals && Animals.length > 0; else noDoctorData" class="space-y-3">
-
           <div *ngFor="let doctor of filteredDoctor" id="doctorCardDropdown{{ getAnimalId(doctor) }}"
             (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
             class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
-            <!-- Image -->
-            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-              <img [src]="doctor.AnimalImage || '../../../assets/DairryFarmImg/doctor_16802630.png'" 
+            
+            <!-- Image with Preview -->
+            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer" 
+                 (click)="previewCardImage(doctor)">
+              <img [src]="doctor.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png'" 
                    class="w-full h-full object-cover"
-                   (error)="doctor.AnimalImage = '../../../assets/DairryFarmImg/doctor_16802630.png'">
+                   (error)="doctor.AnimalImage = '../../../assets/DairryFarmImg/tablet_16443237.png'">
             </div>
 
             <!-- Info -->
@@ -97,7 +97,6 @@
               </ul>
             </div>
           </div>
-
         </div>
 
         <ng-template #noDoctorData>
@@ -115,16 +114,15 @@
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
     <div class="modal-content custom-modal-content">
-
       <div class="modal-header custom-modal-header">
         <div class="modal-title-wrapper flex items-center">
           <!-- Image Container -->
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
             class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
             (click)="openImagePreview()" title="Click to view full image">
-            <img [src]="doctorForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/doctor_16802630.png'"
+            <img [src]="doctorForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
               alt="Animal Image" class="w-10 h-10 object-contain" 
-              onerror="this.src='../../../assets/DairryFarmImg/doctor_16802630.png'" />
+              (error)="doctorForm.get('AnimalImage')?.setValue('../../../assets/DairryFarmImg/tablet_16443237.png')" />
           </div>
 
           <div class="flex items-center">
@@ -147,6 +145,78 @@
       <div class="modal-body custom-modal-body">
         <form [formGroup]="doctorForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
+            
+            <!-- Image Upload Section -->
+            <div class="custom-form-group" *ngIf="modalMode !== 'delete'">
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-green-700 mb-2">
+                  <i class="ri-image-line mr-2"></i>Upload Medicien Image
+                </label>
+                
+                <!-- Image Preview -->
+                <div class="flex flex-col items-center">
+                  <!-- Preview Container -->
+                  <div class="relative mb-4">
+                    <div class="w-40 h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
+                      <img [src]="imagePreview || doctorForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
+                           alt="Preview" 
+                           class="w-full h-full object-contain p-2"
+                           (error)="imagePreview = '../../../assets/DairryFarmImg/tablet_16443237.png'">
+                      
+                      <!-- Default icon when no image -->
+                      <div *ngIf="!imagePreview && !doctorForm.get('AnimalImage')?.value" 
+                           class="text-green-300 text-5xl">
+                        <i class="ri-image-line"></i>
+                      </div>
+                    </div>
+                    
+                    <!-- Remove button -->
+                    <button *ngIf="imagePreview || doctorForm.get('AnimalImage')?.value" 
+                            type="button"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            (click)="removeImage()">
+                      <i class="ri-close-line"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- File Input -->
+                  <div class="relative">
+                    <input type="file" 
+                           id="imageUpload"
+                           class="hidden"
+                           accept="image/*"
+                           (change)="onImageSelected($event)"
+                           #fileInput
+                           [disabled]="isSaving || isUpdating || isDeleting">
+                    
+                    <button type="button"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                            (click)="fileInput.click()"
+                            [disabled]="isSaving || isUpdating || isDeleting">
+                      <i class="ri-upload-cloud-line"></i>
+                      {{ imagePreview || doctorForm.get('AnimalImage')?.value ? 'Change Image' : 'Choose Image' }}
+                    </button>
+                    
+                    <p class="text-xs text-green-500 mt-2">
+                      Supported formats: JPG, PNG, GIF. Max size: 5MB
+                    </p>
+                    
+                    <!-- Loading indicator for image -->
+                    <div *ngIf="isUploadingImage" class="mt-2">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-sm text-green-600">Uploading image...</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Error message -->
+                    <div *ngIf="imageError" class="mt-2">
+                      <p class="text-sm text-red-600">{{ imageError }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Date -->
             <div class="custom-form-group">
@@ -229,152 +299,6 @@
                 </div>
               </div>
             </div>
-            
-            <style>
-              /* Dropdown Panel */
-              .dropdown-panel {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 6px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                margin-top: 4px;
-                max-height: 300px;
-                overflow-y: auto;
-              }
-
-              .dropdown-list-container {
-                padding: 8px;
-              }
-
-              /* Loading State */
-              .dropdown-loading {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-                gap: 12px;
-              }
-
-              .spinner-sm {
-                width: 18px;
-                height: 18px;
-                border-width: 2px;
-              }
-
-              .loading-text {
-                color: #6b7280;
-                font-size: 14px;
-              }
-
-              /* Dropdown Items */
-              .dropdown-items-wrapper {
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
-              }
-
-              .dropdown-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 10px 12px;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: all 0.2s ease;
-              }
-
-              .dropdown-item:hover {
-                background-color: #f3f4f6;
-              }
-
-              .dropdown-item-selected {
-                background-color: #eff6ff;
-                border-left: 3px solid #3b82f6;
-              }
-
-              .dropdown-item-content {
-                flex: 1;
-                min-width: 0;
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
-              }
-
-              .item-name {
-                font-size: 14px;
-                font-weight: 500;
-                color: #111827;
-              }
-
-              .item-meta {
-                font-size: 12px;
-                color: #6b7280;
-              }
-
-              .truncate {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-              }
-
-              /* Check Icon */
-              .dropdown-check-icon {
-                color: #10b981;
-                font-size: 18px;
-                margin-left: 8px;
-              }
-
-              /* Empty State */
-              .dropdown-empty-state {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 32px 16px;
-                text-align: center;
-                color: #6b7280;
-              }
-
-              .empty-icon {
-                font-size: 24px;
-                margin-bottom: 8px;
-                color: #9ca3af;
-              }
-
-              .empty-text {
-                font-size: 14px;
-              }
-
-              /* Form Input Improvements */
-              .branch-input {
-                padding-right: 40px !important;
-              }
-
-              .dropdown-caret-button {
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: none;
-                border: none;
-                color: #6b7280;
-                cursor: pointer;
-                padding: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10;
-              }
-
-              .dropdown-caret-button:hover {
-                color: #374151;
-              }
-            </style>
 
             <!-- Reason -->
             <div class="custom-form-group">
@@ -479,7 +403,7 @@
         <div class="flex justify-center items-center min-h-[70vh]">
           <img [src]="previewImageUrl" alt="Animal Image Preview"
             class="max-w-full max-h-[70vh] rounded-lg shadow-2xl" 
-            (error)="previewImageUrl = '../../../assets/DairryFarmImg/doctor_16802630.png'" />
+            (error)="previewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png'" />
         </div>
 
         <!-- Close Button -->

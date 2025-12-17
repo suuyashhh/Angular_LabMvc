@@ -17,10 +17,11 @@ import { LoaderService } from '../../services/loader.service';
   templateUrl: './medicien.component.html',
   styleUrl: './medicien.component.css'
 })
-export class MedicienComponent  implements OnInit, OnDestroy {
+export class MedicienComponent implements OnInit, OnDestroy {
   @ViewChild('DoctorModal') DoctorModal!: ElementRef;
   @ViewChild('doctorInput') doctorInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+  @ViewChild('fileInput') fileInput!: ElementRef;
 
   // Form
   doctorForm!: FormGroup;
@@ -50,7 +51,11 @@ export class MedicienComponent  implements OnInit, OnDestroy {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
-  // Image Preview
+  // Image Upload
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  isUploadingImage: boolean = false;
+  imageError: string = '';
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
 
@@ -104,10 +109,87 @@ export class MedicienComponent  implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-  openImagePreview(): void {
-    const imageUrl = this.doctorForm.get('AnimalImage')?.value;
-    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/doctor_16802630.png';
+  // ==================== IMAGE UPLOAD METHODS ====================
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    
+    if (!file) {
+      return;
+    }
 
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      this.imageError = 'Image size should be less than 5MB';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      this.imageError = 'Only JPG, PNG, and GIF images are allowed';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    this.imageError = '';
+    this.selectedFile = file;
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.doctorForm.patchValue({ AnimalImage: '' });
+    
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  async uploadImage(): Promise<string> {
+    if (!this.selectedFile) {
+      return this.doctorForm.get('AnimalImage')?.value || '';
+    }
+
+    this.isUploadingImage = true;
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        const base64Image = reader.result as string;
+        this.isUploadingImage = false;
+        resolve(base64Image);
+      };
+      
+      reader.onerror = () => {
+        this.isUploadingImage = false;
+        reject('Failed to read image file');
+      };
+      
+      reader.readAsDataURL(this.selectedFile!);
+    });
+  }
+
+  // ==================== IMAGE PREVIEW METHODS ====================
+  openImagePreview(): void {
+    const imageUrl = this.doctorForm.get('AnimalImage')?.value || this.imagePreview;
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/doctor_16802630.png';
+    this.isImagePreviewOpen = true;
+    this.showImagePreviewModal();
+  }
+
+  previewCardImage(doctor: any): void {
+    this.previewImageUrl = doctor.AnimalImage || '../../../assets/DairryFarmImg/doctor_16802630.png';
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
   }
@@ -235,6 +317,10 @@ export class MedicienComponent  implements OnInit, OnDestroy {
     this.selectedAnimalId = 0;
     this.selectedAnimalName = '';
     this.AnimalSearchTerm = '';
+    
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
 
     this.doctorForm.reset();
     this.doctorForm.patchValue({
@@ -250,103 +336,110 @@ export class MedicienComponent  implements OnInit, OnDestroy {
     this.showModal();
   }
 
- openEditModal(doctor: any): void {
-  this.modalMode = 'edit';
-  this.selectedDoctor = doctor;
-  this.deleteReason = '';
-  this.submitted = false;
-  this.isSaving = false;
-  this.isUpdating = false;
-  this.isDeleting = false;
+  openEditModal(doctor: any): void {
+    this.modalMode = 'edit';
+    this.selectedDoctor = doctor;
+    this.deleteReason = '';
+    this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
-  const expenseId = doctor.expense_id;
+    const expenseId = doctor.expense_id;
 
-  if (!expenseId) {
-    this.toastr.error('Invalid doctor data');
-    return;
+    if (!expenseId) {
+      this.toastr.error('Invalid doctor data');
+      return;
+    }
+
+    this.selectedAnimalId = doctor.Animal_id || 0;
+    this.selectedAnimalName = doctor.animal_name || '';
+    
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
+
+    this.doctorForm.patchValue({
+      Animal_id: this.selectedAnimalId,
+      animal_name: this.selectedAnimalName,
+      price: doctor.price,
+      reason: doctor.reason,
+      date: this.formatDateForInput(doctor.date),
+      AnimalImage: ''
+    });
+
+    // Show loader before API call
+    this.loader.show();
+
+    this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res: any) => {
+          const image = res?.AnimalImage || res?.animalImage;
+          if (image) {
+            this.doctorForm.patchValue({ AnimalImage: image });
+          }
+          this.showModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error("Failed to load animal image");
+          this.showModal();
+        }
+      });
   }
 
-  this.selectedAnimalId = doctor.Animal_id || 0;
-  this.selectedAnimalName = doctor.animal_name || '';
+  openDeleteModal(doctor: any): void {
+    this.modalMode = 'delete';
+    this.selectedDoctor = doctor;
+    this.deleteReason = '';
+    this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
-  this.doctorForm.patchValue({
-    Animal_id: this.selectedAnimalId,
-    animal_name: this.selectedAnimalName,
-    price: doctor.price,
-    reason: doctor.reason,
-    date: this.formatDateForInput(doctor.date),
-    AnimalImage: ''
-  });
+    const expenseId = doctor.expense_id;
 
-  // Show loader before API call
-  this.loader.show();
+    if (!expenseId) {
+      this.toastr.error('Invalid doctor data');
+      return;
+    }
 
-  this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
-    .pipe(finalize(() => this.loader.hide()))
-    .subscribe({
-      next: (res: any) => {
-        const image = res?.AnimalImage || res?.animalImage;
-        if (image) {
-          this.doctorForm.patchValue({ AnimalImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load animal image");
-        this.showModal();
-      }
+    this.selectedAnimalId = doctor.Animal_id || 0;
+    this.selectedAnimalName = doctor.animal_name || '';
+    
+    this.selectedFile = null;
+    this.imagePreview = null;
+
+    this.doctorForm.patchValue({
+      Animal_id: this.selectedAnimalId,
+      animal_name: this.selectedAnimalName,
+      price: doctor.price,
+      reason: doctor.reason,
+      date: this.formatDateForInput(doctor.date),
+      AnimalImage: ''
     });
-}
 
-openDeleteModal(doctor: any): void {
-  this.modalMode = 'delete';
-  this.selectedDoctor = doctor;
-  this.deleteReason = '';
-  this.submitted = false;
-  this.isSaving = false;
-  this.isUpdating = false;
-  this.isDeleting = false;
+    // Show loader before API call
+    this.loader.show();
 
-  const expenseId = doctor.expense_id;
-
-  if (!expenseId) {
-    this.toastr.error('Invalid doctor data');
-    return;
+    this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res: any) => {
+          const image = res?.AnimalImage || res?.animalImage;
+          if (image) {
+            this.doctorForm.patchValue({ AnimalImage: image });
+          }
+          this.showModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error("Failed to load animal image");
+          this.showModal();
+        }
+      });
   }
-
-  this.selectedAnimalId = doctor.Animal_id || 0;
-  this.selectedAnimalName = doctor.animal_name || '';
-
-  this.doctorForm.patchValue({
-    Animal_id: this.selectedAnimalId,
-    animal_name: this.selectedAnimalName,
-    price: doctor.price,
-    reason: doctor.reason,
-    date: this.formatDateForInput(doctor.date),
-    AnimalImage: ''
-  });
-
-  // Show loader before API call
-  this.loader.show();
-
-  this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
-    .pipe(finalize(() => this.loader.hide()))
-    .subscribe({
-      next: (res: any) => {
-        const image = res?.AnimalImage || res?.animalImage;
-        if (image) {
-          this.doctorForm.patchValue({ AnimalImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load animal image");
-        this.showModal();
-      }
-    });
-}
 
   closeModal(): void {
     const modalElement = this.DoctorModal?.nativeElement;
@@ -357,6 +450,11 @@ openDeleteModal(doctor: any): void {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
+    
+    // Reset image upload state
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
   }
 
   showModal(): void {
@@ -397,7 +495,7 @@ openDeleteModal(doctor: any): void {
       });
   }
 
-  submitFeed(): void {
+  async submitFeed(): Promise<void> {
     this.submitted = true;
 
     if (this.modalMode === 'delete') {
@@ -419,14 +517,25 @@ openDeleteModal(doctor: any): void {
       return;
     }
 
-    if (this.modalMode === 'add') {
-      this.addDoctor();
-    } else if (this.modalMode === 'edit') {
-      this.updateDoctor();
+    try {
+      // Upload image if a new one is selected
+      if (this.selectedFile) {
+        const base64Image = await this.uploadImage();
+        this.doctorForm.patchValue({ AnimalImage: base64Image });
+      }
+
+      if (this.modalMode === 'add') {
+        await this.addDoctor();
+      } else if (this.modalMode === 'edit') {
+        await this.updateDoctor();
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      this.toastr.error('Failed to upload image');
     }
   }
 
-  addDoctor(): void {
+  async addDoctor(): Promise<void> {
     this.isSaving = true;
     
     const payload = {
@@ -437,7 +546,8 @@ openDeleteModal(doctor: any): void {
       price: Number(this.doctorForm.value.price),
       reason: this.doctorForm.value.reason,
       date: this.formatDateForAPI(this.doctorForm.value.date),
-      Switch: 1
+      Switch: 1,
+      AnimalImage: this.doctorForm.value.AnimalImage
     };
 
     this.loader.show();
@@ -449,20 +559,20 @@ openDeleteModal(doctor: any): void {
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Doctor record saved successfully');
+          this.toastr.success('Medicien record saved successfully');
           this.closeModal();
           this.loadDoctorHistory();
         },
         error: (error: any) => {
           console.error('Save error:', error);
-          this.toastr.error('Failed to save doctor record');
+          this.toastr.error('Failed to save medicien record');
         }
       });
   }
 
-  updateDoctor(): void {
+  async updateDoctor(): Promise<void> {
     if (!this.selectedDoctor?.expense_id) {
-      this.toastr.error('Invalid doctor data');
+      this.toastr.error('Invalid medicien data');
       return;
     }
 
@@ -477,7 +587,8 @@ openDeleteModal(doctor: any): void {
       price: Number(this.doctorForm.value.price),
       reason: this.doctorForm.value.reason,
       date: this.formatDateForAPI(this.doctorForm.value.date),
-      Switch: 1
+      Switch: 1,
+      AnimalImage: this.doctorForm.value.AnimalImage
     };
 
     this.loader.show();
@@ -489,20 +600,20 @@ openDeleteModal(doctor: any): void {
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Doctor record updated successfully');
+          this.toastr.success('Medicien record updated successfully');
           this.closeModal();
           this.loadDoctorHistory();
         },
         error: (error: any) => {
           console.error('Update error:', error);
-          this.toastr.error('Failed to update doctor record');
+          this.toastr.error('Failed to update medicien record');
         }
       });
   }
 
   deleteDoctor(): void {
     if (!this.selectedDoctor?.expense_id) {
-      this.toastr.error('Invalid doctor data');
+      this.toastr.error('Invalid medicien data');
       return;
     }
 
@@ -517,13 +628,13 @@ openDeleteModal(doctor: any): void {
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Doctor record deleted successfully');
+          this.toastr.success('Medicien record deleted successfully');
           this.closeModal();
           this.loadDoctorHistory();
         },
         error: (error: any) => {
           console.error('Delete error:', error);
-          this.toastr.error('Failed to delete doctor record');
+          this.toastr.error('Failed to delete medicien record');
         }
       });
   }
