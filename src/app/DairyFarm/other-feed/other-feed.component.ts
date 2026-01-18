@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -19,6 +19,7 @@ import { LoaderService } from '../../services/loader.service';
 })
 export class OtherFeedComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
+  @ViewChild('viewModal') viewModal!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
   @ViewChild('fileInput') fileInput!: ElementRef;
 
@@ -28,11 +29,17 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   // Data
   feeds: any[] = [];
   filteredFeeds: any[] = [];
+  groupedFeeds: { date: string; items: any[] }[] = [];
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
   selectedFeed: any = null;
   deleteReason: string = '';
+
+  // View Modal
+  selectedFeedView: any = null;
+  viewImageUrl: string = '';
+  isLoadingImage: boolean = false;
 
   // Search
   searchTerm: string = '';
@@ -40,6 +47,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   // Misc
   submitted: boolean = false;
   dairyUserId: number = 0;
+  isLoading: boolean = false;
 
   // Image Upload
   selectedFile: File | null = null;
@@ -82,7 +90,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.feedForm = new FormGroup({
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
-      quantity: new FormControl('', [Validators.required]),
+      quantity: new FormControl('', [Validators.required, Validators.min(1)]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
       feedImage: new FormControl('')
     });
@@ -98,7 +106,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   // ==================== IMAGE UPLOAD METHODS ====================
   onImageSelected(event: any): void {
     const file = event.target.files[0];
-    
+
     if (!file) {
       return;
     }
@@ -122,7 +130,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
     this.imageError = '';
     this.selectedFile = file;
-    
+
     // Create preview and compress if needed
     this.compressAndPreviewImage(file);
   }
@@ -132,12 +140,12 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     reader.onload = (e: any) => {
       const img = new Image();
       img.src = e.target.result;
-      
+
       img.onload = () => {
         // Create canvas for compression
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         if (!ctx) {
           this.createBasicPreview(file);
           return;
@@ -146,10 +154,10 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
         // Set maximum dimensions
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
-        
+
         let width = img.width;
         let height = img.height;
-        
+
         // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
           if (width > MAX_WIDTH) {
@@ -162,29 +170,29 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
             height = MAX_HEIGHT;
           }
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
+
         // Draw and compress
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         // Get compressed base64 with quality 0.7 (70% quality)
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
         this.imagePreview = compressedBase64;
       };
-      
+
       img.onerror = () => {
         this.createBasicPreview(file);
       };
     };
-    
+
     reader.onerror = () => {
       this.imageError = 'Failed to read image file';
       this.selectedFile = null;
       this.imagePreview = null;
     };
-    
+
     reader.readAsDataURL(file);
   }
 
@@ -200,7 +208,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.feedForm.patchValue({ feedImage: '' });
-    
+
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -212,21 +220,21 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     }
 
     this.isUploadingImage = true;
-    
+
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = () => {
         const base64Image = reader.result as string;
         this.isUploadingImage = false;
         resolve(base64Image);
       };
-      
+
       reader.onerror = () => {
         this.isUploadingImage = false;
         reject('Failed to read image file');
       };
-      
+
       reader.readAsDataURL(this.selectedFile!);
     });
   }
@@ -277,9 +285,103 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+  handleCardImageError(feed: any): void {
+    feed.feedImage = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+  }
+
+  // ==================== VIEW MODAL METHODS ====================
+  async openViewModal(feed: any): Promise<void> {
+    this.selectedFeedView = feed;
+
+    // Reset loading state
+    this.isLoadingImage = true;
+
+    // Initially show default image
+    this.viewImageUrl = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+
+    // Show the modal immediately
+    this.showViewModal();
+
+    // Now fetch the actual image from API
+    await this.loadFeedImageForView(feed);
+  }
+
+  loadFeedImageForView(feed: any): void {
+    const expenseId = feed.expense_id;
+
+    if (!expenseId) {
+      console.error('No expense_id found for feed:', feed);
+      this.isLoadingImage = false;
+      return;
+    }
+
+    this.loader.show();
+
+    this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isLoadingImage = false;
+      }))
+      .subscribe({
+        next: (response: any) => {
+          // Try different possible property names for the image
+          const image = response?.feedImage || response?.FeedImage || response?.feedImageUrl || response?.imageUrl;
+
+          if (image && image.trim() !== '') {
+            // Update the view image URL with the actual image from API
+            this.viewImageUrl = image;
+
+            // Also update the selected feed object for consistency
+            if (this.selectedFeedView) {
+              this.selectedFeedView.feedImage = image;
+            }
+          } else {
+            console.warn('No image found for feed ID:', expenseId);
+            // Keep the default image
+          }
+        },
+        error: (error: any) => {
+          console.error('Failed to load feed image:', error);
+          this.toastr.error("Failed to load feed image");
+        }
+      });
+  }
+
+  handleViewImageError(): void {
+    // If the image fails to load, show default image
+    this.viewImageUrl = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+    this.isLoadingImage = false;
+  }
+
+  closeViewModal(): void {
+    const modalElement = this.viewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+
+    // Reset view modal data
+    this.selectedFeedView = null;
+    this.viewImageUrl = '';
+    this.isLoadingImage = false;
+  }
+
+  showViewModal(): void {
+    const modalElement = this.viewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      backdrop.addEventListener('click', () => this.closeViewModal());
+      document.body.appendChild(backdrop);
+    }
   }
 
   // ==================== MODAL METHODS ====================
@@ -298,7 +400,11 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
     this.feedForm.reset();
     this.feedForm.patchValue({
-      date: this.getTodayDate()
+      date: this.getTodayDate(),
+      feed_name: '',
+      price: '',
+      quantity: '',
+      feedImage: ''
     });
 
     this.showModal();
@@ -329,16 +435,18 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       price: feed.price,
       quantity: feed.quantity,
       date: this.formatDateForInput(feed.date),
-      feedImage: ''
+      feedImage: feed.feedImage || ''
     });
 
+    // Show loader before API call to get image
     this.loader.show();
 
+    // Call API to get the image by ID
     this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
-          const image = res?.feedImage || res?.FeedImage;
+          const image = res?.feedImage || res?.FeedImage || feed.feedImage;
           if (image) {
             this.feedForm.patchValue({ feedImage: image });
           }
@@ -376,16 +484,18 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       price: feed.price,
       quantity: feed.quantity,
       date: this.formatDateForInput(feed.date),
-      feedImage: ''
+      feedImage: feed.feedImage || ''
     });
 
+    // Show loader before API call to get image
     this.loader.show();
 
+    // Call API to get the image by ID
     this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
-          const image = res?.feedImage || res?.FeedImage;
+          const image = res?.feedImage || res?.FeedImage || feed.feedImage;
           if (image) {
             this.feedForm.patchValue({ feedImage: image });
           }
@@ -408,7 +518,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset image upload state
     this.selectedFile = null;
     this.imagePreview = null;
@@ -428,6 +538,45 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ==================== GROUP FEEDS BY DATE ====================
+  groupFeedsByDate(): void {
+    this.groupedFeeds = [];
+
+    if (!this.filteredFeeds || this.filteredFeeds.length === 0) return;
+
+    const map = new Map<string, any[]>();
+
+    for (const feed of this.filteredFeeds) {
+      const dateStr = this.getDateString(feed.date);
+
+      if (!map.has(dateStr)) {
+        map.set(dateStr, []);
+      }
+      map.get(dateStr)!.push(feed);
+    }
+
+    this.groupedFeeds = Array.from(map.entries()).map(([date, items]) => ({
+      date,
+      items
+    }));
+  }
+
+  getDateString(date: any): string {
+    if (!date) return 'Unknown Date';
+
+    try {
+      const d = new Date(date);
+
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    } catch {
+      return 'Unknown Date';
+    }
+  }
+
   // ==================== CRUD OPERATIONS ====================
   loadFeeds(): void {
     if (!this.dairyUserId) {
@@ -435,20 +584,26 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isLoading = true;
     this.loader.show();
 
     this.api.get(`OtherFeeds/History/${this.dairyUserId}`)
-      .pipe(finalize(() => this.loader.hide()))
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isLoading = false;
+      }))
       .subscribe({
         next: (response: any) => {
           this.feeds = Array.isArray(response) ? response : [];
           this.filteredFeeds = [...this.feeds];
+          this.groupFeedsByDate();
         },
         error: (error: any) => {
           console.error('Failed to load feeds:', error);
           this.toastr.error('Failed to load feeds');
           this.feeds = [];
           this.filteredFeeds = [];
+          this.groupedFeeds = [];
         }
       });
   }
@@ -496,7 +651,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
     const payload = {
       user_id: this.dairyUserId,
-      feed_id: 0, // Since we're using direct feed_name input
+      feed_id: 0,
       expense_name: 'OtherFeeds',
       feed_name: this.feedForm.value.feed_name,
       price: Number(this.feedForm.value.price),
@@ -536,7 +691,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     const payload = {
       expense_id: this.selectedFeed.expense_id,
       user_id: this.dairyUserId,
-      feed_id: 0, // Since we're using direct feed_name input
+      feed_id: 0,
       expense_name: 'OtherFeeds',
       feed_name: this.feedForm.value.feed_name,
       price: Number(this.feedForm.value.price),
@@ -594,7 +749,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   }
 
   getFeedId(feed: any): number {
-    return feed.expense_id ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
+    return feed.expense_id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================
@@ -603,6 +758,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
     if (!search) {
       this.filteredFeeds = [...this.feeds];
+      this.groupFeedsByDate();
       return;
     }
 
@@ -612,12 +768,14 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
         const feedDate = this.formatDateDisplay(feed.date).toLowerCase();
         return feedDate.includes(dateMatch);
       });
-      return;
+    } else {
+      this.filteredFeeds = this.feeds.filter(feed =>
+        feed.feed_name?.toLowerCase().includes(search)
+      );
     }
 
-    this.filteredFeeds = this.feeds.filter(feed =>
-      feed.feed_name.toLowerCase().includes(search)
-    );
+    // Regroup after filtering
+    this.groupFeedsByDate();
   }
 
   // ==================== HELPER METHODS ====================
@@ -658,6 +816,22 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
         month: '2-digit',
         year: 'numeric'
       });
+    } catch {
+      return '';
+    }
+  }
+
+  formatDateForView(date: any): string {
+    if (!date) return '';
+
+    try {
+      const d = new Date(date);
+
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
     } catch {
       return '';
     }

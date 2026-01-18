@@ -19,6 +19,7 @@ import { LoaderService } from '../../services/loader.service';
 })
 export class DairyBillComponent implements OnInit, OnDestroy {
   @ViewChild('billModal') billModal!: ElementRef;
+  @ViewChild('viewModal') viewModal!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
   @ViewChild('fileInput') fileInput!: ElementRef;
 
@@ -28,11 +29,17 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   // Data
   bills: any[] = [];
   filteredBills: any[] = [];
+  groupedBills: { date: string; items: any[] }[] = [];
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
   selectedBill: any = null;
   deleteReason: string = '';
+
+  // View Modal
+  selectedBillView: any = null;
+  viewImageUrl: string = '';
+  isLoadingImage: boolean = false;
 
   // Search
   searchTerm: string = '';
@@ -40,6 +47,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   // Misc
   submitted: boolean = false;
   dairyUserId: number = 0;
+  isLoading: boolean = false;
 
   // Image Upload
   selectedFile: File | null = null;
@@ -276,9 +284,98 @@ export class DairyBillComponent implements OnInit, OnDestroy {
     }
   }
 
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = '../../../assets/DairryFarmImg/bill_1052856.png';
+  handleCardImageError(bill: any): void {
+    bill.BillImage = '../../../assets/DairryFarmImg/bill_1052856.png';
+  }
+
+  // ==================== VIEW MODAL METHODS ====================
+  openViewModal(bill: any): void {
+    this.selectedBillView = bill;
+    
+    // Reset loading state
+    this.isLoadingImage = true;
+    
+    // Initially show default image
+    this.viewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png';
+    
+    // Show the modal immediately
+    this.showViewModal();
+    
+    // Now fetch the actual image from API
+    this.loadBillImageForView(bill);
+  }
+
+  loadBillImageForView(bill: any): void {
+    const billId = bill.bill_id;
+    
+    if (!billId) {
+      console.error('No bill_id found for bill:', bill);
+      this.isLoadingImage = false;
+      return;
+    }
+    
+    this.api.get(`BillDairy/GetBillImageById/${billId}`).subscribe({
+      next: (response: any) => {
+        // Try different possible property names for the image
+        const image = response?.BillImage || response?.billImage || response?.BillImageUrl || response?.imageUrl;
+        
+        if (image && image.trim() !== '') {
+          // Update the view image URL with the actual image from API
+          this.viewImageUrl = image;
+          
+          // Also update the selected bill object for consistency
+          if (this.selectedBillView) {
+            this.selectedBillView.BillImage = image;
+          }
+        } else {
+          console.warn('No image found for bill ID:', billId);
+          // Keep the default image
+        }
+        this.isLoadingImage = false;
+      },
+      error: (error: any) => {
+        console.error('Failed to load bill image:', error);
+        this.toastr.error("Failed to load bill image");
+        this.isLoadingImage = false;
+      }
+    });
+  }
+
+  handleViewImageError(): void {
+    // If the image fails to load, show default image
+    this.viewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png';
+    this.isLoadingImage = false;
+  }
+
+  closeViewModal(): void {
+    const modalElement = this.viewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+    
+    // Reset view modal data
+    this.selectedBillView = null;
+    this.viewImageUrl = '';
+    this.isLoadingImage = false;
+  }
+
+  showViewModal(): void {
+    const modalElement = this.viewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      backdrop.addEventListener('click', () => this.closeViewModal());
+      document.body.appendChild(backdrop);
+    }
   }
 
   // ==================== MODAL METHODS ====================
@@ -297,7 +394,10 @@ export class DairyBillComponent implements OnInit, OnDestroy {
 
     this.billForm.reset();
     this.billForm.patchValue({
-      date: this.getTodayDate()
+      date: this.getTodayDate(),
+      animal_type: '',
+      price: '',
+      BillImage: ''
     });
 
     this.showModal();
@@ -327,7 +427,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       animal_type: bill.animal_type || '',
       price: bill.price,
       date: this.formatDateForInput(bill.date),
-      BillImage: ''
+      BillImage: bill.BillImage || ''
     });
 
     this.loader.show();
@@ -336,7 +436,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
-          const image = res?.BillImage || res?.billImage;
+          const image = res?.BillImage || res?.billImage || bill.BillImage;
           if (image) {
             this.billForm.patchValue({ BillImage: image });
           }
@@ -373,7 +473,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       animal_type: bill.animal_type || '',
       price: bill.price,
       date: this.formatDateForInput(bill.date),
-      BillImage: ''
+      BillImage: bill.BillImage || ''
     });
 
     this.loader.show();
@@ -382,7 +482,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
-          const image = res?.BillImage || res?.billImage;
+          const image = res?.BillImage || res?.billImage || bill.BillImage;
           if (image) {
             this.billForm.patchValue({ BillImage: image });
           }
@@ -425,6 +525,45 @@ export class DairyBillComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ==================== GROUP BILLS BY DATE ====================
+  groupBillsByDate(): void {
+    this.groupedBills = [];
+
+    if (!this.filteredBills || this.filteredBills.length === 0) return;
+
+    const map = new Map<string, any[]>();
+
+    for (const bill of this.filteredBills) {
+      const dateStr = this.getDateString(bill.date);
+
+      if (!map.has(dateStr)) {
+        map.set(dateStr, []);
+      }
+      map.get(dateStr)!.push(bill);
+    }
+
+    this.groupedBills = Array.from(map.entries()).map(([date, items]) => ({
+      date,
+      items
+    }));
+  }
+
+  getDateString(date: any): string {
+    if (!date) return 'Unknown Date';
+
+    try {
+      const d = new Date(date);
+
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    } catch {
+      return 'Unknown Date';
+    }
+  }
+
   // ==================== CRUD OPERATIONS ====================
   loadBills(): void {
     if (!this.dairyUserId) {
@@ -432,20 +571,26 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isLoading = true;
     this.loader.show();
 
     this.api.get(`BillDairy/History/${this.dairyUserId}`)
-      .pipe(finalize(() => this.loader.hide()))
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isLoading = false;
+      }))
       .subscribe({
         next: (response: any) => {
           this.bills = Array.isArray(response) ? response : [];
           this.filteredBills = [...this.bills];
+          this.groupBillsByDate();
         },
         error: (error: any) => {
           console.error('Failed to load bills:', error);
           this.toastr.error('Failed to load bills');
           this.bills = [];
           this.filteredBills = [];
+          this.groupedBills = [];
         }
       });
   }
@@ -585,7 +730,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   }
 
   getBillId(bill: any): number {
-    return bill.bill_id ?? bill.id ?? 0;
+    return bill.bill_id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================
@@ -594,6 +739,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
 
     if (!search) {
       this.filteredBills = [...this.bills];
+      this.groupBillsByDate();
       return;
     }
 
@@ -603,12 +749,14 @@ export class DairyBillComponent implements OnInit, OnDestroy {
         const billDate = this.formatDateDisplay(bill.date).toLowerCase();
         return billDate.includes(dateMatch);
       });
-      return;
+    } else {
+      this.filteredBills = this.bills.filter(bill =>
+        bill.animal_type?.toLowerCase().includes(search)
+      );
     }
 
-    this.filteredBills = this.bills.filter(bill =>
-      bill.animal_type.toLowerCase().includes(search)
-    );
+    // Regroup after filtering
+    this.groupBillsByDate();
   }
 
   // ==================== HELPER METHODS ====================
@@ -649,6 +797,22 @@ export class DairyBillComponent implements OnInit, OnDestroy {
         month: '2-digit',
         year: 'numeric'
       });
+    } catch {
+      return '';
+    }
+  }
+
+  formatDateForView(date: any): string {
+    if (!date) return '';
+
+    try {
+      const d = new Date(date);
+
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
     } catch {
       return '';
     }

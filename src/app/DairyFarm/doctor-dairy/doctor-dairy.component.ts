@@ -19,6 +19,7 @@ import { LoaderService } from '../../services/loader.service';
 })
 export class DoctorDairyComponent implements OnInit, OnDestroy {
   @ViewChild('DoctorModal') DoctorModal!: ElementRef;
+  @ViewChild('viewModal') viewModal!: ElementRef;
   @ViewChild('doctorInput') doctorInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
 
@@ -28,6 +29,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   // Data
   Animals: any[] = [];
   filteredDoctor: any[] = [];
+  groupedDoctors: { date: string; items: any[] }[] = [];
 
   // Animal dropdown
   AnimalOptions: any[] = [];
@@ -43,12 +45,17 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   selectedDoctor: any = null;
   deleteReason: string = '';
 
+  // View Modal
+  selectedDoctorView: any = null;
+  viewImageUrl: string = '';
+
   // Search
   searchTerm: string = '';
 
   // Misc
   submitted: boolean = false;
   dairyUserId: number = 0;
+  isLoading: boolean = false;
 
   // Image Preview
   previewImageUrl: string = '';
@@ -104,6 +111,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
+  // ==================== IMAGE PREVIEW METHODS ====================
   openImagePreview(): void {
     const imageUrl = this.doctorForm.get('AnimalImage')?.value;
     this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/doctor_16802630.png';
@@ -144,9 +152,49 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     }
   }
 
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = '../../../assets/DairryFarmImg/doctor_16802630.png';
+  handleCardImageError(doctor: any): void {
+    doctor.AnimalImage = '../../../assets/DairryFarmImg/doctor_16802630.png';
+  }
+
+  // ==================== VIEW MODAL METHODS ====================
+  openViewModal(doctor: any): void {
+    this.selectedDoctorView = doctor;
+    
+    // Set view image URL - Use AnimalImage from the doctor object
+    this.viewImageUrl = doctor.AnimalImage || '../../../assets/DairryFarmImg/doctor_16802630.png';
+    
+    // Show the modal
+    this.showViewModal();
+  }
+
+  closeViewModal(): void {
+    const modalElement = this.viewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+    
+    // Reset view modal data
+    this.selectedDoctorView = null;
+    this.viewImageUrl = '';
+  }
+
+  showViewModal(): void {
+    const modalElement = this.viewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      backdrop.addEventListener('click', () => this.closeViewModal());
+      document.body.appendChild(backdrop);
+    }
   }
 
   // ==================== ANIMAL DROPDOWN METHODS ====================
@@ -250,103 +298,103 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.showModal();
   }
 
- openEditModal(doctor: any): void {
-  this.modalMode = 'edit';
-  this.selectedDoctor = doctor;
-  this.deleteReason = '';
-  this.submitted = false;
-  this.isSaving = false;
-  this.isUpdating = false;
-  this.isDeleting = false;
+  openEditModal(doctor: any): void {
+    this.modalMode = 'edit';
+    this.selectedDoctor = doctor;
+    this.deleteReason = '';
+    this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
-  const expenseId = doctor.expense_id;
+    const expenseId = doctor.expense_id;
 
-  if (!expenseId) {
-    this.toastr.error('Invalid doctor data');
-    return;
+    if (!expenseId) {
+      this.toastr.error('Invalid doctor data');
+      return;
+    }
+
+    this.selectedAnimalId = doctor.Animal_id || 0;
+    this.selectedAnimalName = doctor.animal_name || '';
+
+    this.doctorForm.patchValue({
+      Animal_id: this.selectedAnimalId,
+      animal_name: this.selectedAnimalName,
+      price: doctor.price,
+      reason: doctor.reason,
+      date: this.formatDateForInput(doctor.date),
+      AnimalImage: doctor.AnimalImage || ''
+    });
+
+    // Show loader before API call
+    this.loader.show();
+
+    this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res: any) => {
+          const image = res?.AnimalImage || res?.animalImage || doctor.AnimalImage;
+          if (image) {
+            this.doctorForm.patchValue({ AnimalImage: image });
+          }
+          this.showModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error("Failed to load animal image");
+          this.showModal();
+        }
+      });
   }
 
-  this.selectedAnimalId = doctor.Animal_id || 0;
-  this.selectedAnimalName = doctor.animal_name || '';
+  openDeleteModal(doctor: any): void {
+    this.modalMode = 'delete';
+    this.selectedDoctor = doctor;
+    this.deleteReason = '';
+    this.submitted = false;
+    this.isSaving = false;
+    this.isUpdating = false;
+    this.isDeleting = false;
 
-  this.doctorForm.patchValue({
-    Animal_id: this.selectedAnimalId,
-    animal_name: this.selectedAnimalName,
-    price: doctor.price,
-    reason: doctor.reason,
-    date: this.formatDateForInput(doctor.date),
-    AnimalImage: ''
-  });
+    const expenseId = doctor.expense_id;
 
-  // Show loader before API call
-  this.loader.show();
+    if (!expenseId) {
+      this.toastr.error('Invalid doctor data');
+      return;
+    }
 
-  this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
-    .pipe(finalize(() => this.loader.hide()))
-    .subscribe({
-      next: (res: any) => {
-        const image = res?.AnimalImage || res?.animalImage;
-        if (image) {
-          this.doctorForm.patchValue({ AnimalImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load animal image");
-        this.showModal();
-      }
+    this.selectedAnimalId = doctor.Animal_id || 0;
+    this.selectedAnimalName = doctor.animal_name || '';
+
+    this.doctorForm.patchValue({
+      Animal_id: this.selectedAnimalId,
+      animal_name: this.selectedAnimalName,
+      price: doctor.price,
+      reason: doctor.reason,
+      date: this.formatDateForInput(doctor.date),
+      AnimalImage: doctor.AnimalImage || ''
     });
-}
 
-openDeleteModal(doctor: any): void {
-  this.modalMode = 'delete';
-  this.selectedDoctor = doctor;
-  this.deleteReason = '';
-  this.submitted = false;
-  this.isSaving = false;
-  this.isUpdating = false;
-  this.isDeleting = false;
+    // Show loader before API call
+    this.loader.show();
 
-  const expenseId = doctor.expense_id;
-
-  if (!expenseId) {
-    this.toastr.error('Invalid doctor data');
-    return;
+    this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res: any) => {
+          const image = res?.AnimalImage || res?.animalImage || doctor.AnimalImage;
+          if (image) {
+            this.doctorForm.patchValue({ AnimalImage: image });
+          }
+          this.showModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastr.error("Failed to load animal image");
+          this.showModal();
+        }
+      });
   }
-
-  this.selectedAnimalId = doctor.Animal_id || 0;
-  this.selectedAnimalName = doctor.animal_name || '';
-
-  this.doctorForm.patchValue({
-    Animal_id: this.selectedAnimalId,
-    animal_name: this.selectedAnimalName,
-    price: doctor.price,
-    reason: doctor.reason,
-    date: this.formatDateForInput(doctor.date),
-    AnimalImage: ''
-  });
-
-  // Show loader before API call
-  this.loader.show();
-
-  this.api.get(`DoctorDairy/GetDocImageById/${expenseId}`)
-    .pipe(finalize(() => this.loader.hide()))
-    .subscribe({
-      next: (res: any) => {
-        const image = res?.AnimalImage || res?.animalImage;
-        if (image) {
-          this.doctorForm.patchValue({ AnimalImage: image });
-        }
-        this.showModal();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error("Failed to load animal image");
-        this.showModal();
-      }
-    });
-}
 
   closeModal(): void {
     const modalElement = this.DoctorModal?.nativeElement;
@@ -372,6 +420,45 @@ openDeleteModal(doctor: any): void {
     }
   }
 
+  // ==================== GROUP DOCTORS BY DATE ====================
+  groupDoctorsByDate(): void {
+    this.groupedDoctors = [];
+
+    if (!this.filteredDoctor || this.filteredDoctor.length === 0) return;
+
+    const map = new Map<string, any[]>();
+
+    for (const doctor of this.filteredDoctor) {
+      const dateStr = this.getDateString(doctor.date);
+
+      if (!map.has(dateStr)) {
+        map.set(dateStr, []);
+      }
+      map.get(dateStr)!.push(doctor);
+    }
+
+    this.groupedDoctors = Array.from(map.entries()).map(([date, items]) => ({
+      date,
+      items
+    }));
+  }
+
+  getDateString(date: any): string {
+    if (!date) return 'Unknown Date';
+
+    try {
+      const d = new Date(date);
+
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    } catch {
+      return 'Unknown Date';
+    }
+  }
+
   // ==================== CRUD OPERATIONS ====================
   loadDoctorHistory(): void {
     if (!this.dairyUserId) {
@@ -379,20 +466,26 @@ openDeleteModal(doctor: any): void {
       return;
     }
 
+    this.isLoading = true;
     this.loader.show();
 
     this.api.get(`DoctorDairy/History/${this.dairyUserId}`)
-      .pipe(finalize(() => this.loader.hide()))
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isLoading = false;
+      }))
       .subscribe({
         next: (response: any) => {
           this.Animals = Array.isArray(response) ? response : [];
           this.filteredDoctor = [...this.Animals];
+          this.groupDoctorsByDate();
         },
         error: (error: any) => {
           console.error('Failed to load doctor history:', error);
           this.toastr.error('Failed to load doctor history');
           this.Animals = [];
           this.filteredDoctor = [];
+          this.groupedDoctors = [];
         }
       });
   }
@@ -538,6 +631,7 @@ openDeleteModal(doctor: any): void {
 
     if (!search) {
       this.filteredDoctor = [...this.Animals];
+      this.groupDoctorsByDate();
       return;
     }
 
@@ -547,13 +641,15 @@ openDeleteModal(doctor: any): void {
         const doctorDate = this.formatDateDisplay(doctor.date).toLowerCase();
         return doctorDate.includes(dateMatch);
       });
-      return;
+    } else {
+      this.filteredDoctor = this.Animals.filter(doctor =>
+        doctor.animal_name?.toLowerCase().includes(search) ||
+        doctor.reason?.toLowerCase().includes(search)
+      );
     }
 
-    this.filteredDoctor = this.Animals.filter(doctor =>
-      doctor.animal_name?.toLowerCase().includes(search) ||
-      doctor.reason?.toLowerCase().includes(search)
-    );
+    // Regroup after filtering
+    this.groupDoctorsByDate();
   }
 
   // ==================== HELPER METHODS ====================
@@ -594,6 +690,22 @@ openDeleteModal(doctor: any): void {
         month: '2-digit',
         year: 'numeric'
       });
+    } catch {
+      return '';
+    }
+  }
+
+  formatDateForView(date: any): string {
+    if (!date) return '';
+
+    try {
+      const d = new Date(date);
+
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
     } catch {
       return '';
     }

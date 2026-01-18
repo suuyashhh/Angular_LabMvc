@@ -54,7 +54,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
   // Search
   searchTerm: string = '';
-
+  isLoadingViewImage = false;
   // Misc
   submitted: boolean = false;
   dairyUserId: number = 0;
@@ -120,7 +120,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
   // ==================== IMAGE UPLOAD METHODS ====================
   onImageSelected(event: any): void {
     const file = event.target.files[0];
-    
+
     if (!file) {
       return;
     }
@@ -144,7 +144,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
     this.imageError = '';
     this.selectedFile = file;
-    
+
     // Create preview and compress if needed
     this.compressAndPreviewImage(file);
   }
@@ -154,12 +154,12 @@ export class MedicienComponent implements OnInit, OnDestroy {
     reader.onload = (e: any) => {
       const img = new Image();
       img.src = e.target.result;
-      
+
       img.onload = () => {
         // Create canvas for compression
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         if (!ctx) {
           this.createBasicPreview(file);
           return;
@@ -168,10 +168,10 @@ export class MedicienComponent implements OnInit, OnDestroy {
         // Set maximum dimensions
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
-        
+
         let width = img.width;
         let height = img.height;
-        
+
         // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
           if (width > MAX_WIDTH) {
@@ -184,29 +184,29 @@ export class MedicienComponent implements OnInit, OnDestroy {
             height = MAX_HEIGHT;
           }
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
+
         // Draw and compress
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         // Get compressed base64 with quality 0.7 (70% quality)
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
         this.imagePreview = compressedBase64;
       };
-      
+
       img.onerror = () => {
         this.createBasicPreview(file);
       };
     };
-    
+
     reader.onerror = () => {
       this.imageError = 'Failed to read image file';
       this.selectedFile = null;
       this.imagePreview = null;
     };
-    
+
     reader.readAsDataURL(file);
   }
 
@@ -222,7 +222,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.medicienForm.patchValue({ AnimalImage: '' });
-    
+
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -234,21 +234,21 @@ export class MedicienComponent implements OnInit, OnDestroy {
     }
 
     this.isUploadingImage = true;
-    
+
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = () => {
         const base64Image = reader.result as string;
         this.isUploadingImage = false;
         resolve(base64Image);
       };
-      
+
       reader.onerror = () => {
         this.isUploadingImage = false;
         reject('Failed to read image file');
       };
-      
+
       reader.readAsDataURL(this.selectedFile!);
     });
   }
@@ -265,6 +265,14 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.previewImageUrl = medicine.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png';
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
+  }
+
+  previewViewImage(): void {
+    if (this.viewImageUrl && this.viewImageUrl !== '../../../assets/DairryFarmImg/tablet_16443237.png') {
+      this.previewImageUrl = this.viewImageUrl;
+      this.isImagePreviewOpen = true;
+      this.showImagePreviewModal();
+    }
   }
 
   closeImagePreview(): void {
@@ -307,13 +315,94 @@ export class MedicienComponent implements OnInit, OnDestroy {
   // ==================== VIEW MODAL METHODS ====================
   async openViewModal(medicine: any): Promise<void> {
     this.selectedMedicineView = medicine;
-    
-    // Set view image URL - Use AnimalImage from the medicine object
-    this.viewImageUrl = medicine.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png';
-    
-    // Show the modal
+    this.viewImageUrl = ''; // Reset image URL
+    this.isLoadingViewImage = true;
+
+    // Show the modal immediately
     this.showViewModal();
+
+    // Try to fetch the image in the background
+    if (medicine.expense_id) {
+      try {
+        const imageData = await this.fetchMedicineImageById(medicine.expense_id);
+
+        // Check if the response has an image
+        if (imageData && (imageData.AnimalImage || imageData.animalImage)) {
+          // Use whichever field contains the image
+          const imageUrl = imageData.AnimalImage || imageData.animalImage;
+
+          // Check if it's a base64 image or a URL
+          if (imageUrl.startsWith('data:image') || imageUrl.startsWith('http')) {
+            this.viewImageUrl = imageUrl;
+          } else if (imageUrl) {
+            // If it's not a data URL, assume it's a base64 string without the prefix
+            this.viewImageUrl = 'data:image/jpeg;base64,' + imageUrl;
+          }
+        } else if (medicine.AnimalImage) {
+          // Fallback to the image from the medicine object
+          const imgUrl = medicine.AnimalImage;
+          if (imgUrl.startsWith('data:image') || imgUrl.startsWith('http')) {
+            this.viewImageUrl = imgUrl;
+          } else if (imgUrl) {
+            this.viewImageUrl = 'data:image/jpeg;base64,' + imgUrl;
+          }
+        } else {
+          // No image available, use default
+          this.viewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png';
+        }
+      } catch (error) {
+        console.error('Error fetching medicine image:', error);
+        // Fallback to medicine data or default image
+        if (medicine.AnimalImage) {
+          const imgUrl = medicine.AnimalImage;
+          if (imgUrl.startsWith('data:image') || imgUrl.startsWith('http')) {
+            this.viewImageUrl = imgUrl;
+          } else if (imgUrl) {
+            this.viewImageUrl = 'data:image/jpeg;base64,' + imgUrl;
+          }
+        } else {
+          this.viewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png';
+        }
+      } finally {
+        this.isLoadingViewImage = false;
+      }
+    } else {
+      // No expense_id, use what's available
+      if (medicine.AnimalImage) {
+        const imgUrl = medicine.AnimalImage;
+        if (imgUrl.startsWith('data:image') || imgUrl.startsWith('http')) {
+          this.viewImageUrl = imgUrl;
+        } else if (imgUrl) {
+          this.viewImageUrl = 'data:image/jpeg;base64,' + imgUrl;
+        }
+      } else {
+        this.viewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png';
+      }
+      this.isLoadingViewImage = false;
+    }
   }
+
+  private fetchMedicineImageById(expenseId: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
+        .subscribe({
+          next: (response: any) => {
+            resolve(response);
+          },
+          error: (error: any) => {
+            console.error('Error fetching medicine image:', error);
+            reject(error);
+          }
+        });
+    });
+  }
+
+  onViewImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = '../../../assets/DairryFarmImg/tablet_16443237.png';
+    this.isLoadingViewImage = false;
+  }
+
 
   closeViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -324,10 +413,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset view modal data
     this.selectedMedicineView = null;
     this.viewImageUrl = '';
+    this.isLoadingViewImage = false;
   }
 
   showViewModal(): void {
@@ -410,10 +500,10 @@ export class MedicienComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.showAnimalDropdown) return;
-    
+
     const target = event.target as HTMLElement;
     const isClickInside = this.animalInput?.nativeElement?.contains(target);
-    
+
     if (!isClickInside) {
       this.showAnimalDropdown = false;
     }
@@ -432,7 +522,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.selectedAnimalId = 0;
     this.selectedAnimalName = '';
     this.animalSearchTerm = '';
-    
+
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
@@ -469,7 +559,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
     this.selectedAnimalId = medicine.Animal_id || 0;
     this.selectedAnimalName = medicine.animal_name || '';
-    
+
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
@@ -486,7 +576,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
     // Show loader before API call to get image
     this.loader.show();
 
-    // Call API to get the image by ID (this was missing in the new code)
+    // Call API to get the image by ID
     this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
@@ -523,7 +613,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
     this.selectedAnimalId = medicine.Animal_id || 0;
     this.selectedAnimalName = medicine.animal_name || '';
-    
+
     this.selectedFile = null;
     this.imagePreview = null;
 
@@ -539,7 +629,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
     // Show loader before API call to get image
     this.loader.show();
 
-    // Call API to get the image by ID (this was missing in the new code)
+    // Call API to get the image by ID
     this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
@@ -567,7 +657,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset image upload state
     this.selectedFile = null;
     this.imagePreview = null;
@@ -702,7 +792,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
   async addMedicine(): Promise<void> {
     this.isSaving = true;
-    
+
     const payload = {
       user_id: this.dairyUserId,
       Animal_id: this.selectedAnimalId,
