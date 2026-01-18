@@ -41,5 +41,10 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/dairy-bill/dairy-bill.component')
         .then(m => m.DairyBillComponent)
  },
+ {
+    path:'History',
+    loadComponent:()=> import('../DairyFarm/history-dairy/history-dairy.component')
+        .then(m => m.HistoryDairyComponent)
+ },
   
 ];

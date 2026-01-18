@@ -1,107 +1,151 @@
 <!-- Page Header -->
 <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
-  <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner">
-    <img src="../../../assets/DairryFarmImg/tablet_16443237.png" alt="Doctor Icon" class="w-8 h-8 object-contain" />
+  <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
+    <img src="../../../assets/DairryFarmImg/tablet_16443237.png" alt="Medicine Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
   </div>
 
-  <div>
-    <h1 class="text-2xl font-semibold text-green-900">Mediciens</h1>
-    <p class="text-sm text-green-600 -mt-0.5">Manage Medicien history (add / edit / delete)</p>
+  <div class="min-w-0">
+    <h1 class="text-xl sm:text-2xl font-semibold text-green-900 truncate">Medicines</h1>
+    <p class="text-xs sm:text-sm text-green-600 -mt-0.5 truncate">Manage Medicine history (add / edit / delete / view)</p>
   </div>
 </div>
 
-<main class="min-h-screen bg-green-50 p-6">
-  <div class="max-w-7xl mx-auto space-y-6">
+<main class="min-h-screen bg-green-50 p-3 sm:p-4 md:p-6">
+  <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
     <!-- Actions + Search -->
-    <div class="bg-white rounded-2xl shadow-sm p-4">
-      <div class="flex flex-col lg:flex-row items-center gap-4">
-        <div class="flex gap-3">
+    <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm p-3 sm:p-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <div class="flex gap-2 sm:gap-3">
           <button type="button"
-            class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-1.5 sm:gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
             (click)="openAddModal()">
-            <i class="ri-add-box-fill"></i> Add Medicien
+            <i class="ri-add-box-fill text-sm sm:text-base"></i> 
+            <span class="truncate">Add Medicine</span>
           </button>
         </div>
 
-        <div class="w-full lg:w-80 lg:ml-auto">
+        <div class="w-full sm:w-auto sm:flex-1 sm:ml-auto">
           <div class="relative">
             <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
-                     py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" type="search"
-              placeholder="Search Medicien name..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"
-              id="Medicien-search-input" />
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
-              <i class="ri-search-2-fill"></i>
+                     py-1.5 sm:py-2 pl-9 sm:pl-10 pr-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" 
+                     type="search"
+              placeholder="Search by animal or reason..." 
+              [(ngModel)]="searchTerm" 
+              (ngModelChange)="onSearch()"
+              id="medicine-search-input" />
+            <span class="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
+              <i class="ri-search-2-fill text-sm sm:text-base"></i>
             </span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Mediciens Grid -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-medium text-green-800">Medicien History</h2>
-        <div class="text-sm text-green-600">Total: {{ Animals.length || 0 }}</div>
+    <!-- Medicine History -->
+    <section class="px-1 sm:px-0">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+        <h2 class="text-base sm:text-lg font-medium text-green-800">Medicine History</h2>
+        <div class="text-xs sm:text-sm text-green-600">Total: {{ medicines.length || 0 }}</div>
       </div>
 
-      <!-- Loading indicator for Medicien history -->
-      <div class="text-center my-3">
-        <!-- LoaderService will handle the global loader -->
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="text-center py-6 sm:py-8">
+        <div class="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600"></div>
+        <p class="text-xs sm:text-sm text-green-600 mt-2">Loading medicine history...</p>
       </div>
 
-      <div>
-        <!-- Table on md+ -->
-        <div *ngIf="Animals && Animals.length > 0; else noDoctorData" class="space-y-3">
-          <div *ngFor="let doctor of filteredDoctor" id="doctorCardDropdown{{ getAnimalId(doctor) }}"
-            (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
-            class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
-            
-            <!-- Image with Preview -->
-            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer" 
-                 (click)="previewCardImage(doctor)">
-              <img [src]="doctor.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png'" 
-                   class="w-full h-full object-cover"
-                   (error)="doctor.AnimalImage = '../../../assets/DairryFarmImg/tablet_16443237.png'">
+      <div *ngIf="!isLoading">
+        <!-- Medicine List with Date Grouping -->
+        <div *ngIf="filteredMedicines && filteredMedicines.length > 0; else noMedicineData" class="space-y-4 sm:space-y-6">
+          
+          <!-- Group by Date -->
+          <div *ngFor="let group of groupedMedicines" class="relative">
+            <!-- Date Header -->
+            <div class="sticky top-14 sm:top-16 z-20 bg-green-50 py-2 sm:py-3 mb-2 sm:mb-3 border-b border-green-200">
+              <div class="flex items-center gap-1.5 sm:gap-2">
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 flex-shrink-0"></div>
+                <h3 class="text-sm sm:text-lg font-semibold text-green-900 truncate">{{ group.date }}</h3>
+                <span class="text-xs sm:text-sm text-green-600 whitespace-nowrap">({{ group.items.length }})</span>
+              </div>
             </div>
 
-            <!-- Info -->
-            <div class="flex-1 min-w-0">
-              <div class="text-green-800 font-medium truncate">{{ doctor.reason}}</div>
-              <div class="text-xs text-green-500 mt-1">Price: {{ doctor.price }}</div>
-              <div class="text-xs text-green-500 mt-1">Cattle: {{ doctor.animal_name }}</div>
-              <div class="text-xs text-green-500 mt-1">Date: {{ formatDateDisplay(doctor.date) }}</div>
-            </div>
+            <!-- Medicine Items for this Date -->
+            <div class="space-y-1.5 sm:space-y-2 ml-3 sm:ml-4 border-l border-green-200 pl-3 sm:pl-4">
+              <div *ngFor="let medicine of group.items" 
+                   class="bg-white border border-green-100 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]"
+                   (click)="openViewModal(medicine)">
+                
+                <div class="flex items-center gap-2.5 sm:gap-3">
+                  <!-- Image -->
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0">
+                    <img [src]="medicine.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png'" 
+                         class="w-full h-full object-cover"
+                         (error)="medicine.AnimalImage = '../../../assets/DairryFarmImg/tablet_16443237.png'">
+                  </div>
 
-            <!-- Actions Dropdown -->
-            <div class="dropdown flex-shrink-0">
-              <button
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
-                type="button" id="doctorCardDropdown{{ getAnimalId(doctor) }}" data-bs-toggle="dropdown" aria-expanded="false"
-                (click)="$event.stopPropagation()">
-                <span>Actions</span>
-              </button>
-              <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                [attr.aria-labelledby]="'doctorCardDropdown' + getAnimalId(doctor)">
-                <li>
-                  <a class="dropdown-item flex items-center gap-2 text-green-700 px-3 py-2 rounded hover:bg-green-50"
-                    href="javascript:void(0);" (click)="openEditModal(doctor)">
-                    <i class="ri-edit-line text-sm"></i> Edit
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item flex items-center gap-2 text-red-600 px-3 py-2 rounded hover:bg-red-50"
-                    href="javascript:void(0);" (click)="openDeleteModal(doctor)">
-                    <i class="ri-delete-bin-line text-sm"></i> Delete
-                  </a>
-                </li>
-              </ul>
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-0">
+                      <div class="flex-1 min-w-0">
+                        <!-- Medicine Reason -->
+                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-0.5 sm:mb-1 truncate">{{ medicine.reason || 'N/A' }}</h4>
+                        
+                        <!-- Animal Name -->
+                        <p class="text-xs text-green-600 mb-1 sm:mb-2 truncate">Animal: {{ medicine.animal_name || 'N/A' }}</p>
+                        
+                        <!-- Price -->
+                        <div class="flex items-center">
+                          <span class="inline-flex items-center text-xs sm:text-sm font-medium text-green-800">
+                            <i class="ri-money-rupee-circle-line mr-1 text-xs sm:text-sm"></i> ₹{{ medicine.price || '0' }}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <!-- Actions Dropdown -->
+                      <div class="flex-shrink-0 mt-1 sm:mt-0 sm:ml-2 self-end sm:self-auto" (click)="$event.stopPropagation()">
+                        <div class="dropup">
+                          <button
+                            class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs border border-green-200 hover:bg-green-100 dropdown-toggle whitespace-nowrap"
+                            type="button"
+                            [id]="'medicineCardDropdown' + getMedicineId(medicine)"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="ri-more-2-line sm:hidden"></i>
+                            <span class="hidden sm:inline">Actions</span>
+                          </button>
+
+                          <ul class="dropdown-menu min-w-28 sm:min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
+                              [attr.aria-labelledby]="'medicineCardDropdown' + getMedicineId(medicine)">
+                            <li>
+                              <a class="dropdown-item flex items-center gap-2 text-green-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-green-50 text-xs sm:text-sm"
+                                 href="javascript:void(0);" (click)="openEditModal(medicine)">
+                                <i class="ri-edit-line text-xs sm:text-sm"></i> Edit
+                              </a>
+                            </li>
+                            <li>
+                              <a class="dropdown-item flex items-center gap-2 text-red-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-red-50 text-xs sm:text-sm"
+                                 href="javascript:void(0);" (click)="openDeleteModal(medicine)">
+                                <i class="ri-delete-bin-line text-xs sm:text-sm"></i> Delete
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <ng-template #noDoctorData>
-          <div class="text-center py-4">
-            <p class="text-sm text-green-600">No Medicien history found.</p>
+        <ng-template #noMedicineData>
+          <div class="text-center py-8 sm:py-12 bg-white rounded-xl border border-green-100 mx-1 sm:mx-0">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
+              <i class="ri-medicine-bottle-line text-xl sm:text-2xl text-green-400"></i>
+            </div>
+            <h3 class="text-base sm:text-lg font-medium text-green-900 mb-1.5 sm:mb-2">No Medicine Found</h3>
+            <p class="text-xs sm:text-sm text-green-600 px-4">Start adding medicine records to see your history here.</p>
           </div>
         </ng-template>
       </div>
@@ -109,31 +153,31 @@
   </div>
 </main>
 
-<!-- Medicien Modal -->
-<div class="modal fade custom-modal-fade" #DoctorModal tabindex="-1" aria-labelledby="doctorFormModalLabel"
+<!-- Medicine Modal (Add/Edit/Delete) -->
+<div class="modal fade custom-modal-fade" #medicienModal tabindex="-1" aria-labelledby="medicineFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
     <div class="modal-content custom-modal-content">
       <div class="modal-header custom-modal-header">
         <div class="modal-title-wrapper flex items-center">
           <!-- Image Container -->
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
-            class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
+            class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-2 sm:mr-3 flex-shrink-0"
             (click)="openImagePreview()" title="Click to view full image">
-            <img [src]="doctorForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
-              alt="Animal Image" class="w-10 h-10 object-contain" 
-              (error)="doctorForm.get('AnimalImage')?.setValue('../../../assets/DairryFarmImg/tablet_16443237.png')" />
+            <img [src]="medicienForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
+              alt="Medicine Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain" 
+              (error)="medicienForm.get('AnimalImage')?.setValue('../../../assets/DairryFarmImg/tablet_16443237.png')" />
           </div>
 
-          <div class="flex items-center">
-            <div class="modal-icon mr-2">
-              <i class="ri-file-add-line text-2xl" *ngIf="modalMode === 'add'"></i>
-              <i class="ri-edit-line text-2xl" *ngIf="modalMode === 'edit'"></i>
-              <i class="ri-delete-bin-line text-2xl" *ngIf="modalMode === 'delete'"></i>
+          <div class="flex items-center min-w-0">
+            <div class="modal-icon mr-1.5 sm:mr-2">
+              <i class="ri-file-add-line text-xl sm:text-2xl" *ngIf="modalMode === 'add'"></i>
+              <i class="ri-edit-line text-xl sm:text-2xl" *ngIf="modalMode === 'edit'"></i>
+              <i class="ri-delete-bin-line text-xl sm:text-2xl" *ngIf="modalMode === 'delete'"></i>
             </div>
-            <h5 class="modal-title custom-modal-title">
-              {{ modalMode === 'add' ? 'Add Medicien' :
-              modalMode === 'edit' ? 'Edit Medicien' : 'Delete Medicien' }}
+            <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
+              {{ modalMode === 'add' ? 'Add Medicine' :
+              modalMode === 'edit' ? 'Edit Medicine' : 'Delete Medicine' }}
             </h5>
           </div>
         </div>
@@ -143,44 +187,44 @@
       </div>
 
       <div class="modal-body custom-modal-body">
-        <form [formGroup]="doctorForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
+        <form [formGroup]="medicienForm" (ngSubmit)="submitMedicine()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
             
             <!-- Image Upload Section -->
             <div class="custom-form-group" *ngIf="modalMode !== 'delete'">
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-green-700 mb-2">
-                  <i class="ri-image-line mr-2"></i>Upload Medicien Image
+              <div class="mb-3 sm:mb-4">
+                <label class="block text-xs sm:text-sm font-medium text-green-700 mb-1.5 sm:mb-2">
+                  <i class="ri-image-line mr-1.5 sm:mr-2"></i>Upload Medicine Image
                 </label>
                 
                 <!-- Image Preview -->
                 <div class="flex flex-col items-center">
                   <!-- Preview Container -->
-                  <div class="relative mb-4">
-                    <div class="w-40 h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
-                      <img [src]="imagePreview || doctorForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
+                  <div class="relative mb-3 sm:mb-4">
+                    <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
+                      <img [src]="imagePreview || medicienForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
                            alt="Preview" 
-                           class="w-full h-full object-contain p-2"
+                           class="w-full h-full object-contain p-1.5 sm:p-2"
                            (error)="imagePreview = '../../../assets/DairryFarmImg/tablet_16443237.png'">
                       
                       <!-- Default icon when no image -->
-                      <div *ngIf="!imagePreview && !doctorForm.get('AnimalImage')?.value" 
-                           class="text-green-300 text-5xl">
+                      <div *ngIf="!imagePreview && !medicienForm.get('AnimalImage')?.value" 
+                           class="text-green-300 text-3xl sm:text-5xl">
                         <i class="ri-image-line"></i>
                       </div>
                     </div>
                     
                     <!-- Remove button -->
-                    <button *ngIf="imagePreview || doctorForm.get('AnimalImage')?.value" 
+                    <button *ngIf="imagePreview || medicienForm.get('AnimalImage')?.value" 
                             type="button"
-                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
                             (click)="removeImage()">
                       <i class="ri-close-line"></i>
                     </button>
                   </div>
                   
                   <!-- File Input -->
-                  <div class="relative">
+                  <div class="relative w-full">
                     <input type="file" 
                            id="imageUpload"
                            class="hidden"
@@ -190,28 +234,28 @@
                            [disabled]="isSaving || isUpdating || isDeleting">
                     
                     <button type="button"
-                            class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                            class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-xs sm:text-sm w-full sm:w-auto justify-center"
                             (click)="fileInput.click()"
                             [disabled]="isSaving || isUpdating || isDeleting">
                       <i class="ri-upload-cloud-line"></i>
-                      {{ imagePreview || doctorForm.get('AnimalImage')?.value ? 'Change Image' : 'Choose Image' }}
+                      <span class="truncate">{{ imagePreview || medicienForm.get('AnimalImage')?.value ? 'Change Image' : 'Choose Image' }}</span>
                     </button>
                     
-                    <p class="text-xs text-green-500 mt-2">
-                      Supported formats: JPG, PNG, GIF. Max size: 5MB
+                    <p class="text-xs text-green-500 mt-1.5 sm:mt-2 text-center">
+                      Supported formats: JPG, PNG, GIF. Max size: 1MB
                     </p>
                     
                     <!-- Loading indicator for image -->
-                    <div *ngIf="isUploadingImage" class="mt-2">
-                      <div class="flex items-center justify-center gap-2">
-                        <div class="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-sm text-green-600">Uploading image...</span>
+                    <div *ngIf="isUploadingImage" class="mt-1.5 sm:mt-2">
+                      <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+                        <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-xs sm:text-sm text-green-600">Uploading image...</span>
                       </div>
                     </div>
                     
                     <!-- Error message -->
-                    <div *ngIf="imageError" class="mt-2">
-                      <p class="text-sm text-red-600">{{ imageError }}</p>
+                    <div *ngIf="imageError" class="mt-1.5 sm:mt-2">
+                      <p class="text-xs sm:text-sm text-red-600 text-center">{{ imageError }}</p>
                     </div>
                   </div>
                 </div>
@@ -220,13 +264,13 @@
 
             <!-- Date -->
             <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="date" id="Medicien-date" class="form-control" formControlName="date" placeholder="Date"
+              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
+                <input type="date" id="medicine-date" class="form-control" formControlName="date" placeholder="Date"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting" 
                   [disabled]="isSaving || isUpdating || isDeleting" />
-                <label for="Medicien-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('date')?.invalid">
-                  <small *ngIf="doctorForm.get('date')?.errors?.['required']">Date is required.</small>
+                <label for="medicine-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1 text-xs" *ngIf="submitted && medicienForm.get('date')?.invalid">
+                  <small *ngIf="medicienForm.get('date')?.errors?.['required']">Date is required.</small>
                 </div>
               </div>
             </div>
@@ -234,15 +278,15 @@
             <!-- Animal Search -->
             <div class="custom-form-group position-relative">
               <div class="form-floating form-floating-outline mb-0">
-                <input #doctorInput id="Medicien-animal-input" type="text" class="form-control branch-input" 
+                <input #animalInput id="medicine-animal-input" type="text" class="form-control branch-input" 
                   name="animalSearch" [(ngModel)]="selectedAnimalName" 
-                  (input)="onFeedSearch($event)" (focus)="showAnimalDropdown = true"
+                  (input)="onAnimalSearch($event)" (focus)="showAnimalDropdown = true"
                   autocomplete="off" placeholder="Select Animal" 
                   [ngModelOptions]="{standalone: true}" 
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" />
 
-                <label for="Medicien-animal-input">
+                <label for="medicine-animal-input">
                   <i class="ri-box-3-line"></i>
                   Animal Name <span class="text-danger">*</span>
                 </label>
@@ -252,7 +296,7 @@
                 <input type="hidden" formControlName="animal_name" />
 
                 <!-- CARET -->
-                <button type="button" class="dropdown-caret-button" (click)="toggleFeedDropdown()"
+                <button type="button" class="dropdown-caret-button" (click)="toggleAnimalDropdown()"
                   aria-label="Toggle Animals" 
                   [disabled]="modalMode === 'delete' || isSaving || isUpdating || isDeleting">
                   <i [ngClass]="showAnimalDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
@@ -269,30 +313,30 @@
                   </div>
 
                   <!-- Animal options -->
-                  <div *ngIf="!loadingAnimalOptions && AnimalOptions.length > 0" class="dropdown-items-wrapper">
-                    <div class="dropdown-item" *ngFor="let animal of AnimalOptions" (click)="selectFeed(animal)"
+                  <div *ngIf="!loadingAnimalOptions && animalOptions.length > 0" class="dropdown-items-wrapper">
+                    <div class="dropdown-item" *ngFor="let animal of animalOptions" (click)="selectAnimal(animal)"
                       [class.dropdown-item-selected]="selectedAnimalId === animal.animalId">
                       <div class="dropdown-item-content">
                         <!-- ANIMAL NAME -->
-                        <div class="item-name truncate">
+                        <div class="item-name truncate text-sm">
                           {{ animal.animalName }}
                         </div>
 
                         <!-- ANIMAL META -->
-                        <div class="item-meta truncate">
+                        <div class="item-meta truncate text-xs">
                           ID: {{ animal.animalId }}
                         </div>
                       </div>
 
                       <!-- CHECK ICON -->
-                      <i class="ri-check-line dropdown-check-icon" *ngIf="selectedAnimalId === animal.animalId"></i>
+                      <i class="ri-check-line dropdown-check-icon text-sm" *ngIf="selectedAnimalId === animal.animalId"></i>
                     </div>
                   </div>
 
                   <!-- EMPTY STATE -->
-                  <div class="dropdown-empty-state" *ngIf="!loadingAnimalOptions && AnimalOptions.length === 0">
+                  <div class="dropdown-empty-state" *ngIf="!loadingAnimalOptions && animalOptions.length === 0">
                     <i class="ri-search-line empty-icon"></i>
-                    <div class="empty-text">
+                    <div class="empty-text text-sm">
                       {{ selectedAnimalName ? 'No Animals found for "' + selectedAnimalName + '"' : 'Start typing to search Animals' }}
                     </div>
                   </div>
@@ -302,43 +346,43 @@
 
             <!-- Reason -->
             <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="Medicien-reason" class="form-control" formControlName="reason"
-                  placeholder="Reason" 
+              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
+                <input type="text" id="medicine-reason" class="form-control" formControlName="reason"
+                  placeholder="Medicine Reason" 
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" />
-                <label for="Medicien-reason"><i class="ri-file-text-line"></i>Reason <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('reason')?.invalid">
-                  <small *ngIf="doctorForm.get('reason')?.errors?.['required']">Reason is required.</small>
+                <label for="medicine-reason"><i class="ri-file-text-line"></i>Medicine Reason <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1 text-xs" *ngIf="submitted && medicienForm.get('reason')?.invalid">
+                  <small *ngIf="medicienForm.get('reason')?.errors?.['required']">Medicine reason is required.</small>
                 </div>
               </div>
             </div>
 
             <!-- Price -->
             <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="Medicien-price" class="form-control" formControlName="price" placeholder="Price"
+              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
+                <input type="number" id="medicine-price" class="form-control" formControlName="price" placeholder="Price"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" min="1" />
-                <label for="Medicien-price"><i class="ri-money-dollar-circle-line"></i>Price <span
+                <label for="medicine-price"><i class="ri-money-rupee-circle-line"></i>Price <span
                     class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && doctorForm.get('price')?.invalid">
-                  <small *ngIf="doctorForm.get('price')?.errors?.['required']">Price is required.</small>
-                  <small *ngIf="doctorForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
+                <div class="text-danger mt-1 text-xs" *ngIf="submitted && medicienForm.get('price')?.invalid">
+                  <small *ngIf="medicienForm.get('price')?.errors?.['required']">Price is required.</small>
+                  <small *ngIf="medicienForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
                 </div>
               </div>
             </div>
 
             <!-- Delete Reason -->
             <div class="custom-form-group" *ngIf="modalMode === 'delete'">
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="text" id="deleteDoctorReason" class="form-control" placeholder="Delete Reason"
+              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
+                <input type="text" id="deleteMedicineReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}"
                   [disabled]="isDeleting" />
-                <label for="deleteDoctorReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                <label for="deleteMedicineReason"><i class="ri-chat-3-line"></i>Delete Reason <span
                     class="text-danger">*</span></label>
               </div>
-              <div class="text-danger mt-1" *ngIf="submitted && !deleteReason">
+              <div class="text-danger mt-1 text-xs" *ngIf="submitted && !deleteReason">
                 <small>Delete reason is required.</small>
               </div>
             </div>
@@ -346,49 +390,129 @@
           </div>
 
           <!-- Modal Footer Buttons -->
-          <div class="modal-footer custom-modal-footer">
-            <button type="button" class="custom-btn custom-btn-cancel" (click)="closeModal()"
+          <div class="modal-footer custom-modal-footer flex-col sm:flex-row gap-2 sm:gap-3">
+            <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
+                    (click)="closeModal()"
                     [disabled]="isSaving || isUpdating || isDeleting">
               <i class="ri-close-line"></i> Cancel
             </button>
             
             <!-- Save Button with loading -->
-            <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save"
-                    [disabled]="isSaving || doctorForm.invalid">
+            <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+                    [disabled]="isSaving || medicienForm.invalid">
               <span *ngIf="!isSaving">
                 <i class="ri-save-line"></i> Save
               </span>
               <span *ngIf="isSaving" class="inline-flex items-center">
-                <div class="spinner-border spinner-border-sm mr-2"></div>
+                <div class="spinner-border spinner-border-sm mr-1.5 sm:mr-2"></div>
                 Saving...
               </span>
             </button>
             
             <!-- Update Button with loading -->
-            <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save"
-                    [disabled]="isUpdating || doctorForm.invalid">
+            <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+                    [disabled]="isUpdating || medicienForm.invalid">
               <span *ngIf="!isUpdating">
                 <i class="ri-edit-line"></i> Update
               </span>
               <span *ngIf="isUpdating" class="inline-flex items-center">
-                <div class="spinner-border spinner-border-sm mr-2"></div>
+                <div class="spinner-border spinner-border-sm mr-1.5 sm:mr-2"></div>
                 Updating...
               </span>
             </button>
             
             <!-- Delete Button with loading -->
-            <button *ngIf="modalMode === 'delete'" type="submit" class="custom-btn custom-btn-delete"
+            <button *ngIf="modalMode === 'delete'" type="submit" class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
                     [disabled]="isDeleting || !deleteReason">
               <span *ngIf="!isDeleting">
                 <i class="ri-delete-bin-line"></i> Delete
               </span>
               <span *ngIf="isDeleting" class="inline-flex items-center">
-                <div class="spinner-border spinner-border-sm mr-2"></div>
+                <div class="spinner-border spinner-border-sm mr-1.5 sm:mr-2"></div>
                 Deleting...
               </span>
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Medicine Modal -->
+<div class="modal fade custom-modal-fade" #viewModal tabindex="-1" aria-labelledby="viewMedicineModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm sm:modal-md custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper flex items-center">
+          <div class="flex items-center min-w-0">
+            <div class="modal-icon mr-1.5 sm:mr-2">
+              <i class="ri-medicine-bottle-line text-xl sm:text-2xl text-blue-600"></i>
+            </div>
+            <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
+              Medicine Details
+            </h5>
+          </div>
+        </div>
+
+        <button type="button" class="btn-close custom-btn-close" (click)="closeViewModal()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body custom-modal-body">
+        <div *ngIf="selectedMedicineView" class="space-y-3 sm:space-y-4">
+          
+          <!-- Image Preview -->
+          <div class="text-center">
+            <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-blue-200 bg-blue-50">
+              <img [src]="viewImageUrl || '../../../assets/DairryFarmImg/tablet_16443237.png'" 
+                   alt="Medicine Image" 
+                   class="w-full h-full object-contain p-1.5 sm:p-2"
+                   (error)="viewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png'">
+            </div>
+          </div>
+
+          <!-- Details Card -->
+          <div class="bg-blue-50 rounded-xl p-3 sm:p-4">
+            <div class="space-y-2.5 sm:space-y-3">
+              
+              <!-- Date -->
+              <div>
+                <label class="block text-xs font-medium text-blue-600 mb-1">Date</label>
+                <p class="text-sm text-blue-900">
+                  {{ formatDateForView(selectedMedicineView.date) }}
+                </p>
+              </div>
+
+              <!-- Price -->
+              <div>
+                <label class="block text-xs font-medium text-blue-600 mb-1">Price</label>
+                <p class="text-base sm:text-lg font-semibold text-blue-900">₹{{ selectedMedicineView.price }}</p>
+              </div>
+
+              <!-- Medicine Details -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-blue-600 mb-1">Medicine Reason</label>
+                  <p class="text-sm text-blue-900 truncate">{{ selectedMedicineView.reason || 'N/A' }}</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-blue-600 mb-1">Animal</label>
+                  <p class="text-sm text-blue-900 truncate">{{ selectedMedicineView.animal_name || 'N/A' }}</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer custom-modal-footer">
+        <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center" (click)="closeViewModal()">
+          <i class="ri-close-line"></i> Close
+        </button>
       </div>
     </div>
   </div>
@@ -400,17 +524,17 @@
     <div class="modal-content bg-transparent border-0 shadow-none">
       <div class="modal-body p-0 position-relative">
         <!-- Large Image -->
-        <div class="flex justify-center items-center min-h-[70vh]">
-          <img [src]="previewImageUrl" alt="Animal Image Preview"
-            class="max-w-full max-h-[70vh] rounded-lg shadow-2xl" 
+        <div class="flex justify-center items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
+          <img [src]="previewImageUrl" alt="Medicine Image Preview"
+            class="max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] rounded-lg shadow-2xl" 
             (error)="previewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png'" />
         </div>
 
         <!-- Close Button -->
         <button type="button"
-          class="absolute top-4 right-4 bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
+          class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white text-gray-800 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
           (click)="closeImagePreview()" aria-label="Close">
-          <i class="ri-close-line text-xl"></i>
+          <i class="ri-close-line text-lg sm:text-xl"></i>
         </button>
       </div>
     </div>
