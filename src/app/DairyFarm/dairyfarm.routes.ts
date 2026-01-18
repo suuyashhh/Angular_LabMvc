@@ -31,5 +31,10 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/medicien/medicien.component')
         .then(m => m.MedicienComponent)
  },
+ {
+    path:'OtherFeed',
+    loadComponent:()=> import('../DairyFarm/other-feed/other-feed.component')
+        .then(m => m.OtherFeedComponent)
+ },
   
 ];
