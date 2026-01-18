@@ -20,6 +20,7 @@ import { LoaderService } from '../../services/loader.service';
 export class OtherFeedComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+  @ViewChild('fileInput') fileInput!: ElementRef;
 
   // Form
   feedForm!: FormGroup;
@@ -40,7 +41,11 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   submitted: boolean = false;
   dairyUserId: number = 0;
 
-  // Image Preview
+  // Image Upload
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  isUploadingImage: boolean = false;
+  imageError: string = '';
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
 
@@ -77,7 +82,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.feedForm = new FormGroup({
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
-      quantity: new FormControl('', [Validators.required, Validators.min(1)]),
+      quantity: new FormControl('', [Validators.required]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
       feedImage: new FormControl('')
     });
@@ -90,10 +95,152 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-  openImagePreview(): void {
-    const imageUrl = this.feedForm.get('feedImage')?.value;
-    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+  // ==================== IMAGE UPLOAD METHODS ====================
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    
+    if (!file) {
+      return;
+    }
 
+    // Validate file size (1MB max)
+    if (file.size > 1 * 1024 * 1024) {
+      this.imageError = 'Image size should be less than 1MB';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      this.imageError = 'Only JPG, PNG, and GIF images are allowed';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    this.imageError = '';
+    this.selectedFile = file;
+    
+    // Create preview and compress if needed
+    this.compressAndPreviewImage(file);
+  }
+
+  compressAndPreviewImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.src = e.target.result;
+      
+      img.onload = () => {
+        // Create canvas for compression
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          this.createBasicPreview(file);
+          return;
+        }
+
+        // Set maximum dimensions
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        
+        let width = img.width;
+        let height = img.height;
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Get compressed base64 with quality 0.7 (70% quality)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        this.imagePreview = compressedBase64;
+      };
+      
+      img.onerror = () => {
+        this.createBasicPreview(file);
+      };
+    };
+    
+    reader.onerror = () => {
+      this.imageError = 'Failed to read image file';
+      this.selectedFile = null;
+      this.imagePreview = null;
+    };
+    
+    reader.readAsDataURL(file);
+  }
+
+  createBasicPreview(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.feedForm.patchValue({ feedImage: '' });
+    
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  async uploadImage(): Promise<string> {
+    if (!this.selectedFile) {
+      return this.feedForm.get('feedImage')?.value || '';
+    }
+
+    this.isUploadingImage = true;
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        const base64Image = reader.result as string;
+        this.isUploadingImage = false;
+        resolve(base64Image);
+      };
+      
+      reader.onerror = () => {
+        this.isUploadingImage = false;
+        reject('Failed to read image file');
+      };
+      
+      reader.readAsDataURL(this.selectedFile!);
+    });
+  }
+
+  // ==================== IMAGE PREVIEW METHODS ====================
+  openImagePreview(): void {
+    const imageUrl = this.feedForm.get('feedImage')?.value || this.imagePreview;
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+    this.isImagePreviewOpen = true;
+    this.showImagePreviewModal();
+  }
+
+  previewCardImage(feed: any): void {
+    this.previewImageUrl = feed.feedImage || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
   }
@@ -145,6 +292,10 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.isUpdating = false;
     this.isDeleting = false;
 
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
+
     this.feedForm.reset();
     this.feedForm.patchValue({
       date: this.getTodayDate()
@@ -168,6 +319,10 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       this.toastr.error('Invalid feed data');
       return;
     }
+
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
 
     this.feedForm.patchValue({
       feed_name: feed.feed_name || '',
@@ -213,6 +368,9 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.selectedFile = null;
+    this.imagePreview = null;
+
     this.feedForm.patchValue({
       feed_name: feed.feed_name || '',
       price: feed.price,
@@ -250,6 +408,11 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
+    
+    // Reset image upload state
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
   }
 
   showModal(): void {
@@ -290,7 +453,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       });
   }
 
-  submitFeed(): void {
+  async submitFeed(): Promise<void> {
     this.submitted = true;
 
     if (this.modalMode === 'delete') {
@@ -307,14 +470,28 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.modalMode === 'add') {
-      this.addFeed();
-    } else if (this.modalMode === 'edit') {
-      this.updateFeed();
+    try {
+      // Use the compressed preview image if available
+      if (this.imagePreview) {
+        this.feedForm.patchValue({ feedImage: this.imagePreview });
+      } else if (this.selectedFile) {
+        // Fallback to regular upload if no preview
+        const base64Image = await this.uploadImage();
+        this.feedForm.patchValue({ feedImage: base64Image });
+      }
+
+      if (this.modalMode === 'add') {
+        await this.addFeed();
+      } else if (this.modalMode === 'edit') {
+        await this.updateFeed();
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      this.toastr.error('Failed to upload image');
     }
   }
 
-  addFeed(): void {
+  async addFeed(): Promise<void> {
     this.isSaving = true;
 
     const payload = {
@@ -324,7 +501,8 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       feed_name: this.feedForm.value.feed_name,
       price: Number(this.feedForm.value.price),
       quantity: this.feedForm.value.quantity,
-      date: this.formatDateForAPI(this.feedForm.value.date)
+      date: this.formatDateForAPI(this.feedForm.value.date),
+      feedImage: this.feedForm.value.feedImage || ''
     };
 
     this.loader.show();
@@ -336,18 +514,18 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed saved successfully');
+          this.toastr.success('Other Feed saved successfully');
           this.closeModal();
           this.loadFeeds();
         },
         error: (error: any) => {
           console.error('Save error:', error);
-          this.toastr.error('Failed to save feed');
+          this.toastr.error('Failed to save other feed');
         }
       });
   }
 
-  updateFeed(): void {
+  async updateFeed(): Promise<void> {
     if (!this.selectedFeed?.expense_id) {
       this.toastr.error('Invalid feed data');
       return;
@@ -363,7 +541,8 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       feed_name: this.feedForm.value.feed_name,
       price: Number(this.feedForm.value.price),
       quantity: this.feedForm.value.quantity,
-      date: this.formatDateForAPI(this.feedForm.value.date)
+      date: this.formatDateForAPI(this.feedForm.value.date),
+      feedImage: this.feedForm.value.feedImage || ''
     };
 
     this.loader.show();
@@ -375,13 +554,13 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed updated successfully');
+          this.toastr.success('Other Feed updated successfully');
           this.closeModal();
           this.loadFeeds();
         },
         error: (error: any) => {
           console.error('Update error:', error);
-          this.toastr.error('Failed to update feed');
+          this.toastr.error('Failed to update other feed');
         }
       });
   }
@@ -403,19 +582,19 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed deleted successfully');
+          this.toastr.success('Other Feed deleted successfully');
           this.closeModal();
           this.loadFeeds();
         },
         error: (error: any) => {
           console.error('Delete error:', error);
-          this.toastr.error('Failed to delete feed');
+          this.toastr.error('Failed to delete other feed');
         }
       });
   }
 
   getFeedId(feed: any): number {
-    return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
+    return feed.expense_id ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================

@@ -54,9 +54,11 @@
           <div *ngFor="let f of filteredFeeds" id="feedCardDropdown{{ getFeedId(f) }}"
             (click)="$event.stopPropagation()" data-bs-toggle="dropdown" aria-expanded="false"
             class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
-            <!-- Image -->
-            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-              <img [src]="f.feedImage || '../../../assets/DairryFarmImg/Dryfeed_9137270.png'" class="w-full h-full object-cover"
+            <!-- Image with Preview -->
+            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer" 
+                 (click)="previewCardImage(f)">
+              <img [src]="f.feedImage || '../../../assets/DairryFarmImg/Dryfeed_9137270.png'" 
+                   class="w-full h-full object-cover"
                    (error)="f.feedImage = '../../../assets/DairryFarmImg/Dryfeed_9137270.png'">
             </div>
 
@@ -117,9 +119,9 @@
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
             class="w-12 h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-3"
             (click)="openImagePreview()" title="Click to view full image">
-            <img [src]="feedForm.get('feedImage')?.value || '../../../assets/DairryFarmImg/Dryfeed_9137270.png'"
+            <img [src]="feedForm.get('feedImage')?.value || imagePreview || '../../../assets/DairryFarmImg/Dryfeed_9137270.png'"
               alt="Other Feed Icon" class="w-10 h-10 object-contain" 
-              onerror="this.src='../../../assets/DairryFarmImg/Dryfeed_9137270.png'" />
+              (error)="feedForm.get('feedImage')?.setValue('../../../assets/DairryFarmImg/Dryfeed_9137270.png')" />
           </div>
 
           <div class="flex items-center">
@@ -142,6 +144,78 @@
       <div class="modal-body custom-modal-body">
         <form [formGroup]="feedForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
+            
+            <!-- Image Upload Section -->
+            <div class="custom-form-group" *ngIf="modalMode !== 'delete'">
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-green-700 mb-2">
+                  <i class="ri-image-line mr-2"></i>Upload Other Feed Image
+                </label>
+                
+                <!-- Image Preview -->
+                <div class="flex flex-col items-center">
+                  <!-- Preview Container -->
+                  <div class="relative mb-4">
+                    <div class="w-40 h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
+                      <img [src]="imagePreview || feedForm.get('feedImage')?.value || '../../../assets/DairryFarmImg/Dryfeed_9137270.png'"
+                           alt="Preview" 
+                           class="w-full h-full object-contain p-2"
+                           (error)="imagePreview = '../../../assets/DairryFarmImg/Dryfeed_9137270.png'">
+                      
+                      <!-- Default icon when no image -->
+                      <div *ngIf="!imagePreview && !feedForm.get('feedImage')?.value" 
+                           class="text-green-300 text-5xl">
+                        <i class="ri-image-line"></i>
+                      </div>
+                    </div>
+                    
+                    <!-- Remove button -->
+                    <button *ngIf="imagePreview || feedForm.get('feedImage')?.value" 
+                            type="button"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            (click)="removeImage()">
+                      <i class="ri-close-line"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- File Input -->
+                  <div class="relative">
+                    <input type="file" 
+                           id="imageUpload"
+                           class="hidden"
+                           accept="image/*"
+                           (change)="onImageSelected($event)"
+                           #fileInput
+                           [disabled]="isSaving || isUpdating || isDeleting">
+                    
+                    <button type="button"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                            (click)="fileInput.click()"
+                            [disabled]="isSaving || isUpdating || isDeleting">
+                      <i class="ri-upload-cloud-line"></i>
+                      {{ imagePreview || feedForm.get('feedImage')?.value ? 'Change Image' : 'Choose Image' }}
+                    </button>
+                    
+                    <p class="text-xs text-green-500 mt-2">
+                      Supported formats: JPG, PNG, GIF. Max size: 1MB
+                    </p>
+                    
+                    <!-- Loading indicator for image -->
+                    <div *ngIf="isUploadingImage" class="mt-2">
+                      <div class="flex items-center justify-center gap-2">
+                        <div class="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-sm text-green-600">Uploading image...</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Error message -->
+                    <div *ngIf="imageError" class="mt-2">
+                      <p class="text-sm text-red-600">{{ imageError }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Date -->
             <div class="custom-form-group">
@@ -173,21 +247,6 @@
               </div>
             </div>
 
-            <!-- Price -->
-            <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-4">
-                <input type="number" id="Other Feed-price" class="form-control" formControlName="price" placeholder="Price"
-                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
-                  [disabled]="isSaving || isUpdating || isDeleting" min="1" />
-                <label for="Other Feed-price"><i class="ri-money-dollar-circle-line"></i>Price <span
-                    class="text-danger">*</span></label>
-                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('price')?.invalid">
-                  <small *ngIf="feedForm.get('price')?.errors?.['required']">Price is required.</small>
-                  <small *ngIf="feedForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
-                </div>
-              </div>
-            </div>
-
             <!-- Quantity -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-4">
@@ -199,6 +258,21 @@
                 <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('quantity')?.invalid">
                   <small *ngIf="feedForm.get('quantity')?.errors?.['required']">Quantity is required.</small>
                   <small *ngIf="feedForm.get('quantity')?.errors?.['min']">Quantity must be at least 1.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-4">
+                <input type="number" id="Other Feed-price" class="form-control" formControlName="price" placeholder="Price"
+                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
+                  [disabled]="isSaving || isUpdating || isDeleting" min="1" />
+                <label for="Other Feed-price"><i class="ri-money-dollar-circle-line"></i>Price <span
+                    class="text-danger">*</span></label>
+                <div class="text-danger mt-1" *ngIf="submitted && feedForm.get('price')?.invalid">
+                  <small *ngIf="feedForm.get('price')?.errors?.['required']">Price is required.</small>
+                  <small *ngIf="feedForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
                 </div>
               </div>
             </div>
