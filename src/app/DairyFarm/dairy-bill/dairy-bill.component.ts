@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -11,42 +11,33 @@ import { AuthService } from '../../shared/auth.service';
 import { LoaderService } from '../../services/loader.service';
 
 @Component({
-  selector: 'app-feeds',
+  selector: 'app-dairy-bill',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
-  templateUrl: './feeds.component.html',
-  styleUrls: ['./feeds.component.css']
+  templateUrl: './dairy-bill.component.html',
+  styleUrl: './dairy-bill.component.css'
 })
-export class FeedsComponent implements OnInit, OnDestroy {
-  @ViewChild('feedModal') feedModal!: ElementRef;
+export class DairyBillComponent implements OnInit, OnDestroy {
+  @ViewChild('billModal') billModal!: ElementRef;
   @ViewChild('viewModal') viewModal!: ElementRef;
-  @ViewChild('feedInput') feedInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+  @ViewChild('fileInput') fileInput!: ElementRef;
 
   // Form
-  feedForm!: FormGroup;
+  billForm!: FormGroup;
 
   // Data
-  feeds: any[] = [];
-  filteredFeeds: any[] = [];
-  groupedFeeds: { date: string; items: any[] }[] = [];
-
-  // Feed dropdown
-  feedOptions: any[] = [];
-  selectedFeedId: number = 0;
-  selectedFeedName: string = '';
-  feedSearchTerm: string = '';
-  showFeedDropdown: boolean = false;
-  loadingFeedOptions: boolean = false;
-  feedSearchTimeout: any;
+  bills: any[] = [];
+  filteredBills: any[] = [];
+  groupedBills: { date: string; items: any[] }[] = [];
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
-  selectedFeed: any = null;
+  selectedBill: any = null;
   deleteReason: string = '';
 
   // View Modal
-  selectedFeedView: any = null;
+  selectedBillView: any = null;
   viewImageUrl: string = '';
   isLoadingImage: boolean = false;
 
@@ -58,7 +49,11 @@ export class FeedsComponent implements OnInit, OnDestroy {
   dairyUserId: number = 0;
   isLoading: boolean = false;
 
-  // Image Preview
+  // Image Upload
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  isUploadingImage: boolean = false;
+  imageError: string = '';
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
 
@@ -84,24 +79,19 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.dairyUserId = this.getDairyUserId();
     this.initForm();
-    this.loadFeeds();
-    this.loadFeedOptions();
+    this.loadBills();
   }
 
   ngOnDestroy(): void {
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
-    }
+    // Cleanup if needed
   }
 
   initForm(): void {
-    this.feedForm = new FormGroup({
-      feed_id: new FormControl('', [Validators.required]),
-      feed_name: new FormControl('', [Validators.required]),
+    this.billForm = new FormGroup({
+      animal_type: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
-      quantity: new FormControl('', [Validators.required, Validators.min(1)]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
-      feedImage: new FormControl('')
+      BillImage: new FormControl('')
     });
   }
 
@@ -112,11 +102,152 @@ export class FeedsComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
+  // ==================== IMAGE UPLOAD METHODS ====================
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    
+    if (!file) {
+      return;
+    }
+
+    // Validate file size (1MB max)
+    if (file.size > 1 * 1024 * 1024) {
+      this.imageError = 'Image size should be less than 1MB';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      this.imageError = 'Only JPG, PNG, and GIF images are allowed';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    this.imageError = '';
+    this.selectedFile = file;
+    
+    // Create preview and compress if needed
+    this.compressAndPreviewImage(file);
+  }
+
+  compressAndPreviewImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.src = e.target.result;
+      
+      img.onload = () => {
+        // Create canvas for compression
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          this.createBasicPreview(file);
+          return;
+        }
+
+        // Set maximum dimensions
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        
+        let width = img.width;
+        let height = img.height;
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Get compressed base64 with quality 0.7 (70% quality)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        this.imagePreview = compressedBase64;
+      };
+      
+      img.onerror = () => {
+        this.createBasicPreview(file);
+      };
+    };
+    
+    reader.onerror = () => {
+      this.imageError = 'Failed to read image file';
+      this.selectedFile = null;
+      this.imagePreview = null;
+    };
+    
+    reader.readAsDataURL(file);
+  }
+
+  createBasicPreview(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.billForm.patchValue({ BillImage: '' });
+    
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  async uploadImage(): Promise<string> {
+    if (!this.selectedFile) {
+      return this.billForm.get('BillImage')?.value || '';
+    }
+
+    this.isUploadingImage = true;
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        const base64Image = reader.result as string;
+        this.isUploadingImage = false;
+        resolve(base64Image);
+      };
+      
+      reader.onerror = () => {
+        this.isUploadingImage = false;
+        reject('Failed to read image file');
+      };
+      
+      reader.readAsDataURL(this.selectedFile!);
+    });
+  }
+
   // ==================== IMAGE PREVIEW METHODS ====================
   openImagePreview(): void {
-    const imageUrl = this.feedForm.get('feedImage')?.value;
-    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    const imageUrl = this.billForm.get('BillImage')?.value || this.imagePreview;
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/bill_1052856.png';
+    this.isImagePreviewOpen = true;
+    this.showImagePreviewModal();
+  }
 
+  previewCardImage(bill: any): void {
+    this.previewImageUrl = bill.BillImage || '../../../assets/DairryFarmImg/bill_1052856.png';
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
   }
@@ -153,58 +284,58 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleCardImageError(feed: any): void {
-    feed.feedImage = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+  handleCardImageError(bill: any): void {
+    bill.BillImage = '../../../assets/DairryFarmImg/bill_1052856.png';
   }
 
   // ==================== VIEW MODAL METHODS ====================
-  openViewModal(feed: any): void {
-    this.selectedFeedView = feed;
+  openViewModal(bill: any): void {
+    this.selectedBillView = bill;
     
     // Reset loading state
     this.isLoadingImage = true;
     
     // Initially show default image
-    this.viewImageUrl = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    this.viewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png';
     
     // Show the modal immediately
     this.showViewModal();
     
     // Now fetch the actual image from API
-    this.loadFeedImageForView(feed);
+    this.loadBillImageForView(bill);
   }
 
-  loadFeedImageForView(feed: any): void {
-    const expenseId = feed.expense_id;
+  loadBillImageForView(bill: any): void {
+    const billId = bill.bill_id;
     
-    if (!expenseId) {
-      console.error('No expense_id found for feed:', feed);
+    if (!billId) {
+      console.error('No bill_id found for bill:', bill);
       this.isLoadingImage = false;
       return;
     }
     
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
+    this.api.get(`BillDairy/GetBillImageById/${billId}`).subscribe({
       next: (response: any) => {
         // Try different possible property names for the image
-        const image = response?.feedImage || response?.FeedImage || response?.feedImageUrl || response?.imageUrl;
+        const image = response?.BillImage || response?.billImage || response?.BillImageUrl || response?.imageUrl;
         
         if (image && image.trim() !== '') {
           // Update the view image URL with the actual image from API
           this.viewImageUrl = image;
           
-          // Also update the selected feed object for consistency
-          if (this.selectedFeedView) {
-            this.selectedFeedView.feedImage = image;
+          // Also update the selected bill object for consistency
+          if (this.selectedBillView) {
+            this.selectedBillView.BillImage = image;
           }
         } else {
-          console.warn('No image found for feed ID:', expenseId);
+          console.warn('No image found for bill ID:', billId);
           // Keep the default image
         }
         this.isLoadingImage = false;
       },
       error: (error: any) => {
-        console.error('Failed to load feed image:', error);
-        this.toastr.error("Failed to load feed image");
+        console.error('Failed to load bill image:', error);
+        this.toastr.error("Failed to load bill image");
         this.isLoadingImage = false;
       }
     });
@@ -212,7 +343,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   handleViewImageError(): void {
     // If the image fails to load, show default image
-    this.viewImageUrl = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    this.viewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png';
     this.isLoadingImage = false;
   }
 
@@ -227,7 +358,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
     
     // Reset view modal data
-    this.selectedFeedView = null;
+    this.selectedBillView = null;
     this.viewImageUrl = '';
     this.isLoadingImage = false;
   }
@@ -247,201 +378,126 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ==================== FEED DROPDOWN METHODS ====================
-  loadFeedOptions(searchTerm: string = ''): void {
-    if (!this.dairyUserId) return;
-
-    this.loadingFeedOptions = true;
-
-    this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
-      next: (response: any) => {
-        let feeds = Array.isArray(response) ? response : [];
-
-        if (searchTerm.trim()) {
-          const term = searchTerm.toLowerCase();
-          feeds = feeds.filter(feed =>
-            feed.feedName?.toLowerCase().includes(term)
-          );
-        }
-
-        this.feedOptions = feeds;
-        this.loadingFeedOptions = false;
-      },
-      error: (error: any) => {
-        console.error('Failed to load feed options:', error);
-        this.feedOptions = [];
-        this.loadingFeedOptions = false;
-      }
-    });
-  }
-
-  onFeedSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.feedSearchTerm = input.value;
-
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
-    }
-
-    this.feedSearchTimeout = setTimeout(() => {
-      this.loadFeedOptions(this.feedSearchTerm);
-    }, 300);
-  }
-
-  selectFeed(feed: any): void {
-    this.selectedFeedId = feed.feedId;
-    this.selectedFeedName = feed.feedName;
-    this.showFeedDropdown = false;
-
-    this.feedForm.patchValue({
-      feed_id: feed.feedId,
-      feed_name: feed.feedName
-    });
-  }
-
-  toggleFeedDropdown(): void {
-    this.showFeedDropdown = !this.showFeedDropdown;
-    if (this.showFeedDropdown && this.feedOptions.length === 0) {
-      this.loadFeedOptions();
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (!this.showFeedDropdown) return;
-    
-    const target = event.target as HTMLElement;
-    const isClickInside = this.feedInput?.nativeElement?.contains(target);
-    
-    if (!isClickInside) {
-      this.showFeedDropdown = false;
-    }
-  }
-
   // ==================== MODAL METHODS ====================
   openAddModal(): void {
     this.modalMode = 'add';
-    this.selectedFeed = null;
+    this.selectedBill = null;
     this.deleteReason = '';
     this.submitted = false;
     this.isSaving = false;
     this.isUpdating = false;
     this.isDeleting = false;
 
-    this.selectedFeedId = 0;
-    this.selectedFeedName = '';
-    this.feedSearchTerm = '';
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
 
-    this.feedForm.reset();
-    this.feedForm.patchValue({
+    this.billForm.reset();
+    this.billForm.patchValue({
       date: this.getTodayDate(),
-      feed_id: '',
-      feed_name: '',
-      feedImage: ''
+      animal_type: '',
+      price: '',
+      BillImage: ''
     });
 
-    this.loadFeedOptions();
     this.showModal();
   }
 
-  openEditModal(feed: any): void {
+  openEditModal(bill: any): void {
     this.modalMode = 'edit';
-    this.selectedFeed = feed;
+    this.selectedBill = bill;
     this.deleteReason = '';
     this.submitted = false;
     this.isSaving = false;
     this.isUpdating = false;
     this.isDeleting = false;
 
-    const expenseId = feed.expense_id;
+    const billId = bill.bill_id;
 
-    if (!expenseId) {
-      this.toastr.error('Invalid feed data');
+    if (!billId) {
+      this.toastr.error('Invalid bill data');
       return;
     }
 
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
 
-    this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
-      price: feed.price,
-      quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date),
-      feedImage: feed.feedImage || ''
+    this.billForm.patchValue({
+      animal_type: bill.animal_type || '',
+      price: bill.price,
+      date: this.formatDateForInput(bill.date),
+      BillImage: bill.BillImage || ''
     });
 
     this.loader.show();
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
+    this.api.get(`BillDairy/GetBillImageById/${billId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
-          const image = res?.feedImage || res?.FeedImage || feed.feedImage;
+          const image = res?.BillImage || res?.billImage || bill.BillImage;
           if (image) {
-            this.feedForm.patchValue({ feedImage: image });
+            this.billForm.patchValue({ BillImage: image });
           }
           this.showModal();
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error("Failed to load feed image");
+          this.toastr.error("Failed to load bill image");
           this.showModal();
         }
       });
   }
 
-  openDeleteModal(feed: any): void {
+  openDeleteModal(bill: any): void {
     this.modalMode = 'delete';
-    this.selectedFeed = feed;
+    this.selectedBill = bill;
     this.deleteReason = '';
     this.submitted = false;
     this.isSaving = false;
     this.isUpdating = false;
     this.isDeleting = false;
 
-    const expenseId = feed.expense_id;
+    const billId = bill.bill_id;
 
-    if (!expenseId) {
-      this.toastr.error('Invalid feed data');
+    if (!billId) {
+      this.toastr.error('Invalid bill data');
       return;
     }
 
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+    this.selectedFile = null;
+    this.imagePreview = null;
 
-    this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
-      price: feed.price,
-      quantity: feed.quantity,
-      date: this.formatDateForInput(feed.date),
-      feedImage: feed.feedImage || ''
+    this.billForm.patchValue({
+      animal_type: bill.animal_type || '',
+      price: bill.price,
+      date: this.formatDateForInput(bill.date),
+      BillImage: bill.BillImage || ''
     });
 
     this.loader.show();
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
+    this.api.get(`BillDairy/GetBillImageById/${billId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
-          const image = res?.feedImage || res?.FeedImage || feed.feedImage;
+          const image = res?.BillImage || res?.billImage || bill.BillImage;
           if (image) {
-            this.feedForm.patchValue({ feedImage: image });
+            this.billForm.patchValue({ BillImage: image });
           }
           this.showModal();
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error("Failed to load feed image");
+          this.toastr.error("Failed to load bill image");
           this.showModal();
         }
       });
   }
 
   closeModal(): void {
-    const modalElement = this.feedModal?.nativeElement;
+    const modalElement = this.billModal?.nativeElement;
     if (modalElement) {
       modalElement.classList.remove('show');
       modalElement.style.display = 'none';
@@ -449,10 +505,15 @@ export class FeedsComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
+    
+    // Reset image upload state
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
   }
 
   showModal(): void {
-    const modalElement = this.feedModal?.nativeElement;
+    const modalElement = this.billModal?.nativeElement;
     if (modalElement) {
       modalElement.classList.add('show');
       modalElement.style.display = 'block';
@@ -464,24 +525,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ==================== GROUP FEEDS BY DATE ====================
-  groupFeedsByDate(): void {
-    this.groupedFeeds = [];
+  // ==================== GROUP BILLS BY DATE ====================
+  groupBillsByDate(): void {
+    this.groupedBills = [];
 
-    if (!this.filteredFeeds || this.filteredFeeds.length === 0) return;
+    if (!this.filteredBills || this.filteredBills.length === 0) return;
 
     const map = new Map<string, any[]>();
 
-    for (const feed of this.filteredFeeds) {
-      const dateStr = this.getDateString(feed.date);
+    for (const bill of this.filteredBills) {
+      const dateStr = this.getDateString(bill.date);
 
       if (!map.has(dateStr)) {
         map.set(dateStr, []);
       }
-      map.get(dateStr)!.push(feed);
+      map.get(dateStr)!.push(bill);
     }
 
-    this.groupedFeeds = Array.from(map.entries()).map(([date, items]) => ({
+    this.groupedBills = Array.from(map.entries()).map(([date, items]) => ({
       date,
       items
     }));
@@ -504,7 +565,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   // ==================== CRUD OPERATIONS ====================
-  loadFeeds(): void {
+  loadBills(): void {
     if (!this.dairyUserId) {
       this.toastr.warning('Please login to Dairy Farm');
       return;
@@ -513,28 +574,28 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.loader.show();
 
-    this.api.get(`Feeds/History/${this.dairyUserId}`)
+    this.api.get(`BillDairy/History/${this.dairyUserId}`)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isLoading = false;
       }))
       .subscribe({
         next: (response: any) => {
-          this.feeds = Array.isArray(response) ? response : [];
-          this.filteredFeeds = [...this.feeds];
-          this.groupFeedsByDate();
+          this.bills = Array.isArray(response) ? response : [];
+          this.filteredBills = [...this.bills];
+          this.groupBillsByDate();
         },
         error: (error: any) => {
-          console.error('Failed to load feeds:', error);
-          this.toastr.error('Failed to load feeds');
-          this.feeds = [];
-          this.filteredFeeds = [];
-          this.groupedFeeds = [];
+          console.error('Failed to load bills:', error);
+          this.toastr.error('Failed to load bills');
+          this.bills = [];
+          this.filteredBills = [];
+          this.groupedBills = [];
         }
       });
   }
 
-  submitFeed(): void {
+  async submitBill(): Promise<void> {
     this.submitted = true;
 
     if (this.modalMode === 'delete') {
@@ -542,104 +603,107 @@ export class FeedsComponent implements OnInit, OnDestroy {
         this.toastr.error('Please provide delete reason');
         return;
       }
-      this.deleteFeed();
+      this.deleteBill();
       return;
     }
 
-    if (this.feedForm.invalid) {
+    if (this.billForm.invalid) {
       this.toastr.error('Please fill all required fields correctly');
       return;
     }
 
-    if (!this.selectedFeedId) {
-      this.toastr.error('Please select a feed from the dropdown');
-      return;
-    }
+    try {
+      // Use the compressed preview image if available
+      if (this.imagePreview) {
+        this.billForm.patchValue({ BillImage: this.imagePreview });
+      } else if (this.selectedFile) {
+        // Fallback to regular upload if no preview
+        const base64Image = await this.uploadImage();
+        this.billForm.patchValue({ BillImage: base64Image });
+      }
 
-    if (this.modalMode === 'add') {
-      this.addFeed();
-    } else if (this.modalMode === 'edit') {
-      this.updateFeed();
+      if (this.modalMode === 'add') {
+        await this.addBill();
+      } else if (this.modalMode === 'edit') {
+        await this.updateBill();
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      this.toastr.error('Failed to upload image');
     }
   }
 
-  addFeed(): void {
+  async addBill(): Promise<void> {
     this.isSaving = true;
 
     const payload = {
       user_id: this.dairyUserId,
-      feed_id: this.selectedFeedId,
-      expense_name: 'Feeds',
-      feed_name: this.selectedFeedName,
-      price: Number(this.feedForm.value.price),
-      quantity: Number(this.feedForm.value.quantity),
-      date: this.formatDateForAPI(this.feedForm.value.date),
-      feedImage: this.feedForm.value.feedImage || ''
+      animal_type: this.billForm.value.animal_type,
+      price: Number(this.billForm.value.price),
+      date: this.formatDateForAPI(this.billForm.value.date),
+      BillImage: this.billForm.value.BillImage || ''
     };
 
     this.loader.show();
 
-    this.api.post('Feeds/Save', payload)
+    this.api.post('BillDairy/Save', payload)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isSaving = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed saved successfully');
+          this.toastr.success('Bill saved successfully');
           this.closeModal();
-          this.loadFeeds();
+          this.loadBills();
         },
         error: (error: any) => {
           console.error('Save error:', error);
-          this.toastr.error('Failed to save feed');
+          this.toastr.error('Failed to save bill');
         }
       });
   }
 
-  updateFeed(): void {
-    if (!this.selectedFeed?.expense_id) {
-      this.toastr.error('Invalid feed data');
+  async updateBill(): Promise<void> {
+    if (!this.selectedBill?.bill_id) {
+      this.toastr.error('Invalid bill data');
       return;
     }
 
     this.isUpdating = true;
 
     const payload = {
-      expense_id: this.selectedFeed.expense_id,
+      bill_id: this.selectedBill.bill_id,
       user_id: this.dairyUserId,
-      feed_id: this.selectedFeedId,
-      expense_name: 'Feeds',
-      feed_name: this.selectedFeedName,
-      price: Number(this.feedForm.value.price),
-      quantity: Number(this.feedForm.value.quantity),
-      date: this.formatDateForAPI(this.feedForm.value.date),
-      feedImage: this.feedForm.value.feedImage || ''
+      animal_type: this.billForm.value.animal_type,
+      price: Number(this.billForm.value.price),
+      date: this.formatDateForAPI(this.billForm.value.date),
+      BillImage: this.billForm.value.BillImage || ''
     };
 
     this.loader.show();
 
-    this.api.put('Feeds/Edit', payload)
+    this.api.put('BillDairy/Edit', payload)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isUpdating = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed updated successfully');
+          this.toastr.success('Bill updated successfully');
           this.closeModal();
-          this.loadFeeds();
+          this.loadBills();
         },
         error: (error: any) => {
           console.error('Update error:', error);
-          this.toastr.error('Failed to update feed');
+          this.toastr.error('Failed to update bill');
         }
       });
   }
 
-  deleteFeed(): void {
-    if (!this.selectedFeed?.expense_id) {
-      this.toastr.error('Invalid feed data');
+  deleteBill(): void {
+    if (!this.selectedBill?.bill_id) {
+      this.toastr.error('Invalid bill data');
       return;
     }
 
@@ -647,26 +711,26 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.loader.show();
 
-    this.api.delete(`Feeds/${this.selectedFeed.expense_id}`)
+    this.api.delete(`BillDairy/${this.selectedBill.bill_id}`)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isDeleting = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed deleted successfully');
+          this.toastr.success('Bill deleted successfully');
           this.closeModal();
-          this.loadFeeds();
+          this.loadBills();
         },
         error: (error: any) => {
           console.error('Delete error:', error);
-          this.toastr.error('Failed to delete feed');
+          this.toastr.error('Failed to delete bill');
         }
       });
   }
 
-  getFeedId(feed: any): number {
-    return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
+  getBillId(bill: any): number {
+    return bill.bill_id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================
@@ -674,25 +738,25 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const search = this.searchTerm.toLowerCase().trim();
 
     if (!search) {
-      this.filteredFeeds = [...this.feeds];
-      this.groupFeedsByDate();
+      this.filteredBills = [...this.bills];
+      this.groupBillsByDate();
       return;
     }
 
     const dateMatch = this.tryParseDate(search);
     if (dateMatch) {
-      this.filteredFeeds = this.feeds.filter(feed => {
-        const feedDate = this.formatDateDisplay(feed.date).toLowerCase();
-        return feedDate.includes(dateMatch);
+      this.filteredBills = this.bills.filter(bill => {
+        const billDate = this.formatDateDisplay(bill.date).toLowerCase();
+        return billDate.includes(dateMatch);
       });
     } else {
-      this.filteredFeeds = this.feeds.filter(feed =>
-        feed.feed_name?.toLowerCase().includes(search)
+      this.filteredBills = this.bills.filter(bill =>
+        bill.animal_type?.toLowerCase().includes(search)
       );
     }
 
     // Regroup after filtering
-    this.groupFeedsByDate();
+    this.groupBillsByDate();
   }
 
   // ==================== HELPER METHODS ====================

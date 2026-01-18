@@ -1,12 +1,12 @@
 <!-- Page Header -->
 <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
   <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
-    <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png" alt="Feed Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+    <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Bill Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
   </div>
 
   <div class="min-w-0">
-    <h1 class="text-xl sm:text-2xl font-semibold text-green-900 truncate">Feeds</h1>
-    <p class="text-xs sm:text-sm text-green-600 -mt-0.5 truncate">Manage feed history (add / edit / delete / view)</p>
+    <h1 class="text-xl sm:text-2xl font-semibold text-green-900 truncate">Bills</h1>
+    <p class="text-xs sm:text-sm text-green-600 -mt-0.5 truncate">Manage Bill history (add / edit / delete / view)</p>
   </div>
 </div>
 
@@ -20,7 +20,7 @@
             class="inline-flex items-center gap-1.5 sm:gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
             (click)="openAddModal()">
             <i class="ri-add-box-fill text-sm sm:text-base"></i> 
-            <span class="truncate">Add Feed</span>
+            <span class="truncate">Add Bill</span>
           </button>
         </div>
 
@@ -29,10 +29,10 @@
             <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
                      py-1.5 sm:py-2 pl-9 sm:pl-10 pr-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" 
                      type="search"
-              placeholder="Search feed name..." 
+              placeholder="Search by bill type..." 
               [(ngModel)]="searchTerm" 
               (ngModelChange)="onSearch()"
-              id="feed-search-input" />
+              id="bill-search-input" />
             <span class="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
               <i class="ri-search-2-fill text-sm sm:text-base"></i>
             </span>
@@ -41,25 +41,25 @@
       </div>
     </div>
 
-    <!-- Feed History -->
+    <!-- Bill History -->
     <section class="px-1 sm:px-0">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
-        <h2 class="text-base sm:text-lg font-medium text-green-800">Feed History</h2>
-        <div class="text-xs sm:text-sm text-green-600">Total: {{ feeds.length || 0 }}</div>
+        <h2 class="text-base sm:text-lg font-medium text-green-800">Bill History</h2>
+        <div class="text-xs sm:text-sm text-green-600">Total: {{ bills.length || 0 }}</div>
       </div>
 
       <!-- Loading indicator -->
       <div *ngIf="isLoading" class="text-center py-6 sm:py-8">
         <div class="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600"></div>
-        <p class="text-xs sm:text-sm text-green-600 mt-2">Loading feed history...</p>
+        <p class="text-xs sm:text-sm text-green-600 mt-2">Loading bill history...</p>
       </div>
 
       <div *ngIf="!isLoading">
-        <!-- Feed List with Date Grouping -->
-        <div *ngIf="filteredFeeds && filteredFeeds.length > 0; else noFeedData" class="space-y-4 sm:space-y-6">
+        <!-- Bill List with Date Grouping -->
+        <div *ngIf="filteredBills && filteredBills.length > 0; else noBillData" class="space-y-4 sm:space-y-6">
           
           <!-- Group by Date -->
-          <div *ngFor="let group of groupedFeeds" class="relative">
+          <div *ngFor="let group of groupedBills" class="relative">
             <!-- Date Header -->
             <div class="sticky top-14 sm:top-16 z-20 bg-green-50 py-2 sm:py-3 mb-2 sm:mb-3 border-b border-green-200">
               <div class="flex items-center gap-1.5 sm:gap-2">
@@ -69,34 +69,34 @@
               </div>
             </div>
 
-            <!-- Feed Items for this Date -->
+            <!-- Bill Items for this Date -->
             <div class="space-y-1.5 sm:space-y-2 ml-3 sm:ml-4 border-l border-green-200 pl-3 sm:pl-4">
-              <div *ngFor="let feed of group.items" 
+              <div *ngFor="let bill of group.items" 
                    class="bg-white border border-green-100 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]"
-                   (click)="openViewModal(feed)">
+                   (click)="openViewModal(bill)">
                 
                 <div class="flex items-center gap-2.5 sm:gap-3">
                   <!-- Image -->
                   <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0">
-                    <img [src]="feed.feedImage || '../../../assets/DairryFarmImg/seed-bag_12627079.png'" 
+                    <img [src]="bill.BillImage || '../../../assets/DairryFarmImg/bill_1052856.png'" 
                          class="w-full h-full object-cover"
-                         (error)="handleCardImageError(feed)">
+                         (error)="handleCardImageError(bill)">
                   </div>
 
                   <!-- Content -->
                   <div class="flex-1 min-w-0">
                     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-0">
                       <div class="flex-1 min-w-0">
-                        <!-- Feed Name -->
-                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-0.5 sm:mb-1 truncate">{{ feed.feed_name || 'N/A' }}</h4>
+                        <!-- Bill Type -->
+                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-0.5 sm:mb-1 truncate">{{ bill.animal_type || 'N/A' }}</h4>
                         
                         <!-- Price -->
-                        <p class="text-xs text-green-600 mb-1 sm:mb-2 truncate">Price: ₹{{ feed.price || '0' }}</p>
+                        <p class="text-xs text-green-600 mb-1 sm:mb-2 truncate">Price: ₹{{ bill.price || '0' }}</p>
                         
-                        <!-- Quantity -->
+                        <!-- Date -->
                         <div class="flex items-center">
                           <span class="inline-flex items-center text-xs sm:text-sm font-medium text-green-800">
-                            <i class="ri-stack-line mr-1 text-xs sm:text-sm"></i> Quantity: {{ feed.quantity || '0' }}
+                            <i class="ri-calendar-line mr-1 text-xs sm:text-sm"></i> {{ formatDateDisplay(bill.date) }}
                           </span>
                         </div>
                       </div>
@@ -107,7 +107,7 @@
                           <button
                             class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs border border-green-200 hover:bg-green-100 dropdown-toggle whitespace-nowrap"
                             type="button"
-                            [id]="'feedCardDropdown' + getFeedId(feed)"
+                            [id]="'billCardDropdown' + getBillId(bill)"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
                             <i class="ri-more-2-line sm:hidden"></i>
@@ -115,16 +115,16 @@
                           </button>
 
                           <ul class="dropdown-menu min-w-28 sm:min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                              [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(feed)">
+                              [attr.aria-labelledby]="'billCardDropdown' + getBillId(bill)">
                             <li>
                               <a class="dropdown-item flex items-center gap-2 text-green-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-green-50 text-xs sm:text-sm"
-                                 href="javascript:void(0);" (click)="openEditModal(feed)">
+                                 href="javascript:void(0);" (click)="openEditModal(bill)">
                                 <i class="ri-edit-line text-xs sm:text-sm"></i> Edit
                               </a>
                             </li>
                             <li>
                               <a class="dropdown-item flex items-center gap-2 text-red-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-red-50 text-xs sm:text-sm"
-                                 href="javascript:void(0);" (click)="openDeleteModal(feed)">
+                                 href="javascript:void(0);" (click)="openDeleteModal(bill)">
                                 <i class="ri-delete-bin-line text-xs sm:text-sm"></i> Delete
                               </a>
                             </li>
@@ -139,13 +139,13 @@
           </div>
         </div>
 
-        <ng-template #noFeedData>
+        <ng-template #noBillData>
           <div class="text-center py-8 sm:py-12 bg-white rounded-xl border border-green-100 mx-1 sm:mx-0">
             <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
-              <i class="ri-seedling-line text-xl sm:text-2xl text-green-400"></i>
+              <i class="ri-bill-line text-xl sm:text-2xl text-green-400"></i>
             </div>
-            <h3 class="text-base sm:text-lg font-medium text-green-900 mb-1.5 sm:mb-2">No Feed Found</h3>
-            <p class="text-xs sm:text-sm text-green-600 px-4">Start adding feed records to see your history here.</p>
+            <h3 class="text-base sm:text-lg font-medium text-green-900 mb-1.5 sm:mb-2">No Bill Found</h3>
+            <p class="text-xs sm:text-sm text-green-600 px-4">Start adding bill records to see your history here.</p>
           </div>
         </ng-template>
       </div>
@@ -153,8 +153,8 @@
   </div>
 </main>
 
-<!-- Feed Modal (Add/Edit/Delete) -->
-<div class="modal fade custom-modal-fade" #feedModal tabindex="-1" aria-labelledby="feedFormModalLabel"
+<!-- Bill Modal (Add/Edit/Delete) -->
+<div class="modal fade custom-modal-fade" #billModal tabindex="-1" aria-labelledby="billFormModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
     <div class="modal-content custom-modal-content">
@@ -164,9 +164,9 @@
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
             class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-2 sm:mr-3 flex-shrink-0"
             (click)="openImagePreview()" title="Click to view full image">
-            <img [src]="feedForm.get('feedImage')?.value || '../../../assets/DairryFarmImg/seed-bag_12627079.png'"
-              alt="Feed Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain" 
-              (error)="feedForm.get('feedImage')?.setValue('../../../assets/DairryFarmImg/seed-bag_12627079.png')" />
+            <img [src]="billForm.get('BillImage')?.value || '../../../assets/DairryFarmImg/bill_1052856.png'"
+              alt="Bill Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain" 
+              (error)="billForm.get('BillImage')?.setValue('../../../assets/DairryFarmImg/bill_1052856.png')" />
           </div>
 
           <div class="flex items-center min-w-0">
@@ -176,8 +176,8 @@
               <i class="ri-delete-bin-line text-xl sm:text-2xl" *ngIf="modalMode === 'delete'"></i>
             </div>
             <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
-              {{ modalMode === 'add' ? 'Add Feed' :
-              modalMode === 'edit' ? 'Edit Feed' : 'Delete Feed' }}
+              {{ modalMode === 'add' ? 'Add Bill' :
+              modalMode === 'edit' ? 'Edit Bill' : 'Delete Bill' }}
             </h5>
           </div>
         </div>
@@ -187,261 +187,119 @@
       </div>
 
       <div class="modal-body custom-modal-body">
-        <form [formGroup]="feedForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
+        <form [formGroup]="billForm" (ngSubmit)="submitBill()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
+            
+            <!-- Image Upload Section -->
+            <div class="custom-form-group" *ngIf="modalMode !== 'delete'">
+              <div class="mb-3 sm:mb-4">
+                <label class="block text-xs sm:text-sm font-medium text-green-700 mb-1.5 sm:mb-2">
+                  <i class="ri-image-line mr-1.5 sm:mr-2"></i>Upload Bill Image
+                </label>
+                
+                <!-- Image Preview -->
+                <div class="flex flex-col items-center">
+                  <!-- Preview Container -->
+                  <div class="relative mb-3 sm:mb-4">
+                    <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
+                      <img [src]="imagePreview || billForm.get('BillImage')?.value || '../../../assets/DairryFarmImg/bill_1052856.png'"
+                           alt="Preview" 
+                           class="w-full h-full object-contain p-1.5 sm:p-2"
+                           (error)="imagePreview = '../../../assets/DairryFarmImg/bill_1052856.png'">
+                      
+                      <!-- Default icon when no image -->
+                      <div *ngIf="!imagePreview && !billForm.get('BillImage')?.value" 
+                           class="text-green-300 text-3xl sm:text-5xl">
+                        <i class="ri-image-line"></i>
+                      </div>
+                    </div>
+                    
+                    <!-- Remove button -->
+                    <button *ngIf="imagePreview || billForm.get('BillImage')?.value" 
+                            type="button"
+                            class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            (click)="removeImage()">
+                      <i class="ri-close-line"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- File Input -->
+                  <div class="relative w-full">
+                    <input type="file" 
+                           id="imageUpload"
+                           class="hidden"
+                           accept="image/*"
+                           (change)="onImageSelected($event)"
+                           #fileInput
+                           [disabled]="isSaving || isUpdating || isDeleting">
+                    
+                    <button type="button"
+                            class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-xs sm:text-sm w-full sm:w-auto justify-center"
+                            (click)="fileInput.click()"
+                            [disabled]="isSaving || isUpdating || isDeleting">
+                      <i class="ri-upload-cloud-line"></i>
+                      <span class="truncate">{{ imagePreview || billForm.get('BillImage')?.value ? 'Change Image' : 'Choose Image' }}</span>
+                    </button>
+                    
+                    <p class="text-xs text-green-500 mt-1.5 sm:mt-2 text-center">
+                      Supported formats: JPG, PNG, GIF. Max size: 1MB
+                    </p>
+                    
+                    <!-- Loading indicator for image -->
+                    <div *ngIf="isUploadingImage" class="mt-1.5 sm:mt-2">
+                      <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+                        <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-xs sm:text-sm text-green-600">Uploading image...</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Error message -->
+                    <div *ngIf="imageError" class="mt-1.5 sm:mt-2">
+                      <p class="text-xs sm:text-sm text-red-600 text-center">{{ imageError }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Date -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
-                <input type="date" id="feed-date" class="form-control" formControlName="date" placeholder="Date"
+                <input type="date" id="bill-date" class="form-control" formControlName="date" placeholder="Date"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting" 
                   [disabled]="isSaving || isUpdating || isDeleting" />
-                <label for="feed-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1 text-xs" *ngIf="submitted && feedForm.get('date')?.invalid">
-                  <small *ngIf="feedForm.get('date')?.errors?.['required']">Date is required.</small>
+                <label for="bill-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1 text-xs" *ngIf="submitted && billForm.get('date')?.invalid">
+                  <small *ngIf="billForm.get('date')?.errors?.['required']">Date is required.</small>
                 </div>
               </div>
             </div>
 
-            <!-- Feed Search -->
-            <div class="custom-form-group position-relative">
-              <div class="form-floating form-floating-outline mb-0">
-                <input #feedInput id="feed-search-input" type="text" class="form-control branch-input" name="feedSearch"
-                  [(ngModel)]="selectedFeedName" (input)="onFeedSearch($event)" (focus)="showFeedDropdown = true"
-                  autocomplete="off" placeholder="Select Feed" 
-                  [ngModelOptions]="{standalone: true}"
+            <!-- Bill Type -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
+                <input type="text" id="bill-type" class="form-control" formControlName="animal_type"
+                  placeholder="Bill Type" 
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" />
-
-                <label for="feed-search-input">
-                  <i class="ri-box-3-line"></i>
-                  Feed Name <span class="text-danger">*</span>
-                </label>
-
-                <!-- Hidden input for feed_id -->
-                <input type="hidden" formControlName="feed_id" />
-                <input type="hidden" formControlName="feed_name" />
-
-                <!-- CARET -->
-                <button type="button" class="dropdown-caret-button" (click)="toggleFeedDropdown()"
-                  aria-label="Toggle Feeds"
-                  [disabled]="modalMode === 'delete' || isSaving || isUpdating || isDeleting">
-                  <i [ngClass]="showFeedDropdown ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                </button>
-              </div>
-
-              <!-- DROPDOWN LIST -->
-              <div class="dropdown-panel" *ngIf="showFeedDropdown" (click)="$event.stopPropagation()">
-                <div class="dropdown-list-container">
-                  <!-- Loading state -->
-                  <div *ngIf="loadingFeedOptions" class="dropdown-loading">
-                    <div class="spinner-border text-primary spinner-sm"></div>
-                    <span class="loading-text">Loading feeds...</span>
-                  </div>
-
-                  <!-- Feed options -->
-                  <div *ngIf="!loadingFeedOptions && feedOptions.length > 0" class="dropdown-items-wrapper">
-                    <div class="dropdown-item" *ngFor="let feed of feedOptions" (click)="selectFeed(feed)"
-                      [class.dropdown-item-selected]="selectedFeedId === feed.feedId">
-                      <div class="dropdown-item-content">
-                        <!-- FEED NAME -->
-                        <div class="item-name truncate text-sm">
-                          {{ feed.feedName }}
-                        </div>
-
-                        <!-- FEED META -->
-                        <div class="item-meta truncate text-xs">
-                          ID: {{ feed.feedId }}
-                        </div>
-                      </div>
-
-                      <!-- CHECK ICON -->
-                      <i class="ri-check-line dropdown-check-icon text-sm" *ngIf="selectedFeedId === feed.feedId"></i>
-                    </div>
-                  </div>
-
-                  <!-- EMPTY STATE -->
-                  <div class="dropdown-empty-state" *ngIf="!loadingFeedOptions && feedOptions.length === 0">
-                    <i class="ri-search-line empty-icon"></i>
-                    <div class="empty-text text-sm">
-                      {{ selectedFeedName ? 'No feeds found for "' + selectedFeedName + '"' : 'Start typing to search feeds' }}
-                    </div>
-                  </div>
+                <label for="bill-type"><i class="ri-bill-line"></i>Bill Type <span class="text-danger">*</span></label>
+                <div class="text-danger mt-1 text-xs" *ngIf="submitted && billForm.get('animal_type')?.invalid">
+                  <small *ngIf="billForm.get('animal_type')?.errors?.['required']">Bill type is required.</small>
                 </div>
               </div>
             </div>
-<style>
-              /* Dropdown Panel */
-              .dropdown-panel {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 6px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                margin-top: 4px;
-                max-height: 300px;
-                overflow-y: auto;
-              }
 
-              .dropdown-list-container {
-                padding: 8px;
-              }
-
-              /* Loading State */
-              .dropdown-loading {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-                gap: 12px;
-              }
-
-              .spinner-sm {
-                width: 18px;
-                height: 18px;
-                border-width: 2px;
-              }
-
-              .loading-text {
-                color: #6b7280;
-                font-size: 14px;
-              }
-
-              /* Dropdown Items */
-              .dropdown-items-wrapper {
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
-              }
-
-              .dropdown-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 10px 12px;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: all 0.2s ease;
-              }
-
-              .dropdown-item:hover {
-                background-color: #f3f4f6;
-              }
-
-              .dropdown-item-selected {
-                background-color: #eff6ff;
-                border-left: 3px solid #3b82f6;
-              }
-
-              .dropdown-item-content {
-                flex: 1;
-                min-width: 0;
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
-              }
-
-              .item-name {
-                font-size: 14px;
-                font-weight: 500;
-                color: #111827;
-              }
-
-              .item-meta {
-                font-size: 12px;
-                color: #6b7280;
-              }
-
-              .truncate {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-              }
-
-              /* Check Icon */
-              .dropdown-check-icon {
-                color: #10b981;
-                font-size: 18px;
-                margin-left: 8px;
-              }
-
-              /* Empty State */
-              .dropdown-empty-state {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 32px 16px;
-                text-align: center;
-                color: #6b7280;
-              }
-
-              .empty-icon {
-                font-size: 24px;
-                margin-bottom: 8px;
-                color: #9ca3af;
-              }
-
-              .empty-text {
-                font-size: 14px;
-              }
-
-              /* Form Input Improvements */
-              .branch-input {
-                padding-right: 40px !important;
-              }
-
-              .dropdown-caret-button {
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: none;
-                border: none;
-                color: #6b7280;
-                cursor: pointer;
-                padding: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10;
-              }
-
-              .dropdown-caret-button:hover {
-                color: #374151;
-              }
-            </style>
-            
             <!-- Price -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
-                <input type="number" id="feed-price" class="form-control" formControlName="price" placeholder="Price"
+                <input type="number" id="bill-price" class="form-control" formControlName="price" placeholder="Price"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" min="1" />
-                <label for="feed-price"><i class="ri-money-rupee-circle-line"></i>Price <span
+                <label for="bill-price"><i class="ri-money-rupee-circle-line"></i>Price <span
                     class="text-danger">*</span></label>
-                <div class="text-danger mt-1 text-xs" *ngIf="submitted && feedForm.get('price')?.invalid">
-                  <small *ngIf="feedForm.get('price')?.errors?.['required']">Price is required.</small>
-                  <small *ngIf="feedForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Quantity -->
-            <div class="custom-form-group">
-              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
-                <input type="number" id="feed-quantity" class="form-control" formControlName="quantity"
-                  placeholder="Quantity" 
-                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
-                  [disabled]="isSaving || isUpdating || isDeleting" min="1" />
-                <label for="feed-quantity"><i class="ri-stack-line"></i>Quantity <span class="text-danger">*</span></label>
-                <div class="text-danger mt-1 text-xs" *ngIf="submitted && feedForm.get('quantity')?.invalid">
-                  <small *ngIf="feedForm.get('quantity')?.errors?.['required']">Quantity is required.</small>
-                  <small *ngIf="feedForm.get('quantity')?.errors?.['min']">Quantity must be at least 1.</small>
+                <div class="text-danger mt-1 text-xs" *ngIf="submitted && billForm.get('price')?.invalid">
+                  <small *ngIf="billForm.get('price')?.errors?.['required']">Price is required.</small>
+                  <small *ngIf="billForm.get('price')?.errors?.['min']">Price must be at least 1.</small>
                 </div>
               </div>
             </div>
@@ -449,10 +307,10 @@
             <!-- Delete Reason -->
             <div class="custom-form-group" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
-                <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
+                <input type="text" id="deleteBillReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}"
                   [disabled]="isDeleting" />
-                <label for="deleteFeedReason"><i class="ri-chat-3-line"></i>Delete Reason <span
+                <label for="deleteBillReason"><i class="ri-chat-3-line"></i>Delete Reason <span
                     class="text-danger">*</span></label>
               </div>
               <div class="text-danger mt-1 text-xs" *ngIf="submitted && !deleteReason">
@@ -472,7 +330,7 @@
             
             <!-- Save Button with loading -->
             <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
-                    [disabled]="isSaving || feedForm.invalid">
+                    [disabled]="isSaving || billForm.invalid">
               <span *ngIf="!isSaving">
                 <i class="ri-save-line"></i> Save
               </span>
@@ -484,7 +342,7 @@
             
             <!-- Update Button with loading -->
             <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
-                    [disabled]="isUpdating || feedForm.invalid">
+                    [disabled]="isUpdating || billForm.invalid">
               <span *ngIf="!isUpdating">
                 <i class="ri-edit-line"></i> Update
               </span>
@@ -512,8 +370,8 @@
   </div>
 </div>
 
-<!-- View Feed Modal -->
-<div class="modal fade custom-modal-fade" #viewModal tabindex="-1" aria-labelledby="viewFeedModalLabel"
+<!-- View Bill Modal -->
+<div class="modal fade custom-modal-fade" #viewModal tabindex="-1" aria-labelledby="viewBillModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm sm:modal-md custom-modal-dialog">
     <div class="modal-content custom-modal-content">
@@ -522,10 +380,10 @@
         <div class="modal-title-wrapper flex items-center">
           <div class="flex items-center min-w-0">
             <div class="modal-icon mr-1.5 sm:mr-2">
-              <i class="ri-seedling-line text-xl sm:text-2xl text-blue-600"></i>
+              <i class="ri-bill-line text-xl sm:text-2xl text-blue-600"></i>
             </div>
             <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
-              Feed Details
+              Bill Details
             </h5>
           </div>
         </div>
@@ -534,7 +392,7 @@
       </div>
 
       <div class="modal-body custom-modal-body">
-        <div *ngIf="selectedFeedView" class="space-y-3 sm:space-y-4">
+        <div *ngIf="selectedBillView" class="space-y-3 sm:space-y-4">
           
           <!-- Image Preview -->
           <div class="text-center">
@@ -546,7 +404,7 @@
               
               <!-- Actual image -->
               <img [src]="viewImageUrl" 
-                   alt="Feed Image" 
+                   alt="Bill Image" 
                    class="w-full h-full object-contain p-1.5 sm:p-2 transition-opacity duration-300"
                    (error)="handleViewImageError()"
                    [class.opacity-0]="isLoadingImage"
@@ -562,26 +420,20 @@
               <div>
                 <label class="block text-xs font-medium text-blue-600 mb-1">Date</label>
                 <p class="text-sm text-blue-900">
-                  {{ formatDateForView(selectedFeedView.date) }}
+                  {{ formatDateForView(selectedBillView.date) }}
                 </p>
               </div>
 
-              <!-- Feed Name -->
+              <!-- Bill Type -->
               <div>
-                <label class="block text-xs font-medium text-blue-600 mb-1">Feed Name</label>
-                <p class="text-base sm:text-lg font-semibold text-blue-900">{{ selectedFeedView.feed_name || 'N/A' }}</p>
+                <label class="block text-xs font-medium text-blue-600 mb-1">Bill Type</label>
+                <p class="text-base sm:text-lg font-semibold text-blue-900">{{ selectedBillView.animal_type || 'N/A' }}</p>
               </div>
 
-              <!-- Feed Details -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                <div>
-                  <label class="block text-xs font-medium text-blue-600 mb-1">Price</label>
-                  <p class="text-sm text-blue-900 truncate">₹{{ selectedFeedView.price || '0' }}</p>
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-blue-600 mb-1">Quantity</label>
-                  <p class="text-sm text-blue-900 truncate">{{ selectedFeedView.quantity || '0' }}</p>
-                </div>
+              <!-- Price -->
+              <div>
+                <label class="block text-xs font-medium text-blue-600 mb-1">Price</label>
+                <p class="text-sm text-blue-900 truncate">₹{{ selectedBillView.price || '0' }}</p>
               </div>
 
             </div>
@@ -606,9 +458,9 @@
       <div class="modal-body p-0 position-relative">
         <!-- Large Image -->
         <div class="flex justify-center items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
-          <img [src]="previewImageUrl" alt="Feed Image Preview"
+          <img [src]="previewImageUrl" alt="Bill Image Preview"
             class="max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] rounded-lg shadow-2xl" 
-            (error)="previewImageUrl = '../../../assets/DairryFarmImg/seed-bag_12627079.png'" />
+            (error)="previewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png'" />
         </div>
 
         <!-- Close Button -->

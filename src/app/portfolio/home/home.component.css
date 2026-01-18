@@ -1,0 +1,48 @@
+/* Navigation Menu Styles */
+.suyash-menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.suyash-menu-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.suyash-menu-item:active {
+  transform: translateY(0);
+}
+
+/* Prevent text selection */
+.suyash-menu-item span {
+  user-select: none;
+}
+
+/* Ensure video doesn't interfere with clicks */
+#suyash-video-container {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+#suyash-container {
+  position: relative;
+  z-index: 1;
+}

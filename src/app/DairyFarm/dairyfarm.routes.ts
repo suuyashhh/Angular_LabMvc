@@ -31,5 +31,20 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/medicien/medicien.component')
         .then(m => m.MedicienComponent)
  },
+ {
+    path:'OtherFeed',
+    loadComponent:()=> import('../DairyFarm/other-feed/other-feed.component')
+        .then(m => m.OtherFeedComponent)
+ },
+ {
+    path:'Bill',
+    loadComponent:()=> import('../DairyFarm/dairy-bill/dairy-bill.component')
+        .then(m => m.DairyBillComponent)
+ },
+ {
+    path:'History',
+    loadComponent:()=> import('../DairyFarm/history-dairy/history-dairy.component')
+        .then(m => m.HistoryDairyComponent)
+ },
   
 ];

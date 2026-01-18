@@ -11,17 +11,17 @@ import { AuthService } from '../../shared/auth.service';
 import { LoaderService } from '../../services/loader.service';
 
 @Component({
-  selector: 'app-feeds',
+  selector: 'app-other-feed',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
-  templateUrl: './feeds.component.html',
-  styleUrls: ['./feeds.component.css']
+  templateUrl: './other-feed.component.html',
+  styleUrl: './other-feed.component.css'
 })
-export class FeedsComponent implements OnInit, OnDestroy {
+export class OtherFeedComponent implements OnInit, OnDestroy {
   @ViewChild('feedModal') feedModal!: ElementRef;
   @ViewChild('viewModal') viewModal!: ElementRef;
-  @ViewChild('feedInput') feedInput!: ElementRef;
   @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+  @ViewChild('fileInput') fileInput!: ElementRef;
 
   // Form
   feedForm!: FormGroup;
@@ -30,15 +30,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
   feeds: any[] = [];
   filteredFeeds: any[] = [];
   groupedFeeds: { date: string; items: any[] }[] = [];
-
-  // Feed dropdown
-  feedOptions: any[] = [];
-  selectedFeedId: number = 0;
-  selectedFeedName: string = '';
-  feedSearchTerm: string = '';
-  showFeedDropdown: boolean = false;
-  loadingFeedOptions: boolean = false;
-  feedSearchTimeout: any;
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
@@ -58,7 +49,11 @@ export class FeedsComponent implements OnInit, OnDestroy {
   dairyUserId: number = 0;
   isLoading: boolean = false;
 
-  // Image Preview
+  // Image Upload
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  isUploadingImage: boolean = false;
+  imageError: string = '';
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
 
@@ -85,18 +80,14 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.dairyUserId = this.getDairyUserId();
     this.initForm();
     this.loadFeeds();
-    this.loadFeedOptions();
   }
 
   ngOnDestroy(): void {
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
-    }
+    // Cleanup if needed
   }
 
   initForm(): void {
     this.feedForm = new FormGroup({
-      feed_id: new FormControl('', [Validators.required]),
       feed_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       quantity: new FormControl('', [Validators.required, Validators.min(1)]),
@@ -112,11 +103,152 @@ export class FeedsComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
+  // ==================== IMAGE UPLOAD METHODS ====================
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    // Validate file size (1MB max)
+    if (file.size > 1 * 1024 * 1024) {
+      this.imageError = 'Image size should be less than 1MB';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      this.imageError = 'Only JPG, PNG, and GIF images are allowed';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    this.imageError = '';
+    this.selectedFile = file;
+
+    // Create preview and compress if needed
+    this.compressAndPreviewImage(file);
+  }
+
+  compressAndPreviewImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.src = e.target.result;
+
+      img.onload = () => {
+        // Create canvas for compression
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          this.createBasicPreview(file);
+          return;
+        }
+
+        // Set maximum dimensions
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Get compressed base64 with quality 0.7 (70% quality)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        this.imagePreview = compressedBase64;
+      };
+
+      img.onerror = () => {
+        this.createBasicPreview(file);
+      };
+    };
+
+    reader.onerror = () => {
+      this.imageError = 'Failed to read image file';
+      this.selectedFile = null;
+      this.imagePreview = null;
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  createBasicPreview(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.feedForm.patchValue({ feedImage: '' });
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  async uploadImage(): Promise<string> {
+    if (!this.selectedFile) {
+      return this.feedForm.get('feedImage')?.value || '';
+    }
+
+    this.isUploadingImage = true;
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const base64Image = reader.result as string;
+        this.isUploadingImage = false;
+        resolve(base64Image);
+      };
+
+      reader.onerror = () => {
+        this.isUploadingImage = false;
+        reject('Failed to read image file');
+      };
+
+      reader.readAsDataURL(this.selectedFile!);
+    });
+  }
+
   // ==================== IMAGE PREVIEW METHODS ====================
   openImagePreview(): void {
-    const imageUrl = this.feedForm.get('feedImage')?.value;
-    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    const imageUrl = this.feedForm.get('feedImage')?.value || this.imagePreview;
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+    this.isImagePreviewOpen = true;
+    this.showImagePreviewModal();
+  }
 
+  previewCardImage(feed: any): void {
+    this.previewImageUrl = feed.feedImage || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
     this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
   }
@@ -154,65 +286,70 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   handleCardImageError(feed: any): void {
-    feed.feedImage = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    feed.feedImage = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
   }
 
   // ==================== VIEW MODAL METHODS ====================
-  openViewModal(feed: any): void {
+  async openViewModal(feed: any): Promise<void> {
     this.selectedFeedView = feed;
-    
+
     // Reset loading state
     this.isLoadingImage = true;
-    
+
     // Initially show default image
-    this.viewImageUrl = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
-    
+    this.viewImageUrl = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
+
     // Show the modal immediately
     this.showViewModal();
-    
+
     // Now fetch the actual image from API
-    this.loadFeedImageForView(feed);
+    await this.loadFeedImageForView(feed);
   }
 
   loadFeedImageForView(feed: any): void {
     const expenseId = feed.expense_id;
-    
+
     if (!expenseId) {
       console.error('No expense_id found for feed:', feed);
       this.isLoadingImage = false;
       return;
     }
-    
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
-      next: (response: any) => {
-        // Try different possible property names for the image
-        const image = response?.feedImage || response?.FeedImage || response?.feedImageUrl || response?.imageUrl;
-        
-        if (image && image.trim() !== '') {
-          // Update the view image URL with the actual image from API
-          this.viewImageUrl = image;
-          
-          // Also update the selected feed object for consistency
-          if (this.selectedFeedView) {
-            this.selectedFeedView.feedImage = image;
+
+    this.loader.show();
+
+    this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
+      .pipe(finalize(() => {
+        this.loader.hide();
+        this.isLoadingImage = false;
+      }))
+      .subscribe({
+        next: (response: any) => {
+          // Try different possible property names for the image
+          const image = response?.feedImage || response?.FeedImage || response?.feedImageUrl || response?.imageUrl;
+
+          if (image && image.trim() !== '') {
+            // Update the view image URL with the actual image from API
+            this.viewImageUrl = image;
+
+            // Also update the selected feed object for consistency
+            if (this.selectedFeedView) {
+              this.selectedFeedView.feedImage = image;
+            }
+          } else {
+            console.warn('No image found for feed ID:', expenseId);
+            // Keep the default image
           }
-        } else {
-          console.warn('No image found for feed ID:', expenseId);
-          // Keep the default image
+        },
+        error: (error: any) => {
+          console.error('Failed to load feed image:', error);
+          this.toastr.error("Failed to load feed image");
         }
-        this.isLoadingImage = false;
-      },
-      error: (error: any) => {
-        console.error('Failed to load feed image:', error);
-        this.toastr.error("Failed to load feed image");
-        this.isLoadingImage = false;
-      }
-    });
+      });
   }
 
   handleViewImageError(): void {
     // If the image fails to load, show default image
-    this.viewImageUrl = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    this.viewImageUrl = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
     this.isLoadingImage = false;
   }
 
@@ -225,7 +362,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset view modal data
     this.selectedFeedView = null;
     this.viewImageUrl = '';
@@ -247,77 +384,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ==================== FEED DROPDOWN METHODS ====================
-  loadFeedOptions(searchTerm: string = ''): void {
-    if (!this.dairyUserId) return;
-
-    this.loadingFeedOptions = true;
-
-    this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
-      next: (response: any) => {
-        let feeds = Array.isArray(response) ? response : [];
-
-        if (searchTerm.trim()) {
-          const term = searchTerm.toLowerCase();
-          feeds = feeds.filter(feed =>
-            feed.feedName?.toLowerCase().includes(term)
-          );
-        }
-
-        this.feedOptions = feeds;
-        this.loadingFeedOptions = false;
-      },
-      error: (error: any) => {
-        console.error('Failed to load feed options:', error);
-        this.feedOptions = [];
-        this.loadingFeedOptions = false;
-      }
-    });
-  }
-
-  onFeedSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.feedSearchTerm = input.value;
-
-    if (this.feedSearchTimeout) {
-      clearTimeout(this.feedSearchTimeout);
-    }
-
-    this.feedSearchTimeout = setTimeout(() => {
-      this.loadFeedOptions(this.feedSearchTerm);
-    }, 300);
-  }
-
-  selectFeed(feed: any): void {
-    this.selectedFeedId = feed.feedId;
-    this.selectedFeedName = feed.feedName;
-    this.showFeedDropdown = false;
-
-    this.feedForm.patchValue({
-      feed_id: feed.feedId,
-      feed_name: feed.feedName
-    });
-  }
-
-  toggleFeedDropdown(): void {
-    this.showFeedDropdown = !this.showFeedDropdown;
-    if (this.showFeedDropdown && this.feedOptions.length === 0) {
-      this.loadFeedOptions();
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (!this.showFeedDropdown) return;
-    
-    const target = event.target as HTMLElement;
-    const isClickInside = this.feedInput?.nativeElement?.contains(target);
-    
-    if (!isClickInside) {
-      this.showFeedDropdown = false;
-    }
-  }
-
   // ==================== MODAL METHODS ====================
   openAddModal(): void {
     this.modalMode = 'add';
@@ -328,19 +394,19 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.isUpdating = false;
     this.isDeleting = false;
 
-    this.selectedFeedId = 0;
-    this.selectedFeedName = '';
-    this.feedSearchTerm = '';
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
 
     this.feedForm.reset();
     this.feedForm.patchValue({
       date: this.getTodayDate(),
-      feed_id: '',
       feed_name: '',
+      price: '',
+      quantity: '',
       feedImage: ''
     });
 
-    this.loadFeedOptions();
     this.showModal();
   }
 
@@ -360,21 +426,23 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
 
     this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
+      feed_name: feed.feed_name || '',
       price: feed.price,
       quantity: feed.quantity,
       date: this.formatDateForInput(feed.date),
       feedImage: feed.feedImage || ''
     });
 
+    // Show loader before API call to get image
     this.loader.show();
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
+    // Call API to get the image by ID
+    this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
@@ -408,21 +476,22 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.selectedFeedId = feed.feed_id || feed.feedId || 0;
-    this.selectedFeedName = feed.feed_name || feed.feedName || '';
+    this.selectedFile = null;
+    this.imagePreview = null;
 
     this.feedForm.patchValue({
-      feed_id: this.selectedFeedId,
-      feed_name: this.selectedFeedName,
+      feed_name: feed.feed_name || '',
       price: feed.price,
       quantity: feed.quantity,
       date: this.formatDateForInput(feed.date),
       feedImage: feed.feedImage || ''
     });
 
+    // Show loader before API call to get image
     this.loader.show();
 
-    this.api.get(`Feeds/GetFeedImageById/${expenseId}`)
+    // Call API to get the image by ID
+    this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (res: any) => {
@@ -449,6 +518,11 @@ export class FeedsComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
+
+    // Reset image upload state
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = '';
   }
 
   showModal(): void {
@@ -513,7 +587,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.loader.show();
 
-    this.api.get(`Feeds/History/${this.dairyUserId}`)
+    this.api.get(`OtherFeeds/History/${this.dairyUserId}`)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isLoading = false;
@@ -534,7 +608,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       });
   }
 
-  submitFeed(): void {
+  async submitFeed(): Promise<void> {
     this.submitted = true;
 
     if (this.modalMode === 'delete') {
@@ -551,53 +625,62 @@ export class FeedsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.selectedFeedId) {
-      this.toastr.error('Please select a feed from the dropdown');
-      return;
-    }
+    try {
+      // Use the compressed preview image if available
+      if (this.imagePreview) {
+        this.feedForm.patchValue({ feedImage: this.imagePreview });
+      } else if (this.selectedFile) {
+        // Fallback to regular upload if no preview
+        const base64Image = await this.uploadImage();
+        this.feedForm.patchValue({ feedImage: base64Image });
+      }
 
-    if (this.modalMode === 'add') {
-      this.addFeed();
-    } else if (this.modalMode === 'edit') {
-      this.updateFeed();
+      if (this.modalMode === 'add') {
+        await this.addFeed();
+      } else if (this.modalMode === 'edit') {
+        await this.updateFeed();
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      this.toastr.error('Failed to upload image');
     }
   }
 
-  addFeed(): void {
+  async addFeed(): Promise<void> {
     this.isSaving = true;
 
     const payload = {
       user_id: this.dairyUserId,
-      feed_id: this.selectedFeedId,
-      expense_name: 'Feeds',
-      feed_name: this.selectedFeedName,
+      feed_id: 0,
+      expense_name: 'OtherFeeds',
+      feed_name: this.feedForm.value.feed_name,
       price: Number(this.feedForm.value.price),
-      quantity: Number(this.feedForm.value.quantity),
+      quantity: this.feedForm.value.quantity,
       date: this.formatDateForAPI(this.feedForm.value.date),
       feedImage: this.feedForm.value.feedImage || ''
     };
 
     this.loader.show();
 
-    this.api.post('Feeds/Save', payload)
+    this.api.post('OtherFeeds/Save', payload)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isSaving = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed saved successfully');
+          this.toastr.success('Other Feed saved successfully');
           this.closeModal();
           this.loadFeeds();
         },
         error: (error: any) => {
           console.error('Save error:', error);
-          this.toastr.error('Failed to save feed');
+          this.toastr.error('Failed to save other feed');
         }
       });
   }
 
-  updateFeed(): void {
+  async updateFeed(): Promise<void> {
     if (!this.selectedFeed?.expense_id) {
       this.toastr.error('Invalid feed data');
       return;
@@ -608,31 +691,31 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const payload = {
       expense_id: this.selectedFeed.expense_id,
       user_id: this.dairyUserId,
-      feed_id: this.selectedFeedId,
-      expense_name: 'Feeds',
-      feed_name: this.selectedFeedName,
+      feed_id: 0,
+      expense_name: 'OtherFeeds',
+      feed_name: this.feedForm.value.feed_name,
       price: Number(this.feedForm.value.price),
-      quantity: Number(this.feedForm.value.quantity),
+      quantity: this.feedForm.value.quantity,
       date: this.formatDateForAPI(this.feedForm.value.date),
       feedImage: this.feedForm.value.feedImage || ''
     };
 
     this.loader.show();
 
-    this.api.put('Feeds/Edit', payload)
+    this.api.put('OtherFeeds/Edit', payload)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isUpdating = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed updated successfully');
+          this.toastr.success('Other Feed updated successfully');
           this.closeModal();
           this.loadFeeds();
         },
         error: (error: any) => {
           console.error('Update error:', error);
-          this.toastr.error('Failed to update feed');
+          this.toastr.error('Failed to update other feed');
         }
       });
   }
@@ -647,26 +730,26 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.loader.show();
 
-    this.api.delete(`Feeds/${this.selectedFeed.expense_id}`)
+    this.api.delete(`OtherFeeds/${this.selectedFeed.expense_id}`)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isDeleting = false;
       }))
       .subscribe({
         next: () => {
-          this.toastr.success('Feed deleted successfully');
+          this.toastr.success('Other Feed deleted successfully');
           this.closeModal();
           this.loadFeeds();
         },
         error: (error: any) => {
           console.error('Delete error:', error);
-          this.toastr.error('Failed to delete feed');
+          this.toastr.error('Failed to delete other feed');
         }
       });
   }
 
   getFeedId(feed: any): number {
-    return feed.FeedId ?? feed.feed_id ?? feed.feedId ?? feed.id ?? 0;
+    return feed.expense_id ?? 0;
   }
 
   // ==================== SEARCH & FILTER ====================
