@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { authGuard } from './shared/auth.guard';
+import { LogindairyComponent } from './LoginDairFarm/logindairy/logindairy.component';
+import { dairyAuthGuard } from './shared/dairy-auth.guard';
 
 export const routes: Routes = [
 
   { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
   { path: 'lab', component: LoginComponent },
 
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'dairyfarm', component: LogindairyComponent},
 
   {
     path: 'portfolio',
@@ -20,6 +22,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./labadmin/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./labadmin/labadmin.routes').then(m => m.lABADMIN_ROUTES)
+  },
+  {
+    path: 'SDF',
+    canActivate: [dairyAuthGuard],
+    loadComponent: () => import('./DairyFarm/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./DairyFarm/dairyfarm.routes').then(m => m.DAIRYFARM_ROUTES)
   },
   {
     path: 'ADMIN',
