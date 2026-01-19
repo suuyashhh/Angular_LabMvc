@@ -1,7 +1,9 @@
 <!-- Page Header -->
 <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
-  <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
-    <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Bill Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+  <div
+    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
+    <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Bill Icon"
+      class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
   </div>
 
   <div class="min-w-0">
@@ -19,19 +21,17 @@
           <button type="button"
             class="inline-flex items-center gap-1.5 sm:gap-2 bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
             (click)="openAddModal()">
-            <i class="ri-add-box-fill text-sm sm:text-base"></i> 
+            <i class="ri-add-box-fill text-sm sm:text-base"></i>
             <span class="truncate">Add Bill</span>
           </button>
         </div>
 
         <div class="w-full sm:w-auto sm:flex-1 sm:ml-auto">
           <div class="relative">
-            <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
-                     py-1.5 sm:py-2 pl-9 sm:pl-10 pr-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" 
-                     type="search"
-              placeholder="Search by bill type..." 
-              [(ngModel)]="searchTerm" 
-              (ngModelChange)="onSearch()"
+            <input
+              class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+                     py-1.5 sm:py-2 pl-9 sm:pl-10 pr-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
+              type="search" placeholder="Search by bill type..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"
               id="bill-search-input" />
             <span class="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
               <i class="ri-search-2-fill text-sm sm:text-base"></i>
@@ -57,7 +57,7 @@
       <div *ngIf="!isLoading">
         <!-- Bill List with Date Grouping -->
         <div *ngIf="filteredBills && filteredBills.length > 0; else noBillData" class="space-y-4 sm:space-y-6">
-          
+
           <!-- Group by Date -->
           <div *ngFor="let group of groupedBills" class="relative">
             <!-- Date Header -->
@@ -71,60 +71,67 @@
 
             <!-- Bill Items for this Date -->
             <div class="space-y-1.5 sm:space-y-2 ml-3 sm:ml-4 border-l border-green-200 pl-3 sm:pl-4">
-              <div *ngFor="let bill of group.items" 
-                   class="bg-white border border-green-100 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]"
-                   (click)="openViewModal(bill)">
-                
+              <div *ngFor="let bill of group.items"
+                class="bg-white border border-green-100 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]"
+                (click)="openViewModal(bill)">
+
                 <div class="flex items-center gap-2.5 sm:gap-3">
                   <!-- Image -->
                   <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0">
-                    <img [src]="bill.BillImage || '../../../assets/DairryFarmImg/bill_1052856.png'" 
-                         class="w-full h-full object-cover"
-                         (error)="handleCardImageError(bill)">
+                    <img [src]="bill.BillImage || '../../../assets/DairryFarmImg/bill_1052856.png'"
+                      class="w-full h-full object-cover" (error)="handleCardImageError(bill)">
                   </div>
 
                   <!-- Content -->
                   <div class="flex-1 min-w-0">
-                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-0">
+                    <!-- Main row: Bill Type + Price -->
+                    <div class="flex items-start justify-between gap-2">
+                      <!-- Bill Type on left -->
                       <div class="flex-1 min-w-0">
-                        <!-- Bill Type -->
-                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-0.5 sm:mb-1 truncate">{{ bill.animal_type || 'N/A' }}</h4>
-                        
-                        <!-- Price -->
-                        <p class="text-xs text-green-600 mb-1 sm:mb-2 truncate">Price: ₹{{ bill.price || '0' }}</p>
-                        
-                        <!-- Date -->
-                        <div class="flex items-center">
-                          <span class="inline-flex items-center text-xs sm:text-sm font-medium text-green-800">
-                            <i class="ri-calendar-line mr-1 text-xs sm:text-sm"></i> {{ formatDateDisplay(bill.date) }}
-                          </span>
-                        </div>
+                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-1 truncate">{{ bill.animal_type ||
+                          'N/A' }}</h4>
                       </div>
-                      
-                      <!-- Actions Dropdown -->
-                      <div class="flex-shrink-0 mt-1 sm:mt-0 sm:ml-2 self-end sm:self-auto" (click)="$event.stopPropagation()">
+
+                      <!-- Price on right - larger and bold -->
+                      <div class="flex-shrink-0">
+                        <span class="inline-flex items-center text-green-600 font-bold text-sm sm:text-base">
+                          +₹{{ bill.price || '0' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Second row: Date + Actions -->
+                    <div class="flex items-center justify-between gap-2 mt-1.5">
+                      <!-- Date on left -->
+                      <div class="flex items-center min-w-0">
+                        <span class="inline-flex items-center text-xs text-green-800 truncate">
+                          <i class="ri-calendar-line mr-1 text-xs"></i>
+                          <span class="truncate">{{ formatDateDisplay(bill.date) }}</span>
+                        </span>
+                      </div>
+
+                      <!-- Actions Dropdown on right -->
+                      <div class="flex-shrink-0" (click)="$event.stopPropagation()">
                         <div class="dropup">
                           <button
-                            class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs border border-green-200 hover:bg-green-100 dropdown-toggle whitespace-nowrap"
-                            type="button"
-                            [id]="'billCardDropdown' + getBillId(bill)"
-                            data-bs-toggle="dropdown"
+                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-green-50 text-green-700 text-xs border border-green-200 hover:bg-green-100 dropdown-toggle whitespace-nowrap"
+                            type="button" [id]="'billCardDropdown' + getBillId(bill)" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            <i class="ri-more-2-line sm:hidden"></i>
-                            <span class="hidden sm:inline">Actions</span>
+                            <i class="ri-more-2-line"></i>
                           </button>
 
-                          <ul class="dropdown-menu min-w-28 sm:min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                              [attr.aria-labelledby]="'billCardDropdown' + getBillId(bill)">
+                          <ul
+                            class="dropdown-menu min-w-28 sm:min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
+                            [attr.aria-labelledby]="'billCardDropdown' + getBillId(bill)">
                             <li>
                               <a class="dropdown-item flex items-center gap-2 text-green-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-green-50 text-xs sm:text-sm"
-                                 href="javascript:void(0);" (click)="openEditModal(bill)">
+                                href="javascript:void(0);" (click)="openEditModal(bill)">
                                 <i class="ri-edit-line text-xs sm:text-sm"></i> Edit
                               </a>
                             </li>
                             <li>
                               <a class="dropdown-item flex items-center gap-2 text-red-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-red-50 text-xs sm:text-sm"
-                                 href="javascript:void(0);" (click)="openDeleteModal(bill)">
+                                href="javascript:void(0);" (click)="openDeleteModal(bill)">
                                 <i class="ri-delete-bin-line text-xs sm:text-sm"></i> Delete
                               </a>
                             </li>
@@ -141,7 +148,8 @@
 
         <ng-template #noBillData>
           <div class="text-center py-8 sm:py-12 bg-white rounded-xl border border-green-100 mx-1 sm:mx-0">
-            <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
+            <div
+              class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
               <i class="ri-bill-line text-xl sm:text-2xl text-green-400"></i>
             </div>
             <h3 class="text-base sm:text-lg font-medium text-green-900 mb-1.5 sm:mb-2">No Bill Found</h3>
@@ -165,7 +173,7 @@
             class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-2 sm:mr-3 flex-shrink-0"
             (click)="openImagePreview()" title="Click to view full image">
             <img [src]="billForm.get('BillImage')?.value || '../../../assets/DairryFarmImg/bill_1052856.png'"
-              alt="Bill Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain" 
+              alt="Bill Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               (error)="billForm.get('BillImage')?.setValue('../../../assets/DairryFarmImg/bill_1052856.png')" />
           </div>
 
@@ -182,77 +190,74 @@
           </div>
         </div>
 
-        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close" 
-                [disabled]="isSaving || isUpdating || isDeleting"></button>
+        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"
+          [disabled]="isSaving || isUpdating || isDeleting"></button>
       </div>
 
       <div class="modal-body custom-modal-body">
         <form [formGroup]="billForm" (ngSubmit)="submitBill()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
-            
+
             <!-- Image Upload Section -->
             <div class="custom-form-group" *ngIf="modalMode !== 'delete'">
               <div class="mb-3 sm:mb-4">
                 <label class="block text-xs sm:text-sm font-medium text-green-700 mb-1.5 sm:mb-2">
                   <i class="ri-image-line mr-1.5 sm:mr-2"></i>Upload Bill Image
                 </label>
-                
+
                 <!-- Image Preview -->
                 <div class="flex flex-col items-center">
                   <!-- Preview Container -->
                   <div class="relative mb-3 sm:mb-4">
-                    <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
-                      <img [src]="imagePreview || billForm.get('BillImage')?.value || '../../../assets/DairryFarmImg/bill_1052856.png'"
-                           alt="Preview" 
-                           class="w-full h-full object-contain p-1.5 sm:p-2"
-                           (error)="imagePreview = '../../../assets/DairryFarmImg/bill_1052856.png'">
-                      
+                    <div
+                      class="w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-2 border-dashed border-green-200 bg-green-50 flex items-center justify-center">
+                      <img
+                        [src]="imagePreview || billForm.get('BillImage')?.value || '../../../assets/DairryFarmImg/bill_1052856.png'"
+                        alt="Preview" class="w-full h-full object-contain p-1.5 sm:p-2"
+                        (error)="imagePreview = '../../../assets/DairryFarmImg/bill_1052856.png'">
+
                       <!-- Default icon when no image -->
-                      <div *ngIf="!imagePreview && !billForm.get('BillImage')?.value" 
-                           class="text-green-300 text-3xl sm:text-5xl">
+                      <div *ngIf="!imagePreview && !billForm.get('BillImage')?.value"
+                        class="text-green-300 text-3xl sm:text-5xl">
                         <i class="ri-image-line"></i>
                       </div>
                     </div>
-                    
+
                     <!-- Remove button -->
-                    <button *ngIf="imagePreview || billForm.get('BillImage')?.value" 
-                            type="button"
-                            class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                            (click)="removeImage()">
+                    <button *ngIf="imagePreview || billForm.get('BillImage')?.value" type="button"
+                      class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      (click)="removeImage()">
                       <i class="ri-close-line"></i>
                     </button>
                   </div>
-                  
+
                   <!-- File Input -->
                   <div class="relative w-full">
-                    <input type="file" 
-                           id="imageUpload"
-                           class="hidden"
-                           accept="image/*"
-                           (change)="onImageSelected($event)"
-                           #fileInput
-                           [disabled]="isSaving || isUpdating || isDeleting">
-                    
+                    <input type="file" id="imageUpload" class="hidden" accept="image/*"
+                      (change)="onImageSelected($event)" #fileInput [disabled]="isSaving || isUpdating || isDeleting">
+
                     <button type="button"
-                            class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-xs sm:text-sm w-full sm:w-auto justify-center"
-                            (click)="fileInput.click()"
-                            [disabled]="isSaving || isUpdating || isDeleting">
+                      class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-xs sm:text-sm w-full sm:w-auto justify-center"
+                      (click)="fileInput.click()" [disabled]="isSaving || isUpdating || isDeleting">
                       <i class="ri-upload-cloud-line"></i>
-                      <span class="truncate">{{ imagePreview || billForm.get('BillImage')?.value ? 'Change Image' : 'Choose Image' }}</span>
+                      <span class="truncate">{{ imagePreview || billForm.get('BillImage')?.value ? 'Change Image' :
+                        'Choose Image' }}</span>
                     </button>
-                    
+
                     <p class="text-xs text-green-500 mt-1.5 sm:mt-2 text-center">
                       Supported formats: JPG, PNG, GIF. Max size: 1MB
                     </p>
-                    
+
                     <!-- Loading indicator for image -->
                     <div *ngIf="isUploadingImage" class="mt-1.5 sm:mt-2">
                       <div class="flex items-center justify-center gap-1.5 sm:gap-2">
-                        <div class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div
+                          class="w-3 h-3 sm:w-4 sm:h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin">
+                        </div>
                         <span class="text-xs sm:text-sm text-green-600">Uploading image...</span>
                       </div>
                     </div>
-                    
+
                     <!-- Error message -->
                     <div *ngIf="imageError" class="mt-1.5 sm:mt-2">
                       <p class="text-xs sm:text-sm text-red-600 text-center">{{ imageError }}</p>
@@ -266,7 +271,7 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="date" id="bill-date" class="form-control" formControlName="date" placeholder="Date"
-                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting" 
+                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" />
                 <label for="bill-date"><i class="ri-calendar-line"></i>Date <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1 text-xs" *ngIf="submitted && billForm.get('date')?.invalid">
@@ -279,8 +284,7 @@
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="text" id="bill-type" class="form-control" formControlName="animal_type"
-                  placeholder="Bill Type" 
-                  [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
+                  placeholder="Bill Type" [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
                   [disabled]="isSaving || isUpdating || isDeleting" />
                 <label for="bill-type"><i class="ri-bill-line"></i>Bill Type <span class="text-danger">*</span></label>
                 <div class="text-danger mt-1 text-xs" *ngIf="submitted && billForm.get('animal_type')?.invalid">
@@ -308,8 +312,7 @@
             <div class="custom-form-group" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="text" id="deleteBillReason" class="form-control" placeholder="Delete Reason"
-                  [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}"
-                  [disabled]="isDeleting" />
+                  [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" [disabled]="isDeleting" />
                 <label for="deleteBillReason"><i class="ri-chat-3-line"></i>Delete Reason <span
                     class="text-danger">*</span></label>
               </div>
@@ -323,14 +326,14 @@
           <!-- Modal Footer Buttons -->
           <div class="modal-footer custom-modal-footer flex-col sm:flex-row gap-2 sm:gap-3">
             <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
-                    (click)="closeModal()"
-                    [disabled]="isSaving || isUpdating || isDeleting">
+              (click)="closeModal()" [disabled]="isSaving || isUpdating || isDeleting">
               <i class="ri-close-line"></i> Cancel
             </button>
-            
+
             <!-- Save Button with loading -->
-            <button *ngIf="modalMode === 'add'" type="submit" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
-                    [disabled]="isSaving || billForm.invalid">
+            <button *ngIf="modalMode === 'add'" type="submit"
+              class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+              [disabled]="isSaving || billForm.invalid">
               <span *ngIf="!isSaving">
                 <i class="ri-save-line"></i> Save
               </span>
@@ -339,10 +342,11 @@
                 Saving...
               </span>
             </button>
-            
+
             <!-- Update Button with loading -->
-            <button *ngIf="modalMode === 'edit'" type="submit" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
-                    [disabled]="isUpdating || billForm.invalid">
+            <button *ngIf="modalMode === 'edit'" type="submit"
+              class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+              [disabled]="isUpdating || billForm.invalid">
               <span *ngIf="!isUpdating">
                 <i class="ri-edit-line"></i> Update
               </span>
@@ -351,10 +355,11 @@
                 Updating...
               </span>
             </button>
-            
+
             <!-- Delete Button with loading -->
-            <button *ngIf="modalMode === 'delete'" type="submit" class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
-                    [disabled]="isDeleting || !deleteReason">
+            <button *ngIf="modalMode === 'delete'" type="submit"
+              class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
+              [disabled]="isDeleting || !deleteReason">
               <span *ngIf="!isDeleting">
                 <i class="ri-delete-bin-line"></i> Delete
               </span>
@@ -393,29 +398,29 @@
 
       <div class="modal-body custom-modal-body">
         <div *ngIf="selectedBillView" class="space-y-3 sm:space-y-4">
-          
+
           <!-- Image Preview -->
           <div class="text-center">
-            <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-blue-200 bg-blue-50 relative">
+            <div
+              class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-blue-200 bg-blue-50 relative">
               <!-- Loading spinner -->
               <div *ngIf="isLoadingImage" class="absolute inset-0 flex items-center justify-center bg-blue-50 z-10">
-                <div class="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600"></div>
+                <div class="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600">
+                </div>
               </div>
-              
+
               <!-- Actual image -->
-              <img [src]="viewImageUrl" 
-                   alt="Bill Image" 
-                   class="w-full h-full object-contain p-1.5 sm:p-2 transition-opacity duration-300"
-                   (error)="handleViewImageError()"
-                   [class.opacity-0]="isLoadingImage"
-                   [class.opacity-100]="!isLoadingImage">
+              <img [src]="viewImageUrl" alt="Bill Image"
+                class="w-full h-full object-contain p-1.5 sm:p-2 transition-opacity duration-300"
+                (error)="handleViewImageError()" [class.opacity-0]="isLoadingImage"
+                [class.opacity-100]="!isLoadingImage">
             </div>
           </div>
 
           <!-- Details Card -->
           <div class="bg-blue-50 rounded-xl p-3 sm:p-4">
             <div class="space-y-2.5 sm:space-y-3">
-              
+
               <!-- Date -->
               <div>
                 <label class="block text-xs font-medium text-blue-600 mb-1">Date</label>
@@ -427,7 +432,8 @@
               <!-- Bill Type -->
               <div>
                 <label class="block text-xs font-medium text-blue-600 mb-1">Bill Type</label>
-                <p class="text-base sm:text-lg font-semibold text-blue-900">{{ selectedBillView.animal_type || 'N/A' }}</p>
+                <p class="text-base sm:text-lg font-semibold text-blue-900">{{ selectedBillView.animal_type || 'N/A' }}
+                </p>
               </div>
 
               <!-- Price -->
@@ -443,7 +449,8 @@
       </div>
 
       <div class="modal-footer custom-modal-footer">
-        <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center" (click)="closeViewModal()">
+        <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
+          (click)="closeViewModal()">
           <i class="ri-close-line"></i> Close
         </button>
       </div>
@@ -459,7 +466,7 @@
         <!-- Large Image -->
         <div class="flex justify-center items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
           <img [src]="previewImageUrl" alt="Bill Image Preview"
-            class="max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] rounded-lg shadow-2xl" 
+            class="max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] rounded-lg shadow-2xl"
             (error)="previewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png'" />
         </div>
 
