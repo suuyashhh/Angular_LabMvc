@@ -97,6 +97,8 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
             item.DisplaySubtitle = this.getDisplaySubtitle(item);
             item.BadgeColor = this.getBadgeColor(item.expense_name);
             item.IconClass = this.getTypeIconClass(item.expense_name);
+            item.FormattedPrice = this.getFormattedPrice(item);
+            item.PriceColor = this.getPriceColor(item.expense_name);
           });
           
           this.filteredHistory = [...this.history];
@@ -306,6 +308,27 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
     }
     
     this.isImagePreviewOpen = false;
+  }
+
+  // ==================== PRICE FORMATTING METHODS ====================
+  getFormattedPrice(item: any): string {
+    const price = item.price || 0;
+    
+    if (item.expense_name === 'Bill') {
+      // For Bills: Green with + prefix
+      return `+₹${price}`;
+    } else {
+      // For all other expenses: Red with - prefix
+      return `-₹${price}`;
+    }
+  }
+
+  getPriceColor(type: string): string {
+    if (type === 'Bill') {
+      return 'text-green-600';
+    } else {
+      return 'text-red-600';
+    }
   }
 
   // ==================== HELPER METHODS ====================
