@@ -88,8 +88,14 @@
                     <div class="flex items-start justify-between gap-2">
                       <!-- Reason on left -->
                       <div class="flex-1 min-w-0">
-                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-1 truncate">{{ doctor.reason ||
-                          'N/A' }}</h4>
+                        <h4 class="font-medium text-green-900 text-sm sm:text-base mb-1 truncate">
+                          {{ doctor.reason || 'N/A' }}
+                          <!-- Show Breeding tag if Switch is 22 -->
+                          <span *ngIf="doctor.Switch === 22"
+                            class="ml-2 px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full">
+                            Breeding
+                          </span>
+                        </h4>
                       </div>
 
                       <!-- Price on right - red color with minus sign -->
@@ -198,6 +204,23 @@
         <form [formGroup]="doctorForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
           <div class="form-group-wrapper">
 
+
+            <!-- Breeding Switch -->
+            <div class="custom-form-group">
+              <div class="form-floating form-floating-outline mb-3 sm:mb-4">
+                <div class="switch-container">
+                  <span class="switch-label">Breeding</span>
+                  <label class="switch">
+                    <!-- Fix: Use [checked] binding properly -->
+                    <input type="checkbox" id="breedingSwitch" [checked]="doctorForm.get('Switch')?.value === 22"
+                      (change)="updateSwitchValue($event)">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <input type="hidden" formControlName="Switch" />
+              </div>
+            </div>
+
             <!-- Date -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
@@ -280,6 +303,7 @@
                 </div>
               </div>
             </div>
+
             <style>
               /* Dropdown Panel */
               .dropdown-panel {
@@ -568,10 +592,17 @@
                 </p>
               </div>
 
-              <!-- Reason -->
+              <!-- Reason with Breeding tag -->
               <div>
                 <label class="block text-xs font-medium text-blue-600 mb-1">Reason</label>
-                <p class="text-base sm:text-lg font-semibold text-blue-900">{{ selectedDoctorView.reason || 'N/A' }}</p>
+                <p class="text-base sm:text-lg font-semibold text-blue-900">
+                  {{ selectedDoctorView.reason || 'N/A' }}
+                  <!-- Show Breeding tag if Switch is 22 -->
+                  <span *ngIf="selectedDoctorView.Switch === 22"
+                    class="ml-2 px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full">
+                    Breeding
+                  </span>
+                </p>
               </div>
 
               <!-- Doctor Details -->
@@ -584,6 +615,14 @@
                   <label class="block text-xs font-medium text-blue-600 mb-1">Price</label>
                   <p class="text-sm text-blue-900 truncate">₹{{ selectedDoctorView.price || '0' }}</p>
                 </div>
+              </div>
+
+              <!-- Switch Status -->
+              <div *ngIf="selectedDoctorView.Switch">
+                <label class="block text-xs font-medium text-blue-600 mb-1">Type</label>
+                <p class="text-sm text-blue-900">
+                  {{ selectedDoctorView.Switch === 22 ? 'Breeding' : 'Regular' }}
+                </p>
               </div>
 
             </div>
@@ -624,3 +663,97 @@
     </div>
   </div>
 </div>
+
+<!-- Add this CSS for the switch -->
+<style>
+  /* Switch Styles - same as ASP.NET page */
+  .switch-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    font-family: 'Saira', sans-serif;
+  }
+
+  .switch-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #4CAF50;
+  }
+
+  input:checked+.slider:before {
+    transform: translateX(26px);
+  }
+
+  /* Glow effect when checked */
+  input:checked+.slider {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .switch-container {
+      padding: 8px 0;
+    }
+
+    .switch {
+      width: 50px;
+      height: 28px;
+    }
+
+    .slider:before {
+      height: 20px;
+      width: 20px;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(22px);
+    }
+
+    .switch-label {
+      font-size: 0.9rem;
+    }
+  }
+</style>

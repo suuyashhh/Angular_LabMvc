@@ -1,0 +1,309 @@
+<!-- Main Container -->
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center space-x-3">
+        <!-- Back Button (only visible on detail page) -->
+        <button *ngIf="currentPage === 'detail'" (click)="goBackToList()"
+          class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          aria-label="Go back">
+          <i class="ri-arrow-left-line text-gray-600"></i>
+        </button>
+
+        <!-- Icon and Title -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center">
+            <img src="assets/DairryFarmImg/Breedingdate.png" alt="Breeding Date Check" class="w-6 h-6 object-contain">
+          </div>
+          <div>
+            <h1 class="text-xl font-semibold text-gray-900">
+              <ng-container *ngIf="currentPage === 'list'">Breeding Date Check</ng-container>
+              <ng-container *ngIf="currentPage === 'detail'">
+                Breeding History of {{ selectedAnimal?.animalName }}
+              </ng-container>
+            </h1>
+            <p class="text-sm text-gray-600">
+              <ng-container *ngIf="currentPage === 'list'">Track and manage animal breeding cycles</ng-container>
+              <ng-container *ngIf="currentPage === 'detail'">
+                {{ totalBreedingRecords }} breeding records
+              </ng-container>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- ============ ANIMALS LIST PAGE ============ -->
+    <ng-container *ngIf="currentPage === 'list'">
+      <!-- Search and Filter Section -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Search Bar -->
+        <div class="relative">
+          <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"
+            placeholder="Search animals by name or reason..."
+            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            id="animal-search">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <i class="ri-search-line text-gray-400"></i>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilter()"
+            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+            <option value="all">All Status</option>
+            <option value="Recent">Recent (&lt;30 days)</option>
+            <option value="Ongoing">Ongoing (30-90 days)</option>
+            <option value="Overdue">Overdue (&gt;90 days)</option>
+            <option value="No Records">No Records</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <!-- Total Animals -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Total Animals</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ totalAnimals }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+              <i class="ri-team-line text-blue-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Breeding -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Recent Breeding</p>
+              <p class="text-2xl font-semibold text-green-600">{{ animalsWithRecentBreeding }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+              <i class="ri-checkbox-circle-line text-green-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ongoing -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Ongoing</p>
+              <p class="text-2xl font-semibold text-blue-600">
+               {{ animalsOngoing }}
+              </p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+              <i class="ri-time-line text-blue-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overdue -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Overdue</p>
+              <p class="text-2xl font-semibold text-red-600">{{ animalsOverdue }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
+              <i class="ri-alarm-warning-line text-red-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div>
+        <p class="text-sm text-gray-600 mt-3">Loading animals...</p>
+      </div>
+
+      <!-- Animals Grid -->
+      <div *ngIf="!isLoading">
+        <div *ngIf="filteredAnimals.length > 0; else noAnimals"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div *ngFor="let animal of filteredAnimals" (click)="viewAnimalBreedingHistory(animal)"
+            class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]">
+
+            <!-- Animal Header -->
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center">
+                  <i class="ri-heart-2-line text-pink-600"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="font-medium text-gray-900 truncate">{{ animal.animalName }}</h3>
+                  <p class="text-xs text-gray-600 truncate" *ngIf="animal.lastBreedingReason">
+                    {{ animal.lastBreedingReason }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Status Badge -->
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="getStatusBadgeColor(animal.status)">
+                <i [class]="getStatusIcon(animal.status) + ' mr-1 text-xs'"></i>
+                {{ animal.status }}
+              </span>
+            </div>
+
+            <!-- Breeding Summary -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Total Records:</span>
+                <span class="font-medium text-gray-900">{{ animal.totalBreedingRecords || 0 }}</span>
+              </div>
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Last Breeding:</span>
+                <span class="font-medium text-gray-900 truncate ml-2">
+                  {{ formatLastBreedingDate(animal.lastBreedingDate) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- View Button -->
+            <div class="mt-4 pt-3 border-t border-gray-100">
+              <button
+                class="w-full py-2 px-4 bg-pink-600 text-white rounded-lg text-sm font-medium hover:bg-pink-700 transition-colors flex items-center justify-center space-x-2">
+                <i class="ri-history-line"></i>
+                <span>View Breeding History</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noAnimals>
+          <div class="text-center py-12 bg-white rounded-xl border border-gray-200">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+              <i class="ri-team-line text-2xl text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Animals Found</h3>
+            <p class="text-sm text-gray-600">Add animals to track their breeding cycles.</p>
+            <div *ngIf="searchTerm || statusFilter !== 'all'" class="mt-4">
+              <p class="text-sm text-gray-600 mb-2">Try adjusting your search or filter.</p>
+              <button (click)="searchTerm = ''; statusFilter = 'all'; onSearch()"
+                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </ng-container>
+
+    <!-- ============ ANIMAL DETAIL PAGE ============ -->
+    <ng-container *ngIf="currentPage === 'detail'">
+      <!-- Search Bar -->
+      <div class="mb-6">
+        <div class="relative">
+          <input type="text" placeholder="Search breeding records..."
+            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            id="history-search">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <i class="ri-search-line text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Breeding Summary</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-600">Total Records</p>
+                <p class="text-xl font-semibold text-gray-900">{{ totalBreedingRecords }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Last Record</p>
+                <p class="text-xl font-semibold text-gray-900">
+                  {{ breedingHistory[0] ? formatDate(breedingHistory[0].breedingDate) : 'No records' }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="w-16 h-16 rounded-lg bg-pink-100 flex items-center justify-center">
+            <i class="ri-heart-2-line text-pink-600 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoadingHistory" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-pink-600"></div>
+        <p class="text-sm text-gray-600 mt-3">Loading breeding history...</p>
+      </div>
+
+      <!-- Breeding History List -->
+      <div *ngIf="!isLoadingHistory">
+        <div *ngIf="breedingHistory.length > 0; else noHistory">
+          <!-- Group by Month -->
+          <div *ngFor="let group of groupedHistory | keyvalue" class="mb-8">
+            <!-- Month Header -->
+            <div class="sticky top-20 z-10 bg-gray-50 py-3 mb-4 border-b border-gray-200">
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 rounded-full bg-pink-500"></div>
+                <h3 class="text-lg font-semibold text-gray-900">{{ group.key }}</h3>
+                <span class="text-sm text-gray-600">({{ group.value.length }} records)</span>
+              </div>
+            </div>
+
+            <!-- Records List -->
+            <div class="space-y-3">
+              <div *ngFor="let record of group.value" class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+
+                <div class="flex items-start justify-between">
+                  <!-- Left Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-2 mb-2">
+                      <!-- Status Badge -->
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        [ngClass]="getRecordStatusBadge(record.daysSinceBreeding)">
+                        <i class="ri-time-line mr-1 text-xs"></i>
+                        {{ getDaysSinceText(record.daysSinceBreeding) }}
+                      </span>
+                    </div>
+
+                    <!-- Reason -->
+                    <h4 class="font-medium text-gray-900 mb-1">{{ record.reason }}</h4>
+
+                    <!-- Date -->
+                    <p class="text-sm text-gray-600">
+                      <i class="ri-calendar-line mr-1"></i>
+                      {{ record.formattedDate || formatDate(record.breedingDate) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noHistory>
+          <div class="text-center py-12 bg-white rounded-xl border border-gray-200">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+              <i class="ri-history-line text-2xl text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Breeding Records Found</h3>
+            <p class="text-sm text-gray-600 mb-4">No breeding records found for {{ selectedAnimal?.animalName }}</p>
+            <button (click)="goBackToList()"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+              Back to Animals List
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </ng-container>
+  </main>
+</div>

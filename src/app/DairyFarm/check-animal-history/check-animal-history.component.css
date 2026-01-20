@@ -1,0 +1,88 @@
+/* Custom styles for Animal Health History */
+
+/* Smooth transitions */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Active state for cards */
+.card-hover:active {
+  transform: scale(0.99);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Animation for page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Month header sticky effect */
+.sticky-header {
+  position: sticky;
+  top: 5rem; /* Adjust based on your header height */
+  backdrop-filter: blur(8px);
+  background-color: rgba(249, 250, 251, 0.8);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .stats-card {
+    padding: 1rem;
+  }
+  
+  .animal-card {
+    padding: 1rem;
+  }
+  
+  .history-card {
+    padding: 0.75rem;
+  }
+}

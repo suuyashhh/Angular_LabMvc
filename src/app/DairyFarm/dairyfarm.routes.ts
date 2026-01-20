@@ -46,5 +46,15 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/history-dairy/history-dairy.component')
         .then(m => m.HistoryDairyComponent)
  },
+ {
+    path:'check-Animal-History',
+    loadComponent:()=> import('../DairyFarm/check-animal-history/check-animal-history.component')
+        .then(m => m.CheckAnimalHistoryComponent)
+ },
+ {
+    path:'check-Breeding-History',
+    loadComponent:()=> import('../DairyFarm/check-breeding-dates/check-breeding-dates.component')
+        .then(m => m.CheckBreedingDatesComponent)
+ },
   
 ];

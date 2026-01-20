@@ -100,7 +100,16 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       reason: new FormControl('', [Validators.required]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
-      AnimalImage: new FormControl('')
+      AnimalImage: new FormControl(''),
+      Switch: new FormControl(11) // Default value 11 (unchecked), 22 when checked
+    });
+  }
+
+  // Switch value handler
+  updateSwitchValue(event: any): void {
+    const isChecked = event.target.checked;
+    this.doctorForm.patchValue({
+      Switch: isChecked ? 22 : 11
     });
   }
 
@@ -159,10 +168,10 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   // ==================== VIEW MODAL METHODS ====================
   openViewModal(doctor: any): void {
     this.selectedDoctorView = doctor;
-    
+
     // Set view image URL - Use AnimalImage from the doctor object
     this.viewImageUrl = doctor.AnimalImage || '../../../assets/DairryFarmImg/doctor_16802630.png';
-    
+
     // Show the modal
     this.showViewModal();
   }
@@ -176,7 +185,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset view modal data
     this.selectedDoctorView = null;
     this.viewImageUrl = '';
@@ -261,10 +270,10 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.showAnimalDropdown) return;
-    
+
     const target = event.target as HTMLElement;
     const isClickInside = this.doctorInput?.nativeElement?.contains(target);
-    
+
     if (!isClickInside) {
       this.showAnimalDropdown = false;
     }
@@ -291,7 +300,8 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       animal_name: '',
       price: '',
       reason: '',
-      AnimalImage: ''
+      AnimalImage: '',
+      Switch: 11 // Default to unchecked (11)
     });
 
     this.loadAnimalsOptions();
@@ -317,13 +327,19 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.selectedAnimalId = doctor.Animal_id || 0;
     this.selectedAnimalName = doctor.animal_name || '';
 
+    // IMPORTANT: Get the Switch value from the doctor object
+    const switchValue = doctor.Switch || doctor.switch || 11;
+
+    console.log('Opening edit modal - Switch value:', switchValue); // Debug log
+
     this.doctorForm.patchValue({
       Animal_id: this.selectedAnimalId,
       animal_name: this.selectedAnimalName,
       price: doctor.price,
       reason: doctor.reason,
       date: this.formatDateForInput(doctor.date),
-      AnimalImage: doctor.AnimalImage || ''
+      AnimalImage: doctor.AnimalImage || '',
+      Switch: switchValue  // Set the Switch value
     });
 
     // Show loader before API call
@@ -338,6 +354,9 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
             this.doctorForm.patchValue({ AnimalImage: image });
           }
           this.showModal();
+
+          // Debug: Log the form value after patch
+          console.log('Form Switch value after patch:', this.doctorForm.get('Switch')?.value);
         },
         error: (err) => {
           console.error(err);
@@ -347,6 +366,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       });
   }
 
+  // Also update the delete modal method similarly:
   openDeleteModal(doctor: any): void {
     this.modalMode = 'delete';
     this.selectedDoctor = doctor;
@@ -366,13 +386,17 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     this.selectedAnimalId = doctor.Animal_id || 0;
     this.selectedAnimalName = doctor.animal_name || '';
 
+    // Set Switch value - same as edit modal
+    const switchValue = doctor.Switch || doctor.switch || 11;
+
     this.doctorForm.patchValue({
       Animal_id: this.selectedAnimalId,
       animal_name: this.selectedAnimalName,
       price: doctor.price,
       reason: doctor.reason,
       date: this.formatDateForInput(doctor.date),
-      AnimalImage: doctor.AnimalImage || ''
+      AnimalImage: doctor.AnimalImage || '',
+      Switch: switchValue
     });
 
     // Show loader before API call
@@ -521,7 +545,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
 
   addDoctor(): void {
     this.isSaving = true;
-    
+
     const payload = {
       user_id: this.dairyUserId,
       Animal_id: this.selectedAnimalId,
@@ -530,7 +554,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       price: Number(this.doctorForm.value.price),
       reason: this.doctorForm.value.reason,
       date: this.formatDateForAPI(this.doctorForm.value.date),
-      Switch: 1
+      Switch: this.doctorForm.value.Switch // Include Switch value (11 or 22)
     };
 
     this.loader.show();
@@ -570,7 +594,7 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
       price: Number(this.doctorForm.value.price),
       reason: this.doctorForm.value.reason,
       date: this.formatDateForAPI(this.doctorForm.value.date),
-      Switch: 1
+      Switch: this.doctorForm.value.Switch // Include Switch value (11 or 22)
     };
 
     this.loader.show();
