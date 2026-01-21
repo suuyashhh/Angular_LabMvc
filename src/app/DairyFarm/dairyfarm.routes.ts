@@ -56,5 +56,21 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/check-breeding-dates/check-breeding-dates.component')
         .then(m => m.CheckBreedingDatesComponent)
  },
+ {
+    path:'monthlype',
+    loadComponent:()=> import('../DairyFarm/monthly-pe/monthly-pe.component')
+        .then(m => m.MonthlyPeComponent)
+ },
+ {
+    path:'datepe',
+    loadComponent:()=> import('../DairyFarm/date-pe/date-pe.component')
+        .then(m => m.DatePEComponent)
+ },
+ {
+    path:'Cattle-breeding-calculater',
+    loadComponent:()=> import('../DairyFarm/cattle-breeding-calculator/cattle-breeding-calculator.component')
+        .then(m => m.CattleBreedingCalculatorComponent)
+ },
+  
   
 ];
