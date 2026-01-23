@@ -19,20 +19,20 @@ import { LoaderService } from '../../services/loader.service';
 export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
   // Page states
   currentPage: 'list' | 'detail' = 'list';
-  
+
   // Animals list data
   animals: any[] = [];
   filteredAnimals: any[] = [];
   searchTerm: string = '';
-  
+
   // Animal detail data
   selectedAnimal: any = null;
   breedingHistory: any[] = [];
   groupedHistory: Map<string, any[]> = new Map();
-  
+
   // Filter options
   statusFilter: string = 'all';
-  
+
   // Loading states
   isLoading: boolean = false;
   isLoadingHistory: boolean = false;
@@ -54,12 +54,12 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
     }
 
     this.userId = this.getUserId();
-    
+
     // Check if we're coming with animal_id parameter
     this.route.queryParams.subscribe(params => {
       const animalId = params['animal_id'];
       const animalName = params['animal_name'];
-      
+
       if (animalId && animalName) {
         this.loadAnimalBreedingDetail(parseInt(animalId), animalName);
       } else {
@@ -110,7 +110,8 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
   }
 
   // ==================== LOAD ANIMAL BREEDING DETAIL ====================
-  loadAnimalBreedingDetail(animalId: number, animalName: string): void {
+  loadAnimalBreedingDetail(animalId: number, animalName: string, animalImage?: string): void {
+
     if (!this.userId || !animalId) {
       this.toastr.warning('Invalid animal selection');
       this.loadAnimals();
@@ -124,8 +125,10 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
     // Set selected animal
     this.selectedAnimal = {
       animalId: animalId,
-      animalName: decodeURIComponent(animalName)
+      animalName: decodeURIComponent(animalName),
+      animalImage: animalImage || null
     };
+
 
     this.api.get(`BreedingDateCheck/history/${this.userId}/${animalId}`)
       .pipe(finalize(() => {
@@ -152,13 +155,15 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
       relativeTo: this.route,
       queryParams: {
         animal_id: animal.animalId,
-        animal_name: encodeURIComponent(animal.animalName)
+        animal_name: encodeURIComponent(animal.animalName),
+        animal_image: encodeURIComponent(animal.animalImage || '')
       },
       queryParamsHandling: 'merge'
     }).then(() => {
-      this.loadAnimalBreedingDetail(animal.animalId, animal.animalName);
+      this.loadAnimalBreedingDetail(animal.animalId, animal.animalName, animal.animalImage);
     });
   }
+
 
   goBackToList(): void {
     this.router.navigate([], {
@@ -173,7 +178,7 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
   // ==================== SEARCH & FILTER FUNCTIONALITY ====================
   onSearch(): void {
     const search = this.searchTerm.toLowerCase().trim();
-    
+
     if (!search) {
       this.filteredAnimals = [...this.animals];
       return;
@@ -200,7 +205,7 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
   // ==================== GROUP HISTORY BY MONTH ====================
   groupHistoryByMonth(): void {
     this.groupedHistory.clear();
-    
+
     this.breedingHistory.forEach(record => {
       const monthYear = record.monthYear || this.getMonthYear(record.breedingDate);
       if (!this.groupedHistory.has(monthYear)) {
@@ -233,25 +238,45 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatLastBreedingDate(dateString: string): string {
-    if (!dateString) return 'No breeding records';
-    
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (diffDays === 0) return 'Today';
-      if (diffDays === 1) return 'Yesterday';
-      if (diffDays < 7) return `${diffDays} days ago`;
-      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-      if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-      
-      return this.formatDate(dateString);
-    } catch {
-      return dateString;
+ formatLastBreedingDate(dateString: string): string {
+  if (!dateString) return 'No breeding records';
+
+  try {
+    const from = new Date(dateString);
+    const to = new Date();
+
+    let years = to.getFullYear() - from.getFullYear();
+    let months = to.getMonth() - from.getMonth();
+    let days = to.getDate() - from.getDate();
+
+    if (days < 0) {
+      months--;
+      const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0).getDate();
+      days += prevMonth;
     }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    if (years > 0) {
+      return `${years} year${years > 1 ? 's' : ''} ${months} month${months !== 1 ? 's' : ''} ago`;
+    }
+
+    if (months > 0) {
+      return `${months} month${months > 1 ? 's' : ''} ${days} day${days !== 1 ? 's' : ''} ago`;
+    }
+
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+
+    return `${days} days ago`;
+  } catch {
+    return dateString;
   }
+}
+
 
   getStatusBadgeColor(status: string): string {
     const colorMap: { [key: string]: string } = {
@@ -306,7 +331,7 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
     return this.animals.filter(a => a.status === 'Overdue').length;
   }
   get animalsOngoing(): number {
-  return this.animals.filter(a => a.status === 'Ongoing').length;
-}
+    return this.animals.filter(a => a.status === 'Ongoing').length;
+  }
 
 }

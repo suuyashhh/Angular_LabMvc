@@ -1,162 +1,188 @@
 <!-- Page Header -->
 <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
-    <div
-        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
-        <img src="../../../assets/DairryFarmImg/calander.png" alt="Calendar Icon"
-            class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
-    </div>
+  <div
+    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
+    <img src="../../../assets/DairryFarmImg/calander.png" alt="Calendar Icon"
+      class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+  </div>
 
-    <div class="min-w-0">
-        <h1 class="text-xl sm:text-2xl font-semibold text-green-900 truncate">
-            Cattle Breeding Calculator
-        </h1>
-        <p class="text-xs sm:text-sm text-green-600 -mt-0.5 truncate">
-            Calculate breeding dates and pregnancy timeline
-        </p>
-    </div>
+  <div class="min-w-0">
+    <h1 class="text-xl sm:text-2xl font-semibold text-green-900 truncate">
+      Cattle Breeding Calculator
+    </h1>
+    <p class="text-xs sm:text-sm text-green-600 -mt-0.5 truncate">
+      Calculate breeding dates and pregnancy timeline
+    </p>
+  </div>
 </div>
 
 <main class="min-h-screen bg-green-50 p-3 sm:p-4 md:p-6">
-    <div class="max-w-5xl mx-auto">
+  <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
 
-        <!-- Loading -->
-        <div *ngIf="loadingAnimals" class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
-            <p class="text-sm text-green-600 mt-3">Loading animals data...</p>
-        </div>
-
-        <div *ngIf="!loadingAnimals" class="space-y-6">
-
-            <!-- No Animals -->
-            <div *ngIf="animalOptions.length === 0"
-                class="text-center py-12 bg-white rounded-xl border border-green-100">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                    <i class="ri-calendar-event-line text-2xl text-green-400"></i>
-                </div>
-                <h3 class="text-lg font-medium text-green-900 mb-2">No Animals Found</h3>
-                <p class="text-sm text-green-600 px-4">Add animals to use the breeding calculator.</p>
-
-                <button type="button" class="mt-4 text-green-600 hover:text-green-800 text-sm font-medium"
-                    (click)="goToAnimals()">
-                    <i class="ri-add-circle-line mr-1.5"></i> Add Animals
-                </button>
-            </div>
-
-            <!-- Calculator -->
-            <div *ngIf="animalOptions.length > 0"
-                class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-green-100">
-
-                <form [formGroup]="breedingForm" class="space-y-6">
-
-                    <!-- Animal -->
-                    <div>
-                        <label class="block text-sm font-medium text-green-700 mb-1.5">
-                            <i class="ri-user-line mr-1.5"></i>Select Animal <span class="text-red-500">*</span>
-                        </label>
-
-                        <select class="form-control" formControlName="animalId">
-                            <option value="">-- Select Animal --</option>
-                            <option *ngFor="let animal of animalOptions" [value]="animal.animalId">
-                                {{ animal.animalName }}
-                            </option>
-                        </select>
-
-                        <!-- Info -->
-                        <div *ngIf="selectedAnimal" class="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
-
-                            <div class="flex justify-between text-xs text-green-900">
-                                <div>
-                                    Status:
-                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium" [ngClass]="{
-                          'bg-green-200 text-green-900': selectedAnimal.status === 'Recent',
-                          'bg-yellow-200 text-yellow-900': selectedAnimal.status === 'Ongoing',
-                          'bg-red-200 text-red-900': selectedAnimal.status === 'Overdue',
-                          'bg-gray-200 text-gray-900': selectedAnimal.status === 'No Records'
-                        }">
-                                        {{ selectedAnimal.status }}
-                                    </span>
-                                </div>
-                                <div>Total: {{ selectedAnimal.totalBreedingRecords }}</div>
-                            </div>
-
-                            <div *ngIf="selectedAnimal.lastBreedingReason" class="mt-1 text-xs text-green-800 truncate">
-                                Last Reason: {{ selectedAnimal.lastBreedingReason }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cattle Type -->
-                    <div>
-                        <label class="block text-sm font-medium text-green-700 mb-1.5">
-                            <i class="ri-cow-line mr-1.5"></i>Select Cattle Type
-                        </label>
-
-                        <select class="form-control" formControlName="animalType">
-                            <option *ngFor="let type of cattleTypes" [value]="type.value">
-                                {{ type.label }} ({{ type.gestationMonths }} months)
-                            </option>
-                        </select>
-                    </div>
-
-                    <!-- AI Date -->
-                    <div>
-                        <label class="block text-sm font-medium text-green-700 mb-1.5">
-                            <i class="ri-calendar-line mr-1.5"></i>AI Date
-                        </label>
-
-                        <input type="date" class="form-control" formControlName="aiDate" />
-                    </div>
-
-                    <!-- RESULTS -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-6 border-t mt-6">
-
-                        <!-- Days Pregnant -->
-                        <div
-                            class="rounded-xl p-5 bg-gradient-to-br from-green-100 to-green-50 border border-green-200 shadow-sm text-center">
-                            <div class="text-sm text-green-700 mb-1 flex justify-center items-center gap-1">
-                                <i class="ri-timer-line"></i> Days Pregnant
-                            </div>
-                            <div class="text-3xl font-bold text-green-900">
-                                {{ breedingForm.get('daysPregnant')?.value || 0 }}
-                            </div>
-                        </div>
-
-                        <!-- Expected Calving -->
-                        <div
-                            class="rounded-xl p-5 bg-gradient-to-br from-blue-100 to-blue-50 border border-blue-200 shadow-sm text-center">
-                            <div class="text-sm text-blue-700 mb-1 flex justify-center items-center gap-1">
-                                <i class="ri-calendar-check-line"></i> Expected Calving
-                            </div>
-                            <div class="text-lg font-semibold text-blue-900">
-                                <ng-container *ngIf="breedingForm.get('expectedCalvingDate')?.value; else noDate1">
-                                    {{ formatDate(breedingForm.get('expectedCalvingDate')?.value) }}
-                                </ng-container>
-                                <ng-template #noDate1>-- Select Date --</ng-template>
-                            </div>
-                        </div>
-
-                        <!-- Target Date -->
-                        <div
-                            class="rounded-xl p-5 bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200 shadow-sm text-center">
-                            <div class="text-sm text-purple-700 mb-1 flex justify-center items-center gap-1">
-                                <i class="ri-flag-line"></i> Target Date
-                            </div>
-                            <div class="text-lg font-semibold text-purple-900">
-                                <ng-container *ngIf="breedingForm.get('targetDate')?.value; else noDate2">
-                                    {{ formatDate(breedingForm.get('targetDate')?.value) }}
-                                </ng-container>
-                                <ng-template #noDate2>-- Select Date --</ng-template>
-                            </div>
-
-                            <div *ngIf="breedingForm.get('targetDate')?.value" class="text-xs mt-1 text-purple-800">
-                                {{ getTargetDays() }} days after calving
-                            </div>
-                        </div>
-
-                    </div>
-
-                </form>
-            </div>
-        </div>
+    <!-- Loading -->
+    <div *ngIf="loadingAnimals" class="text-center py-8 sm:py-12">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-green-600"></div>
+      <p class="text-sm text-green-600 mt-2">Loading animals data...</p>
     </div>
+
+    <div *ngIf="!loadingAnimals" class="space-y-6">
+
+      <!-- No Animals -->
+      <div *ngIf="animalOptions.length === 0"
+        class="text-center py-8 sm:py-12 bg-white rounded-xl border border-green-100">
+
+        <div
+          class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
+          <i class="ri-calendar-event-line text-xl sm:text-2xl text-green-400"></i>
+        </div>
+
+        <h3 class="text-base sm:text-lg font-medium text-green-900 mb-1.5 sm:mb-2">
+          No Animals Found
+        </h3>
+
+        <p class="text-xs sm:text-sm text-green-600 px-4">
+          Add animals to use the breeding calculator.
+        </p>
+
+        <button type="button"
+          class="mt-4 inline-flex items-center gap-1.5 text-green-700 hover:text-green-900 text-sm font-medium"
+          (click)="goToAnimals()">
+          <i class="ri-add-circle-line"></i> Add Animals
+        </button>
+      </div>
+
+      <!-- Calculator Card -->
+      <div *ngIf="animalOptions.length > 0"
+        class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-green-100">
+
+        <form [formGroup]="breedingForm" class="space-y-5 sm:space-y-6">
+
+          <!-- Animal -->
+          <div>
+            <label class="block text-xs sm:text-sm font-medium text-green-700 mb-1.5">
+              <i class="ri-user-line mr-1"></i> Select Animal <span class="text-red-500">*</span>
+            </label>
+
+            <select class="block w-full rounded-md border border-green-200 bg-white text-green-800
+                           py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
+              formControlName="animalId">
+              <option value="">-- Select Animal --</option>
+              <option *ngFor="let animal of animalOptions" [value]="animal.animalId">
+                {{ animal.animalName }}
+              </option>
+            </select>
+
+            <!-- Info -->
+            <div *ngIf="selectedAnimal"
+              class="mt-2 p-3 bg-green-50 rounded-lg border border-green-200 text-xs sm:text-sm">
+
+              <div class="flex justify-between items-center text-green-900">
+                <div class="flex items-center gap-2">
+                  <span>Status:</span>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium" [ngClass]="{
+                      'bg-green-200 text-green-900': selectedAnimal.status === 'Recent',
+                      'bg-yellow-200 text-yellow-900': selectedAnimal.status === 'Ongoing',
+                      'bg-red-200 text-red-900': selectedAnimal.status === 'Overdue',
+                      'bg-gray-200 text-gray-900': selectedAnimal.status === 'No Records'
+                    }">
+                    {{ selectedAnimal.status }}
+                  </span>
+                </div>
+                <div>Total: {{ selectedAnimal.totalBreedingRecords }}</div>
+              </div>
+
+              <div *ngIf="selectedAnimal.lastBreedingReason" class="mt-1 text-green-800 truncate">
+                Last Reason: {{ selectedAnimal.lastBreedingReason }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Cattle Type -->
+          <div>
+            <label class="block text-xs sm:text-sm font-medium text-green-700 mb-1.5">
+              <i class="ri-cow-line mr-1"></i> Select Cattle Type
+            </label>
+
+            <select class="block w-full rounded-md border border-green-200 bg-white text-green-800
+                           py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
+              formControlName="animalType">
+              <option *ngFor="let type of cattleTypes" [value]="type.value">
+                {{ type.label }} ({{ type.gestationMonths }} months)
+              </option>
+            </select>
+          </div>
+
+          <!-- AI Date -->
+          <div>
+            <label class="block text-xs sm:text-sm font-medium text-green-700 mb-1.5">
+              <i class="ri-calendar-line mr-1"></i> AI Date
+            </label>
+
+            <input type="date"
+              class="block w-full rounded-md border border-green-200 bg-white text-green-800
+                     py-2 px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
+              formControlName="aiDate" />
+          </div>
+
+         <!-- Results -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 pt-5 border-t border-green-100">
+
+  <!-- Days Pregnant -->
+  <div class="rounded-xl p-4 sm:p-5 bg-green-50 border border-green-200 shadow-sm text-center">
+    <div class="text-xs sm:text-sm text-green-700 mb-1 flex justify-center items-center gap-1">
+      <i class="ri-timer-line"></i> Days Pregnant
+    </div>
+    <div class="text-2xl sm:text-3xl font-bold text-green-900">
+      {{ breedingForm.get('daysPregnant')?.value || 0 }}
+    </div>
+  </div>
+
+  <!-- Months & Days -->
+  <div class="rounded-xl p-4 sm:p-5 bg-teal-50 border border-teal-200 shadow-sm text-center">
+    <div class="text-xs sm:text-sm text-teal-700 mb-1 flex justify-center items-center gap-1">
+      <i class="ri-calendar-2-line"></i> Months & Days
+    </div>
+    <div class="text-sm sm:text-lg font-bold text-teal-900">
+      {{ getPregnancyMonthsDays() }}
+    </div>
+  </div>
+
+  <!-- Expected Calving -->
+  <div class="rounded-xl p-4 sm:p-5 bg-blue-50 border border-blue-200 shadow-sm text-center">
+    <div class="text-xs sm:text-sm text-blue-700 mb-1 flex justify-center items-center gap-1">
+      <i class="ri-calendar-check-line"></i> Expected Calving
+    </div>
+    <div class="text-sm sm:text-lg font-semibold text-blue-900">
+      <ng-container *ngIf="breedingForm.get('expectedCalvingDate')?.value; else noDate1">
+        {{ formatDate(breedingForm.get('expectedCalvingDate')?.value) }}
+      </ng-container>
+      <ng-template #noDate1>-- Select Date --</ng-template>
+    </div>
+  </div>
+
+  <!-- Target Date -->
+  <div class="rounded-xl p-4 sm:p-5 bg-purple-50 border border-purple-200 shadow-sm text-center">
+    <div class="text-xs sm:text-sm text-purple-700 mb-1 flex justify-center items-center gap-1">
+      <i class="ri-flag-line"></i> Target Date
+    </div>
+    <div class="text-sm sm:text-lg font-semibold text-purple-900">
+      <ng-container *ngIf="breedingForm.get('targetDate')?.value; else noDate2">
+        {{ formatDate(breedingForm.get('targetDate')?.value) }}
+      </ng-container>
+      <ng-template #noDate2>-- Select Date --</ng-template>
+    </div>
+
+    <div *ngIf="breedingForm.get('targetDate')?.value" class="text-xs mt-1 text-purple-800">
+      {{ getTargetDays() }} days after calving
+    </div>
+  </div>
+
+</div>
+
+
+        </form>
+      </div>
+
+    </div>
+  </div>
 </main>
