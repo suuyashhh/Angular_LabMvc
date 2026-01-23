@@ -159,42 +159,47 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   // ==================== VIEW MODAL METHODS ====================
   openViewModal(feed: any): void {
-    this.selectedFeedView = feed;
-    
+    // ✅ Store the original object for Edit/Delete actions
+    this.selectedFeed = feed;          // <-- IMPORTANT: Store original object
+    this.selectedFeedView = { ...feed }; // copy for display
+
     // Reset loading state
     this.isLoadingImage = true;
-    
+
     // Initially show default image
     this.viewImageUrl = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
-    
+
     // Show the modal immediately
     this.showViewModal();
-    
+
     // Now fetch the actual image from API
     this.loadFeedImageForView(feed);
   }
 
   loadFeedImageForView(feed: any): void {
     const expenseId = feed.expense_id;
-    
+
     if (!expenseId) {
       console.error('No expense_id found for feed:', feed);
       this.isLoadingImage = false;
       return;
     }
-    
+
     this.api.get(`Feeds/GetFeedImageById/${expenseId}`).subscribe({
       next: (response: any) => {
         // Try different possible property names for the image
         const image = response?.feedImage || response?.FeedImage || response?.feedImageUrl || response?.imageUrl;
-        
+
         if (image && image.trim() !== '') {
           // Update the view image URL with the actual image from API
           this.viewImageUrl = image;
-          
-          // Also update the selected feed object for consistency
+
+          // Also update the selected feed objects for consistency
           if (this.selectedFeedView) {
             this.selectedFeedView.feedImage = image;
+          }
+          if (this.selectedFeed) {
+            this.selectedFeed.feedImage = image;
           }
         } else {
           console.warn('No image found for feed ID:', expenseId);
@@ -225,12 +230,20 @@ export class FeedsComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
-    // Reset view modal data
+
+    // reset only view data
     this.selectedFeedView = null;
     this.viewImageUrl = '';
     this.isLoadingImage = false;
+
+    // ✅ DO NOT clear selectedFeed here
   }
+
+  closeViewModalAndReset(): void {
+    this.closeViewModal();
+    this.selectedFeed = null; // only when fully closing
+  }
+
 
   showViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -309,10 +322,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.showFeedDropdown) return;
-    
+
     const target = event.target as HTMLElement;
     const isClickInside = this.feedInput?.nativeElement?.contains(target);
-    
+
     if (!isClickInside) {
       this.showFeedDropdown = false;
     }
@@ -770,4 +783,39 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     return null;
   }
+
+  // ==================== VIEW MODAL ACTION METHODS ====================
+  editFromViewModal(): void {
+    if (!this.selectedFeed) {
+      this.toastr.error('No feed data available');
+      return;
+    }
+
+    const feed = this.selectedFeed; // ✅ store first
+
+    this.closeViewModal(); // does NOT clear selectedFeed now
+
+    setTimeout(() => {
+      this.openEditModal(feed);
+    }, 300);
+  }
+
+
+  deleteFromViewModal(): void {
+    if (!this.selectedFeed) {
+      this.toastr.error('No feed data available');
+      return;
+    }
+
+    const feed = this.selectedFeed; // ✅ store first
+
+    this.closeViewModal();
+
+    setTimeout(() => {
+      this.openDeleteModal(feed);
+    }, 300);
+  }
+
+
+
 }

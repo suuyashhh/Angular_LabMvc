@@ -314,7 +314,10 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
   // ==================== VIEW MODAL METHODS ====================
   async openViewModal(medicine: any): Promise<void> {
-    this.selectedMedicineView = medicine;
+    // ✅ Store the original object for Edit/Delete actions
+    this.selectedMedicine = medicine;          // <-- IMPORTANT: Store original object
+    this.selectedMedicineView = { ...medicine }; // copy for display
+
     this.viewImageUrl = ''; // Reset image URL
     this.isLoadingViewImage = true;
 
@@ -365,6 +368,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
         }
       } finally {
         this.isLoadingViewImage = false;
+
+        // Update the stored medicine object with the image
+        if (this.selectedMedicine && this.viewImageUrl !== '../../../assets/DairryFarmImg/tablet_16443237.png') {
+          this.selectedMedicine.AnimalImage = this.viewImageUrl;
+        }
       }
     } else {
       // No expense_id, use what's available
@@ -414,11 +422,14 @@ export class MedicienComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
 
-    // Reset view modal data
+    // reset only view data
     this.selectedMedicineView = null;
     this.viewImageUrl = '';
     this.isLoadingViewImage = false;
+
+    // ✅ DO NOT clear selectedMedicine here
   }
+
 
   showViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -1000,4 +1011,39 @@ export class MedicienComponent implements OnInit, OnDestroy {
       return '';
     }
   }
+  // ==================== VIEW MODAL ACTION METHODS ====================
+  editFromViewModal(): void {
+    if (!this.selectedMedicine) {
+      this.toastr.error('No medicine data available');
+      return;
+    }
+
+    console.log('Editing medicine from view modal:', this.selectedMedicine);
+
+    // Close the view modal
+    this.closeViewModal();
+
+    // Open edit modal with the selected medicine
+    setTimeout(() => {
+      this.openEditModal(this.selectedMedicine);
+    }, 300);
+  }
+
+  deleteFromViewModal(): void {
+    if (!this.selectedMedicine) {
+      this.toastr.error('No medicine data available');
+      return;
+    }
+
+    console.log('Deleting medicine from view modal:', this.selectedMedicine);
+
+    // Close the view modal
+    this.closeViewModal();
+
+    // Open delete modal with the selected medicine
+    setTimeout(() => {
+      this.openDeleteModal(this.selectedMedicine);
+    }, 300);
+  }
+
 }
