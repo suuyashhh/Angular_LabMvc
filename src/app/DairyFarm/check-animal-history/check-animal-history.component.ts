@@ -19,17 +19,17 @@ import { LoaderService } from '../../services/loader.service';
 export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
   // Page states
   currentPage: 'list' | 'detail' = 'list';
-  
+
   // Animals list data
   animals: any[] = [];
   filteredAnimals: any[] = [];
   searchTerm: string = '';
-  
+
   // Animal detail data
   selectedAnimal: any = null;
   healthHistory: any[] = [];
   groupedHistory: Map<string, any[]> = new Map();
-  
+
   // Loading states
   isLoading: boolean = false;
   isLoadingHistory: boolean = false;
@@ -51,12 +51,12 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
     }
 
     this.userId = this.getUserId();
-    
+
     // Check if we're coming with animal_id parameter
     this.route.queryParams.subscribe(params => {
       const animalId = params['animal_id'];
       const animalName = params['animal_name'];
-      
+
       if (animalId && animalName) {
         this.loadAnimalDetail(parseInt(animalId), animalName);
       } else {
@@ -87,7 +87,7 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
     this.loader.show();
     this.currentPage = 'list';
 
-    this.api.get(`AnimalHealthHistory/animals/${this.userId}`)
+    this.api.get(`AnimalHealthHistory/GetAllAnimalsWithImage/${this.userId}`)
       .pipe(finalize(() => {
         this.loader.hide();
         this.isLoading = false;
@@ -107,7 +107,8 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
   }
 
   // ==================== LOAD ANIMAL DETAIL ====================
-  loadAnimalDetail(animalId: number, animalName: string): void {
+  loadAnimalDetail(animalId: number, animalName: string, animalImage?: string): void {
+
     if (!this.userId || !animalId) {
       this.toastr.warning('Invalid animal selection');
       this.loadAnimals();
@@ -121,8 +122,10 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
     // Set selected animal
     this.selectedAnimal = {
       animalId: animalId,
-      animalName: decodeURIComponent(animalName)
+      animalName: decodeURIComponent(animalName),
+      animalImage: animalImage || null
     };
+
 
     this.api.get(`AnimalHealthHistory/history/${this.userId}/${animalId}`)
       .pipe(finalize(() => {
@@ -149,13 +152,15 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
       relativeTo: this.route,
       queryParams: {
         animal_id: animal.animalId,
-        animal_name: encodeURIComponent(animal.animalName)
+        animal_name: encodeURIComponent(animal.animalName),
+        animal_image: encodeURIComponent(animal.animalImage || '')
       },
       queryParamsHandling: 'merge'
     }).then(() => {
-      this.loadAnimalDetail(animal.animalId, animal.animalName);
+      this.loadAnimalDetail(animal.animalId, animal.animalName, animal.animalImage);
     });
   }
+
 
   goBackToList(): void {
     this.router.navigate([], {
@@ -170,7 +175,7 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
   // ==================== SEARCH FUNCTIONALITY ====================
   onSearch(): void {
     const search = this.searchTerm.toLowerCase().trim();
-    
+
     if (!search) {
       this.filteredAnimals = [...this.animals];
       return;
@@ -184,7 +189,7 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
   // ==================== GROUP HISTORY BY MONTH ====================
   groupHistoryByMonth(): void {
     this.groupedHistory.clear();
-    
+
     this.healthHistory.forEach(record => {
       const monthYear = record.monthYear || this.getMonthYear(record.recordDate);
       if (!this.groupedHistory.has(monthYear)) {
