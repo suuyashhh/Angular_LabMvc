@@ -66,7 +66,7 @@ export class CattleBreedingCalculatorComponent implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
-  // ✅ LOCAL DATE STRING (NO UTC SHIFT)
+  // ✅ Local date string (prevents UTC shift)
   private toInputDate(date: Date): string {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -87,9 +87,11 @@ export class CattleBreedingCalculatorComponent implements OnInit, OnDestroy {
       animalId: new FormControl('', Validators.required),
       animalType: new FormControl('Cow', Validators.required),
       aiDate: new FormControl(todayStr, Validators.required),
-      daysPregnant: new FormControl({ value: 0, disabled: true }),
-      expectedCalvingDate: new FormControl({ value: '', disabled: true }),
-      targetDate: new FormControl({ value: '', disabled: true })
+
+      // ✅ ENABLED controls so UI can read values
+      daysPregnant: new FormControl(0),
+      expectedCalvingDate: new FormControl(''),
+      targetDate: new FormControl('')
     });
 
     this.breedingForm.get('animalId')?.valueChanges.subscribe(id => this.onAnimalSelect(id));
@@ -138,7 +140,7 @@ export class CattleBreedingCalculatorComponent implements OnInit, OnDestroy {
     const aiDateStr = this.breedingForm.get('aiDate')?.value;
     if (!type || !aiDateStr) return;
 
-    const breedingDate = new Date(aiDateStr + 'T00:00:00'); // local safe
+    const breedingDate = new Date(aiDateStr + 'T00:00:00');
     const today = new Date();
 
     const days = Math.max(
@@ -168,10 +170,16 @@ export class CattleBreedingCalculatorComponent implements OnInit, OnDestroy {
     return ct ? ct.targetDays : 0;
   }
 
+  // ✅ FULL MONTH DISPLAY
   formatDate(d: string): string {
+    if (!d) return '';
     const date = new Date(d + 'T00:00:00');
-    return isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric'
+    if (isNaN(date.getTime())) return '';
+
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
     });
   }
 
@@ -182,4 +190,19 @@ export class CattleBreedingCalculatorComponent implements OnInit, OnDestroy {
   navigateBack(): void {
     this.router.navigate(['/dairyfarm/webpage']);
   }
+  getPregnancyMonthsDays(): string {
+
+  const days = this.breedingForm.get('daysPregnant')?.value || 0;
+
+  const months = Math.floor(days / 30);
+  const remainingDays = days % 30;
+
+  if (months === 0) {
+    return `${remainingDays} day${remainingDays !== 1 ? 's' : ''}`;
+  }
+
+  return `${months} month${months > 1 ? 's' : ''} ${remainingDays} day${remainingDays !== 1 ? 's' : ''}`;
+}
+
+
 }
