@@ -91,7 +91,7 @@
                         <h4 class="font-medium text-green-900 text-sm sm:text-base mb-1 truncate">
                           {{ doctor.reason || 'N/A' }}
                           <!-- Show Breeding tag if Switch is 22 -->
-                          <span *ngIf="doctor.Switch === 22"
+                          <span *ngIf="doctor.Switch === 22 || doctor.switch === 22"
                             class="ml-2 px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full">
                             Breeding
                           </span>
@@ -106,9 +106,9 @@
                       </div>
                     </div>
 
-                    <!-- Second row: Animal Name + Actions -->
+                    <!-- REMOVED THE ACTIONS DROPDOWN SECTION COMPLETELY -->
+                    <!-- Only show Animal Name -->
                     <div class="flex items-center justify-between gap-2 mt-1.5">
-                      <!-- Animal Name on left -->
                       <div class="flex items-center min-w-0">
                         <span class="inline-flex items-center text-xs text-green-800 truncate">
                           <i class="ri-user-line mr-1 text-xs"></i>
@@ -116,34 +116,6 @@
                         </span>
                       </div>
 
-                      <!-- Actions Dropdown on right -->
-                      <div class="flex-shrink-0" (click)="$event.stopPropagation()">
-                        <div class="dropup">
-                          <button
-                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-green-50 text-green-700 text-xs border border-green-200 hover:bg-green-100 dropdown-toggle whitespace-nowrap"
-                            type="button" [id]="'doctorCardDropdown' + getAnimalId(doctor)" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="ri-more-2-line"></i>
-                          </button>
-
-                          <ul
-                            class="dropdown-menu min-w-28 sm:min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                            [attr.aria-labelledby]="'doctorCardDropdown' + getAnimalId(doctor)">
-                            <li>
-                              <a class="dropdown-item flex items-center gap-2 text-green-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-green-50 text-xs sm:text-sm"
-                                href="javascript:void(0);" (click)="openEditModal(doctor)">
-                                <i class="ri-edit-line text-xs sm:text-sm"></i> Edit
-                              </a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item flex items-center gap-2 text-red-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-red-50 text-xs sm:text-sm"
-                                href="javascript:void(0);" (click)="openDeleteModal(doctor)">
-                                <i class="ri-delete-bin-line text-xs sm:text-sm"></i> Delete
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -206,14 +178,16 @@
 
 
             <!-- Breeding Switch -->
+            <!-- Breeding Switch -->
             <div class="custom-form-group">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <div class="switch-container">
                   <span class="switch-label">Breeding</span>
                   <label class="switch">
-                    <!-- Fix: Use [checked] binding properly -->
+                    <!-- FIX: Use correct binding for checked state -->
                     <input type="checkbox" id="breedingSwitch" [checked]="doctorForm.get('Switch')?.value === 22"
-                      (change)="updateSwitchValue($event)">
+                      (change)="updateSwitchValue($event)"
+                      [disabled]="modalMode === 'delete' || isSaving || isUpdating || isDeleting">
                     <span class="slider"></span>
                   </label>
                 </div>
@@ -595,14 +569,16 @@
               <!-- Reason with Breeding tag -->
               <div>
                 <label class="block text-xs font-medium text-blue-600 mb-1">Reason</label>
-                <p class="text-base sm:text-lg font-semibold text-blue-900">
-                  {{ selectedDoctorView.reason || 'N/A' }}
+                <div class="flex items-center gap-2">
+                  <p class="text-base sm:text-lg font-semibold text-blue-900">
+                    {{ selectedDoctorView.reason || 'N/A' }}
+                  </p>
                   <!-- Show Breeding tag if Switch is 22 -->
-                  <span *ngIf="selectedDoctorView.Switch === 22"
-                    class="ml-2 px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full">
+                  <span *ngIf="selectedDoctorView.Switch === 22 || selectedDoctorView.switch === 22"
+                    class="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
                     Breeding
                   </span>
-                </p>
+                </div>
               </div>
 
               <!-- Doctor Details -->
@@ -618,10 +594,10 @@
               </div>
 
               <!-- Switch Status -->
-              <div *ngIf="selectedDoctorView.Switch">
+              <div *ngIf="selectedDoctorView.Switch || selectedDoctorView.switch">
                 <label class="block text-xs font-medium text-blue-600 mb-1">Type</label>
                 <p class="text-sm text-blue-900">
-                  {{ selectedDoctorView.Switch === 22 ? 'Breeding' : 'Regular' }}
+                  {{ (selectedDoctorView.Switch === 22 || selectedDoctorView.switch === 22) ? 'Breeding' : 'Regular' }}
                 </p>
               </div>
 
@@ -631,7 +607,21 @@
         </div>
       </div>
 
-      <div class="modal-footer custom-modal-footer">
+      <!-- ACTION BUTTONS IN VIEW MODAL -->
+      <div class="modal-footer custom-modal-footer flex-col sm:flex-row gap-2 sm:gap-3">
+        <!-- Edit Button -->
+        <button type="button" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+          (click)="editFromViewModal()">
+          <i class="ri-edit-line"></i> Edit
+        </button>
+
+        <!-- Delete Button -->
+        <button type="button" class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
+          (click)="deleteFromViewModal()">
+          <i class="ri-delete-bin-line"></i> Delete
+        </button>
+
+        <!-- Close Button -->
         <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
           (click)="closeViewModal()">
           <i class="ri-close-line"></i> Close

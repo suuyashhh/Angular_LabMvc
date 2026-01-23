@@ -101,9 +101,9 @@
                       </div>
                     </div>
 
-                    <!-- Second row: Quantity + Actions -->
+                    <!-- REMOVED THE ACTIONS DROPDOWN SECTION -->
+                    <!-- Only show Quantity -->
                     <div class="flex items-center justify-between gap-2 mt-1.5">
-                      <!-- Quantity on left -->
                       <div class="flex items-center min-w-0">
                         <span class="inline-flex items-center text-xs text-green-800 truncate">
                           <i class="ri-stack-line mr-1 text-xs"></i>
@@ -111,33 +111,9 @@
                         </span>
                       </div>
 
-                      <!-- Actions Dropdown on right -->
-                      <div class="flex-shrink-0" (click)="$event.stopPropagation()">
-                        <div class="dropup">
-                          <button
-                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-green-50 text-green-700 text-xs border border-green-200 hover:bg-green-100 dropdown-toggle whitespace-nowrap"
-                            type="button" [id]="'feedCardDropdown' + getFeedId(feed)" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="ri-more-2-line"></i>
-                          </button>
-
-                          <ul
-                            class="dropdown-menu min-w-28 sm:min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
-                            [attr.aria-labelledby]="'feedCardDropdown' + getFeedId(feed)">
-                            <li>
-                              <a class="dropdown-item flex items-center gap-2 text-green-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-green-50 text-xs sm:text-sm"
-                                href="javascript:void(0);" (click)="openEditModal(feed)">
-                                <i class="ri-edit-line text-xs sm:text-sm"></i> Edit
-                              </a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item flex items-center gap-2 text-red-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-red-50 text-xs sm:text-sm"
-                                href="javascript:void(0);" (click)="openDeleteModal(feed)">
-                                <i class="ri-delete-bin-line text-xs sm:text-sm"></i> Delete
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
+                      <!-- Optional: Add a view icon -->
+                      <div class="flex-shrink-0">
+                        <i class="ri-eye-line text-green-500 text-sm"></i>
                       </div>
                     </div>
                   </div>
@@ -471,7 +447,21 @@
         </div>
       </div>
 
-      <div class="modal-footer custom-modal-footer">
+      <!-- ADD ACTION BUTTONS TO VIEW MODAL -->
+      <div class="modal-footer custom-modal-footer flex-col sm:flex-row gap-2 sm:gap-3">
+        <!-- Edit Button -->
+        <button type="button" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+          (click)="editFromViewModal()">
+          <i class="ri-edit-line"></i> Edit
+        </button>
+
+        <!-- Delete Button -->
+        <button type="button" class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
+          (click)="deleteFromViewModal()">
+          <i class="ri-delete-bin-line"></i> Delete
+        </button>
+
+        <!-- Close Button -->
         <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
           (click)="closeViewModal()">
           <i class="ri-close-line"></i> Close

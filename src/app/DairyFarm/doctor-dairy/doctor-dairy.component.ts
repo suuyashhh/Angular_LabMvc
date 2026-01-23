@@ -165,16 +165,20 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
     doctor.AnimalImage = '../../../assets/DairryFarmImg/doctor_16802630.png';
   }
 
-  // ==================== VIEW MODAL METHODS ====================
   openViewModal(doctor: any): void {
-    this.selectedDoctorView = doctor;
 
-    // Set view image URL - Use AnimalImage from the doctor object
-    this.viewImageUrl = doctor.AnimalImage || '../../../assets/DairryFarmImg/doctor_16802630.png';
+    // ✅ KEEP ORIGINAL OBJECT FOR EDIT/DELETE
+    this.selectedDoctor = doctor;        // <-- IMPORTANT
+    this.selectedDoctorView = { ...doctor }; // copy only for display
 
-    // Show the modal
+    this.viewImageUrl =
+      doctor.AnimalImage ||
+      doctor.animalImage ||
+      '../../../assets/DairryFarmImg/doctor_16802630.png';
+
     this.showViewModal();
   }
+
 
   closeViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -751,4 +755,33 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
 
     return null;
   }
+
+  // ==================== VIEW MODAL ACTION METHODS ====================
+  editFromViewModal(): void {
+    if (!this.selectedDoctor) {
+      this.toastr.error('No doctor data available');
+      return;
+    }
+
+    this.closeViewModal();
+
+    setTimeout(() => {
+      this.openEditModal(this.selectedDoctor); // ✅ correct object
+    }, 200);
+  }
+
+
+  deleteFromViewModal(): void {
+    if (!this.selectedDoctor) {
+      this.toastr.error('No doctor data available');
+      return;
+    }
+
+    this.closeViewModal();
+
+    setTimeout(() => {
+      this.openDeleteModal(this.selectedDoctor); // ✅ correct object
+    }, 200);
+  }
+
 }

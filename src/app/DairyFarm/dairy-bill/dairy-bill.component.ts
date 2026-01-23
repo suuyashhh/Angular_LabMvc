@@ -105,7 +105,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   // ==================== IMAGE UPLOAD METHODS ====================
   onImageSelected(event: any): void {
     const file = event.target.files[0];
-    
+
     if (!file) {
       return;
     }
@@ -129,7 +129,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
 
     this.imageError = '';
     this.selectedFile = file;
-    
+
     // Create preview and compress if needed
     this.compressAndPreviewImage(file);
   }
@@ -139,12 +139,12 @@ export class DairyBillComponent implements OnInit, OnDestroy {
     reader.onload = (e: any) => {
       const img = new Image();
       img.src = e.target.result;
-      
+
       img.onload = () => {
         // Create canvas for compression
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         if (!ctx) {
           this.createBasicPreview(file);
           return;
@@ -153,10 +153,10 @@ export class DairyBillComponent implements OnInit, OnDestroy {
         // Set maximum dimensions
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
-        
+
         let width = img.width;
         let height = img.height;
-        
+
         // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
           if (width > MAX_WIDTH) {
@@ -169,29 +169,29 @@ export class DairyBillComponent implements OnInit, OnDestroy {
             height = MAX_HEIGHT;
           }
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
+
         // Draw and compress
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         // Get compressed base64 with quality 0.7 (70% quality)
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
         this.imagePreview = compressedBase64;
       };
-      
+
       img.onerror = () => {
         this.createBasicPreview(file);
       };
     };
-    
+
     reader.onerror = () => {
       this.imageError = 'Failed to read image file';
       this.selectedFile = null;
       this.imagePreview = null;
     };
-    
+
     reader.readAsDataURL(file);
   }
 
@@ -207,7 +207,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.billForm.patchValue({ BillImage: '' });
-    
+
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -219,21 +219,21 @@ export class DairyBillComponent implements OnInit, OnDestroy {
     }
 
     this.isUploadingImage = true;
-    
+
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = () => {
         const base64Image = reader.result as string;
         this.isUploadingImage = false;
         resolve(base64Image);
       };
-      
+
       reader.onerror = () => {
         this.isUploadingImage = false;
         reject('Failed to read image file');
       };
-      
+
       reader.readAsDataURL(this.selectedFile!);
     });
   }
@@ -290,42 +290,46 @@ export class DairyBillComponent implements OnInit, OnDestroy {
 
   // ==================== VIEW MODAL METHODS ====================
   openViewModal(bill: any): void {
-    this.selectedBillView = bill;
-    
-    // Reset loading state
+
+    // ✅ KEEP ORIGINAL OBJECT (has bill_id)
+    this.selectedBill = bill;
+
+    // copy only for UI
+    this.selectedBillView = { ...bill };
+
     this.isLoadingImage = true;
-    
-    // Initially show default image
     this.viewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png';
-    
-    // Show the modal immediately
+
     this.showViewModal();
-    
-    // Now fetch the actual image from API
+
     this.loadBillImageForView(bill);
   }
 
+
   loadBillImageForView(bill: any): void {
     const billId = bill.bill_id;
-    
+
     if (!billId) {
       console.error('No bill_id found for bill:', bill);
       this.isLoadingImage = false;
       return;
     }
-    
+
     this.api.get(`BillDairy/GetBillImageById/${billId}`).subscribe({
       next: (response: any) => {
         // Try different possible property names for the image
         const image = response?.BillImage || response?.billImage || response?.BillImageUrl || response?.imageUrl;
-        
+
         if (image && image.trim() !== '') {
           // Update the view image URL with the actual image from API
           this.viewImageUrl = image;
-          
-          // Also update the selected bill object for consistency
+
+          // Also update the selected bill objects for consistency
           if (this.selectedBillView) {
             this.selectedBillView.BillImage = image;
+          }
+          if (this.selectedBill) {
+            this.selectedBill.BillImage = image;
           }
         } else {
           console.warn('No image found for bill ID:', billId);
@@ -356,12 +360,15 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
-    // Reset view modal data
+
+    // reset only view data
     this.selectedBillView = null;
     this.viewImageUrl = '';
     this.isLoadingImage = false;
+
+    // ✅ DO NOT reset selectedBill here
   }
+
 
   showViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -505,7 +512,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset image upload state
     this.selectedFile = null;
     this.imagePreview = null;
@@ -834,4 +841,39 @@ export class DairyBillComponent implements OnInit, OnDestroy {
 
     return null;
   }
+  // ==================== VIEW MODAL ACTION METHODS ====================
+  editFromViewModal(): void {
+    if (!this.selectedBill) {
+      this.toastr.error('No bill data available');
+      return;
+    }
+
+    console.log('Editing bill from view modal:', this.selectedBill);
+
+    // Close the view modal
+    this.closeViewModal();
+
+    // Open edit modal with the selected bill
+    setTimeout(() => {
+      this.openEditModal(this.selectedBill);
+    }, 300);
+  }
+
+  deleteFromViewModal(): void {
+    if (!this.selectedBill) {
+      this.toastr.error('No bill data available');
+      return;
+    }
+
+    console.log('Deleting bill from view modal:', this.selectedBill);
+
+    // Close the view modal
+    this.closeViewModal();
+
+    // Open delete modal with the selected bill
+    setTimeout(() => {
+      this.openDeleteModal(this.selectedBill);
+    }, 300);
+  }
+
 }

@@ -291,7 +291,9 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
   // ==================== VIEW MODAL METHODS ====================
   async openViewModal(feed: any): Promise<void> {
-    this.selectedFeedView = feed;
+    // ✅ Store the original object for Edit/Delete actions
+    this.selectedFeed = feed;          // <-- IMPORTANT: Store original object
+    this.selectedFeedView = { ...feed }; // copy for display
 
     // Reset loading state
     this.isLoadingImage = true;
@@ -331,9 +333,12 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
             // Update the view image URL with the actual image from API
             this.viewImageUrl = image;
 
-            // Also update the selected feed object for consistency
+            // Also update the selected feed objects for consistency
             if (this.selectedFeedView) {
               this.selectedFeedView.feedImage = image;
+            }
+            if (this.selectedFeed) {
+              this.selectedFeed.feedImage = image;
             }
           } else {
             console.warn('No image found for feed ID:', expenseId);
@@ -353,21 +358,27 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.isLoadingImage = false;
   }
 
-  closeViewModal(): void {
+  closeViewModal(resetSelection: boolean = true): void {
     const modalElement = this.viewModal?.nativeElement;
     if (modalElement) {
       modalElement.classList.remove('show');
       modalElement.style.display = 'none';
       document.body.classList.remove('modal-open');
+
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
 
-    // Reset view modal data
     this.selectedFeedView = null;
     this.viewImageUrl = '';
     this.isLoadingImage = false;
+
+    // ❗ only clear when fully closing, not when going to edit/delete
+    if (resetSelection) {
+      this.selectedFeed = null;
+    }
   }
+
 
   showViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -853,4 +864,39 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
     return null;
   }
+
+  // ==================== VIEW MODAL ACTION METHODS ====================
+  editFromViewModal(): void {
+    if (!this.selectedFeed) {
+      this.toastr.error('No feed data available');
+      return;
+    }
+
+    const feed = this.selectedFeed; // store before closing
+
+    this.closeViewModal(false); // ❗ DO NOT reset selectedFeed
+
+    setTimeout(() => {
+      this.openEditModal(feed);
+    }, 300);
+  }
+
+
+  deleteFromViewModal(): void {
+    if (!this.selectedFeed) {
+      this.toastr.error('No feed data available');
+      return;
+    }
+
+    const feed = this.selectedFeed; // store before closing
+
+    this.closeViewModal(false); // ❗ DO NOT reset selectedFeed
+
+    setTimeout(() => {
+      this.openDeleteModal(feed);
+    }, 300);
+  }
+
+
+
 }
