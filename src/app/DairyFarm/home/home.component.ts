@@ -33,7 +33,7 @@ export class HomeComponent {
     }
 
     this.loadNotificationCount();
-    this.updateBreedingNotification();
+    //this.updateBreedingNotification();
   }
 
   dairyLogout(): void {
