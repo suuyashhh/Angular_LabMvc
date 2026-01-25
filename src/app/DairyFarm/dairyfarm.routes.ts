@@ -71,6 +71,11 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/cattle-breeding-calculator/cattle-breeding-calculator.component')
         .then(m => m.CattleBreedingCalculatorComponent)
  },
+ {
+    path:'Notification',
+    loadComponent:()=> import('../DairyFarm/notification/notification.component')
+        .then(m => m.NotificationComponent)
+ },
   
   
 ];
