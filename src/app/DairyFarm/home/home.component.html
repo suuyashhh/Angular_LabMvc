@@ -6,7 +6,8 @@
       <div class="flex items-center justify-between h-12 md:h-14">
         <!-- Brand / Title -->
         <div class="flex items-center gap-2 md:gap-3">
-          <img src="../../assets/img/avatars/1.png" alt="logo" class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
+          <img src="../../assets/img/avatars/1.png" alt="logo"
+            class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
           <span class="font-semibold text-sm md:text-lg">{{userName}}</span>
         </div>
 
@@ -14,24 +15,64 @@
         <div class="flex items-center gap-2 md:gap-3">
           <span class="hidden sm:inline text-xs md:text-sm text-green-100"></span>
 
+          <!-- Notification Button -->
+          <button class="relative p-2 rounded-full hover:bg-green-700/40" routerLink="/SDF/Notification">
+
+            <i class="ri-notification-3-line text-lg"></i>
+
+            <span *ngIf="notificationCount > 0"
+              class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 rounded-full">
+              {{ notificationCount }}
+            </span>
+          </button>
+
+
           <!-- Non-functional logout button (no JS) -->
-         <button
+          <button
   class="px-2 py-1 rounded-md bg-white text-green-800 font-medium hover:bg-green-100 shadow-sm text-xs md:text-sm"
   type="button"
-  (click)="dairyLogout()"
->
+  (click)="confirmLogout()">
   Logout
 </button>
 
 
+
           <!-- mobile toggler (visual only) -->
-          <button class="ml-1 md:hidden inline-flex items-center justify-center p-2 rounded-md text-green-100 hover:bg-green-700/40" type="button" aria-hidden="true">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <button
+            class="ml-1 md:hidden inline-flex items-center justify-center p-2 rounded-md text-green-100 hover:bg-green-700/40"
+            type="button" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
         </div>
       </div>
     </div>
   </nav>
+
+  <!-- Logout Confirm Modal -->
+<div *ngIf="showLogoutConfirm"
+  class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl p-5 w-72 shadow-lg text-center">
+    <h3 class="font-semibold text-gray-800 mb-3">Confirm Logout</h3>
+    <p class="text-sm text-gray-600 mb-4">Are you sure you want to logout?</p>
+
+    <div class="flex justify-end gap-3">
+     <button
+  class="px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-800 bg-white
+         hover:bg-gray-100 transition"
+  (click)="showLogoutConfirm = false">
+  Cancel
+</button>
+
+      <button class="px-3 py-1 rounded bg-red-600 text-white" (click)="logoutConfirmed()">
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
+
 
   <!-- Page content container -->
   <div class="max-w-6xl mx-auto mt-28 md:mt-36 mb-28 px-1 md:px-4">
@@ -42,7 +83,8 @@
       <div class="cursor-default" routerLink="/SDF/Masters" title="Cattle Details">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/cow_9466827.png" alt="Cattle Details" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/cow_9466827.png" alt="Cattle Details"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Cattle Details</h5>
           </div>
         </div>
@@ -51,7 +93,8 @@
       <div class="cursor-default" routerLink="/SDF/Feed" title="Feeds">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png" alt="Feeds" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png" alt="Feeds"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Feeds</h5>
           </div>
         </div>
@@ -60,7 +103,8 @@
       <div class="cursor-default" routerLink="/SDF/Doctor" title="Doctor">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/doctor_16802630.png" alt="Doctor" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/doctor_16802630.png" alt="Doctor"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Doctor</h5>
           </div>
         </div>
@@ -70,7 +114,8 @@
       <div class="cursor-default" routerLink="/SDF/Bill" title="Received Bill">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Received Bill" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Received Bill"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Received Bill</h5>
           </div>
         </div>
@@ -79,7 +124,8 @@
       <div class="cursor-default" title="Medicine" routerLink="/SDF/Medicien">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/tablet_16443237.png" alt="Medicine" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/tablet_16443237.png" alt="Medicine"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Medicine</h5>
           </div>
         </div>
@@ -88,7 +134,8 @@
       <div class="cursor-default" title="Other Feed" routerLink="/SDF/OtherFeed">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/Dryfeed_9137270.png" alt="Other Feed" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/Dryfeed_9137270.png" alt="Other Feed"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Other Feed</h5>
           </div>
         </div>
@@ -98,7 +145,8 @@
       <div class="cursor-default" title="Monthly Profit Expense" routerLink="/SDF/monthlype">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/fiscal_13495984.png" alt="Monthly Profit Expense" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/fiscal_13495984.png" alt="Monthly Profit Expense"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Monthly Profit Expense</h5>
           </div>
         </div>
@@ -107,7 +155,8 @@
       <div class="cursor-default" title="Days Profit Expense" routerLink="/SDF/datepe">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/calendar_16118660.png" alt="Days Profit Expense" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/calendar_16118660.png" alt="Days Profit Expense"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Days Profit Expense</h5>
           </div>
         </div>
@@ -118,7 +167,8 @@
       <div class="cursor-default" title="History" routerLink="/SDF/History">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/HistoryRecord.png" alt="History" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/HistoryRecord.png" alt="History"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">History</h5>
           </div>
         </div>
@@ -127,7 +177,8 @@
       <div class="cursor-default" title="Check Animal History" routerLink="/SDF/check-Animal-History">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/AniHistory.png" alt="Check Animal History" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/AniHistory.png" alt="Check Animal History"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Check Animal History</h5>
           </div>
         </div>
@@ -136,7 +187,8 @@
       <div class="cursor-default" title="Check Breeding Date" routerLink="/SDF/check-Breeding-History">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/Breedingdate.png" alt="Check Breeding Date" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/Breedingdate.png" alt="Check Breeding Date"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Check Breeding Date</h5>
           </div>
         </div>
@@ -147,7 +199,8 @@
       <div class="cursor-default" title="Cattle Breeding Calculator" routerLink="/SDF/Cattle-breeding-calculater">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/calander.png" alt="Cattle Breeding Calculator" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/calander.png" alt="Cattle Breeding Calculator"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Cattle Breeding Calculator</h5>
           </div>
         </div>
@@ -156,27 +209,30 @@
       <div class="cursor-default" title="Calculator">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/calculator_1325970.png" alt="Calculator" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/calculator_1325970.png" alt="Calculator"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Calculator</h5>
           </div>
         </div>
       </div>
 
-      
+
       <div class="cursor-default" title="Home Expense">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/HomeExpense.png" alt="Home Expense" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/HomeExpense.png" alt="Home Expense"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Home Expense</h5>
           </div>
         </div>
       </div>
-      
+
       <!-- Row 6 -->
       <div class="cursor-default" title="Remaining Bill">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/RemainBill.png" alt="Remaining Bill" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/RemainBill.png" alt="Remaining Bill"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Remaining Bill</h5>
           </div>
         </div>
@@ -185,7 +241,8 @@
       <div class="cursor-default" title="Notes">
         <div class="bg-white rounded-lg p-2 md:p-4 shadow-md hover:shadow-xl transform hover:scale-[1.03] transition">
           <div class="flex flex-col items-center gap-2 md:gap-3">
-            <img src="../../../assets/DairryFarmImg/New Note.png" alt="Notes" class="w-10 h-10 md:w-14 md:h-14 object-contain" />
+            <img src="../../../assets/DairryFarmImg/New Note.png" alt="Notes"
+              class="w-10 h-10 md:w-14 md:h-14 object-contain" />
             <h5 class="text-xs md:text-sm font-semibold text-green-900 text-center">Notes</h5>
           </div>
         </div>

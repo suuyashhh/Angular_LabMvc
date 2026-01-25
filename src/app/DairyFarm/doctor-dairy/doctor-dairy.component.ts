@@ -472,20 +472,25 @@ export class DoctorDairyComponent implements OnInit, OnDestroy {
   }
 
   getDateString(date: any): string {
-    if (!date) return 'Unknown Date';
+  if (!date) return 'Unknown Date';
 
-    try {
-      const d = new Date(date);
+  try {
+    const d = new Date(date);
 
-      const day = d.getDate().toString().padStart(2, '0');
-      const month = (d.getMonth() + 1).toString().padStart(2, '0');
-      const year = d.getFullYear();
+    const day = d.getDate().toString().padStart(2, '0');
 
-      return `${day}/${month}/${year}`;
-    } catch {
-      return 'Unknown Date';
-    }
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear();
+
+    return `${day}-${month}-${year}`;   // ✅ 17-Jan-2026
+  } catch {
+    return 'Unknown Date';
   }
+}
+
 
   // ==================== CRUD OPERATIONS ====================
   loadDoctorHistory(): void {
