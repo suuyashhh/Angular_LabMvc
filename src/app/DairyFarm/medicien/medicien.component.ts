@@ -254,29 +254,13 @@ export class MedicienComponent implements OnInit, OnDestroy {
   }
 
   // ==================== IMAGE PREVIEW METHODS ====================
-  openImagePreview(): void {
-    const imageUrl = this.medicienForm.get('AnimalImage')?.value || this.imagePreview;
+  openImagePreviewWithUrl(imageUrl: string | null): void {
     this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/tablet_16443237.png';
-    this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
   }
 
-  previewCardImage(medicine: any): void {
-    this.previewImageUrl = medicine.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png';
-    this.isImagePreviewOpen = true;
-    this.showImagePreviewModal();
-  }
-
-  previewViewImage(): void {
-    if (this.viewImageUrl && this.viewImageUrl !== '../../../assets/DairryFarmImg/tablet_16443237.png') {
-      this.previewImageUrl = this.viewImageUrl;
-      this.isImagePreviewOpen = true;
-      this.showImagePreviewModal();
-    }
-  }
 
   closeImagePreview(): void {
-    this.isImagePreviewOpen = false;
     this.hideImagePreviewModal();
   }
 
@@ -289,7 +273,6 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
-      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
       backdrop.addEventListener('click', () => this.closeImagePreview());
       document.body.appendChild(backdrop);
     }
@@ -306,6 +289,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
   }
+
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
@@ -712,24 +696,24 @@ export class MedicienComponent implements OnInit, OnDestroy {
   }
 
   getDateString(date: any): string {
-  if (!date) return 'Unknown Date';
+    if (!date) return 'Unknown Date';
 
-  try {
-    const d = new Date(date);
+    try {
+      const d = new Date(date);
 
-    const day = d.getDate().toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
 
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const month = monthNames[d.getMonth()];
-    const year = d.getFullYear();
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
 
-    return `${day}-${month}-${year}`;  
-  } catch {
-    return 'Unknown Date';
+      return `${day}-${month}-${year}`;
+    } catch {
+      return 'Unknown Date';
+    }
   }
-}
 
   // ==================== CRUD OPERATIONS ====================
   loadMedicineHistory(): void {

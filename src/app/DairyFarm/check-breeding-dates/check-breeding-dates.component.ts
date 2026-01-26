@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -37,6 +37,11 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isLoadingHistory: boolean = false;
   userId: number = 0;
+
+  @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+
+  previewImageUrl: string = '';
+
 
   constructor(
     private api: ApiService,
@@ -238,44 +243,44 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
     }
   }
 
- formatLastBreedingDate(dateString: string): string {
-  if (!dateString) return 'No breeding records';
+  formatLastBreedingDate(dateString: string): string {
+    if (!dateString) return 'No breeding records';
 
-  try {
-    const from = new Date(dateString);
-    const to = new Date();
+    try {
+      const from = new Date(dateString);
+      const to = new Date();
 
-    let years = to.getFullYear() - from.getFullYear();
-    let months = to.getMonth() - from.getMonth();
-    let days = to.getDate() - from.getDate();
+      let years = to.getFullYear() - from.getFullYear();
+      let months = to.getMonth() - from.getMonth();
+      let days = to.getDate() - from.getDate();
 
-    if (days < 0) {
-      months--;
-      const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0).getDate();
-      days += prevMonth;
+      if (days < 0) {
+        months--;
+        const prevMonth = new Date(to.getFullYear(), to.getMonth(), 0).getDate();
+        days += prevMonth;
+      }
+
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      if (years > 0) {
+        return `${years} year${years > 1 ? 's' : ''} ${months} month${months !== 1 ? 's' : ''} ago`;
+      }
+
+      if (months > 0) {
+        return `${months} month${months > 1 ? 's' : ''} ${days} day${days !== 1 ? 's' : ''} ago`;
+      }
+
+      if (days === 0) return 'Today';
+      if (days === 1) return 'Yesterday';
+
+      return `${days} days ago`;
+    } catch {
+      return dateString;
     }
-
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-
-    if (years > 0) {
-      return `${years} year${years > 1 ? 's' : ''} ${months} month${months !== 1 ? 's' : ''} ago`;
-    }
-
-    if (months > 0) {
-      return `${months} month${months > 1 ? 's' : ''} ${days} day${days !== 1 ? 's' : ''} ago`;
-    }
-
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-
-    return `${days} days ago`;
-  } catch {
-    return dateString;
   }
-}
 
 
   getStatusBadgeColor(status: string): string {
@@ -332,6 +337,45 @@ export class CheckBreedingDatesComponent implements OnInit, OnDestroy {
   }
   get animalsOngoing(): number {
     return this.animals.filter(a => a.status === 'Ongoing').length;
+  }
+
+  openImagePreviewWithUrl(imageUrl: string | null): void {
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Breedingdate.png';
+    this.showImagePreviewModal();
+  }
+
+  closeImagePreview(): void {
+    this.hideImagePreviewModal();
+  }
+
+  showImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.addEventListener('click', () => this.closeImagePreview());
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  hideImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+  }
+
+  onAnimalImageError(animal: any): void {
+    animal.animalImage = '../../../assets/DairryFarmImg/Breedingdate.png';
   }
 
 }

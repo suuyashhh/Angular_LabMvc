@@ -239,10 +239,8 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   }
 
   // ==================== IMAGE PREVIEW METHODS ====================
-  openImagePreview(): void {
-    const imageUrl = this.billForm.get('BillImage')?.value || this.imagePreview;
+  openImagePreviewWithUrl(imageUrl: string | null): void {
     this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/bill_1052856.png';
-    this.isImagePreviewOpen = true;
     this.showImagePreviewModal();
   }
 
@@ -253,7 +251,6 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   }
 
   closeImagePreview(): void {
-    this.isImagePreviewOpen = false;
     this.hideImagePreviewModal();
   }
 
@@ -266,7 +263,6 @@ export class DairyBillComponent implements OnInit, OnDestroy {
 
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
-      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
       backdrop.addEventListener('click', () => this.closeImagePreview());
       document.body.appendChild(backdrop);
     }
@@ -283,6 +279,7 @@ export class DairyBillComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
   }
+
 
   handleCardImageError(bill: any): void {
     bill.BillImage = '../../../assets/DairryFarmImg/bill_1052856.png';
@@ -556,24 +553,24 @@ export class DairyBillComponent implements OnInit, OnDestroy {
   }
 
   getDateString(date: any): string {
-  if (!date) return 'Unknown Date';
+    if (!date) return 'Unknown Date';
 
-  try {
-    const d = new Date(date);
+    try {
+      const d = new Date(date);
 
-    const day = d.getDate().toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
 
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const month = monthNames[d.getMonth()];
-    const year = d.getFullYear();
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
 
-    return `${day}-${month}-${year}`;  
-  } catch {
-    return 'Unknown Date';
+      return `${day}-${month}-${year}`;
+    } catch {
+      return 'Unknown Date';
+    }
   }
-}
 
 
   // ==================== CRUD OPERATIONS ====================

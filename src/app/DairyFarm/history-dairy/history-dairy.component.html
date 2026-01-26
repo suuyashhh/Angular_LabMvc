@@ -1,7 +1,9 @@
 <!-- Page Header -->
 <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
-  <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
-    <img src="../../../assets/DairryFarmImg/HistoryRecord.png" alt="History Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+  <div
+    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
+    <img src="../../../assets/DairryFarmImg/HistoryRecord.png" alt="History Icon"
+      class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
   </div>
 
   <div class="min-w-0">
@@ -18,13 +20,11 @@
       <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 sm:gap-4">
         <div class="w-full lg:flex-1">
           <div class="relative">
-            <input class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
-                     py-1.5 sm:py-2 pl-9 sm:pl-10 pr-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200" 
-                     type="search"
-              placeholder="Search by feed name, animal, reason..." 
-              [(ngModel)]="searchTerm" 
-              (ngModelChange)="onSearch()"
-              id="history-search-input" />
+            <input
+              class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+                     py-1.5 sm:py-2 pl-9 sm:pl-10 pr-3 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200"
+              type="search" placeholder="Search by feed name, animal, reason..." [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearch()" id="history-search-input" />
             <span class="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-400">
               <i class="ri-search-2-fill text-sm sm:text-base"></i>
             </span>
@@ -34,9 +34,10 @@
         <!-- Filter by Type -->
         <div class="w-full lg:w-48">
           <div class="relative">
-            <select class="block w-full rounded-md border border-green-200 bg-white text-green-800 
+            <select
+              class="block w-full rounded-md border border-green-200 bg-white text-green-800 
                      py-1.5 sm:py-2 pl-9 sm:pl-10 pr-8 text-sm sm:text-base shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200 appearance-none"
-                    [(ngModel)]="selectedType" (ngModelChange)="onTypeFilter()">
+              [(ngModel)]="selectedType" (ngModelChange)="onTypeFilter()">
               <option value="">All Types</option>
               <option value="Feeds">Feeds</option>
               <option value="OtherFeeds">Other Feeds</option>
@@ -69,55 +70,63 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Feeds -->
       <div class="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-green-100">
         <div class="flex items-center justify-between">
           <div class="min-w-0">
             <p class="text-xs sm:text-sm text-green-600 truncate">Feeds</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-green-900 truncate">{{ typeCounts['Feeds'] || 0 }}</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-green-900 truncate">{{ typeCounts['Feeds'] || 0
+              }}</p>
           </div>
           <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-            <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png" alt="Feed Icon" class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+            <img src="../../../assets/DairryFarmImg/seed-bag_12627079.png" alt="Feed Icon"
+              class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
           </div>
         </div>
       </div>
-      
+
       <!-- Medicine -->
       <div class="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-blue-100">
         <div class="flex items-center justify-between">
           <div class="min-w-0">
             <p class="text-xs sm:text-sm text-blue-600 truncate">Medicine</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-blue-900 truncate">{{ typeCounts['Medicine'] || 0 }}</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-blue-900 truncate">{{ typeCounts['Medicine'] ||
+              0 }}</p>
           </div>
           <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <img src="../../../assets/DairryFarmImg/tablet_16443237.png" alt="Medicine Icon" class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+            <img src="../../../assets/DairryFarmImg/tablet_16443237.png" alt="Medicine Icon"
+              class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
           </div>
         </div>
       </div>
-      
+
       <!-- Doctor -->
       <div class="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-red-100">
         <div class="flex items-center justify-between">
           <div class="min-w-0">
             <p class="text-xs sm:text-sm text-red-600 truncate">Doctor</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-red-900 truncate">{{ typeCounts['Doctor'] || 0 }}</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-red-900 truncate">{{ typeCounts['Doctor'] || 0
+              }}</p>
           </div>
           <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-            <img src="../../../assets/DairryFarmImg/doctor_16802630.png" alt="Doctor Icon" class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+            <img src="../../../assets/DairryFarmImg/doctor_16802630.png" alt="Doctor Icon"
+              class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
           </div>
         </div>
       </div>
-      
+
       <!-- Bills -->
       <div class="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-yellow-100">
         <div class="flex items-center justify-between">
           <div class="min-w-0">
             <p class="text-xs sm:text-sm text-yellow-600 truncate">Bills</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-yellow-900 truncate">{{ typeCounts['Bill'] || 0 }}</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-semibold text-yellow-900 truncate">{{ typeCounts['Bill'] || 0
+              }}</p>
           </div>
           <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
-            <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Bill Icon" class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+            <img src="../../../assets/DairryFarmImg/bill_1052856.png" alt="Bill Icon"
+              class="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
           </div>
         </div>
       </div>
@@ -141,7 +150,7 @@
       <div *ngIf="!isLoading">
         <!-- History List with Date Grouping -->
         <div *ngIf="filteredHistory && filteredHistory.length > 0; else noHistoryData" class="space-y-4 sm:space-y-6">
-          
+
           <!-- Group by Date -->
           <div *ngFor="let group of groupedHistory | keyvalue: dateGroupComparator" class="relative">
             <!-- Date Header -->
@@ -149,23 +158,23 @@
               <div class="flex items-center gap-1.5 sm:gap-2">
                 <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 flex-shrink-0"></div>
                 <h3 class="text-sm sm:text-lg font-semibold text-green-900 truncate">{{ group.key }}</h3>
-                <span class="text-xs sm:text-sm text-green-600 whitespace-nowrap">({{ group.value.length }} records)</span>
+                <span class="text-xs sm:text-sm text-green-600 whitespace-nowrap">({{ group.value.length }}
+                  records)</span>
               </div>
             </div>
 
             <!-- History Items for this Date -->
             <div class="space-y-1.5 sm:space-y-2 ml-3 sm:ml-4 border-l border-green-200 pl-3 sm:pl-4">
-              <div *ngFor="let item of group.value" 
-                   class="bg-white border border-green-100 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]"
-                   (click)="openViewModal(item)">
-                
+              <div *ngFor="let item of group.value"
+                class="bg-white border border-green-100 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer active:scale-[0.99]"
+                (click)="openViewModal(item)">
+
                 <div class="flex items-center gap-2.5 sm:gap-3">
                   <!-- Icon/Image based on type -->
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border border-green-100 bg-green-50">
-                    <img [src]="getTypeIcon(item.expense_name)" 
-                         alt="{{ getTypeDisplayName(item.expense_name) }}"
-                         class="w-full h-full object-contain p-1 sm:p-1.5"
-                         (error)="handleIconError(item, $event)">
+                  <div
+                    class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border border-green-100 bg-green-50">
+                    <img [src]="getTypeIcon(item.expense_name)" alt="{{ getTypeDisplayName(item.expense_name) }}"
+                      class="w-full h-full object-contain p-1 sm:p-1.5" (error)="handleIconError(item, $event)">
                   </div>
 
                   <!-- Content -->
@@ -177,27 +186,29 @@
                           <div class="flex-1 min-w-0">
                             <!-- Type Badge -->
                             <div class="mb-1 sm:mb-1.5">
-                              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ getBadgeColor(item.expense_name) }}">
+                              <span
+                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ getBadgeColor(item.expense_name) }}">
                                 <i [class]="getTypeIconClass(item.expense_name) + ' mr-1 text-xs'"></i>
                                 {{ getTypeDisplayName(item.expense_name) }}
                               </span>
                             </div>
-                            
+
                             <!-- Title/Name -->
                             <h4 class="font-medium text-green-900 text-sm sm:text-base mb-0.5 sm:mb-1 truncate">
                               {{ getDisplayTitle(item) }}
                             </h4>
-                            
+
                             <!-- Subtitle -->
                             <p class="text-xs text-green-600 mb-1 sm:mb-2 truncate">
                               {{ getDisplaySubtitle(item) }}
                             </p>
                           </div>
-                          
+
                           <!-- Right side: Price (aligned to right) -->
                           <div class="flex-shrink-0 self-start">
-                            <span class="inline-flex items-center text-sm sm:text-base font-semibold {{ getPriceColor(item.expense_name) }}">
-                              <i class="ri-money-rupee-circle-line mr-1 text-xs sm:text-sm"></i> 
+                            <span
+                              class="inline-flex items-center text-sm sm:text-base font-semibold {{ getPriceColor(item.expense_name) }}">
+                              <i class="ri-money-rupee-circle-line mr-1 text-xs sm:text-sm"></i>
                               {{ getFormattedPrice(item) }}
                             </span>
                           </div>
@@ -213,7 +224,8 @@
 
         <ng-template #noHistoryData>
           <div class="text-center py-8 sm:py-12 bg-white rounded-xl border border-green-100 mx-1 sm:mx-0">
-            <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
+            <div
+              class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-green-100 flex items-center justify-center">
               <i class="ri-history-line text-xl sm:text-2xl text-green-400"></i>
             </div>
             <h3 class="text-base sm:text-lg font-medium text-green-900 mb-1.5 sm:mb-2">No History Found</h3>
@@ -235,8 +247,8 @@
         <div class="modal-title-wrapper flex items-center">
           <div class="flex items-center min-w-0">
             <div class="modal-icon mr-1.5 sm:mr-2">
-              <i [class]="selectedHistory?.IconClass + ' text-xl sm:text-2xl'" 
-                 [ngClass]="getTypeColorClass(selectedHistory?.expense_name)"></i>
+              <i [class]="selectedHistory?.IconClass + ' text-xl sm:text-2xl'"
+                [ngClass]="getTypeColorClass(selectedHistory?.expense_name)"></i>
             </div>
             <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
               {{ getTypeDisplayName(selectedHistory?.expense_name) }} Details
@@ -249,39 +261,38 @@
 
       <div class="modal-body custom-modal-body">
         <div *ngIf="selectedHistory" class="space-y-3 sm:space-y-4">
-          
+
           <!-- Image Preview -->
           <div class="text-center">
-            <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-green-200 bg-green-50 relative">
+            <div
+              class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-green-200 bg-green-50 relative">
               <!-- Loading spinner -->
               <div *ngIf="isLoadingImage" class="absolute inset-0 flex items-center justify-center bg-green-50 z-10">
-                <div class="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600"></div>
+                <div class="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600">
+                </div>
               </div>
-              
+
               <!-- Actual image -->
-              <img [src]="viewImageUrl" 
-                   alt="History Image" 
-                   class="w-full h-full object-contain p-1.5 sm:p-2 transition-opacity duration-300"
-                   (error)="handleViewImageError()"
-                   [class.opacity-0]="isLoadingImage"
-                   [class.opacity-100]="!isLoadingImage"
-                   (click)="previewImage()">
+              <img [src]="viewImageUrl" alt="History Image"
+                class="w-full h-full object-contain p-1.5 sm:p-2 transition-opacity duration-300"
+                (error)="handleViewImageError()" [class.opacity-0]="isLoadingImage"
+                [class.opacity-100]="!isLoadingImage" (click)="previewImage()">
             </div>
           </div>
 
           <!-- Details Card -->
           <div class="bg-green-50 rounded-xl p-3 sm:p-4">
             <div class="space-y-2.5 sm:space-y-3">
-              
+
               <!-- Type Badge -->
               <div>
                 <label class="block text-xs font-medium text-green-600 mb-1">Type</label>
                 <div class="flex items-center">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ getBadgeColor(selectedHistory.expense_name) }}">
-                    <img [src]="getTypeIcon(selectedHistory.expense_name)" 
-                         alt="Type Icon" 
-                         class="w-3 h-3 mr-1.5 object-contain"
-                         onerror="this.src='../../../assets/DairryFarmImg/default-history.png'">
+                  <span
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ getBadgeColor(selectedHistory.expense_name) }}">
+                    <img [src]="getTypeIcon(selectedHistory.expense_name)" alt="Type Icon"
+                      class="w-3 h-3 mr-1.5 object-contain"
+                      onerror="this.src='../../../assets/DairryFarmImg/default-history.png'">
                     {{ getTypeDisplayName(selectedHistory.expense_name) }}
                   </span>
                 </div>
@@ -303,7 +314,7 @@
 
               <!-- Type-Specific Details -->
               <ng-container [ngSwitch]="selectedHistory.expense_name">
-                
+
                 <!-- Feeds -->
                 <div *ngSwitchCase="'Feeds'" class="space-y-2">
                   <div class="grid grid-cols-2 gap-2 sm:gap-3">
@@ -321,7 +332,7 @@
                     <p class="text-sm text-green-900">{{ selectedHistory.animal_name }}</p>
                   </div>
                 </div>
-                
+
                 <!-- Other Feeds -->
                 <div *ngSwitchCase="'OtherFeeds'" class="space-y-2">
                   <div class="grid grid-cols-2 gap-2 sm:gap-3">
@@ -335,7 +346,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Medicine -->
                 <div *ngSwitchCase="'Medicine'" class="space-y-2">
                   <div class="grid grid-cols-2 gap-2 sm:gap-3">
@@ -349,7 +360,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Doctor -->
                 <div *ngSwitchCase="'Doctor'" class="space-y-2">
                   <div class="grid grid-cols-2 gap-2 sm:gap-3">
@@ -363,7 +374,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Bill -->
                 <div *ngSwitchCase="'Bill'" class="space-y-2">
                   <div>
@@ -384,7 +395,8 @@
       </div>
 
       <div class="modal-footer custom-modal-footer">
-        <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center" (click)="closeViewModal()">
+        <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
+          (click)="closeViewModal()">
           <i class="ri-close-line"></i> Close
         </button>
       </div>
@@ -392,25 +404,40 @@
   </div>
 </div>
 
-<!-- Image Preview Modal -->
-<div class="modal fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content bg-transparent border-0 shadow-none">
-      <div class="modal-body p-0 position-relative">
-        <!-- Large Image -->
-        <div class="flex justify-center items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
-          <img [src]="previewImageUrl" alt="History Image Preview"
-            class="max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] rounded-lg shadow-2xl" 
-            (error)="previewImageUrl = '../../../assets/DairryFarmImg/default-history.png'" />
-        </div>
+<!-- Image Preview Modal (Form Style) -->
+<div class="modal fade custom-modal-fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
 
-        <!-- Close Button -->
-        <button type="button"
-          class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white text-gray-800 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
-          (click)="closeImagePreview()" aria-label="Close">
-          <i class="ri-close-line text-lg sm:text-xl"></i>
+      <!-- Header -->
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon bg-green-100 text-green-700">
+            <i class="ri-image-line"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title">Image Preview</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" (click)="closeImagePreview()"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body custom-modal-body">
+        <div class="flex items-center justify-center">
+          <div class="bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
+            <img [src]="previewImageUrl"
+              class="max-h-[60vh] max-w-full object-contain rounded-xl bg-white p-2 shadow-md" alt="Preview Image"
+              (error)="previewImageUrl='../../../assets/DairryFarmImg/default-history.png'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer custom-modal-footer">
+        <button type="button" class="custom-btn custom-btn-cancel" (click)="closeImagePreview()">
+          <i class="ri-close-line"></i> Close
         </button>
       </div>
+
     </div>
   </div>
 </div>

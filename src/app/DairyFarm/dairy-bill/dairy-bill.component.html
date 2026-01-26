@@ -77,10 +77,14 @@
 
                 <div class="flex items-center gap-2.5 sm:gap-3">
                   <!-- Image -->
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0">
+                  <div
+                    class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
+                    (click)="$event.stopPropagation(); openImagePreviewWithUrl(bill.BillImage)">
+
                     <img [src]="bill.BillImage || '../../../assets/DairryFarmImg/bill_1052856.png'"
                       class="w-full h-full object-cover" (error)="handleCardImageError(bill)">
                   </div>
+
 
                   <!-- Content -->
                   <div class="flex-1 min-w-0">
@@ -147,7 +151,9 @@
           <!-- Image Container -->
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
             class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-2 sm:mr-3 flex-shrink-0"
-            (click)="openImagePreview()" title="Click to view full image">
+            (click)="openImagePreviewWithUrl(billForm.get('BillImage')?.value || imagePreview)"
+            title="Click to view full image">
+
             <img [src]="billForm.get('BillImage')?.value || '../../../assets/DairryFarmImg/bill_1052856.png'"
               alt="Bill Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               (error)="billForm.get('BillImage')?.setValue('../../../assets/DairryFarmImg/bill_1052856.png')" />
@@ -386,10 +392,10 @@
               </div>
 
               <!-- Actual image -->
-              <img [src]="viewImageUrl" alt="Bill Image"
-                class="w-full h-full object-contain p-1.5 sm:p-2 transition-opacity duration-300"
-                (error)="handleViewImageError()" [class.opacity-0]="isLoadingImage"
-                [class.opacity-100]="!isLoadingImage">
+              <img [src]="viewImageUrl" class="w-full h-full object-contain p-1.5 sm:p-2 cursor-pointer"
+                (click)="openImagePreviewWithUrl(viewImageUrl)" (error)="handleViewImageError()"
+                [class.opacity-0]="isLoadingImage" [class.opacity-100]="!isLoadingImage">
+
             </div>
           </div>
 
@@ -448,25 +454,40 @@
   </div>
 </div>
 
-<!-- Image Preview Modal -->
-<div class="modal fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content bg-transparent border-0 shadow-none">
-      <div class="modal-body p-0 position-relative">
-        <!-- Large Image -->
-        <div class="flex justify-center items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
-          <img [src]="previewImageUrl" alt="Bill Image Preview"
-            class="max-w-full max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] rounded-lg shadow-2xl"
-            (error)="previewImageUrl = '../../../assets/DairryFarmImg/bill_1052856.png'" />
-        </div>
+<!-- Image Preview Modal (Form Style - Bills Page) -->
+<div class="modal fade custom-modal-fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
 
-        <!-- Close Button -->
-        <button type="button"
-          class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white text-gray-800 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
-          (click)="closeImagePreview()" aria-label="Close">
-          <i class="ri-close-line text-lg sm:text-xl"></i>
+      <!-- Header -->
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon bg-green-100 text-green-700">
+            <i class="ri-image-line"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title">Image Preview</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" (click)="closeImagePreview()"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body custom-modal-body">
+        <div class="flex items-center justify-center">
+          <div class="bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
+            <img [src]="previewImageUrl"
+              class="max-h-[60vh] max-w-full object-contain rounded-xl bg-white p-2 shadow-md" alt="Preview Image"
+              (error)="previewImageUrl='../../../assets/DairryFarmImg/bill_1052856.png'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer custom-modal-footer">
+        <button type="button" class="custom-btn custom-btn-cancel" (click)="closeImagePreview()">
+          <i class="ri-close-line"></i> Close
         </button>
       </div>
+
     </div>
   </div>
 </div>
