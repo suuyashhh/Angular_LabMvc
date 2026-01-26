@@ -79,12 +79,15 @@
 
                 <div class="flex items-center gap-2.5 sm:gap-3">
                   <!-- Image -->
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0">
+                  <div
+                    class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
+                    (click)="$event.stopPropagation(); openImagePreviewWithUrl(medicine.AnimalImage)">
+
                     <img [src]="medicine.AnimalImage || '../../../assets/DairryFarmImg/tablet_16443237.png'"
                       class="w-full h-full object-cover"
-                      (error)="medicine.AnimalImage = '../../../assets/DairryFarmImg/tablet_16443237.png'"
-                      (click)="previewCardImage(medicine); $event.stopPropagation()">
+                      (error)="medicine.AnimalImage='../../../assets/DairryFarmImg/tablet_16443237.png'">
                   </div>
+
 
                   <!-- Content -->
                   <div class="flex-1 min-w-0">
@@ -139,7 +142,9 @@
           <!-- Image Container -->
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
             class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl bg-green-50 hover:bg-green-100 cursor-pointer transition-colors mr-2 sm:mr-3 flex-shrink-0"
-            (click)="openImagePreview()" title="Click to view full image">
+            (click)="openImagePreviewWithUrl(medicienForm.get('AnimalImage')?.value || imagePreview)"
+            title="Click to view full image">
+
             <img [src]="medicienForm.get('AnimalImage')?.value || '../../../assets/DairryFarmImg/tablet_16443237.png'"
               alt="Medicine Image" class="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               (error)="medicienForm.get('AnimalImage')?.setValue('../../../assets/DairryFarmImg/tablet_16443237.png')" />
@@ -444,9 +449,10 @@
           <div class="text-center">
             <div
               class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-blue-200 bg-blue-50">
-              <img [src]="viewImageUrl || '../../../assets/DairryFarmImg/tablet_16443237.png'" alt="Medicine Image"
-                class="w-full h-full object-contain p-1.5 sm:p-2" (error)="onViewImageError($event)"
-                (click)="previewViewImage()">
+              <img [src]="viewImageUrl || '../../../assets/DairryFarmImg/tablet_16443237.png'"
+                class="w-full h-full object-contain p-1.5 sm:p-2 cursor-pointer"
+                (click)="openImagePreviewWithUrl(viewImageUrl)" (error)="onViewImageError($event)">
+
               <div *ngIf="isLoadingViewImage" class="absolute inset-0 flex items-center justify-center bg-blue-50">
                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
               </div>
@@ -511,6 +517,44 @@
           <i class="ri-close-line"></i> Close
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Preview Modal (Form Style - Medicine Page) -->
+<div class="modal fade custom-modal-fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+
+      <!-- Header -->
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon bg-green-100 text-green-700">
+            <i class="ri-image-line"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title">Image Preview</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" (click)="closeImagePreview()"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body custom-modal-body">
+        <div class="flex items-center justify-center">
+          <div class="bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
+            <img [src]="previewImageUrl"
+              class="max-h-[60vh] max-w-full object-contain rounded-xl bg-white p-2 shadow-md" alt="Preview Image"
+              (error)="previewImageUrl='../../../assets/DairryFarmImg/tablet_16443237.png'">
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer custom-modal-footer">
+        <button type="button" class="custom-btn custom-btn-cancel" (click)="closeImagePreview()">
+          <i class="ri-close-line"></i> Close
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

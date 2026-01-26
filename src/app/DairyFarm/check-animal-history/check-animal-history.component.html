@@ -8,7 +8,9 @@
 
   <!-- Icon -->
   <div
-    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
+    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0 cursor-pointer"
+    (click)="openImagePreviewWithUrl(selectedAnimal?.animalImage)">
+
     <img *ngIf="selectedAnimal?.animalImage" [src]="selectedAnimal.animalImage" alt="Animal"
       class="w-full h-full object-cover" />
 
@@ -67,11 +69,17 @@
             class="bg-white border border-green-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
 
             <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 rounded-lg overflow-hidden bg-green-50 border flex items-center justify-center">
-                <img *ngIf="animal.animalImage" [src]="animal.animalImage" class="w-full h-full object-cover" />
+              <div
+                class="w-12 h-12 rounded-lg overflow-hidden bg-green-50 border flex items-center justify-center cursor-pointer"
+                (click)="$event.stopPropagation(); openImagePreviewWithUrl(animal.animalImage)">
+
+                <img *ngIf="animal.animalImage" [src]="animal.animalImage" class="w-full h-full object-cover"
+                  (error)="onAnimalImageError(animal)" />
+
                 <img *ngIf="!animal.animalImage" src="../../../assets/DairryFarmImg/AniHistory.png"
                   class="w-7 h-7 object-contain" />
               </div>
+
 
               <div class="min-w-0">
                 <h3 class="font-medium text-green-900 truncate">{{ animal.animalName }}</h3>
@@ -188,4 +196,42 @@
     </ng-container>
 
   </div>
+  <!-- Image Preview Modal (Form Style) -->
+  <div class="modal fade custom-modal-fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+      <div class="modal-content custom-modal-content">
+
+        <!-- Header -->
+        <div class="modal-header custom-modal-header">
+          <div class="modal-title-wrapper">
+            <div class="modal-icon bg-green-100 text-green-700">
+              <i class="ri-image-line"></i>
+            </div>
+            <h5 class="modal-title custom-modal-title">Image Preview</h5>
+          </div>
+          <button type="button" class="btn-close custom-btn-close" (click)="closeImagePreview()"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body custom-modal-body">
+          <div class="flex items-center justify-center">
+            <div class="bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
+              <img [src]="previewImageUrl"
+                class="max-h-[60vh] max-w-full object-contain rounded-xl bg-white p-2 shadow-md" alt="Preview Image"
+                (error)="previewImageUrl='../../../assets/DairryFarmImg/AniHistory.png'">
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer custom-modal-footer">
+          <button type="button" class="custom-btn custom-btn-cancel" (click)="closeImagePreview()">
+            <i class="ri-close-line"></i> Close
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </main>

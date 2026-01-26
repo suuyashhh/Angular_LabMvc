@@ -122,7 +122,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   closeImagePreview(): void {
-    this.isImagePreviewOpen = false;
     this.hideImagePreviewModal();
   }
 
@@ -135,7 +134,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
-      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
       backdrop.addEventListener('click', () => this.closeImagePreview());
       document.body.appendChild(backdrop);
     }
@@ -152,6 +150,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
   }
+
 
   handleCardImageError(feed: any): void {
     feed.feedImage = '../../../assets/DairryFarmImg/seed-bag_12627079.png';
@@ -500,25 +499,25 @@ export class FeedsComponent implements OnInit, OnDestroy {
     }));
   }
 
-getDateString(date: any): string {
-  if (!date) return 'Unknown Date';
+  getDateString(date: any): string {
+    if (!date) return 'Unknown Date';
 
-  try {
-    const d = new Date(date);
+    try {
+      const d = new Date(date);
 
-    const day = d.getDate().toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
 
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const month = monthNames[d.getMonth()];
-    const year = d.getFullYear();
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
 
-    return `${day}-${month}-${year}`;   // ✅ 17-Jan-2026
-  } catch {
-    return 'Unknown Date';
+      return `${day}-${month}-${year}`;   // ✅ 17-Jan-2026
+    } catch {
+      return 'Unknown Date';
+    }
   }
-}
 
 
   // ==================== CRUD OPERATIONS ====================
@@ -820,6 +819,12 @@ getDateString(date: any): string {
       this.openDeleteModal(feed);
     }, 300);
   }
+
+  openImagePreviewWithUrl(imageUrl: string | null): void {
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/seed-bag_12627079.png';
+    this.showImagePreviewModal();
+  }
+
 
 
 

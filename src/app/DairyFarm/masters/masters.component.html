@@ -59,23 +59,27 @@
             <div *ngFor="let a of filteredAnimals()"
               class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
               <!-- Image -->
-              <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img [src]="getAnimalImage(a)" alt="{{ getAnimalName(a) }}" class="w-full h-full object-cover"
-                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0yNCAyMEMyOC40MTgzIDIwIDMyIDE2LjQxODMgMzIgMTJDMzIgNy41ODE3MiAyOC40MTgzIDQgMjQgNEMxOS41ODE3IDQgMTYgNy41ODE3MiAxNiAxMkMxNiAxNi40MTgzIDE5LjU4MTcgMjAgMjQgMjBaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTEyLjUgMzhDMTMuODgwNyAzOCAxNSAzNi44ODA3IDE1IDM1LjVDMTUgMzQuMTE5MyAxMy44ODA3IDMzIDEyLjUgMzNDMTEuMTE5MyAzMyAxMCAzNC4xMTkzIDEwIDM1LjVDMTAgMzYuODgwNyAxMS4xMTkzIDM4IDEyLjUgMzhaIiBmaWxsPSIjMERCNjZGIi8+PHBhdGggZD0iTTM0IDM4QzM0IDMxLjM3MjYgMjkuNjk2IDI2IDI0LjUgMjZDMTkuMzA0IDI2IDE1IDMxLjM3MjYgMTUgMzhIMzRaIiBmaWxsPSIjMERCNjZGIi8+PC9zdmc+'">
+              <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
+                (click)="openImagePreview(getAnimalImage(a))">
+
+                <img [src]="getAnimalImage(a)"
+                  class="w-full h-full object-cover hover:scale-105 transition-transform" />
               </div>
-              
+
+
               <!-- Info -->
               <div class="flex-1 min-w-0">
                 <div class="text-green-800 font-medium truncate">{{ getAnimalName(a) }}</div>
                 <div class="text-xs text-green-500 mt-1">ID: {{ getAnimalId(a) }}</div>
               </div>
-              
+
               <!-- Actions Dropdown -->
               <div class="dropdown flex-shrink-0">
-                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
-                  type="button" id="animalCardDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown" aria-expanded="false"
-                  (click)="$event.stopPropagation()">
-                  <span>Actions</span>                  
+                <button
+                  class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
+                  type="button" id="animalCardDropdown{{ getAnimalId(a) }}" data-bs-toggle="dropdown"
+                  aria-expanded="false" (click)="$event.stopPropagation()">
+                  <span>Actions</span>
                 </button>
                 <ul class="dropdown-menu min-w-32 shadow-lg rounded-lg p-1 bg-white border border-green-100"
                   [attr.aria-labelledby]="'animalCardDropdown' + getAnimalId(a)">
@@ -125,20 +129,23 @@
             <div *ngFor="let f of filteredFeeds()"
               class="bg-white border border-green-100 rounded-lg p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
               <!-- Image -->
-              <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img [src]="getFeedImage(f)" alt="{{ getFeedName(f) }}" class="w-full h-full object-cover"
-                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSIjRkZGIiBzdHJva2U9IiNERURFREUiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik0xNiAyM0MxNiAyNy40MTgzIDE5LjU4MTcgMzEgMjQgMzFDMjguNDE4MyAzMSAzMiAyNy40MTgzIDMyIDIzQzMyIDE4LjU4MTcgMjguNDE4MyAxNSAyNCAxNUMxOS41ODE3IDE1IDE2IDE4LjU4MTcgMTYgMjNaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI3IDMyQzI3IDMwLjM0MzEgMjUuNjU2OSAyOSAyNCAyOUMyMi4zNDMxIDI5IDIxIDMwLjM0MzEgMjEgMzJIMjdaIiBmaWxsPSIjNTlBMDI3Ii8+PHBhdGggZD0iTTI0IDM0QzMwLjYyNzQgMzQgMzYgMjguNjI3NCAzNiAyMkMzNiAxNS4zNzI2IDMwLjYyNzQgMTAgMjQgMTBDMTcuMzcyNiAxMCAxMiAxNS4zNzI2IDEyIDIyQzEyIDI4LjYyNzQgMTcuMzcyNiAzNCAyNCAzNFoiIHN0cm9rZT0iIzU5QTAyNyIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+'">
+              <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
+                (click)="openImagePreview(getFeedImage(f))">
+
+                <img [src]="getFeedImage(f)" class="w-full h-full object-cover hover:scale-105 transition-transform" />
               </div>
-              
+
+
               <!-- Info -->
               <div class="flex-1 min-w-0">
                 <div class="text-green-800 font-medium truncate">{{ getFeedName(f) }}</div>
                 <div class="text-xs text-green-500 mt-1">ID: {{ getFeedId(f) }}</div>
               </div>
-              
+
               <!-- Actions Dropdown -->
               <div class="dropdown flex-shrink-0">
-                <button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
+                <button
+                  class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 hover:bg-green-100 dropdown-toggle"
                   type="button" id="feedCardDropdown{{ getFeedId(f) }}" data-bs-toggle="dropdown" aria-expanded="false"
                   (click)="$event.stopPropagation()">
                   <span>Actions</span>
@@ -462,6 +469,53 @@
           </div>
         </form>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Image Preview Modal (Form-Style UI) -->
+<div class="modal fade custom-modal-fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+    <div class="modal-content custom-modal-content">
+
+      <!-- Header -->
+      <div class="modal-header custom-modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon bg-green-100 text-green-700">
+            <i class="ri-image-line"></i>
+          </div>
+          <h5 class="modal-title custom-modal-title">Image Preview</h5>
+        </div>
+        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body custom-modal-body">
+
+        <div class="flex items-center justify-center">
+          <div class="relative bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
+
+            <img [src]="previewImageSrc"
+              class="max-h-[60vh] max-w-full object-contain rounded-xl bg-white p-2 shadow-md" alt="Preview Image"
+              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIHJ4PSIxNiIgZmlsbD0iI0ZGRiIgc3Ryb2tlPSIjRERERCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE1MCAxMDBDMjA1IDEwMCAyNTAgMTQ1IDI1MCAyMDBDMjUwIDI1NSAyMDUgMzAwIDE1MCAzMDBDMTAwIDMwMCA1MCAyNTUgNTAgMjAwQzUwIDE0NSAxMDAgMTAwIDE1MCAxMDBaIiBmaWxsPSIjOTlDQ0E1Ii8+PC9zdmc+'">
+
+          </div>
+        </div>
+
+        <p class="text-center text-xs text-green-600 mt-3">
+          Tap outside or press close to exit preview
+        </p>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer custom-modal-footer">
+        <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+          <i class="ri-close-line"></i> Close
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

@@ -22,7 +22,7 @@ export class MastersComponent implements OnInit {
   // Forms
   animalForm!: FormGroup;
   feedForm!: FormGroup;
-  
+
   // Image compression properties
   animalImageSize: string = '';
   feedImageSize: string = '';
@@ -72,13 +72,16 @@ export class MastersComponent implements OnInit {
   currentAnimal: any = null;
   currentFeed: any = null;
 
+  previewImageSrc: string = '';
+
+
   constructor(
     private api: ApiService,
     private toastr: ToastrService,
     private service: ServicesService,
     private auth: AuthService,
     private router: Router,
-        private loader: LoaderService
+    private loader: LoaderService
   ) { }
 
   ngOnInit(): void {
@@ -476,20 +479,20 @@ export class MastersComponent implements OnInit {
       return;
     }
 
-    
+
     this.loader.show();
     this.api.get(`DairyMasters/Animals/${this.dairyUserId}`).subscribe({
       next: (res: any) => {
         this.animals = res || [];
-      
-    this.loader.hide();
+
+        this.loader.hide();
       },
       error: (err) => {
         console.error('loadAnimals', err);
         this.toastr.error('Failed to load animal list');
         this.animals = [];
-       
-    this.loader.hide();
+
+        this.loader.hide();
       }
     });
   }
@@ -626,19 +629,19 @@ export class MastersComponent implements OnInit {
       return;
     }
 
-    
+
     this.loader.show();
     this.api.get(`DairyMasters/Feeds/${this.dairyUserId}`).subscribe({
       next: (res: any) => {
         this.feeds = res || [];
-       
-    this.loader.hide();
+
+        this.loader.hide();
       },
       error: (err) => {
         console.error('loadFeeds', err);
         this.toastr.error('Failed to load feeds');
         this.feeds = [];
-    this.loader.hide();
+        this.loader.hide();
       }
     });
   }
@@ -766,4 +769,17 @@ export class MastersComponent implements OnInit {
     }
     return ''; // Return empty if no image
   }
+
+  openImagePreview(imageSrc: string) {
+    if (!imageSrc) return;
+
+    this.previewImageSrc = imageSrc;
+
+    const modalEl = document.getElementById('imagePreviewModal');
+    if (modalEl) {
+      const modal = new (window as any).bootstrap.Modal(modalEl);
+      modal.show();
+    }
+  }
+
 }

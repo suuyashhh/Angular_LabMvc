@@ -33,7 +33,7 @@ export class HomeComponent {
     }
 
     this.loadNotificationCount();
-    //this.updateBreedingNotification();
+    this.updateBreedingNotification();
   }
 
   dairyLogout(): void {
@@ -91,13 +91,13 @@ export class HomeComponent {
   }
 
 
-confirmLogout(): void {
-  this.showLogoutConfirm = true;
-}
+  confirmLogout(): void {
+    this.showLogoutConfirm = true;
+  }
 
-logoutConfirmed(): void {
-  this.showLogoutConfirm = false;
-  this.dairyLogout();
-}
+  logoutConfirmed(): void {
+    this.showLogoutConfirm = false;
+    this.dairyLogout();
+  }
 
 }

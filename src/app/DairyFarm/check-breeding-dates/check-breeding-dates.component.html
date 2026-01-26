@@ -9,13 +9,15 @@
 
   <!-- Icon -->
   <div
-    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0">
-    <img *ngIf="selectedAnimal?.animalImage" [src]="selectedAnimal.animalImage" alt="Animal"
-              class="w-full h-full object-cover" />
+    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner flex-shrink-0 cursor-pointer"
+    (click)="openImagePreviewWithUrl(selectedAnimal?.animalImage)">
 
-            <img *ngIf="!selectedAnimal?.animalImage" src="assets/DairryFarmImg/Breedingdate.png"
-              alt="Breeding Date Check" class="w-7 h-7 object-contain" />
-          </div>
+    <img *ngIf="selectedAnimal?.animalImage" [src]="selectedAnimal.animalImage" alt="Animal"
+      class="w-full h-full object-cover" />
+
+    <img *ngIf="!selectedAnimal?.animalImage" src="assets/DairryFarmImg/Breedingdate.png" alt="Breeding Date Check"
+      class="w-7 h-7 object-contain" />
+  </div>
 
   <!-- Title -->
   <div class="min-w-0">
@@ -48,8 +50,7 @@
           <!-- Search -->
           <div class="relative">
             <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"
-              placeholder="Search animals by name or reason..."
-              class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+              placeholder="Search animals by name or reason..." class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
                      py-2 pl-10 pr-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-400">
               <i class="ri-search-2-fill"></i>
@@ -58,8 +59,7 @@
 
           <!-- Status Filter -->
           <div>
-            <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilter()"
-              class="block w-full rounded-md border border-green-200 bg-white text-green-800
+            <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilter()" class="block w-full rounded-md border border-green-200 bg-white text-green-800
                      py-2 pl-3 pr-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200">
               <option value="all">All Status</option>
               <option value="Recent">Recent (&lt;30 days)</option>
@@ -114,11 +114,17 @@
             <div class="flex items-center justify-between mb-3">
 
               <div class="flex items-center gap-3 min-w-0">
-                <div class="w-12 h-12 rounded-lg overflow-hidden bg-green-50 border flex items-center justify-center">
-                  <img *ngIf="animal.animalImage" [src]="animal.animalImage" class="w-full h-full object-cover" />
+                <div
+                  class="w-12 h-12 rounded-lg overflow-hidden bg-green-50 border flex items-center justify-center cursor-pointer"
+                  (click)="$event.stopPropagation(); openImagePreviewWithUrl(animal.animalImage)">
+
+                  <img *ngIf="animal.animalImage" [src]="animal.animalImage" class="w-full h-full object-cover"
+                    (error)="onAnimalImageError(animal)" />
+
                   <img *ngIf="!animal.animalImage" src="../../../assets/DairryFarmImg/Breedingdate.png"
                     class="w-7 h-7 object-contain" />
                 </div>
+
 
                 <div class="min-w-0">
                   <h3 class="font-medium text-green-900 truncate">{{ animal.animalName }}</h3>
@@ -169,8 +175,7 @@
       <!-- Search -->
       <div class="bg-white rounded-xl shadow-sm p-3 sm:p-4">
         <div class="relative">
-          <input type="text" placeholder="Search breeding records..."
-            class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
+          <input type="text" placeholder="Search breeding records..." class="block w-full rounded-md border border-green-200 bg-white text-green-800 placeholder-green-400
                    py-2 pl-10 pr-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-green-200">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-400">
             <i class="ri-search-2-fill"></i>
@@ -219,8 +224,7 @@
             <!-- Records -->
             <div class="space-y-2 ml-3 border-l border-green-200 pl-4">
 
-              <div *ngFor="let record of group.value"
-                class="bg-white border border-green-100 rounded-lg p-3 shadow-sm">
+              <div *ngFor="let record of group.value" class="bg-white border border-green-100 rounded-lg p-3 shadow-sm">
 
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs mb-1"
                   [ngClass]="getRecordStatusBadge(record.daysSinceBreeding)">
@@ -260,4 +264,42 @@
     </ng-container>
 
   </div>
+  <!-- Image Preview Modal (Form Style) -->
+  <div class="modal fade custom-modal-fade" #imagePreviewModal tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+      <div class="modal-content custom-modal-content">
+
+        <!-- Header -->
+        <div class="modal-header custom-modal-header">
+          <div class="modal-title-wrapper">
+            <div class="modal-icon bg-green-100 text-green-700">
+              <i class="ri-image-line"></i>
+            </div>
+            <h5 class="modal-title custom-modal-title">Image Preview</h5>
+          </div>
+          <button type="button" class="btn-close custom-btn-close" (click)="closeImagePreview()"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body custom-modal-body">
+          <div class="flex items-center justify-center">
+            <div class="bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
+              <img [src]="previewImageUrl"
+                class="max-h-[60vh] max-w-full object-contain rounded-xl bg-white p-2 shadow-md" alt="Preview Image"
+                (error)="previewImageUrl='../../../assets/DairryFarmImg/Breedingdate.png'">
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer custom-modal-footer">
+          <button type="button" class="custom-btn custom-btn-cancel" (click)="closeImagePreview()">
+            <i class="ri-close-line"></i> Close
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </main>

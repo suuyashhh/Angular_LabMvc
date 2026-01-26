@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -17,6 +17,9 @@ import { LoaderService } from '../../services/loader.service';
   styleUrls: ['./check-animal-history.component.css']
 })
 export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
+
+  @ViewChild('imagePreviewModal') imagePreviewModal!: ElementRef;
+
   // Page states
   currentPage: 'list' | 'detail' = 'list';
 
@@ -34,6 +37,9 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   isLoadingHistory: boolean = false;
   userId: number = 0;
+
+  previewImageUrl: string = '';
+
 
   constructor(
     private api: ApiService,
@@ -262,4 +268,44 @@ export class CheckAnimalHistoryComponent implements OnInit, OnDestroy {
   get totalExpenses(): number {
     return this.healthHistory.reduce((sum, record) => sum + (record.price || 0), 0);
   }
+
+  openImagePreviewWithUrl(imageUrl: string | null): void {
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/AniHistory.png';
+    this.showImagePreviewModal();
+  }
+
+  closeImagePreview(): void {
+    this.hideImagePreviewModal();
+  }
+
+  showImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      document.body.classList.add('modal-open');
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      backdrop.addEventListener('click', () => this.closeImagePreview());
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  hideImagePreviewModal(): void {
+    const modalElement = this.imagePreviewModal?.nativeElement;
+    if (modalElement) {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
+  }
+
+  onAnimalImageError(animal: any): void {
+    animal.animalImage = '../../../assets/DairryFarmImg/AniHistory.png';
+  }
+
 }

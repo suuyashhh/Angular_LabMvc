@@ -55,7 +55,6 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   isUploadingImage: boolean = false;
   imageError: string = '';
   previewImageUrl: string = '';
-  isImagePreviewOpen: boolean = false;
 
   // Button loading states
   isSaving: boolean = false;
@@ -240,23 +239,17 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   }
 
   // ==================== IMAGE PREVIEW METHODS ====================
-  openImagePreview(): void {
-    const imageUrl = this.feedForm.get('feedImage')?.value || this.imagePreview;
-    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
-    this.isImagePreviewOpen = true;
-    this.showImagePreviewModal();
-  }
 
-  previewCardImage(feed: any): void {
-    this.previewImageUrl = feed.feedImage || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
-    this.isImagePreviewOpen = true;
+
+  openImagePreviewWithUrl(imageUrl: string | null): void {
+    this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
     this.showImagePreviewModal();
   }
 
   closeImagePreview(): void {
-    this.isImagePreviewOpen = false;
     this.hideImagePreviewModal();
   }
+
 
   showImagePreviewModal(): void {
     const modalElement = this.imagePreviewModal?.nativeElement;
@@ -267,7 +260,6 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
 
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
-      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
       backdrop.addEventListener('click', () => this.closeImagePreview());
       document.body.appendChild(backdrop);
     }
@@ -284,6 +276,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
   }
+
 
   handleCardImageError(feed: any): void {
     feed.feedImage = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
@@ -573,24 +566,24 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   }
 
   getDateString(date: any): string {
-  if (!date) return 'Unknown Date';
+    if (!date) return 'Unknown Date';
 
-  try {
-    const d = new Date(date);
+    try {
+      const d = new Date(date);
 
-    const day = d.getDate().toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
 
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const month = monthNames[d.getMonth()];
-    const year = d.getFullYear();
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
 
-    return `${day}-${month}-${year}`;  
-  } catch {
-    return 'Unknown Date';
+      return `${day}-${month}-${year}`;
+    } catch {
+      return 'Unknown Date';
+    }
   }
-}
 
   // ==================== CRUD OPERATIONS ====================
   loadFeeds(): void {

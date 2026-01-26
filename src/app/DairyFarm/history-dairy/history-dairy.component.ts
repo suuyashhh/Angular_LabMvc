@@ -25,7 +25,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   filteredHistory: any[] = [];
   groupedHistory: Map<string, any[]> = new Map();
   typeCounts: { [key: string]: number } = {};
-  
+
   // Selected Item
   selectedHistory: any = null;
   viewImageUrl: string = '';
@@ -90,7 +90,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           this.history = Array.isArray(response) ? response : [];
-          
+
           // Process each history item to add display properties
           this.history.forEach(item => {
             item.DisplayTitle = this.getDisplayTitle(item);
@@ -99,8 +99,12 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
             item.IconClass = this.getTypeIconClass(item.expense_name);
             item.FormattedPrice = this.getFormattedPrice(item);
             item.PriceColor = this.getPriceColor(item.expense_name);
+
+            // ✅ Add searchable date text: 22-Jan-2026
+            item.SearchDate = this.formatDateDisplay(item.date);
           });
-          
+
+
           this.filteredHistory = [...this.history];
           this.calculateTypeCounts();
           this.groupByDate();
@@ -117,7 +121,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   // ==================== SEARCH & FILTER ====================
   onSearch(): void {
     const search = this.searchTerm.toLowerCase().trim();
-    
+
     if (!search && !this.selectedType) {
       this.filteredHistory = [...this.history];
       this.groupByDate();
@@ -139,8 +143,10 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
         (item.feed_name && item.feed_name.toLowerCase().includes(search)) ||
         (item.animal_name && item.animal_name.toLowerCase().includes(search)) ||
         (item.reason && item.reason.toLowerCase().includes(search)) ||
-        (item.animal_type && item.animal_type.toLowerCase().includes(search))
+        (item.animal_type && item.animal_type.toLowerCase().includes(search)) ||
+        (item.SearchDate && item.SearchDate.toLowerCase().includes(search)) // ✅ date search
       );
+
     });
 
     this.groupByDate();
@@ -153,7 +159,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   // ==================== GROUPING ====================
   groupByDate(): void {
     this.groupedHistory.clear();
-    
+
     this.filteredHistory.forEach(item => {
       const dateKey = this.formatDateDisplay(item.date);
       if (!this.groupedHistory.has(dateKey)) {
@@ -182,13 +188,13 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   async openViewModal(item: any): Promise<void> {
     this.selectedHistory = item;
     this.isLoadingImage = true;
-    
+
     // Initially show default image
     this.viewImageUrl = this.getDefaultIconForType(item.expense_name);
-    
+
     // Show the modal immediately
     this.showViewModal();
-    
+
     // Now fetch the actual image from API
     await this.loadHistoryImage(item);
   }
@@ -210,10 +216,10 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           // Try different possible property names for the image
-          const image = response?.Image || response?.image || 
-                       response?.feedImage || response?.AnimalImage || 
-                       response?.doctorImage || response?.billImage;
-          
+          const image = response?.Image || response?.image ||
+            response?.feedImage || response?.AnimalImage ||
+            response?.doctorImage || response?.billImage;
+
           if (image && image.trim() !== '' && !image.includes('undefined')) {
             // Check if it's a base64 image or a URL
             if (image.startsWith('data:image') || image.startsWith('http')) {
@@ -242,12 +248,13 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   }
 
   previewImage(): void {
-    if (this.viewImageUrl && !this.viewImageUrl.includes('default-history.png')) {
+    if (this.viewImageUrl) {
       this.previewImageUrl = this.viewImageUrl;
       this.isImagePreviewOpen = true;
       this.showImagePreviewModal();
     }
   }
+
 
   closeViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -258,7 +265,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     // Reset view modal data
     this.selectedHistory = null;
     this.viewImageUrl = '';
@@ -290,7 +297,6 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
 
       const backdrop = document.createElement('div');
       backdrop.className = 'modal-backdrop fade show';
-      backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
       backdrop.addEventListener('click', () => this.closeImagePreview());
       document.body.appendChild(backdrop);
     }
@@ -306,14 +312,15 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) backdrop.remove();
     }
-    
+
     this.isImagePreviewOpen = false;
   }
+
 
   // ==================== PRICE FORMATTING METHODS ====================
   getFormattedPrice(item: any): string {
     const price = item.price || 0;
-    
+
     if (item.expense_name === 'Bill') {
       // For Bills: Green with + prefix
       return `+₹${price}`;
@@ -396,7 +403,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   }
 
   getDisplayTitle(item: any): string {
-    switch(item.expense_name) {
+    switch (item.expense_name) {
       case 'Feeds':
       case 'OtherFeeds':
         return item.feed_name || 'Feed Purchase';
@@ -412,7 +419,7 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
   }
 
   getDisplaySubtitle(item: any): string {
-    switch(item.expense_name) {
+    switch (item.expense_name) {
       case 'Feeds':
       case 'OtherFeeds':
         return item.animal_name ? `For: ${item.animal_name}` : '';
@@ -433,22 +440,27 @@ export class HistoryDairyComponent implements OnInit, OnDestroy {
 
   formatDateDisplay(date: any): string {
     if (!date) return '';
-    
+
     try {
-      const dateObj = new Date(date);
-      return dateObj.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
+      const d = new Date(date);
+
+      const day = String(d.getDate()).padStart(2, '0');
+
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = monthNames[d.getMonth()];
+
+      const year = d.getFullYear();
+
+      return `${day}-${month}-${year}`;
     } catch {
       return '';
     }
   }
 
+
   formatTime(date: any): string {
     if (!date) return '';
-    
+
     try {
       const dateObj = new Date(date);
       return dateObj.toLocaleTimeString('en-IN', {
