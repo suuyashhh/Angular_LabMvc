@@ -145,12 +145,12 @@ isDairyLoggedIn(): boolean {
 
 setDairyCredentialsCookie(value: any, days: number = 7): void {
   try {
-    const json = JSON.stringify(value);
-    const encoded = encodeURIComponent(json);
-    const expires = new Date();
-    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-    document.cookie = `dairyCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
-  } catch (e) {
+  const json = JSON.stringify(value);
+  const encoded = encodeURIComponent(json);
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `dairyCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+   } catch (e) {
     console.error('Failed to set dairy cookie', e);
   }
 }
