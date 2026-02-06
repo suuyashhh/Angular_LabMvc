@@ -56,53 +56,58 @@
       </button>
     </div>
 
-    
-  <!-- Card Grid -->
-  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
+    <!-- Empty State -->
+    <div *ngIf="items.length === 0" 
+         class="text-center text-gray-400 mt-16">
+      No Farm Categories Added Yet 🌱
+    </div>
 
-    <!-- Card -->
-    <div *ngFor="let item of items; let i = index"
-         class="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden relative group hover:shadow-xl transition">
+    <!-- Card Grid -->
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
 
-      <!-- 3 Dot Menu -->
-      <button
-        (click)="toggleMenu(i)"
-        class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-xl">
-        ⋮
-      </button>
+      <!-- Card -->
+      <div *ngFor="let item of items; let i = index"
+           class="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden relative group hover:shadow-xl transition">
 
-      <!-- Dropdown -->
-      <div *ngIf="menuIndex === i"
-           class="absolute right-3 top-12 bg-white shadow-xl rounded-xl border border-gray-100 w-28 z-10">
-
+        <!-- 3 Dot Menu -->
         <button
-          (click)="editItem(item)"
-          class="block w-full text-left px-4 py-2 hover:bg-amber-50">
-          Edit
+          (click)="toggleMenu(i)"
+          class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-xl">
+          ⋮
         </button>
 
-        <button
-          (click)="deleteItem(i)"
-          class="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-50">
-          Delete
-        </button>
-      </div>
+        <!-- Dropdown -->
+        <div *ngIf="menuIndex === i"
+             class="absolute right-3 top-12 bg-white shadow-xl rounded-xl border border-gray-100 w-28 z-10">
 
-      <!-- Image -->
-      <div class="h-44 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-        <img *ngIf="item.image"
-             [src]="item.image"
-             class="h-full w-full object-cover" />
-      </div>
+          <button
+            (click)="editItem(item)"
+            class="block w-full text-left px-4 py-2 hover:bg-amber-50">
+            Edit
+          </button>
 
-      <!-- Name -->
-      <div class="p-4 text-center font-semibold text-gray-700">
-        {{ item.name }}
+          <button
+            (click)="deleteItem(item)"
+            class="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-50">
+            Delete
+          </button>
+        </div>
+
+        <!-- Image -->
+        <div class="h-44 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center overflow-hidden">
+          <img *ngIf="item.IMAGE"
+               [src]="item.IMAGE"
+               class="h-full w-full object-cover" />
+        </div>
+
+        <!-- Name -->
+        <div class="p-4 text-center font-semibold text-gray-700">
+          {{ item.FARM_NAME }}
+        </div>
+
       </div>
 
     </div>
-
-  </div>
 
   </div>
 
@@ -121,7 +126,7 @@
       </button>
 
       <h2 class="text-xl font-semibold text-gray-800 mb-5">
-        {{ editMode ? 'Edit Item' : 'Add Item' }}
+        {{ editMode ? 'Edit Farm' : 'Add Farm' }}
       </h2>
 
       <!-- Upload -->
@@ -132,6 +137,7 @@
 
         <input type="file"
                (change)="onFileSelect($event)"
+               accept="image/*"
                class="w-full border border-gray-300 rounded-xl p-2.5 
                       text-gray-700 bg-white
                       focus:ring-2 focus:ring-orange-500 outline-none" />
@@ -145,10 +151,12 @@
       <!-- Name -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Name
+          Farm Name
         </label>
 
         <input type="text"
+               [(ngModel)]="formName"
+               placeholder="Enter Farm Name"
                class="w-full border border-gray-300 rounded-xl px-4 py-2.5
                       bg-white text-gray-800 placeholder-gray-400
                       focus:ring-2 focus:ring-orange-500
@@ -156,21 +164,27 @@
       </div>
 
       <!-- Buttons -->
-      <div class="flex justify-end gap-3">
-        <button
-          (click)="closeModal()"
-          class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-50">
-          Cancel
-        </button>
+ <!-- In your modal buttons section -->
+<div class="flex justify-end gap-3">
+  <button
+    (click)="closeModal()"
+    [disabled]="isSaving || isUpdating"
+    class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+    Cancel
+  </button>
 
-        <button
-          (click)="saveItem()"
-          class="bg-gradient-to-r from-orange-500 to-amber-600 
-                 text-white px-5 py-2 rounded-xl shadow 
-                 hover:from-orange-600 hover:to-amber-700 transition">
-          Save
-        </button>
-      </div>
+  <button
+    (click)="saveItem()"
+    [disabled]="!formName.trim() || isSaving || isUpdating"
+    class="bg-gradient-to-r from-orange-500 to-amber-600 
+           text-white px-5 py-2 rounded-xl shadow 
+           hover:from-orange-600 hover:to-amber-700 transition
+           disabled:opacity-50 disabled:cursor-not-allowed
+           flex items-center justify-center min-w-20">
+    <span *ngIf="isSaving || isUpdating" class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></span>
+    {{ isSaving || isUpdating ? 'Saving...' : 'Save' }}
+  </button>
+</div>
 
     </div>
   </div>
