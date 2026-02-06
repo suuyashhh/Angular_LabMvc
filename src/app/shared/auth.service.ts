@@ -199,4 +199,69 @@ clearDairyCredentialsCookie(): void {
   document.cookie = 'dairyCredentials=; path=/; max-age=0';
 }
 
+
+
+
+
+
+/**Farm Credentials
+ */
+isFarmUserLoggedIn(): boolean {
+  if (!isPlatformBrowser(this.platformId)) return false;
+
+  const farm = this.getFarmUserDetailsFromCookie();
+  return !!farm && typeof farm === 'object';
+}
+
+setFarmUserDetailsCookie(value: any, days: number = 7): void {
+  try {
+  const json = JSON.stringify(value);
+  const encoded = encodeURIComponent(json);
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `FarmCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+   } catch (e) {
+    console.error('Failed to set Farm cookie', e);
+  }
+}
+
+getFarmUserDetailsFromCookie(): any | null {
+  try {
+    const cookies = document.cookie ? document.cookie.split('; ') : [];
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=');
+      if (name === 'FarmCredentials' && value) {
+        const decoded = decodeURIComponent(value);
+        return JSON.parse(decoded);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to read Farm cookie', e);
+  }
+  return null;
+}
+
+farmLogout(): void {
+  try {
+    this.clearDairyCredentialsCookie();
+
+    try {
+      this.toaster.success('Logged out from Farm', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+
+    // Navigate to login page
+    this.router.navigate(['/farm']);
+  } catch (err) {
+    console.error('Logout error', err);
+    this.router.navigate(['/farm']);
+  }
+}
+
+
+clearFarmUserDetailsCookie(): void {
+  document.cookie = 'FarmCredentials=; path=/; max-age=0';
+}
+
 }

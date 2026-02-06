@@ -3,14 +3,16 @@ import { LoginComponent } from './login/login.component';
 import { authGuard } from './shared/auth.guard';
 import { LogindairyComponent } from './LoginDairFarm/logindairy/logindairy.component';
 import { dairyAuthGuard } from './shared/dairy-auth.guard';
+import { LoginfarmComponent } from './LoginFarm/loginfarm/loginfarm.component';
 
 export const routes: Routes = [
 
-  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+  { path: '', redirectTo: 'farm', pathMatch: 'full' },
   { path: 'lab', component: LoginComponent },
 
   { path: 'login', component: LoginComponent },
   { path: 'dairyfarm', component: LogindairyComponent},
+  { path: 'farm', component: LoginfarmComponent},
 
   {
     path: 'portfolio',
@@ -28,6 +30,11 @@ export const routes: Routes = [
     canActivate: [dairyAuthGuard],
     loadComponent: () => import('./DairyFarm/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./DairyFarm/dairyfarm.routes').then(m => m.DAIRYFARM_ROUTES)
+  },
+  {
+    path: 'SF',
+    loadComponent: () => import('./Farm/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./Farm/farm.routes').then(m => m.FARM_ROUTES)
   },
   {
     path: 'ADMIN',

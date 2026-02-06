@@ -1,0 +1,178 @@
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+
+  <!-- ================= NAVBAR ================= -->
+  <nav class="fixed inset-x-4 md:inset-x-10 top-4 rounded-2xl 
+              bg-gradient-to-r from-orange-500 to-amber-600 
+              text-white z-50 shadow-xl backdrop-blur-md">
+
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between h-14">
+
+        <!-- Logo + Title -->
+        <div class="flex items-center gap-3">
+          <img src="../../assets/img/avatars/1.png"
+               class="w-9 h-9 rounded-full object-cover border-2 border-white/40" />
+
+          <span class="font-semibold text-lg tracking-wide">
+            AgriSync Pro
+          </span>
+        </div>
+
+        <!-- Right Section -->
+        <div class="flex items-center gap-3">
+
+          <!-- Notification -->
+          <button routerLink="/SDF/Notification"
+                  class="relative p-2 rounded-full hover:bg-white/20 transition">
+            <i class="ri-notification-3-line text-lg"></i>
+          </button>
+
+          <!-- Logout -->
+          <button
+            class="px-3 py-1.5 rounded-lg bg-white text-orange-600 font-semibold 
+                   hover:bg-orange-100 shadow transition text-sm">
+            Logout
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== PAGE CONTENT ===== -->
+  <div class="pt-24 px-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-800">Farm Categories</h1>
+
+      <button
+        (click)="openModal()"
+        class="bg-gradient-to-r from-orange-500 to-amber-600 
+               text-white px-5 py-2.5 rounded-xl shadow-lg 
+               hover:from-orange-600 hover:to-amber-700 transition 
+               flex items-center gap-2">
+        <span class="text-xl">+</span> Add
+      </button>
+    </div>
+
+    
+  <!-- Card Grid -->
+  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
+
+    <!-- Card -->
+    <div *ngFor="let item of items; let i = index"
+         class="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden relative group hover:shadow-xl transition">
+
+      <!-- 3 Dot Menu -->
+      <button
+        (click)="toggleMenu(i)"
+        class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-xl">
+        ⋮
+      </button>
+
+      <!-- Dropdown -->
+      <div *ngIf="menuIndex === i"
+           class="absolute right-3 top-12 bg-white shadow-xl rounded-xl border border-gray-100 w-28 z-10">
+
+        <button
+          (click)="editItem(item)"
+          class="block w-full text-left px-4 py-2 hover:bg-amber-50">
+          Edit
+        </button>
+
+        <button
+          (click)="deleteItem(i)"
+          class="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-50">
+          Delete
+        </button>
+      </div>
+
+      <!-- Image -->
+      <div class="h-44 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+        <img *ngIf="item.image"
+             [src]="item.image"
+             class="h-full w-full object-cover" />
+      </div>
+
+      <!-- Name -->
+      <div class="p-4 text-center font-semibold text-gray-700">
+        {{ item.name }}
+      </div>
+
+    </div>
+
+  </div>
+
+  </div>
+
+  <!-- ================= MODAL ================= -->
+  <div *ngIf="showModal"
+       class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-7 
+                relative border border-amber-100">
+
+      <!-- Close -->
+      <button
+        (click)="closeModal()"
+        class="absolute top-3 right-3 text-gray-400 hover:text-gray-700">
+        ✕
+      </button>
+
+      <h2 class="text-xl font-semibold text-gray-800 mb-5">
+        {{ editMode ? 'Edit Item' : 'Add Item' }}
+      </h2>
+
+      <!-- Upload -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Upload Image
+        </label>
+
+        <input type="file"
+               (change)="onFileSelect($event)"
+               class="w-full border border-gray-300 rounded-xl p-2.5 
+                      text-gray-700 bg-white
+                      focus:ring-2 focus:ring-orange-500 outline-none" />
+
+        <!-- Preview -->
+        <img *ngIf="previewImage"
+             [src]="previewImage"
+             class="mt-4 h-36 w-full object-cover rounded-xl border" />
+      </div>
+
+      <!-- Name -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Name
+        </label>
+
+        <input type="text"
+               class="w-full border border-gray-300 rounded-xl px-4 py-2.5
+                      bg-white text-gray-800 placeholder-gray-400
+                      focus:ring-2 focus:ring-orange-500
+                      focus:border-orange-500 outline-none" />
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-3">
+        <button
+          (click)="closeModal()"
+          class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-50">
+          Cancel
+        </button>
+
+        <button
+          (click)="saveItem()"
+          class="bg-gradient-to-r from-orange-500 to-amber-600 
+                 text-white px-5 py-2 rounded-xl shadow 
+                 hover:from-orange-600 hover:to-amber-700 transition">
+          Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
