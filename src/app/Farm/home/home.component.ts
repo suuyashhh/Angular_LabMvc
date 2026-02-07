@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../shared/auth.service';
-import { finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { LoaderService } from '../../services/loader.service';
 
 interface Farm {
   farM_ID: number;
@@ -27,13 +27,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   showModal = false;
   editMode = false;
   menuIndex: number | null = null;
-  isLoading = true;
   formName = '';
   selectedFile: File | null = null;
   previewImage: string | null = null;
   editId: number | null = null;
   userId: string = '';
-  isSaving = false;
+  userName: string | null = null;
+  showLogoutConfirm = false;
   
   // Image preview modal
   showImagePreview = false;
@@ -45,7 +45,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private api: ApiService,
     private toastr: ToastrService,
-    private auth: AuthService
+    private auth: AuthService,
+    public loader: LoaderService
   ) {}
 
   ngOnInit() {
@@ -64,24 +65,25 @@ export class HomeComponent implements OnInit, OnDestroy {
   initializeUser() {
     const userDetails = this.auth.getFarmUserDetailsFromCookie();
     this.userId = userDetails?.useR_ID?.toString() || '';
+    this.userName = userDetails.useR_NAME;
     
     if (!this.userId) {
       this.toastr.error('User not authenticated');
-      this.isLoading = false;
     }
   }
 
   getAll() {
-    this.isLoading = true;
+    this.loader.show();
     
     const sub = this.api.get('HomeFarm/GetAll', { userId: this.userId })
-      .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (res: any) => {
           this.items = Array.isArray(res) ? res : [];
+          this.loader.hide();
         },
         error: (err) => {
           this.toastr.error('Failed to load farms');
+          this.loader.hide();
         }
       });
     
@@ -96,7 +98,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   closeModal() {
-    if (this.isSaving) return;
     this.showModal = false;
     this.editMode = false;
     this.resetForm();
@@ -157,7 +158,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   insertFarm(imageBase64: string | null) {
-    this.isSaving = true;
+    this.loader.show();
     
     const payload = {
       farM_NAME: this.formName.trim(),
@@ -166,15 +167,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     
     const sub = this.api.post('HomeFarm/Insert', payload)
-      .pipe(finalize(() => this.isSaving = false))
       .subscribe({
         next: () => {
           this.toastr.success('Farm added successfully');
-          this.getAll();
+          this.loader.hide();
           this.closeModal();
+          this.getAll();
         },
         error: (err) => {
           this.toastr.error(err.error?.message || 'Failed to add farm');
+          this.loader.hide();
         }
       });
     
@@ -184,7 +186,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   updateFarm(imageBase64: string | null) {
     if (!this.editId) return;
     
-    this.isSaving = true;
+    this.loader.show();
     
     const payload = {
       farM_ID: this.editId,
@@ -194,15 +196,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     
     const sub = this.api.put('HomeFarm/Update', payload)
-      .pipe(finalize(() => this.isSaving = false))
       .subscribe({
         next: () => {
           this.toastr.success('Farm updated successfully');
-          this.getAll();
+          this.loader.hide();
           this.closeModal();
+          this.getAll();
         },
         error: (err) => {
           this.toastr.error(err.error?.message || 'Failed to update farm');
+          this.loader.hide();
         }
       });
     
@@ -224,6 +227,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
     
+    this.loader.show();
+    
     const sub = this.api.delete('HomeFarm/Delete', { 
       farmId: item.farM_ID,
       userId: this.userId 
@@ -231,11 +236,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     .subscribe({
       next: () => {
         this.toastr.success('Farm deleted successfully');
-        this.getAll();
+        this.loader.hide();
         this.menuIndex = null;
+        this.getAll();
       },
       error: (err) => {
         this.toastr.error(err.error?.message || 'Failed to delete farm');
+        this.loader.hide();
       }
     });
     
@@ -262,7 +269,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Image preview methods
   openImagePreview(item: Farm) {
     this.previewImageUrl = item.image;
     this.previewImageName = item.farM_NAME;
@@ -286,5 +292,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     document.body.removeChild(link);
     
     this.toastr.success('Image downloaded successfully');
+  }
+
+  
+  confirmLogout(): void {
+    this.showLogoutConfirm = true;
+  }
+
+  logoutConfirmed(): void {
+    this.showLogoutConfirm = false;
+    this.FarmLogout();
+  }
+
+  FarmLogout(): void {
+    try { this.loader.show(); } catch { }
+
+    try {
+      this.auth.farmLogout();
+    } finally {
+      setTimeout(() => {
+        try { this.loader.hide(); } catch { }
+      }, 200);
+    }
   }
 }

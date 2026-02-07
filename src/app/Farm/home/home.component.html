@@ -8,17 +8,16 @@
       <div class="flex items-center justify-between h-14">
         <div class="flex items-center gap-3">
           <img src="../../assets/img/avatars/1.png"
-               class="w-9 h-9 rounded-full object-cover border-2 border-white/40" />
-          <span class="font-semibold text-lg">AgriSync Pro</span>
+            class="w-9 h-9 rounded-full object-cover border-2 border-white/40" />
+          <span class="font-semibold text-lg">{{userName}}</span>
         </div>
 
         <div class="flex items-center gap-3">
-          <button routerLink="/SDF/Notification"
-                  class="relative p-2 rounded-full hover:bg-white/20 transition">
+          <button routerLink="/SDF/Notification" class="relative p-2 rounded-full hover:bg-white/20 transition">
             <i class="ri-notification-3-line text-lg"></i>
           </button>
           <button class="px-3 py-1.5 rounded-lg bg-white text-orange-600 font-semibold 
-                         hover:bg-orange-100 shadow transition text-sm">
+                         hover:bg-orange-100 shadow transition text-sm" (click)="confirmLogout()">
             Logout
           </button>
         </div>
@@ -26,12 +25,31 @@
     </div>
   </nav>
 
+    <!-- Logout Confirm Modal -->
+  <div *ngIf="showLogoutConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+    <div class="bg-white rounded-xl p-5 w-72 shadow-lg text-center">
+      <h3 class="font-semibold text-gray-800 mb-3">Confirm Logout</h3>
+      <p class="text-sm text-gray-600 mb-4">Are you sure you want to logout?</p>
+
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-800 bg-white
+         hover:bg-gray-100 transition" (click)="showLogoutConfirm = false">
+          Cancel
+        </button>
+
+        <button class="px-3 py-1 rounded bg-red-600 text-white" (click)="logoutConfirmed()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- PAGE CONTENT -->
   <div class="pt-24 px-6">
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-2xl font-bold text-gray-800">Farm Categories</h1>
-      <button (click)="openModal()"
-              class="bg-gradient-to-r from-orange-500 to-amber-600 
+      <button (click)="openModal()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                      text-white px-5 py-2.5 rounded-xl shadow-lg 
                      hover:from-orange-600 hover:to-amber-700 transition 
                      flex items-center gap-2">
@@ -39,20 +57,12 @@
       </button>
     </div>
 
-    <!-- Loading -->
-    <div *ngIf="isLoading" class="text-center py-20">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 
-                  border-t-2 border-b-2 border-orange-500 mb-4"></div>
-      <p class="text-gray-600">Loading farms...</p>
-    </div>
-
     <!-- Empty State -->
-    <div *ngIf="!isLoading && items.length === 0" class="text-center py-20">
+    <div *ngIf=" items.length === 0" class="text-center py-20">
       <div class="text-6xl mb-4">🌱</div>
       <h3 class="text-xl font-semibold text-gray-700 mb-2">No Farm Categories Yet</h3>
       <p class="text-gray-500 mb-8">Get started by adding your first farm</p>
-      <button (click)="openModal()"
-              class="bg-gradient-to-r from-orange-500 to-amber-600 
+      <button (click)="openModal()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                      text-white px-6 py-3 rounded-xl shadow-lg 
                      hover:from-orange-600 hover:to-amber-700 transition">
         + Add Your First Farm
@@ -60,32 +70,26 @@
     </div>
 
     <!-- Cards Grid -->
-    <div *ngIf="!isLoading && items.length > 0"
-         class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
+    <div *ngIf="items.length > 0" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
 
-      <div *ngFor="let item of items; let i = index"
-           class="bg-white rounded-2xl shadow-lg border border-amber-100 
+      <div *ngFor="let item of items; let i = index" class="bg-white rounded-2xl shadow-lg border border-amber-100 
                   overflow-hidden relative group hover:shadow-xl transition 
                   hover:-translate-y-1">
 
         <!-- Menu Button -->
-        <button (click)="toggleMenu(i); $event.stopPropagation()"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
+        <button (click)="toggleMenu(i); $event.stopPropagation()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
                        z-20 p-1 rounded-full hover:bg-white/80">
           <i class="ri-more-2-fill text-lg"></i>
         </button>
 
         <!-- Dropdown -->
-        <div *ngIf="menuIndex === i"
-             class="absolute right-3 top-12 bg-white shadow-xl rounded-xl 
+        <div *ngIf="menuIndex === i" class="absolute right-3 top-12 bg-white shadow-xl rounded-xl 
                     border border-gray-100 w-32 z-30 py-2">
-          <button (click)="editItem(item); $event.stopPropagation()"
-                  class="block w-full text-left px-4 py-2.5 hover:bg-amber-50 
+          <button (click)="editItem(item); $event.stopPropagation()" class="block w-full text-left px-4 py-2.5 hover:bg-amber-50 
                          flex items-center gap-2 text-gray-700">
             <i class="ri-edit-line text-amber-600"></i> Edit
           </button>
-          <button (click)="deleteItem(item); $event.stopPropagation()"
-                  class="block w-full text-left px-4 py-2.5 text-red-500 
+          <button (click)="deleteItem(item); $event.stopPropagation()" class="block w-full text-left px-4 py-2.5 text-red-500 
                          hover:bg-red-50 flex items-center gap-2">
             <i class="ri-delete-bin-line"></i> Delete
           </button>
@@ -94,12 +98,9 @@
         <!-- Image -->
         <div class="h-44 bg-gradient-to-br from-amber-100 to-orange-100 
                     flex items-center justify-center overflow-hidden cursor-pointer"
-             (click)="item.image ? openImagePreview(item) : null">
-          <img *ngIf="item.image; else noImage"
-               [src]="item.image"
-               class="h-full w-full object-cover group-hover:scale-105 
-                      transition-transform duration-300"
-               [alt]="item.farM_NAME" />
+          (click)="item.image ? openImagePreview(item) : null">
+          <img *ngIf="item.image; else noImage" [src]="item.image" class="h-full w-full object-cover group-hover:scale-105 
+                      transition-transform duration-300" [alt]="item.farM_NAME" />
           <ng-template #noImage>
             <div class="flex flex-col items-center justify-center text-amber-600">
               <i class="ri-image-line text-5xl mb-2"></i>
@@ -120,14 +121,12 @@
   </div>
 
   <!-- MODAL -->
-  <div *ngIf="showModal"
-       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+  <div *ngIf="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-7 
                 relative border border-amber-100">
 
-      <button (click)="closeModal()" [disabled]="isSaving"
-              class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
-                     disabled:opacity-50 p-1 rounded-full hover:bg-gray-100">
+      <button (click)="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
+                     p-1 rounded-full hover:bg-gray-100">
         <i class="ri-close-line text-xl"></i>
       </button>
 
@@ -145,23 +144,19 @@
         </label>
 
         <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 
-                    text-center hover:border-orange-400 transition cursor-pointer"
-             (click)="fileInput.click()">
+                    text-center hover:border-orange-400 transition cursor-pointer" (click)="fileInput.click()">
           <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-3"></i>
           <p class="text-gray-600 mb-2">Click to upload</p>
           <p class="text-xs text-gray-400">PNG, JPG, GIF up to 5MB</p>
         </div>
 
-        <input #fileInput type="file" (change)="onFileSelect($event)"
-               accept="image/*" class="hidden" />
+        <input #fileInput type="file" (change)="onFileSelect($event)" accept="image/*" class="hidden" />
 
         <div *ngIf="previewImage" class="mt-4">
           <p class="text-sm font-medium text-gray-700 mb-2">Preview</p>
           <div class="relative">
-            <img [src]="previewImage"
-                 class="h-48 w-full object-cover rounded-xl border shadow-sm" />
-            <button (click)="removeImage()"
-                    class="absolute top-2 right-2 bg-red-500 text-white 
+            <img [src]="previewImage" class="h-48 w-full object-cover rounded-xl border shadow-sm" />
+            <button (click)="removeImage()" class="absolute top-2 right-2 bg-red-500 text-white 
                            p-1.5 rounded-full hover:bg-red-600">
               <i class="ri-close-line text-sm"></i>
             </button>
@@ -177,56 +172,44 @@
 
         <div class="relative">
           <i class="ri-home-4-line absolute left-3 top-3.5 text-gray-400"></i>
-          <input type="text" [(ngModel)]="formName"
-                 placeholder="Enter farm name"
-                 class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3.5
+          <input type="text" [(ngModel)]="formName" placeholder="Enter farm name" class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3.5
                         bg-white text-gray-800 placeholder-gray-400
                         focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                        outline-none transition"
-                 (keyup.enter)="saveItem()" />
+                        outline-none transition" (keyup.enter)="saveItem()" />
         </div>
       </div>
 
       <!-- Buttons -->
       <div class="flex justify-end gap-3">
-        <button (click)="closeModal()" [disabled]="isSaving"
-                class="px-5 py-3 rounded-xl border border-gray-300 text-gray-700 
-                       hover:bg-gray-50 disabled:opacity-50 font-medium transition">
+        <button (click)="closeModal()" class="px-5 py-3 rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-medium transition">
           Cancel
         </button>
 
-        <button (click)="saveItem()" 
-                [disabled]="!formName.trim() || isSaving"
-                class="bg-gradient-to-r from-orange-500 to-amber-600 
+        <button (click)="saveItem()" [disabled]="!formName.trim()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                        text-white px-6 py-3 rounded-xl shadow 
                        hover:from-orange-600 hover:to-amber-700 transition
-                       disabled:opacity-50 font-medium flex items-center gap-2 min-w-28">
-          <span *ngIf="isSaving" 
-                class="inline-block animate-spin rounded-full h-4 w-4 
-                       border-t-2 border-white"></span>
-          {{ isSaving ? 'Saving...' : (editMode ? 'Update' : 'Save') }}
+                       disabled:opacity-50 font-medium">
+          {{ editMode ? 'Update' : 'Save' }}
         </button>
       </div>
     </div>
   </div>
 
   <!-- IMAGE PREVIEW MODAL -->
-  <div *ngIf="showImagePreview"
-       class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4"
-       (click)="closeImagePreview()">
+  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4"
+    (click)="closeImagePreview()">
     <div class="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center"
-         (click)="$event.stopPropagation()">
-      
+      (click)="$event.stopPropagation()">
+
       <!-- Close Button -->
-      <button (click)="closeImagePreview()"
-              class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 
+      <button (click)="closeImagePreview()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 
                      text-white p-3 rounded-full backdrop-blur-sm transition z-10">
         <i class="ri-close-line text-2xl"></i>
       </button>
 
       <!-- Download Button -->
-      <button (click)="downloadImage()"
-              class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
+      <button (click)="downloadImage()" class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
                      text-white px-4 py-2.5 rounded-lg flex items-center gap-2 
                      shadow-lg transition z-10">
         <i class="ri-download-2-line text-lg"></i>
@@ -241,9 +224,8 @@
 
       <!-- Image Container -->
       <div class="flex items-center justify-center w-full h-full p-20">
-        <img [src]="previewImageUrl"
-             [alt]="previewImageName"
-             class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+        <img [src]="previewImageUrl" [alt]="previewImageName"
+          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
       </div>
 
       <!-- Image Info -->

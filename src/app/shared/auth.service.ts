@@ -243,7 +243,7 @@ getFarmUserDetailsFromCookie(): any | null {
 
 farmLogout(): void {
   try {
-    this.clearDairyCredentialsCookie();
+    this.clearFarmUserDetailsCookie();
 
     try {
       this.toaster.success('Logged out from Farm', 'Logout');
