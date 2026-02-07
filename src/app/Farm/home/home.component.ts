@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,32 +6,41 @@ import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../shared/auth.service';
 import { finalize } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+
+interface Farm {
+  farM_ID: number;
+  farM_NAME: string;
+  useR_ID: string;
+  image: string;
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
-
-  items: any[] = [];
+export class HomeComponent implements OnInit, OnDestroy {
+  items: Farm[] = [];
   showModal = false;
   editMode = false;
   menuIndex: number | null = null;
-
+  isLoading = true;
   formName = '';
   selectedFile: File | null = null;
   previewImage: string | null = null;
   editId: number | null = null;
-
   userId: string = '';
+  isSaving = false;
   
-  // Button loading states
-  isSaving: boolean = false;
-  isUpdating: boolean = false;
-  isDeleting: boolean = false;
+  // Image preview modal
+  showImagePreview = false;
+  previewImageUrl: string | null = null;
+  previewImageName: string = '';
+  
+  private subscriptions = new Subscription();
 
   constructor(
     private api: ApiService,
@@ -40,49 +49,60 @@ export class HomeComponent {
   ) {}
 
   ngOnInit() {
+    this.initializeUser();
+    this.getAll();
+    document.addEventListener('click', this.closeDropdown.bind(this));
+    document.addEventListener('keydown', this.handleKeyPress.bind(this));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+    document.removeEventListener('click', this.closeDropdown.bind(this));
+    document.removeEventListener('keydown', this.handleKeyPress.bind(this));
+  }
+
+  initializeUser() {
     const userDetails = this.auth.getFarmUserDetailsFromCookie();
-    // Try different property names to get userId
-    this.userId = userDetails.userId || userDetails.userID || userDetails.useR_ID || userDetails.UserId || '';
+    this.userId = userDetails?.useR_ID?.toString() || '';
     
     if (!this.userId) {
-      console.error('User details from cookie:', userDetails);
-      this.toastr.error('User not authenticated - No userId found');
-      return;
+      this.toastr.error('User not authenticated');
+      this.isLoading = false;
     }
-    
-    console.log('User ID:', this.userId); // Debug log
-    this.getAll();
   }
 
   getAll() {
-    // Send userId (lowercase) as required by backend
-    // Remove empty comId parameter
-    this.api.get('HomeFarm/GetAll', { userId: this.userId })
+    this.isLoading = true;
+    
+    const sub = this.api.get('HomeFarm/GetAll', { userId: this.userId })
+      .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (res: any) => {
-          console.log('API Response:', res); // Debug log
           this.items = Array.isArray(res) ? res : [];
         },
         error: (err) => {
-          console.error('Error fetching farms:', err);
-          this.toastr.error('Failed to load farms: ' + (err.error?.message || err.message));
+          this.toastr.error('Failed to load farms');
         }
       });
+    
+    this.subscriptions.add(sub);
   }
 
   openModal() {
     this.showModal = true;
     this.editMode = false;
-    this.formName = '';
-    this.selectedFile = null;
-    this.previewImage = null;
-    this.editId = null;
+    this.resetForm();
     this.menuIndex = null;
   }
 
   closeModal() {
+    if (this.isSaving) return;
     this.showModal = false;
     this.editMode = false;
+    this.resetForm();
+  }
+
+  resetForm() {
     this.formName = '';
     this.selectedFile = null;
     this.previewImage = null;
@@ -91,116 +111,90 @@ export class HomeComponent {
 
   onFileSelect(event: any) {
     const file = event.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        this.toastr.error('File size should be less than 5MB');
-        event.target.value = '';
-        return;
-      }
-      
-      if (!file.type.match(/image\/(jpeg|jpg|png|gif|webp)/)) {
-        this.toastr.error('Only image files are allowed (JPEG, JPG, PNG, GIF, WEBP)');
-        event.target.value = '';
-        return;
-      }
-      
-      this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.previewImage = reader.result as string;
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    
+    if (file.size > 5 * 1024 * 1024) {
+      this.toastr.error('File size should be less than 5MB');
+      return;
     }
+    
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.toastr.error('Only image files are allowed');
+      return;
+    }
+    
+    this.selectedFile = file;
+    
+    const reader = new FileReader();
+    reader.onload = (e: any) => this.previewImage = e.target.result;
+    reader.readAsDataURL(file);
+  }
+
+  removeImage() {
+    this.selectedFile = null;
+    this.previewImage = null;
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
   }
 
   saveItem() {
     if (!this.formName.trim()) {
-      this.toastr.error('Please enter farm name');
+      this.toastr.error('Please enter a farm name');
       return;
     }
 
-    // Convert image to base64 if file is selected
-    const processImage = (callback: (imageBase64: string | null) => void) => {
-      if (this.selectedFile) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          callback(reader.result as string);
-        };
-        reader.onerror = () => {
-          callback(null);
-          this.toastr.error('Failed to read image file');
-        };
-        reader.readAsDataURL(this.selectedFile);
-      } else {
-        callback(this.previewImage);
-      }
-    };
-
-    processImage((imageBase64) => {
-      if (this.editMode) {
-        this.updateFarm(imageBase64);
-      } else {
-        this.insertFarm(imageBase64);
-      }
-    });
+    if (this.selectedFile) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageBase64 = reader.result as string;
+        this.editMode ? this.updateFarm(imageBase64) : this.insertFarm(imageBase64);
+      };
+      reader.readAsDataURL(this.selectedFile);
+    } else {
+      this.editMode ? this.updateFarm(this.previewImage) : this.insertFarm(this.previewImage);
+    }
   }
 
   insertFarm(imageBase64: string | null) {
     this.isSaving = true;
-
+    
     const payload = {
-      farmName: this.formName.trim(), // Try lowercase first
-      FARM_NAME: this.formName.trim(), // Keep uppercase as fallback
-      userId: this.userId, // lowercase
-      USER_ID: this.userId, // uppercase as fallback
-      image: imageBase64 || '', // lowercase
-      IMAGE: imageBase64 || '' // uppercase as fallback
+      farM_NAME: this.formName.trim(),
+      useR_ID: this.userId,
+      image: imageBase64 || ''
     };
-
-    console.log('Insert Payload:', payload); // Debug log
-
-    this.api.post('HomeFarm/Insert', payload)
-      .pipe(finalize(() => {
-        this.isSaving = false;
-      }))
+    
+    const sub = this.api.post('HomeFarm/Insert', payload)
+      .pipe(finalize(() => this.isSaving = false))
       .subscribe({
-        next: (response: any) => {
+        next: () => {
           this.toastr.success('Farm added successfully');
           this.getAll();
           this.closeModal();
         },
         error: (err) => {
-          console.error('Insert error:', err);
-          this.toastr.error(err.error?.message || err.error?.title || 'Failed to add farm');
+          this.toastr.error(err.error?.message || 'Failed to add farm');
         }
       });
+    
+    this.subscriptions.add(sub);
   }
 
   updateFarm(imageBase64: string | null) {
-    if (!this.editId) {
-      this.toastr.error('Invalid farm data');
-      return;
-    }
-
-    this.isUpdating = true;
-
+    if (!this.editId) return;
+    
+    this.isSaving = true;
+    
     const payload = {
-      farmId: this.editId, // lowercase
-      FARM_ID: this.editId, // uppercase
-      farmName: this.formName.trim(),
-      FARM_NAME: this.formName.trim(),
-      userId: this.userId,
-      USER_ID: this.userId,
-      image: imageBase64 || '',
-      IMAGE: imageBase64 || ''
+      farM_ID: this.editId,
+      farM_NAME: this.formName.trim(),
+      useR_ID: this.userId,
+      image: imageBase64 || ''
     };
-
-    console.log('Update Payload:', payload); // Debug log
-
-    this.api.put('HomeFarm/Update', payload)
-      .pipe(finalize(() => {
-        this.isUpdating = false;
-      }))
+    
+    const sub = this.api.put('HomeFarm/Update', payload)
+      .pipe(finalize(() => this.isSaving = false))
       .subscribe({
         next: () => {
           this.toastr.success('Farm updated successfully');
@@ -208,64 +202,89 @@ export class HomeComponent {
           this.closeModal();
         },
         error: (err) => {
-          console.error('Update error:', err);
-          this.toastr.error(err.error?.message || err.error?.title || 'Failed to update farm');
+          this.toastr.error(err.error?.message || 'Failed to update farm');
         }
       });
+    
+    this.subscriptions.add(sub);
   }
 
-  editItem(item: any) {
+  editItem(item: Farm) {
     this.editMode = true;
     this.showModal = true;
-    this.formName = item.FARM_NAME || item.farmName || '';
-    this.previewImage = item.IMAGE || item.image || null;
-    this.editId = item.FARM_ID || item.farmId || null;
+    this.formName = item.farM_NAME;
+    this.previewImage = item.image;
+    this.editId = item.farM_ID;
     this.selectedFile = null;
     this.menuIndex = null;
-    
-    console.log('Editing item:', item); // Debug log
   }
 
-  deleteItem(item: any) {
-    const farmId = item.FARM_ID || item.farmId;
-    
-    if (!farmId) {
-      this.toastr.error('Invalid farm data');
+  deleteItem(item: Farm) {
+    if (!confirm(`Are you sure you want to delete "${item.farM_NAME}"?`)) {
       return;
     }
-
-    if (confirm('Are you sure you want to delete this farm? This action cannot be undone.')) {
-      this.isDeleting = true;
-
-      // Send both lowercase and uppercase parameters
-      const params = {
-        farmId: farmId,
-        FARM_ID: farmId,
-        userId: this.userId,
-        USER_ID: this.userId
-      };
-
-      console.log('Delete params:', params); // Debug log
-
-      this.api.delete('HomeFarm/Delete', params)
-      .pipe(finalize(() => {
-        this.isDeleting = false;
-      }))
-      .subscribe({
-        next: () => {
-          this.toastr.success('Farm deleted successfully');
-          this.getAll();
-          this.menuIndex = null;
-        },
-        error: (err) => {
-          console.error('Delete error:', err);
-          this.toastr.error(err.error?.message || err.error?.title || 'Failed to delete farm');
-        }
-      });
-    }
+    
+    const sub = this.api.delete('HomeFarm/Delete', { 
+      farmId: item.farM_ID,
+      userId: this.userId 
+    })
+    .subscribe({
+      next: () => {
+        this.toastr.success('Farm deleted successfully');
+        this.getAll();
+        this.menuIndex = null;
+      },
+      error: (err) => {
+        this.toastr.error(err.error?.message || 'Failed to delete farm');
+      }
+    });
+    
+    this.subscriptions.add(sub);
   }
 
   toggleMenu(index: number) {
     this.menuIndex = this.menuIndex === index ? null : index;
+  }
+
+  closeDropdown(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const isMenuButton = target.closest('button')?.querySelector('.ri-more-2-fill');
+    const isMenu = target.closest('div[class*="absolute right-3 top-12"]');
+    
+    if (!isMenuButton && !isMenu && this.menuIndex !== null) {
+      this.menuIndex = null;
+    }
+  }
+
+  handleKeyPress(event: KeyboardEvent) {
+    if (event.key === 'Escape' && this.showImagePreview) {
+      this.closeImagePreview();
+    }
+  }
+
+  // Image preview methods
+  openImagePreview(item: Farm) {
+    this.previewImageUrl = item.image;
+    this.previewImageName = item.farM_NAME;
+    this.showImagePreview = true;
+  }
+
+  closeImagePreview() {
+    this.showImagePreview = false;
+    this.previewImageUrl = null;
+    this.previewImageName = '';
+  }
+
+  downloadImage() {
+    if (!this.previewImageUrl) return;
+    
+    const link = document.createElement('a');
+    link.href = this.previewImageUrl;
+    link.download = `${this.previewImageName || 'farm-image'}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    this.toastr.success('Image downloaded successfully');
   }
 }
