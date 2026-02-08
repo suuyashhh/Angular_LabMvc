@@ -147,7 +147,8 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     
     this.api.get('FarmEntry/GetAll', { 
       farmId: this.farmId, 
-      userId: this.userId 
+      userId: this.userId, 
+      entryTypeName: this.entryTypeName
     }).subscribe({
       next: (res: any) => {
         this.entries = Array.isArray(res) ? res : [];
