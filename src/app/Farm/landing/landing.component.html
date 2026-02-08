@@ -1,0 +1,31 @@
+<!-- index.html or top-level component template (make sure it's outside layout-wrapper) -->
+<body>
+  <router-outlet></router-outlet>
+  <div class="fixed bottom-16 right-8 z-50 no-print" routerLink="/SDF/home">
+        <button
+            class="bg-green-600 hover:bg-green-700 text-white shadow-xl rounded-full w-14 h-14 flex items-center justify-center hover:scale-105 transition-transform duration-200 hover:shadow-2xl">
+            <i class="fas fa-home text-xl"></i>
+        </button>
+    </div>
+</body>
+<style>.floating-home {
+  position: fixed !important;
+  bottom: calc(16px + env(safe-area-inset-bottom)); /* accounts for phone safe area */
+  right: 16px;
+  z-index: 9999;
+  text-decoration: none;
+}
+
+.home-btn {
+  width: 56px; height: 56px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  background: #16a34a;
+  color: white;
+  border: none;
+  transform: translateZ(0); /* optional */
+}
+</style>

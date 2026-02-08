@@ -1,0 +1,179 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 px-4">
+    <div class="w-full max-w-md">
+        <!-- Header with new theme -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-4">
+                <!-- Icon/logo with new theme -->
+                <div
+                    class="w-16 h-16 rounded-full bg-gradient-to-r from-orange-500 to-amber-600 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">AgriSync Pro</h1>
+            <p class="text-gray-600 mt-2">Manage your farm operations efficiently</p>
+        </div>
+
+        <!-- Login Form Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 border border-amber-100">
+
+            <!-- Form - Added (ngSubmit) and removed (click) from button -->
+            <form class="space-y-6" (ngSubmit)="login()">
+                <!-- Contact Input (Changed from Email to Contact) -->
+                <div>
+                    <label for="CONTACT" class="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address or Phone
+                    </label>
+                   <div class="relative">
+    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                            </svg>
+                        </div>
+                        <!-- Changed to CONTACT field with ngModel -->
+                        <input type="text"
+           name="CONTACT"
+           [(ngModel)]="loginObj.CONTACT"
+           required
+           placeholder="farmer@example.com or phone number"
+           class="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-xl
+                  focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                  transition duration-200 outline-none text-gray-800 text-sm" />
+</div>
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="password" class="block text-sm font-medium text-gray-700">
+                            Password
+                        </label>
+                        <a href="#" class="text-sm text-orange-600 hover:text-orange-700 font-medium">
+                            Forgot password?
+                        </a>
+                    </div>
+                  <div class="relative">
+
+    <!-- Lock Icon -->
+    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+    </div>
+
+    <!-- Password Input -->
+    <input type="password"
+           name="PASSWORD"
+           [(ngModel)]="loginObj.PASSWORD"
+           required
+           placeholder="Enter your password"
+           class="w-full h-12 pl-10 pr-10 border border-gray-300 rounded-xl
+                  focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                  transition duration-200 outline-none text-gray-800 text-sm" />
+
+    <!-- Eye Icon -->
+    <button type="button"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+    </button>
+
+</div>
+
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div class="flex items-center">
+                    <input id="remember-me" type="checkbox"
+                        class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded" />
+                    <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                        Remember me on this device
+                    </label>
+                </div>
+
+                <!-- Submit Button - Removed (click), form will submit via ngSubmit -->
+                <button type="submit" [disabled]="isLoading"
+                    class="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-orange-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none">
+                    <span *ngIf="!isLoading">Sign In</span>
+                    <span *ngIf="isLoading" class="flex items-center justify-center">
+                        <svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Signing In...
+                    </span>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-8">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <!-- Social Login Buttons - Fixed text color -->
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <button type="button"
+                        class="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-xl text-sm font-medium text-gray-800 bg-white hover:bg-gray-50 transition duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70497C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
+                                fill="#EA4335" />
+                            <path
+                                d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z"
+                                fill="#4285F4" />
+                            <path
+                                d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.2749 6.60986C0.4649 8.22986 0 10.0599 0 11.9999C0 13.9399 0.4649 15.7699 1.2749 17.3899L5.26498 14.2949Z"
+                                fill="#FBBC05" />
+                            <path
+                                d="M12.0003 24C15.2403 24 17.9653 22.935 19.9453 21.095L16.0803 18.095C15.0053 18.82 13.6203 19.25 12.0003 19.25C8.87028 19.25 6.21525 17.14 5.27028 14.295L1.28027 17.39C3.25527 21.31 7.31028 24 12.0003 24Z"
+                                fill="#34A853" />
+                        </svg>
+                        Google
+                    </button>
+                    <button type="button"
+                        class="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-xl text-sm font-medium text-gray-800 bg-white hover:bg-gray-50 transition duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                        Facebook
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="mt-8 text-center">
+                <p class="text-gray-600">
+                    New to AgriSync Pro?
+                    <a href="#" class="font-medium text-orange-600 hover:text-orange-700">
+                        Create an account
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-gray-500 text-sm">
+            <p>© 2024 AgriSync Pro. All rights reserved.</p>
+            <p class="mt-1">Cultivating efficiency, harvesting success</p>
+        </div>
+    </div>
+</div>
