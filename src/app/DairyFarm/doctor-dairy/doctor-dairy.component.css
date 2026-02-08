@@ -1,0 +1,94 @@
+/* View Modal Action Buttons */
+.view-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.view-action-btn {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.view-action-edit {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.view-action-edit:hover {
+  background-color: #2563eb;
+}
+
+.view-action-delete {
+  background-color: #ef4444;
+  color: white;
+}
+
+.view-action-delete:hover {
+  background-color: #dc2626;
+}
+
+.view-action-close {
+  background-color: #6b7280;
+  color: white;
+}
+
+.view-action-close:hover {
+  background-color: #4b5563;
+}
+
+/* Breeding tag styling */
+.breeding-tag {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+.breeding-tag-purple {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.breeding-tag-light {
+  background-color: #f3f0ff;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
+}
+
+/* Ensure modal footer buttons are properly spaced */
+.modal-footer.custom-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+@media (max-width: 640px) {
+  .modal-footer.custom-modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-footer.custom-modal-footer button {
+    width: 100%;
+  }
+}

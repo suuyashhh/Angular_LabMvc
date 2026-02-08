@@ -1,0 +1,96 @@
+<!-- Header -->
+<div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-green-100 sticky top-0 z-40">
+  <div class="flex items-center gap-4">
+    <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center shadow-inner">
+      <i class="ri-notification-3-line text-green-700 text-xl"></i>
+    </div>
+    <div>
+      <h1 class="text-xl font-semibold text-green-900">Notifications</h1>
+      <p class="text-sm text-green-600" *ngIf="lastUpdated">
+        Last updated: {{ lastUpdated }}
+      </p>
+      <p class="text-sm text-green-600" *ngIf="!lastUpdated && !isLoading">
+        Monthly breeding reminders
+      </p>
+    </div>
+  </div>
+  
+  <button 
+    class="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+    (click)="refreshNotifications()"
+    [disabled]="isLoading">
+    <i class="ri-refresh-line" [class.animate-spin]="isLoading"></i>
+    Refresh
+  </button>
+</div>
+
+<main class="min-h-screen bg-green-50 p-4">
+  <div class="max-w-5xl mx-auto space-y-4">
+
+    <!-- Skeleton Loaders -->
+    <div *ngIf="isLoading && notifications[0]?.skeleton">
+      <div *ngFor="let _ of notifications" class="bg-white border border-green-100 rounded-xl p-4 shadow-sm animate-pulse">
+        <div class="flex justify-between items-center">
+          <div class="space-y-2">
+            <div class="h-4 bg-green-200 rounded w-32"></div>
+            <div class="h-3 bg-green-100 rounded w-48"></div>
+          </div>
+          <div class="h-8 bg-green-200 rounded-lg w-20"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Data -->
+    <div *ngIf="!isLoading && notifications.length === 0"
+      class="bg-white p-8 rounded-xl border border-green-100 text-center">
+      <i class="ri-checkbox-circle-line text-3xl text-green-400"></i>
+      <p class="text-green-700 mt-2">No notifications available</p>
+      <button 
+        class="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+        (click)="refreshNotifications()">
+        Check Again
+      </button>
+    </div>
+
+    <!-- Notification Cards -->
+    <div *ngIf="!isLoading && notifications.length > 0">
+      <div *ngFor="let n of notifications"
+        class="bg-white border border-green-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+        
+        <div class="flex justify-between items-center">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <i class="ri-cow-line text-green-600"></i>
+              <p class="font-medium text-green-900">{{ n.animalName }}</p>
+              <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                Month {{ n.monthNo }}
+              </span>
+            </div>
+            <p class="text-sm text-green-600 mb-2">{{ n.message }}</p>
+            <div class="text-xs text-green-500">
+              <i class="ri-calendar-line mr-1"></i>
+              Last breeding: {{ n.lastBreedingDate | date:'mediumDate' }}
+            </div>
+          </div>
+          
+          <button
+            class="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 whitespace-nowrap"
+            (click)="markChecked(n.id)">
+            <i class="ri-check-line"></i>
+            Mark as Read
+          </button>
+        </div>
+        
+      </div>
+      
+      <!-- Summary -->
+      <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div class="text-sm text-green-700">
+          <i class="ri-information-line mr-2"></i>
+          Showing {{ notifications.length }} unread notification(s)
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

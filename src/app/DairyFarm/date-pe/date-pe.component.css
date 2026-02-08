@@ -1,0 +1,302 @@
+/* date-pe.component.css */
+/* Global styles */
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* Header Animation */
+.flex.items-center.gap-4.bg-white {
+  transform: translateY(-100%);
+  animation: slideDownHeader 0.8s ease-out forwards;
+}
+
+@keyframes slideDownHeader {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  color: #374151;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #10a37f;
+  box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.1);
+}
+
+.form-control.border-red-300 {
+  border-color: #f87171;
+}
+
+.form-control.border-red-300:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Month Box Animation */
+.month-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 26px;
+  border: 2px solid #10a37f;
+  border-radius: 16px;
+  background-color: white;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
+  opacity: 0;
+  transform: scale(0.85) translateY(30px);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.month-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #10a37f, #059669);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.month-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(16, 163, 127, 0.25);
+}
+
+.month-box:hover::before {
+  opacity: 1;
+}
+
+.month-box.active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Month Header */
+.month-box h5 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0;
+  position: relative;
+  padding-left: 24px;
+}
+
+.month-box h5::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
+/* Profit/Expense Styles */
+.month-box .text-right {
+  text-align: right;
+  min-width: 220px;
+}
+
+.month-box .profit {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.month-box .bill,
+.month-box .expense {
+  font-size: 1rem;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.month-box .bill span,
+.month-box .expense span,
+.month-box .profit span {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* Button Styles */
+button[type="submit"] {
+  background: linear-gradient(135deg, #10a37f 0%, #059669 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(16, 163, 127, 0.3);
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0d946f 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 163, 127, 0.4);
+}
+
+button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Back Button Animation */
+.fixed.bottom-6.right-6 button {
+  animation: fadeInUp 0.5s ease-out 0.8s both;
+  background: linear-gradient(135deg, #10a37f 0%, #059669 100%);
+  box-shadow: 0 4px 15px rgba(16, 163, 127, 0.3);
+}
+
+.fixed.bottom-6.right-6 button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 22px rgba(16, 163, 127, 0.4);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading Animation */
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border: 0.15em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .month-box {
+    padding: 18px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .month-box h5 {
+    padding-left: 20px;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
+  
+  .month-box h5::before {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .month-box .text-right {
+    width: 100%;
+    text-align: left;
+    min-width: unset;
+  }
+  
+  .month-box .profit {
+    font-size: 1.1rem;
+  }
+  
+  .month-box .bill,
+  .month-box .expense {
+    font-size: 0.95rem;
+  }
+  
+  .fixed.bottom-6.right-6 {
+    bottom: 4;
+    right: 4;
+  }
+  
+  .fixed.bottom-6.right-6 button {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .month-box {
+    padding: 16px 18px;
+    border-radius: 14px;
+  }
+  
+  .month-box h5 {
+    font-size: 1.05rem;
+    padding-left: 18px;
+  }
+  
+  .month-box .profit {
+    font-size: 1rem;
+  }
+  
+  .month-box .bill,
+  .month-box .expense {
+    font-size: 0.9rem;
+  }
+  
+  main {
+    padding: 12px;
+  }
+}
+
+/* No Data State */
+.text-center.py-8 {
+  animation: fadeIn 0.6s ease-out;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  border: 2px dashed #bbf7d0;
+}
+
+.text-center.py-8 .w-14.h-14 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

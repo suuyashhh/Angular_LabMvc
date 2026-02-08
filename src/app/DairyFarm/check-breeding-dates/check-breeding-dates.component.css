@@ -1,0 +1,156 @@
+/* Custom styles for Breeding Date Check */
+
+/* Smooth transitions */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Active state for cards */
+.card-hover:active {
+  transform: scale(0.99);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Animation for page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Status color styles */
+.status-recent {
+  color: #10b981;
+}
+
+.status-ongoing {
+  color: #3b82f6;
+}
+
+.status-overdue {
+  color: #ef4444;
+}
+
+.status-none {
+  color: #6b7280;
+}
+
+/* Month header sticky effect */
+.sticky-header {
+  position: sticky;
+  top: 5rem;
+  backdrop-filter: blur(8px);
+  background-color: rgba(249, 250, 251, 0.8);
+}
+
+/* Breeding specific colors */
+.bg-pink-50 {
+  background-color: #fdf2f8;
+}
+
+.bg-pink-100 {
+  background-color: #fce7f3;
+}
+
+.text-pink-600 {
+  color: #db2777;
+}
+
+.border-pink-200 {
+  border-color: #fbcfe8;
+}
+
+.focus\:ring-pink-500:focus {
+  --tw-ring-color: #ec4899;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .animal-card {
+    padding: 1rem;
+  }
+  
+  .history-card {
+    padding: 0.75rem;
+  }
+}
+
+/* Hover effects for interactive elements */
+.interactive:hover {
+  background-color: #f9fafb;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+/* Card grid for animals */
+.animals-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .animals-grid {
+    grid-template-columns: 1fr;
+  }
+}

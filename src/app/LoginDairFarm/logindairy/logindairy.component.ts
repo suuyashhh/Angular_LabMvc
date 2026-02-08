@@ -60,7 +60,7 @@ export class LogindairyComponent {
       .subscribe({
   next: (res: any) => {
     if (res) {
-      this.auth.setDairyCredentialsCookie(res, 7);
+      this.auth.setDairyCredentialsCookie(res, 365);
       this.toastr.success('Login Successful..!', 'Dairy Login');
       this.router.navigate(['SDF']);
     } else {

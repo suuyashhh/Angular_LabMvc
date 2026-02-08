@@ -1,26 +1,20 @@
 <main class="relative z-10 max-w-6xl mx-auto px-6 py-20">
   <!-- Particle background -->
-<div id="particles-js" class="fixed inset-0 -z-10"></div>
-<div class="card inline-flex bg-dark-800 p-1 rounded-lg border border-gray-700 space-x-2" style="margin-top: 40px;">
-  <button 
-    id="webAppsBtn"
-    class="px-4 py-2 rounded-md font-medium transition-all duration-300 flex items-center
+  <div id="particles-js" class="fixed inset-0 -z-10"></div>
+  <div class="card inline-flex bg-dark-800 p-1 rounded-lg border border-gray-700 space-x-2" style="margin-top: 40px;">
+    <button id="webAppsBtn" class="px-4 py-2 rounded-md font-medium transition-all duration-300 flex items-center
            bg-purple-600/90 text-white
-           focus:outline-none"
-    (click)="showSection('webApps')">
-    <i class="fas fa-laptop-code mr-2"></i>
-    Web Applications
-  </button>
-  <button 
-    id="websitesBtn"
-    class="px-4 py-2 rounded-md font-medium transition-all duration-300 flex items-center
+           focus:outline-none" (click)="showSection('webApps')">
+      <i class="fas fa-laptop-code mr-2"></i>
+      Web Applications
+    </button>
+    <button id="websitesBtn" class="px-4 py-2 rounded-md font-medium transition-all duration-300 flex items-center
            bg-white/10 text-gray-300
-           focus:outline-none"
-    (click)="showSection('websites')">
-    <i class="fas fa-globe mr-2"></i>
-    Websites
-  </button>
-</div>
+           focus:outline-none" (click)="showSection('websites')">
+      <i class="fas fa-globe mr-2"></i>
+      Websites
+    </button>
+  </div>
 
 
   <!-- <div class="card flex space-x-2 bg-dark-800 p-1 rounded-lg border border-gray-700">
@@ -43,14 +37,14 @@
   <section id="projects" class="mb-20" style="margin-top: 20px;">
     <div class="flex justify-between items-center mb-8">
       <h2 class="text-3xl font-bold pb-2 border-b-2 border-accent inline-block text-gradient">My Recent Works</h2>
-      
-      
+
+
     </div>
 
 
     <!-- Web Applications Section -->
     <div id="webAppsSection" class="grid md:grid-cols-2 gap-8">
-      
+
       <!-- Laboratory Card -->
       <div class="relative bg-dark rounded-lg border border-gray-800 overflow-hidden 
                   transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/10
@@ -74,12 +68,12 @@
 
           <!-- Carousel Navigation -->
           <button
-             class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
             (click)="prevImage('laboratory'); $event.stopPropagation()">
             <i class="fas fa-chevron-left"></i>
           </button>
           <button
-          class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
             (click)="nextImage('laboratory'); $event.stopPropagation()">
             <i class="fas fa-chevron-right"></i>
           </button>
@@ -113,10 +107,10 @@
               class="py-2 px-2 bg-green-500/10 border border-green-500/50 rounded-lg text-center text-green-400 hover:bg-green-500/20 hover:border-green-500 transition-all duration-300 text-sm">
               <i class="fab fa-android mr-1"></i> Android
             </a>
-          <a href="#" (click)="showToast($event)"
-  class="py-2 px-2 bg-purple-500/10 border border-purple-500/50 rounded-lg text-center text-purple-400 hover:bg-purple-500/20 hover:border-purple-500 transition-all duration-300 text-sm">
-  <i class="fas fa-desktop mr-1"></i> Desktop
-</a>
+            <a href="#" (click)="showToast($event)"
+              class="py-2 px-2 bg-purple-500/10 border border-purple-500/50 rounded-lg text-center text-purple-400 hover:bg-purple-500/20 hover:border-purple-500 transition-all duration-300 text-sm">
+              <i class="fas fa-desktop mr-1"></i> Desktop
+            </a>
           </div>
         </div>
       </div>
@@ -128,16 +122,16 @@
         <div class="relative h-64 overflow-hidden">
           <!-- Carousel Images -->
           <div class="relative h-full w-full transition-transform duration-500 group-hover:scale-105">
-            <img src="../../../assets/img/DairFarm/img1.png" alt="DairyFarm App"
+            <img src="../../../assets/img/DairFarm/DF1.png" alt="DairyFarm App"
               class="carousel-image absolute inset-0 w-full h-full object-cover"
               [class.opacity-100]="imageIndex['dairy'] === 1" [class.opacity-0]="imageIndex['dairy'] !== 1">
-            <img src="../../../assets/img/DairFarm/img2.png" alt="DairyFarm App"
+            <img src="../../../assets/img/DairFarm/DF2.png" alt="DairyFarm App"
               class="carousel-image absolute inset-0 w-full h-full object-cover"
               [class.opacity-100]="imageIndex['dairy'] === 2" [class.opacity-0]="imageIndex['dairy'] !== 2">
-            <img src="../../../assets/img/DairFarm/img1.png" alt="DairyFarm App"
+            <img src="../../../assets/img/DairFarm/DF3.png" alt="DairyFarm App"
               class="carousel-image absolute inset-0 w-full h-full object-cover"
               [class.opacity-100]="imageIndex['dairy'] === 3" [class.opacity-0]="imageIndex['dairy'] !== 3">
-            <img src="../../../assets/img/DairFarm/img2.png" alt="DairyFarm App"
+            <img src="../../../assets/img/DairFarm/DF4.png" alt="DairyFarm App"
               class="carousel-image absolute inset-0 w-full h-full object-cover"
               [class.opacity-100]="imageIndex['dairy'] === 4" [class.opacity-0]="imageIndex['dairy'] !== 4">
           </div>
@@ -162,10 +156,10 @@
             efficiently with our comprehensive solution.</p>
 
           <div class="flex flex-wrap gap-2 mb-6">
-            <span class="tech-badge hover:bg-blue-500/10 hover:text-blue-400 transition-colors">Javascript</span>
-            <span class="tech-badge hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Bootstrap</span>
+            <span class="tech-badge hover:bg-blue-500/10 hover:text-blue-400 transition-colors">Angular</span>
+            <span class="tech-badge hover:bg-purple-500/10 hover:text-purple-400 transition-colors">.Net Core Web
+              Api</span>
             <span class="tech-badge hover:bg-yellow-500/10 hover:text-yellow-400 transition-colors">SQL</span>
-            <span class="tech-badge hover:bg-indigo-500/10 hover:text-indigo-400 transition-colors">.Net Webforms</span>
             <span class="tech-badge hover:bg-red-500/10 hover:text-red-400 transition-colors">Android Studio</span>
           </div>
 
@@ -174,7 +168,7 @@
               class="py-2 px-2 bg-accent/10 border border-accent/50 rounded-lg text-center text-accent hover:bg-accent/20 hover:border-accent transition-all duration-300 text-sm">
               <i class="fas fa-code mr-1"></i> Code
             </a>
-            <a href="https://dairyfarm.revolutionit.in/WebPage"
+            <a href="https://suyashpatil.in/dairyfarm"
               class="py-2 px-2 bg-primary/10 border border-primary/50 rounded-lg text-center text-primary hover:bg-primary/20 hover:border-primary transition-all duration-300 text-sm">
               <i class="fas fa-external-link-alt mr-1"></i> Live Demo
             </a>
@@ -182,7 +176,7 @@
               class="py-2 px-2 bg-green-500/10 border border-green-500/50 rounded-lg text-center text-green-400 hover:bg-green-500/20 hover:border-green-500 transition-all duration-300 text-sm">
               <i class="fab fa-android mr-1"></i> Android
             </a>
-            <a href="#" (click)="showToast($event)"
+            <a href="../../../assets/DeskTopAPK'S/Dairy Farm.lnk"
               class="py-2 px-2 bg-purple-500/10 border border-purple-500/50 rounded-lg text-center text-purple-400 hover:bg-purple-500/20 hover:border-purple-500 transition-all duration-300 text-sm">
               <i class="fas fa-desktop mr-1"></i> Desktop
             </a>
@@ -213,12 +207,12 @@
 
           <!-- Carousel Navigation -->
           <button
-             class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
             (click)="prevImage('fabrication'); $event.stopPropagation()">
             <i class="fas fa-chevron-left"></i>
           </button>
           <button
-           class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
             (click)="nextImage('fabrication'); $event.stopPropagation()">
             <i class="fas fa-chevron-right"></i>
           </button>
@@ -247,7 +241,7 @@
               class="py-2 px-2 bg-primary/10 border border-primary/50 rounded-lg text-center text-primary hover:bg-primary/20 hover:border-primary transition-all duration-300 text-sm">
               <i class="fas fa-external-link-alt mr-1"></i> Live Demo
             </a>
-            <a href="../../../assets/APK'S/Fabrication.apk" 
+            <a href="../../../assets/APK'S/Fabrication.apk"
               class="py-2 px-2 bg-green-500/10 border border-green-500/50 rounded-lg text-center text-green-400 hover:bg-green-500/20 hover:border-green-500 transition-all duration-300 text-sm">
               <i class="fab fa-android mr-1"></i> Android
             </a>
@@ -293,7 +287,8 @@
         <div class="p-6 transition-all duration-300 group-hover:bg-dark/90"
           style="background-color: rgb(30 41 59 / 0.9)!important;">
           <h3 class="text-2xl font-bold mb-3 text-accent group-hover:text-purple-400 transition-colors">Lab Website</h3>
-          <p class="text-light/80 mb-5 group-hover:text-light transition-colors">A modern personal Lab website showcasing my skills and projects.</p>
+          <p class="text-light/80 mb-5 group-hover:text-light transition-colors">A modern personal Lab website
+            showcasing my skills and projects.</p>
 
           <div class="flex flex-wrap gap-2 mb-6">
             <span class="tech-badge hover:bg-blue-500/10 hover:text-blue-400 transition-colors">HTML5</span>
@@ -309,7 +304,7 @@
             </a>
             <a href="https://rupeshlabmanipaltrutest.com/"
               class="py-2 px-2 bg-primary/10 border border-primary/50 rounded-lg text-center text-primary hover:bg-primary/20 hover:border-primary transition-all duration-300 text-sm">
-              <i class="fas fa-external-link-alt mr-1"></i> Live 
+              <i class="fas fa-external-link-alt mr-1"></i> Live
             </a>
           </div>
         </div>
@@ -332,20 +327,22 @@
 
           <!-- Carousel Navigation -->
           <button
-             class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
             (click)="prevImage('ecommerce'); $event.stopPropagation()">
             <i class="fas fa-chevron-left"></i>
           </button>
           <button
-           class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
             (click)="nextImage('ecommerce'); $event.stopPropagation()">
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
         <div class="p-6 transition-all duration-300 group-hover:bg-dark/90"
           style="background-color: rgb(30 41 59 / 0.9)!important;">
-          <h3 class="text-2xl font-bold mb-3 text-accent group-hover:text-purple-400 transition-colors">Fabrication Website</h3>
-          <p class="text-light/80 mb-5 group-hover:text-light transition-colors">A fully responsive e-commerce platform with product listings and cart functionality.</p>
+          <h3 class="text-2xl font-bold mb-3 text-accent group-hover:text-purple-400 transition-colors">Fabrication
+            Website</h3>
+          <p class="text-light/80 mb-5 group-hover:text-light transition-colors">A fully responsive e-commerce platform
+            with product listings and cart functionality.</p>
 
           <div class="flex flex-wrap gap-2 mb-6">
             <span class="tech-badge hover:bg-blue-500/10 hover:text-blue-400 transition-colors">HTML5</span>
@@ -360,7 +357,7 @@
             </a>
             <a href="https://dairyfarm.revolutionit.in/WebFabrication.html"
               class="py-2 px-2 bg-primary/10 border border-primary/50 rounded-lg text-center text-primary hover:bg-primary/20 hover:border-primary transition-all duration-300 text-sm">
-              <i class="fas fa-external-link-alt mr-1"></i> Live 
+              <i class="fas fa-external-link-alt mr-1"></i> Live
             </a>
           </div>
         </div>

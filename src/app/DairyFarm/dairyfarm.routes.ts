@@ -31,5 +31,51 @@ export const DAIRYFARM_ROUTES: Routes = [
     loadComponent:()=> import('../DairyFarm/medicien/medicien.component')
         .then(m => m.MedicienComponent)
  },
+ {
+    path:'OtherFeed',
+    loadComponent:()=> import('../DairyFarm/other-feed/other-feed.component')
+        .then(m => m.OtherFeedComponent)
+ },
+ {
+    path:'Bill',
+    loadComponent:()=> import('../DairyFarm/dairy-bill/dairy-bill.component')
+        .then(m => m.DairyBillComponent)
+ },
+ {
+    path:'History',
+    loadComponent:()=> import('../DairyFarm/history-dairy/history-dairy.component')
+        .then(m => m.HistoryDairyComponent)
+ },
+ {
+    path:'check-Animal-History',
+    loadComponent:()=> import('../DairyFarm/check-animal-history/check-animal-history.component')
+        .then(m => m.CheckAnimalHistoryComponent)
+ },
+ {
+    path:'check-Breeding-History',
+    loadComponent:()=> import('../DairyFarm/check-breeding-dates/check-breeding-dates.component')
+        .then(m => m.CheckBreedingDatesComponent)
+ },
+ {
+    path:'monthlype',
+    loadComponent:()=> import('../DairyFarm/monthly-pe/monthly-pe.component')
+        .then(m => m.MonthlyPeComponent)
+ },
+ {
+    path:'datepe',
+    loadComponent:()=> import('../DairyFarm/date-pe/date-pe.component')
+        .then(m => m.DatePEComponent)
+ },
+ {
+    path:'Cattle-breeding-calculater',
+    loadComponent:()=> import('../DairyFarm/cattle-breeding-calculator/cattle-breeding-calculator.component')
+        .then(m => m.CattleBreedingCalculatorComponent)
+ },
+ {
+    path:'Notification',
+    loadComponent:()=> import('../DairyFarm/notification/notification.component')
+        .then(m => m.NotificationComponent)
+ },
+  
   
 ];
