@@ -42,6 +42,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   previewImageUrl: string | null = null;
   previewImageName: string = '';
   
+  // Image compression settings
+  private readonly TARGET_FILE_SIZE = 50 * 1024; // 50KB target
+  private readonly MAX_ALLOWED_SIZE = 50 * 1024; // Maximum allowed size 50KB
+  private readonly INITIAL_QUALITY = 0.8; // Start with 80% quality
+  private readonly MIN_QUALITY = 0.1; // Minimum quality 10%
+  private readonly MAX_WIDTH = 1024; // Maximum width for resizing
+  private readonly MAX_HEIGHT = 768; // Maximum height for resizing
+  
   private subscriptions = new Subscription();
   private isBrowser: boolean;
 
@@ -131,31 +139,189 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFileSelect(event: any) {
+  async onFileSelect(event: any) {
     const file = event.target.files[0];
     if (!file) return;
     
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      this.toastr.error('File size should be less than 5MB');
-      return;
-    }
-    
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    // Validate file type only
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
     if (!allowedTypes.includes(file.type)) {
-      this.toastr.error('Only image files (JPEG, PNG, GIF, WebP) are allowed');
+      this.toastr.error('Only image files are allowed (JPEG, PNG, GIF, WebP, BMP, TIFF)');
       return;
     }
     
-    this.selectedFile = file;
+    try {
+      this.loader.show();
+      
+      // Show original size info
+      const originalSizeKB = Math.round(file.size / 1024);
+      const originalSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      
+      console.log(`Original image: ${originalSizeKB}KB (${originalSizeMB}MB)`);
+      
+      // Compress the image
+      const compressedFile = await this.compressImageToTargetSize(file);
+      this.selectedFile = compressedFile;
+      
+      // Create preview from compressed file
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewImage = e.target.result;
+        this.loader.hide();
+        
+        // Show compression info
+        const compressedSizeKB = Math.round(compressedFile.size / 1024);
+        const reductionPercentage = Math.round(((originalSizeKB - compressedSizeKB) / originalSizeKB) * 100);
+        
+        if (compressedSizeKB <= this.MAX_ALLOWED_SIZE) {
+          this.toastr.success(
+            `Image compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB (${reductionPercentage}% reduction)`,
+            '',
+            { timeOut: 3000 }
+          );
+        } else {
+          this.toastr.warning(
+            `Image compressed from ${originalSizeKB}KB to ${compressedSizeKB}KB (Minimum quality reached)`,
+            '',
+            { timeOut: 3000 }
+          );
+        }
+      };
+      reader.readAsDataURL(compressedFile);
+      
+    } catch (error: any) {
+      console.error('Image compression error:', error);
+      this.toastr.error(`Failed to process image: ${error.message}`);
+      this.loader.hide();
+    }
+  }
+
+  private async compressImageToTargetSize(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      
+      reader.onload = (e: any) => {
+        img.src = e.target.result;
+        
+        img.onload = () => {
+          // Calculate optimal dimensions for compression
+          const dimensions = this.calculateOptimalDimensions(img.width, img.height);
+          
+          // Create canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = dimensions.width;
+          canvas.height = dimensions.height;
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+          
+          // Set canvas background to white for transparent PNGs
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Draw image with new dimensions
+          ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
+          
+          // Convert all images to JPEG for maximum compression
+          const mimeType = 'image/jpeg';
+          
+          // Use progressive compression to reach target size
+          this.compressWithProgressiveQuality(canvas, mimeType, this.INITIAL_QUALITY)
+            .then(blob => {
+              const compressedFile = new File([blob], this.generateFileName(file), {
+                type: mimeType,
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            })
+            .catch(reject);
+        };
+        
+        img.onerror = () => {
+          reject(new Error('Failed to load image for compression'));
+        };
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read image file'));
+      };
+      
+      reader.readAsDataURL(file);
+    });
+  }
+
+  private calculateOptimalDimensions(originalWidth: number, originalHeight: number): { width: number, height: number } {
+    let width = originalWidth;
+    let height = originalHeight;
     
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.previewImage = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    // If image is very large, scale down aggressively
+    const maxPixels = this.MAX_WIDTH * this.MAX_HEIGHT;
+    const currentPixels = width * height;
+    
+    if (currentPixels > maxPixels * 4) {
+      // For very large images (4x max pixels), scale down more aggressively
+      const scale = Math.sqrt((maxPixels * 2) / currentPixels);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    } else if (currentPixels > maxPixels) {
+      // Scale down to fit within max dimensions while maintaining aspect ratio
+      const ratio = Math.min(this.MAX_WIDTH / width, this.MAX_HEIGHT / height);
+      width = Math.round(width * ratio);
+      height = Math.round(height * ratio);
+    }
+    
+    // Ensure minimum dimensions for very small images
+    width = Math.max(width, 100);
+    height = Math.max(height, 100);
+    
+    return { width, height };
+  }
+
+  private async compressWithProgressiveQuality(
+    canvas: HTMLCanvasElement, 
+    mimeType: string, 
+    quality: number
+  ): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Failed to create blob from canvas'));
+            return;
+          }
+          
+          const currentSize = blob.size;
+          
+          // Check if we've reached the target size or minimum quality
+          if (currentSize <= this.TARGET_FILE_SIZE || quality <= this.MIN_QUALITY) {
+            resolve(blob);
+            return;
+          }
+          
+          // Calculate next quality level (reduce by 15% each iteration)
+          const nextQuality = Math.max(this.MIN_QUALITY, quality - 0.15);
+          
+          // Recursively compress with lower quality
+          this.compressWithProgressiveQuality(canvas, mimeType, nextQuality)
+            .then(resolve)
+            .catch(reject);
+        },
+        mimeType,
+        quality
+      );
+    });
+  }
+
+  private generateFileName(originalFile: File): string {
+    const originalName = originalFile.name;
+    const extensionIndex = originalName.lastIndexOf('.');
+    const nameWithoutExt = extensionIndex > 0 ? originalName.substring(0, extensionIndex) : originalName;
+    const timestamp = Date.now();
+    return `${nameWithoutExt}_compressed_${timestamp}.jpg`;
   }
 
   removeImage() {
@@ -188,11 +354,18 @@ export class HomeComponent implements OnInit, OnDestroy {
         const formData = new FormData();
         formData.append('file', this.selectedFile);
         
+        // Show final file size info
+        const fileSizeKB = Math.round(this.selectedFile.size / 1024);
+        console.log(`Uploading compressed image: ${fileSizeKB}KB`);
+        
         const uploadResult: any = await this.api.upload('FileUpload/Upload', formData).toPromise();
         
         if (uploadResult && uploadResult.success) {
           imagePath = uploadResult.filePath;
           uploadedFileName = uploadResult.fileName;
+          
+          // Show upload success message
+          this.toastr.success(`Compressed image uploaded (${fileSizeKB}KB)`);
           
           // Delete old image if updating and it's a different file
           if (this.editMode && this.existingFileName && this.existingFileName !== uploadedFileName) {
