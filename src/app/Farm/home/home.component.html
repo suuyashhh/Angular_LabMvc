@@ -25,7 +25,7 @@
     </div>
   </nav>
 
-    <!-- Logout Confirm Modal -->
+  <!-- Logout Confirm Modal -->
   <div *ngIf="showLogoutConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
     <div class="bg-white rounded-xl p-5 w-72 shadow-lg text-center">
@@ -99,11 +99,8 @@
         <div class="h-44 bg-gradient-to-br from-amber-100 to-orange-100 
                     flex items-center justify-center overflow-hidden cursor-pointer"
           (click)="item.image ? openImagePreview(item) : null">
-          <img *ngIf="item.image; else noImage" [src]="item.image" 
-               class="h-full w-full object-cover group-hover:scale-105 
-                      transition-transform duration-300" 
-               [alt]="item.farM_NAME"
-               (error)="handleImageError($event)" />
+          <img *ngIf="item.image; else noImage" [src]="item.image" class="h-full w-full object-cover group-hover:scale-105 
+                      transition-transform duration-300" [alt]="item.farM_NAME" (error)="handleImageError($event)" />
           <ng-template #noImage>
             <div class="flex flex-col items-center justify-center text-amber-600">
               <i class="ri-image-line text-5xl mb-2"></i>
@@ -113,7 +110,9 @@
         </div>
 
         <!-- Name -->
-        <div class="p-4 text-center" routerLink="/SF/farmentrytypes">
+        <!-- Replace the Name section with this: -->
+        <div class="p-4 text-center cursor-pointer hover:bg-amber-50 transition rounded-b-xl"
+          (click)="navigateToFarmEntryTypes(item)">
           <h3 class="font-semibold text-gray-800 truncate" [title]="item.farM_NAME">
             {{ item.farM_NAME }}
           </h3>
@@ -147,8 +146,7 @@
         </label>
 
         <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 
-                    text-center hover:border-orange-400 transition cursor-pointer" 
-             (click)="fileInput.click()">
+                    text-center hover:border-orange-400 transition cursor-pointer" (click)="fileInput.click()">
           <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-3"></i>
           <p class="text-gray-600 mb-2">Click to upload</p>
           <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP up to 5MB</p>
@@ -166,7 +164,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Show current image info in edit mode -->
         <div *ngIf="editMode && existingImagePath && !previewImage" class="mt-4">
           <p class="text-sm font-medium text-gray-700 mb-2">Current Image</p>
@@ -185,13 +183,10 @@
 
         <div class="relative">
           <i class="ri-home-4-line absolute left-3 top-3.5 text-gray-400"></i>
-          <input type="text" [(ngModel)]="formName" placeholder="Enter farm name" 
-                 class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3.5
+          <input type="text" [(ngModel)]="formName" placeholder="Enter farm name" class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3.5
                         bg-white text-gray-800 placeholder-gray-400
                         focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                        outline-none transition" 
-                 (keyup.enter)="saveItem()" 
-                 autofocus />
+                        outline-none transition" (keyup.enter)="saveItem()" autofocus />
         </div>
       </div>
 
@@ -202,8 +197,7 @@
           Cancel
         </button>
 
-        <button (click)="saveItem()" [disabled]="!formName.trim()" 
-                class="bg-gradient-to-r from-orange-500 to-amber-600 
+        <button (click)="saveItem()" [disabled]="!formName.trim()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                        text-white px-6 py-3 rounded-xl shadow 
                        hover:from-orange-600 hover:to-amber-700 transition
                        disabled:opacity-50 disabled:cursor-not-allowed font-medium">
@@ -226,8 +220,7 @@
       </button>
 
       <!-- Download Button -->
-      <button (click)="downloadImage()" *ngIf="previewImageUrl" 
-              class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
+      <button (click)="downloadImage()" *ngIf="previewImageUrl" class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
                      text-white px-4 py-2.5 rounded-lg flex items-center gap-2 
                      shadow-lg transition z-10">
         <i class="ri-download-2-line text-lg"></i>
@@ -244,12 +237,9 @@
 
       <!-- Image Container -->
       <div class="flex items-center justify-center w-full h-full p-4 md:p-20">
-        <img *ngIf="previewImageUrl" 
-             [src]="previewImageUrl" 
-             [alt]="previewImageName"
-             class="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-             (error)="handlePreviewImageError()" />
-        
+        <img *ngIf="previewImageUrl" [src]="previewImageUrl" [alt]="previewImageName"
+          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (error)="handlePreviewImageError()" />
+
         <!-- Error state for image preview -->
         <div *ngIf="!previewImageUrl" class="text-center text-white">
           <i class="ri-image-off-line text-6xl mb-4 opacity-70"></i>

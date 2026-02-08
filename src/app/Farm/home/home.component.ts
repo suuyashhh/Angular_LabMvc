@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
@@ -58,9 +58,31 @@ export class HomeComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private auth: AuthService,
     public loader: LoaderService,
+    private router: Router,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
+  }
+
+  navigateToFarmEntryTypes(farm: Farm) {
+    // Store farm data in sessionStorage for persistence
+    const farmData = {
+      farmId: farm.farM_ID,
+      farmName: farm.farM_NAME,
+      farmImage: farm.image,
+      userId: farm.useR_ID
+    };
+    
+    sessionStorage.setItem('selectedFarm', JSON.stringify(farmData));
+    
+    // Navigate with both state and queryParams for reliability
+    this.router.navigate(['/SF/farmentrytypes'], {
+      state: { farmData: farmData },
+      queryParams: {
+        farmId: farm.farM_ID,
+        farmName: farm.farM_NAME
+      }
+    });
   }
 
   ngOnInit() {

@@ -15,6 +15,16 @@ export const FARM_ROUTES: Routes = [
     path:'farmentrytypes',
     loadComponent:()=> import('../Farm/farm-entry-types/farm-entry-types.component')
         .then(m => m.FarmEntryTypesComponent)
+ },
+ {
+    path:'farmentry',
+    loadComponent:()=> import('../Farm/farmentry/farmentry.component')
+        .then(m => m.FarmentryComponent)
+ },
+ {
+    path:'showentry',
+    loadComponent:()=> import('../Farm/showentry/showentry.component')
+        .then(m => m.ShowentryComponent)
  }
   
 ];
