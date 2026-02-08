@@ -82,5 +82,29 @@ formatDate(dateString: string): string {
   // return `${year}-${month}-${day}`;
 }
 
+// Add these methods to your existing ApiService class:
+
+upload(api: string, formData: FormData) {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+    // Don't set Content-Type for FormData, let browser set it
+  });
+  
+  return this.http.post(this.baseurl + api, formData, { headers });
+}
+
+deleteFile(api: string, params: any = {}) {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+  
+  return this.http.delete(this.baseurl + api, {
+    headers: headers,
+    params: params
+  });
+}
+
 }
 

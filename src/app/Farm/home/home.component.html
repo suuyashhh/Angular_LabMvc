@@ -25,7 +25,7 @@
     </div>
   </nav>
 
-    <!-- Logout Confirm Modal -->
+  <!-- Logout Confirm Modal -->
   <div *ngIf="showLogoutConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
     <div class="bg-white rounded-xl p-5 w-72 shadow-lg text-center">
@@ -58,7 +58,7 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf=" items.length === 0" class="text-center py-20">
+    <div *ngIf="items.length === 0" class="text-center py-20">
       <div class="text-6xl mb-4">🌱</div>
       <h3 class="text-xl font-semibold text-gray-700 mb-2">No Farm Categories Yet</h3>
       <p class="text-gray-500 mb-8">Get started by adding your first farm</p>
@@ -100,7 +100,7 @@
                     flex items-center justify-center overflow-hidden cursor-pointer"
           (click)="item.image ? openImagePreview(item) : null">
           <img *ngIf="item.image; else noImage" [src]="item.image" class="h-full w-full object-cover group-hover:scale-105 
-                      transition-transform duration-300" [alt]="item.farM_NAME" />
+                      transition-transform duration-300" [alt]="item.farM_NAME" (error)="handleImageError($event)" />
           <ng-template #noImage>
             <div class="flex flex-col items-center justify-center text-amber-600">
               <i class="ri-image-line text-5xl mb-2"></i>
@@ -110,7 +110,9 @@
         </div>
 
         <!-- Name -->
-        <div class="p-4 text-center" routerLink="/SF/farmentrytypes">
+        <!-- Replace the Name section with this: -->
+        <div class="p-4 text-center cursor-pointer hover:bg-amber-50 transition rounded-b-xl"
+          (click)="navigateToFarmEntryTypes(item)">
           <h3 class="font-semibold text-gray-800 truncate" [title]="item.farM_NAME">
             {{ item.farM_NAME }}
           </h3>
@@ -120,7 +122,7 @@
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- ADD/EDIT MODAL -->
   <div *ngIf="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-7 
                 relative border border-amber-100">
@@ -147,7 +149,7 @@
                     text-center hover:border-orange-400 transition cursor-pointer" (click)="fileInput.click()">
           <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-3"></i>
           <p class="text-gray-600 mb-2">Click to upload</p>
-          <p class="text-xs text-gray-400">PNG, JPG, GIF up to 5MB</p>
+          <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP up to 5MB</p>
         </div>
 
         <input #fileInput type="file" (change)="onFileSelect($event)" accept="image/*" class="hidden" />
@@ -157,9 +159,18 @@
           <div class="relative">
             <img [src]="previewImage" class="h-48 w-full object-cover rounded-xl border shadow-sm" />
             <button (click)="removeImage()" class="absolute top-2 right-2 bg-red-500 text-white 
-                           p-1.5 rounded-full hover:bg-red-600">
+                           p-1.5 rounded-full hover:bg-red-600 transition">
               <i class="ri-close-line text-sm"></i>
             </button>
+          </div>
+        </div>
+
+        <!-- Show current image info in edit mode -->
+        <div *ngIf="editMode && existingImagePath && !previewImage" class="mt-4">
+          <p class="text-sm font-medium text-gray-700 mb-2">Current Image</p>
+          <div class="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+            <i class="ri-image-line mr-2"></i>
+            {{ existingFileName || 'Image file' }}
           </div>
         </div>
       </div>
@@ -175,7 +186,7 @@
           <input type="text" [(ngModel)]="formName" placeholder="Enter farm name" class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3.5
                         bg-white text-gray-800 placeholder-gray-400
                         focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                        outline-none transition" (keyup.enter)="saveItem()" />
+                        outline-none transition" (keyup.enter)="saveItem()" autofocus />
         </div>
       </div>
 
@@ -189,7 +200,7 @@
         <button (click)="saveItem()" [disabled]="!formName.trim()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                        text-white px-6 py-3 rounded-xl shadow 
                        hover:from-orange-600 hover:to-amber-700 transition
-                       disabled:opacity-50 font-medium">
+                       disabled:opacity-50 disabled:cursor-not-allowed font-medium">
           {{ editMode ? 'Update' : 'Save' }}
         </button>
       </div>
@@ -209,7 +220,7 @@
       </button>
 
       <!-- Download Button -->
-      <button (click)="downloadImage()" class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
+      <button (click)="downloadImage()" *ngIf="previewImageUrl" class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
                      text-white px-4 py-2.5 rounded-lg flex items-center gap-2 
                      shadow-lg transition z-10">
         <i class="ri-download-2-line text-lg"></i>
@@ -218,20 +229,34 @@
 
       <!-- Image Name -->
       <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-white/10 
-                  backdrop-blur-sm px-6 py-2 rounded-lg z-10">
-        <p class="text-white font-medium">{{ previewImageName }}</p>
+                  backdrop-blur-sm px-6 py-2 rounded-lg z-10 max-w-xs">
+        <p class="text-white font-medium truncate" [title]="previewImageName">
+          {{ previewImageName }}
+        </p>
       </div>
 
       <!-- Image Container -->
-      <div class="flex items-center justify-center w-full h-full p-20">
-        <img [src]="previewImageUrl" [alt]="previewImageName"
-          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+      <div class="flex items-center justify-center w-full h-full p-4 md:p-20">
+        <img *ngIf="previewImageUrl" [src]="previewImageUrl" [alt]="previewImageName"
+          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (error)="handlePreviewImageError()" />
+
+        <!-- Error state for image preview -->
+        <div *ngIf="!previewImageUrl" class="text-center text-white">
+          <i class="ri-image-off-line text-6xl mb-4 opacity-70"></i>
+          <p class="text-lg font-medium mb-2">Image Not Available</p>
+          <p class="text-sm opacity-80">The image could not be loaded</p>
+        </div>
       </div>
 
       <!-- Image Info -->
       <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/10 
                   backdrop-blur-sm px-4 py-2 rounded-lg">
-        <p class="text-white text-sm">Click outside to close or press ESC</p>
+        <p class="text-white text-sm">
+          <span class="hidden sm:inline">Click outside to close</span>
+          <span class="sm:hidden">Tap outside to close</span>
+          <span class="mx-2">•</span>
+          <span>Press ESC to close</span>
+        </p>
       </div>
     </div>
   </div>
