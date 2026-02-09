@@ -21,18 +21,6 @@
         </span>
       </div>
       
-      <p class="text-sm text-gray-600">
-        Select an entry type for <span class="font-medium text-green-700">{{ farmName || 'your farm' }}</span>
-      </p>
-      
-      <!-- Breadcrumb -->
-      <div class="flex items-center gap-1 text-xs text-gray-500 mt-2">
-        <span>Farms</span>
-        <span>→</span>
-        <span class="text-green-600 font-medium">{{ farmName || 'Select Farm' }}</span>
-        <span>→</span>
-        <span class="font-medium">Entry Types</span>
-      </div>
     </div>
 
     <!-- Back Button -->
@@ -42,23 +30,6 @@
     </button>
   </div>
 
-  <!-- Welcome Message -->
-  <div *ngIf="farmName" class="max-w-6xl mx-auto mt-6 px-4">
-    <div class="bg-white rounded-xl p-4 mb-6 shadow-sm border border-green-100">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-          <i class="ri-information-line text-green-600 text-xl"></i>
-        </div>
-        <div>
-          <h3 class="font-medium text-green-800">Welcome to {{ farmName }}</h3>
-          <p class="text-sm text-gray-600 mt-1">
-            Manage your farm operations by selecting an entry type below. 
-            Each option helps you track different aspects of your farm.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Page content container -->
   <div class="max-w-6xl mx-auto mb-28 px-1 md:px-4">

@@ -1,23 +1,29 @@
-<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
   
   <!-- FIXED HEADER -->
-  <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 border-b-2 border-green-100">
-    <div class="max-w-7xl mx-auto px-4 py-3">
-      <div class="flex items-center justify-between">
+  <header class="fixed inset-x-4 md:inset-x-10 top-4 rounded-2xl 
+                 bg-gradient-to-r from-orange-500 to-amber-600 
+                 text-white z-50 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between h-14">
         
         <!-- Left: Back Button & Title -->
         <div class="flex items-center gap-3">
           <button (click)="navigateBack()" 
-                  class="p-2 rounded-lg hover:bg-green-50 text-green-600 transition">
+                  class="p-2 rounded-lg hover:bg-white/20 transition">
             <i class="ri-arrow-left-line text-xl"></i>
           </button>
           
           <div class="hidden sm:flex items-center gap-3">
-            <img *ngIf="entryTypeImage" [src]="entryTypeImage" [alt]="entryTypeName"
-                 class="w-10 h-10 object-contain" />
+            <div class="w-9 h-9 rounded-lg bg-white/20 border border-white/40 
+                        flex items-center justify-center p-1.5">
+              <img *ngIf="entryTypeImage" [src]="entryTypeImage" [alt]="entryTypeName"
+                   class="w-full h-full object-contain" />
+              <i *ngIf="!entryTypeImage" class="ri-file-text-line text-xl"></i>
+            </div>
             <div>
-              <h1 class="text-lg font-bold text-gray-800">{{ entryTypeName || 'Farm Entry' }}</h1>
-              <p class="text-xs text-gray-500">{{ farmName }}</p>
+              <h1 class="text-lg font-semibold">{{ entryTypeName || 'Farm Entry' }}</h1>
+              <p class="text-xs opacity-90">{{ farmName }}</p>
             </div>
           </div>
         </div>
@@ -25,21 +31,21 @@
         <!-- Right: Menu Button -->
         <div class="relative">
           <button (click)="toggleMenu()" 
-                  class="p-2 rounded-lg hover:bg-gray-100 transition">
-            <i class="ri-menu-line text-2xl text-gray-700"></i>
+                  class="p-2 rounded-lg hover:bg-white/20 transition">
+            <i class="ri-menu-line text-2xl"></i>
           </button>
 
           <!-- Dropdown Menu -->
           <div *ngIf="showMenu" 
                class="absolute right-0 top-12 bg-white rounded-xl shadow-xl border border-gray-200 w-56 py-2 z-50">
             <button (click)="navigateBack(); closeMenu()" 
-                    class="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-3 text-gray-700 transition">
-              <i class="ri-arrow-go-back-line text-green-600"></i>
+                    class="w-full text-left px-4 py-3 hover:bg-amber-50 flex items-center gap-3 text-gray-700 transition">
+              <i class="ri-arrow-go-back-line text-orange-600"></i>
               <span>Back to Entry Types</span>
             </button>
             <button (click)="navigateToHome(); closeMenu()" 
-                    class="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-3 text-gray-700 transition">
-              <i class="ri-home-4-line text-green-600"></i>
+                    class="w-full text-left px-4 py-3 hover:bg-amber-50 flex items-center gap-3 text-gray-700 transition">
+              <i class="ri-home-4-line text-orange-600"></i>
               <span>Back to Farms</span>
             </button>
           </div>
@@ -49,34 +55,19 @@
   </header>
 
   <!-- MAIN CONTENT -->
-  <main class="pt-20 pb-20 px-4">
+  <main class="pt-24 pb-20 px-6">
     <div class="max-w-4xl mx-auto">
-      
-      <!-- HEADER SECTION -->
-      <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 border border-green-100">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-              <img *ngIf="entryTypeImage" [src]="entryTypeImage" [alt]="entryTypeName"
-                   class="w-8 h-8 object-contain" />
-              <i *ngIf="!entryTypeImage" class="ri-file-list-line text-2xl text-green-600"></i>
-            </div>
-            <div>
-              <h2 class="text-xl font-bold text-gray-800">{{ entryTypeName }}</h2>
-              <p class="text-sm text-gray-500">Manage feed history (add / edit / delete / view)</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
+     
       <!-- ACTION BAR -->
-      <div class="bg-white rounded-xl shadow-sm p-4 mb-4 border border-green-100">
+      <div class="bg-white rounded-2xl shadow-lg p-4 mb-6 border border-amber-100">
         <div class="flex flex-col sm:flex-row gap-3">
           <button (click)="openAddModal()"
-                  class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg 
-                         font-semibold flex items-center justify-center gap-2 transition shadow-md">
-            <i class="ri-add-circle-line text-lg"></i>
-            <span>Add Feed</span>
+                  class="bg-gradient-to-r from-orange-500 to-amber-600 
+                         text-white px-5 py-2.5 rounded-xl shadow-lg 
+                         hover:from-orange-600 hover:to-amber-700 transition 
+                         flex items-center justify-center gap-2 font-semibold">
+            <span class="text-xl">+</span>
+            <span>Add</span>
           </button>
 
           <div class="flex-1 relative">
@@ -84,29 +75,33 @@
             <input type="text" 
                    [(ngModel)]="searchQuery"
                    (input)="searchEntries()"
-                   placeholder="Search feed name..."
-                   class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none" />
+                   placeholder="Search name..."
+                   class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl 
+                          bg-white text-gray-800 placeholder-gray-400
+                          focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                          outline-none transition" />
           </div>
         </div>
       </div>
 
-      <!-- FEED HISTORY -->
-      <div class="bg-white rounded-xl shadow-sm p-4 border border-green-100">
+      <!-- HISTORY -->
+      <div class="bg-white rounded-2xl shadow-lg p-5 border border-amber-100">
         <div class="flex items-center justify-between mb-4 pb-3 border-b">
-          <h3 class="text-lg font-semibold text-gray-700">Feed History</h3>
-          <span class="text-sm text-green-600 font-medium">Total: ₹{{ totalAmount }}</span>
+          <h3 class="text-lg font-semibold text-gray-800">History</h3>
+          <span class="text-sm text-orange-600 font-semibold bg-orange-50 px-3 py-1 rounded-lg">
+            Total: ₹{{ totalAmount }}
+          </span>
         </div>
 
         <!-- Empty State -->
         <div *ngIf="groupedEntries.length === 0" class="text-center py-12">
-          <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
-            <i class="ri-file-list-line text-4xl text-green-400"></i>
-          </div>
-          <h4 class="text-lg font-semibold text-gray-700 mb-2">No Entries Yet</h4>
-          <p class="text-gray-500 mb-4">Start by adding your first entry</p>
+          <div class="text-6xl mb-4">📝</div>
+          <h4 class="text-xl font-semibold text-gray-700 mb-2">No Entries Yet</h4>
+          <p class="text-gray-500 mb-6">Start by adding your first entry</p>
           <button (click)="openAddModal()"
-                  class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold">
+                  class="bg-gradient-to-r from-orange-500 to-amber-600 
+                         text-white px-6 py-3 rounded-xl shadow-lg 
+                         hover:from-orange-600 hover:to-amber-700 transition font-semibold">
             <i class="ri-add-line mr-2"></i>Add First Entry
           </button>
         </div>
@@ -115,7 +110,7 @@
         <div *ngFor="let group of groupedEntries" class="mb-6 last:mb-0">
           <!-- Date Header -->
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+            <div class="w-2 h-2 rounded-full bg-orange-500"></div>
             <h4 class="font-semibold text-gray-800">{{ group.date }}</h4>
             <span class="text-sm text-gray-500">({{ group.count }})</span>
           </div>
@@ -124,16 +119,17 @@
           <div class="space-y-3">
             <div *ngFor="let entry of group.entries" 
                  (click)="viewEntry(entry)"
-                 class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 
-                        border border-green-100 hover:shadow-md transition cursor-pointer group">
+                 class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 
+                        border border-amber-100 hover:shadow-lg transition cursor-pointer group
+                        hover:-translate-y-0.5">
               <div class="flex items-start justify-between gap-4">
                 <!-- Left: Icon & Details -->
                 <div class="flex items-start gap-3 flex-1 min-w-0">
-                  <div class="w-12 h-12 rounded-lg bg-white border-2 border-green-200 
-                              flex items-center justify-center flex-shrink-0 p-1.5">
+                  <div class="w-12 h-12 rounded-xl bg-white border-2 border-orange-200 
+                              flex items-center justify-center flex-shrink-0 p-1.5 shadow-sm">
                     <img *ngIf="entryTypeImage" [src]="entryTypeImage" [alt]="entryTypeName"
                          class="w-full h-full object-contain" />
-                    <i *ngIf="!entryTypeImage" class="ri-file-text-line text-2xl text-green-600"></i>
+                    <i *ngIf="!entryTypeImage" class="ri-file-text-line text-2xl text-orange-600"></i>
                   </div>
 
                   <div class="flex-1 min-w-0">
@@ -148,9 +144,9 @@
                 <!-- Right: Price & View Icon -->
                 <div class="flex flex-col items-end gap-2">
                   <span class="text-lg font-bold text-red-600">-₹{{ entry.price }}</span>
-                  <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center
-                              group-hover:bg-green-200 transition">
-                    <i class="ri-eye-line text-green-600 text-sm"></i>
+                  <div class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center
+                              group-hover:bg-orange-200 transition shadow-sm">
+                    <i class="ri-eye-line text-orange-600 text-sm"></i>
                   </div>
                 </div>
               </div>
@@ -164,16 +160,19 @@
 
   <!-- ADD ENTRY MODAL -->
   <div *ngIf="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] px-4">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 relative border border-green-100 max-h-[90vh] overflow-y-auto">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-7 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
       
       <button (click)="closeModal()" 
-              class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100">
+              class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
+                     p-1 rounded-full hover:bg-gray-100 transition">
         <i class="ri-close-line text-2xl"></i>
       </button>
 
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-          <i class="ri-add-circle-line text-2xl text-green-600"></i>
+        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 
+                    flex items-center justify-center">
+          <i class="ri-add-circle-line text-2xl text-orange-600"></i>
         </div>
         <div>
           <h2 class="text-2xl font-bold text-gray-800">Add New Entry</h2>
@@ -192,8 +191,10 @@
           <textarea [(ngModel)]="formData.reason"
                     placeholder="Enter reason or description"
                     rows="3"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-3 
-                           focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none resize-none"></textarea>
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 
+                           bg-white text-gray-800 placeholder-gray-400
+                           focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                           outline-none resize-none transition"></textarea>
         </div>
 
         <!-- Price -->
@@ -207,8 +208,10 @@
                    [(ngModel)]="formData.price"
                    placeholder="0"
                    min="0"
-                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none" />
+                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl 
+                          bg-white text-gray-800 placeholder-gray-400
+                          focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                          outline-none transition" />
           </div>
         </div>
 
@@ -221,8 +224,10 @@
             <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></i>
             <input type="date" 
                    [(ngModel)]="formData.date"
-                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg 
-                          focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none" />
+                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl 
+                          bg-white text-gray-800
+                          focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                          outline-none transition" />
           </div>
         </div>
 
@@ -233,10 +238,10 @@
           </label>
 
           <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center 
-                      hover:border-green-400 transition cursor-pointer"
+                      hover:border-orange-400 transition cursor-pointer"
                onclick="document.getElementById('fileInput').click()">
-            <i class="ri-image-add-line text-4xl text-gray-400 mb-2"></i>
-            <p class="text-gray-600 mb-1">Click to upload images</p>
+            <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-3"></i>
+            <p class="text-gray-600 mb-2">Click to upload images</p>
             <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP (Max 4 images)</p>
           </div>
 
@@ -250,10 +255,10 @@
           <!-- Image Previews -->
           <div *ngIf="previewImages.length > 0" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
             <div *ngFor="let img of previewImages; let i = index" class="relative group">
-              <img [src]="img" class="w-full h-24 object-cover rounded-lg border-2 border-green-200" />
+              <img [src]="img" class="w-full h-24 object-cover rounded-xl border-2 border-orange-200 shadow-sm" />
               <button (click)="removeImage(i)" 
                       class="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full 
-                             hover:bg-red-600 transition opacity-0 group-hover:opacity-100">
+                             hover:bg-red-600 transition opacity-0 group-hover:opacity-100 shadow-lg">
                 <i class="ri-close-line text-sm"></i>
               </button>
             </div>
@@ -263,16 +268,18 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <div class="flex justify-end gap-3 mt-8 pt-4 border-t">
         <button (click)="closeModal()" 
-                class="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 
+                class="px-5 py-3 rounded-xl border border-gray-300 text-gray-700 
                        hover:bg-gray-50 font-medium transition">
           Cancel
         </button>
         <button (click)="saveEntry()" 
                 [disabled]="!formData.reason.trim() || formData.price <= 0"
-                class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg 
-                       shadow font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                class="bg-gradient-to-r from-orange-500 to-amber-600 
+                       text-white px-6 py-3 rounded-xl shadow-lg
+                       hover:from-orange-600 hover:to-amber-700 transition
+                       disabled:opacity-50 disabled:cursor-not-allowed font-medium">
           <i class="ri-save-line mr-2"></i>Save Entry
         </button>
       </div>
@@ -280,9 +287,11 @@
   </div>
 
   <!-- FIXED FOOTER -->
-  <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-green-800 to-emerald-800 text-white py-3 text-center shadow-lg">
+  <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-orange-600 to-amber-600 
+                 text-white py-3 text-center shadow-lg">
     <p class="text-sm">
-      Developed by <a href="https://suyashpatil.in" target="_blank" class="underline font-semibold hover:text-green-200">SuyashPatil</a>
+      Developed by <a href="https://suyashpatil.in" target="_blank" 
+                      class="underline font-semibold hover:text-orange-200">SuyashPatil</a>
     </p>
   </footer>
 

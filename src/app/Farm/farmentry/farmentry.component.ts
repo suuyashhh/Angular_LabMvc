@@ -13,10 +13,10 @@ interface FarmEntry {
   price: number;
   farM_ID: number;
   useR_ID: number;
-  image1: string;
-  image2: string;
-  image3: string;
-  image4: string;
+  imagE1?: string;
+  imagE2?: string;
+  imagE3?: string;
+  imagE4?: string;
   date: string;
 }
 
@@ -327,7 +327,17 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   viewEntry(entry: FarmEntry) {
     // Store entry data for the detail page
     const entryData = {
-      ...entry,
+      farM_ENTRY_ID: entry.farM_ENTRY_ID,
+      entrY_TYPE: entry.entrY_TYPE,
+      reason: entry.reason,
+      price: entry.price,
+      farM_ID: entry.farM_ID,
+      useR_ID: entry.useR_ID,
+      imagE1: entry.imagE1 || '',
+      imagE2: entry.imagE2 || '',
+      imagE3: entry.imagE3 || '',
+      imagE4: entry.imagE4 || '',
+      date: entry.date,
       farmId: this.farmId,
       farmName: this.farmName,
       farmImage: this.farmImage,

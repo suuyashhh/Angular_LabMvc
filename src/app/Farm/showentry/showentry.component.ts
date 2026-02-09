@@ -13,10 +13,10 @@ interface EntryDetail {
   price: number;
   farM_ID: number;
   useR_ID: number;
-  image1: string;
-  image2: string;
-  image3: string;
-  image4: string;
+  imagE1?: string;
+  imagE2?: string;
+  imagE3?: string;
+  imagE4?: string;
   date: string;
   farmName?: string;
   farmImage?: string;
@@ -104,7 +104,7 @@ export class ShowentryComponent implements OnInit {
   private fetchEntryById(farmEntryId: number, farmId: number) {
     this.loader.show();
     
-    // Get userId from sessionStorage or other source
+    // Get userId from sessionStorage
     const farmData = sessionStorage.getItem('currentFarmEntry');
     let userId = 0;
     
@@ -123,8 +123,36 @@ export class ShowentryComponent implements OnInit {
       userId
     }).subscribe({
       next: (res: any) => {
-        console.log('API Response:', res); // Debug log
-        this.entry = res;
+        console.log('GetById API Response:', res);
+        
+        // Map the response to our interface
+        this.entry = {
+          farM_ENTRY_ID: res.farM_ENTRY_ID,
+          entrY_TYPE: res.entrY_TYPE,
+          reason: res.reason,
+          price: res.price,
+          farM_ID: res.farM_ID,
+          useR_ID: res.useR_ID,
+          imagE1: res.imagE1 || '',
+          imagE2: res.imagE2 || '',
+          imagE3: res.imagE3 || '',
+          imagE4: res.imagE4 || '',
+          date: res.date
+        };
+        
+        // Add farm data from sessionStorage if available
+        if (farmData) {
+          try {
+            const data = JSON.parse(farmData);
+            this.entry.farmName = data.farmName;
+            this.entry.farmImage = data.farmImage;
+            this.entry.entryTypeName = data.entryTypeName;
+            this.entry.entryTypeImage = data.entryTypeImage;
+          } catch (e) {
+            console.error('Error parsing farm data:', e);
+          }
+        }
+        
         this.loadImages();
         this.loader.hide();
       },
@@ -140,19 +168,17 @@ export class ShowentryComponent implements OnInit {
   private loadImages() {
     if (!this.entry) return;
     
-    console.log('Entry object:', this.entry); // Debug log
-    console.log('Image1:', this.entry.image1); // Debug log
-    console.log('Image2:', this.entry.image2); // Debug log
+    console.log('Loading images from entry:', this.entry);
     
-    // Try both uppercase and lowercase property names
-    const img1 = this.entry.image1 || (this.entry as any).IMAGE1 || '';
-    const img2 = this.entry.image2 || (this.entry as any).IMAGE2 || '';
-    const img3 = this.entry.image3 || (this.entry as any).IMAGE3 || '';
-    const img4 = this.entry.image4 || (this.entry as any).IMAGE4 || '';
+    // Use uppercase property names from API response
+    const img1 = this.entry.imagE1 || '';
+    const img2 = this.entry.imagE2 || '';
+    const img3 = this.entry.imagE3 || '';
+    const img4 = this.entry.imagE4 || '';
     
     this.images = [img1, img2, img3, img4].filter(img => img && img.trim() !== '');
     
-    console.log('Loaded images:', this.images); // Debug log
+    console.log('Loaded images:', this.images);
   }
 
   formatDate(dateString: string): string {
@@ -203,7 +229,7 @@ export class ShowentryComponent implements OnInit {
     this.formData = {
       reason: this.entry.reason,
       price: this.entry.price,
-      date: this.entry.date.split('T')[0] // Format date for input
+      date: this.entry.date.split('T')[0]
     };
     
     this.existingImages = [...this.images];
@@ -223,7 +249,7 @@ export class ShowentryComponent implements OnInit {
     this.existingImages = [];
     
     if (this.isBrowser) {
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const fileInput = document.getElementById('updateFileInput') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     }
   }
@@ -260,6 +286,27 @@ export class ShowentryComponent implements OnInit {
 
   removeExistingImage(index: number) {
     this.existingImages.splice(index, 1);
+    this.toastr.info('Image removed');
+  }
+
+  // Get total image count for validation
+  getTotalImageCount(): number {
+    return this.existingImages.length + this.selectedFiles.length;
+  }
+
+  // Get remaining slots
+  getRemainingSlots(): number {
+    return 4 - this.getTotalImageCount();
+  }
+
+  // Trigger file input click
+  triggerFileInput() {
+    if (this.isBrowser) {
+      const fileInput = document.getElementById('updateFileInput') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
   }
 
   async updateEntry() {
@@ -281,15 +328,14 @@ export class ShowentryComponent implements OnInit {
       // Prepare image paths array
       let imagePaths = ['', '', '', ''];
       
-      // Keep existing images
+      // Keep existing images (extract relative paths)
       for (let i = 0; i < this.existingImages.length; i++) {
-        // Extract relative path from full URL
         const img = this.existingImages[i];
         if (img) {
-          // If it's a full URL, extract the path
+          // If it's a full URL, extract the path part
           if (img.includes('/FarmImgs/')) {
             const parts = img.split('/FarmImgs/');
-            imagePaths[i] = '/FarmImgs/' + parts[1];
+            imagePaths[i] = '/FarmImgs/' + parts[parts.length - 1];
           } else {
             imagePaths[i] = img;
           }
@@ -325,15 +371,15 @@ export class ShowentryComponent implements OnInit {
         date: this.formData.date
       };
       
+      console.log('Update payload:', payload);
+      
       const result: any = await this.api.put('FarmEntry/Update', payload).toPromise();
       
       if (result.success) {
         this.toastr.success('Entry updated successfully');
         this.closeUpdateModal();
-        // Reload entry data
-        if (this.entry) {
-          this.fetchEntryById(this.entry.farM_ENTRY_ID, this.entry.farM_ID);
-        }
+        // Reload entry data from API
+        this.fetchEntryById(this.entry.farM_ENTRY_ID, this.entry.farM_ID);
       } else {
         this.toastr.error(result.message || 'Failed to update entry');
         this.loader.hide();
@@ -379,5 +425,35 @@ export class ShowentryComponent implements OnInit {
         this.loader.hide();
       }
     });
+  }
+
+  // Download image methods
+  downloadImage(imageUrl: string, index: number) {
+    if (!imageUrl) return;
+    
+    const fileName = `entry-image-${index + 1}.jpg`;
+    
+    fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        this.toastr.success('Image downloaded successfully');
+      })
+      .catch(error => {
+        console.error('Download error:', error);
+        this.toastr.error('Failed to download image');
+      });
+  }
+
+  downloadCurrentImage() {
+    if (!this.previewImageUrl) return;
+    this.downloadImage(this.previewImageUrl, this.currentImageIndex);
   }
 }
