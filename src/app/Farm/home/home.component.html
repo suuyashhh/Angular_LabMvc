@@ -6,7 +6,7 @@
               text-white z-50 shadow-lg">
     <div class="max-w-7xl mx-auto px-3 md:px-4">
       <div class="flex items-center justify-between h-12 md:h-14">
-        
+
         <!-- Left: User Info -->
         <div class="flex items-center gap-2 md:gap-3">
           <img src="../../assets/img/avatars/1.png"
@@ -16,13 +16,12 @@
 
         <!-- Right: Actions -->
         <div class="flex items-center gap-2">
-          <button routerLink="/SDF/Notification" 
-                  class="relative p-1.5 md:p-2 rounded-full hover:bg-white/20 transition">
+          <button routerLink="/SDF/Notification"
+            class="relative p-1.5 md:p-2 rounded-full hover:bg-white/20 transition">
             <i class="ri-notification-3-line text-base md:text-lg"></i>
           </button>
           <button class="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-white text-orange-600 font-medium 
-                         hover:bg-orange-100 shadow transition text-xs md:text-sm" 
-                  (click)="confirmLogout()">
+                         hover:bg-orange-100 shadow transition text-xs md:text-sm" (click)="confirmLogout()">
             Logout
           </button>
         </div>
@@ -38,13 +37,11 @@
 
       <div class="flex justify-end gap-2">
         <button class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm
-                       hover:bg-gray-50 transition" 
-                (click)="showLogoutConfirm = false">
+                       hover:bg-gray-50 transition" (click)="showLogoutConfirm = false">
           Cancel
         </button>
         <button class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm
-                       hover:bg-red-700 transition" 
-                (click)="logoutConfirmed()">
+                       hover:bg-red-700 transition" (click)="logoutConfirmed()">
           Logout
         </button>
       </div>
@@ -54,12 +51,11 @@
   <!-- PAGE CONTENT - Compact Header -->
   <div class="pt-20 md:pt-24 px-4 md:px-6 pb-6">
     <div class="max-w-7xl mx-auto">
-      
+
       <!-- Header -->
       <div class="flex justify-between items-center mb-5 md:mb-6">
         <h1 class="text-xl md:text-2xl font-bold text-gray-800">Farm Categories</h1>
-        <button (click)="openModal()" 
-                class="bg-gradient-to-r from-orange-500 to-amber-600 
+        <button (click)="openModal()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                        text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl 
                        shadow-lg hover:from-orange-600 hover:to-amber-700 transition 
                        flex items-center gap-1.5 md:gap-2 text-sm md:text-base font-medium">
@@ -73,8 +69,7 @@
         <div class="text-5xl md:text-6xl mb-3 md:mb-4">🌱</div>
         <h3 class="text-lg md:text-xl font-semibold text-gray-700 mb-2">No Farm Categories Yet</h3>
         <p class="text-sm md:text-base text-gray-500 mb-6 md:mb-8">Get started by adding your first farm</p>
-        <button (click)="openModal()" 
-                class="bg-gradient-to-r from-orange-500 to-amber-600 
+        <button (click)="openModal()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                        text-white px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl 
                        shadow-lg hover:from-orange-600 hover:to-amber-700 transition text-sm md:text-base">
           <i class="ri-add-line mr-1"></i> Add Your First Farm
@@ -82,32 +77,28 @@
       </div>
 
       <!-- Cards Grid - More Compact -->
-      <div *ngIf="items.length > 0" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5">
+      <div *ngIf="items.length > 0"
+        class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5">
 
-        <div *ngFor="let item of items; let i = index" 
-             class="bg-white rounded-xl md:rounded-2xl shadow-md border border-amber-100 
+        <div *ngFor="let item of items; let i = index" class="bg-white rounded-xl md:rounded-2xl shadow-md border border-amber-100 
                     overflow-hidden relative group hover:shadow-lg transition 
                     hover:-translate-y-0.5">
 
           <!-- Menu Button - Smaller -->
-          <button (click)="toggleMenu(i); $event.stopPropagation()" 
-                  class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 
+          <button (click)="toggleMenu(i); $event.stopPropagation()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 
                          z-20 p-1 rounded-full hover:bg-white/90 transition">
             <i class="ri-more-2-fill text-base md:text-lg"></i>
           </button>
 
           <!-- Dropdown - Compact -->
-          <div *ngIf="menuIndex === i" 
-               class="absolute right-2 top-9 bg-white shadow-xl rounded-lg 
+          <div *ngIf="menuIndex === i" class="absolute right-2 top-9 bg-white shadow-xl rounded-lg 
                       border border-gray-100 w-28 z-30 py-1 text-sm">
-            <button (click)="editItem(item); $event.stopPropagation()" 
-                    class="block w-full text-left px-3 py-2 hover:bg-amber-50 
+            <button (click)="editItem(item); $event.stopPropagation()" class="block w-full text-left px-3 py-2 hover:bg-amber-50 
                            flex items-center gap-2 text-gray-700">
               <i class="ri-edit-line text-amber-600 text-sm"></i>
               <span class="text-xs md:text-sm">Edit</span>
             </button>
-            <button (click)="deleteItem(item); $event.stopPropagation()" 
-                    class="block w-full text-left px-3 py-2 text-red-500 
+            <button (click)="deleteItem(item); $event.stopPropagation()" class="block w-full text-left px-3 py-2 text-red-500 
                            hover:bg-red-50 flex items-center gap-2">
               <i class="ri-delete-bin-line text-sm"></i>
               <span class="text-xs md:text-sm">Delete</span>
@@ -117,13 +108,9 @@
           <!-- Image - Smaller Height -->
           <div class="h-32 md:h-36 lg:h-40 bg-gradient-to-br from-amber-100 to-orange-100 
                       flex items-center justify-center overflow-hidden cursor-pointer"
-               (click)="item.image ? openImagePreview(item) : null">
-            <img *ngIf="item.image; else noImage" 
-                 [src]="item.image" 
-                 class="h-full w-full object-cover group-hover:scale-105 
-                        transition-transform duration-300" 
-                 [alt]="item.farM_NAME" 
-                 (error)="handleImageError($event)" />
+            (click)="item.image ? openImagePreview(item) : null">
+            <img *ngIf="item.image; else noImage" [src]="item.image" class="h-full w-full object-cover group-hover:scale-105 
+                        transition-transform duration-300" [alt]="item.farM_NAME" (error)="handleImageError($event)" />
             <ng-template #noImage>
               <div class="flex flex-col items-center justify-center text-amber-600">
                 <i class="ri-image-line text-3xl md:text-4xl mb-1"></i>
@@ -134,9 +121,8 @@
 
           <!-- Name - Compact -->
           <div class="p-3 md:p-4 text-center cursor-pointer hover:bg-amber-50 transition rounded-b-xl"
-               (click)="navigateToFarmEntryTypes(item)">
-            <h3 class="font-semibold text-gray-800 truncate text-sm md:text-base" 
-                [title]="item.farM_NAME">
+            (click)="navigateToFarmEntryTypes(item)">
+            <h3 class="font-semibold text-gray-800 truncate text-sm md:text-base" [title]="item.farM_NAME">
               {{ item.farM_NAME }}
             </h3>
             <p class="text-xs text-gray-500 mt-0.5">Farm ID: {{ item.farM_ID }}</p>
@@ -151,8 +137,7 @@
     <div class="bg-white w-full max-w-md rounded-xl md:rounded-2xl shadow-2xl p-5 md:p-6 
                 relative border border-amber-100 max-h-[90vh] overflow-y-auto">
 
-      <button (click)="closeModal()" 
-              class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
+      <button (click)="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
                      p-1 rounded-full hover:bg-gray-100 transition">
         <i class="ri-close-line text-xl"></i>
       </button>
@@ -171,8 +156,8 @@
         </label>
 
         <div class="border-2 border-dashed border-gray-300 rounded-xl p-5 
-                    text-center hover:border-orange-400 hover:bg-orange-50/30 transition cursor-pointer" 
-             (click)="fileInput.click()">
+                    text-center hover:border-orange-400 hover:bg-orange-50/30 transition cursor-pointer"
+          (click)="fileInput.click()">
           <i class="ri-upload-cloud-2-line text-3xl text-gray-400 mb-2"></i>
           <p class="text-sm text-gray-600 mb-1">Click to upload</p>
           <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP up to 5MB</p>
@@ -184,10 +169,8 @@
         <div *ngIf="previewImage" class="mt-3">
           <p class="text-sm font-medium text-gray-700 mb-2">Preview</p>
           <div class="relative">
-            <img [src]="previewImage" 
-                 class="h-40 w-full object-cover rounded-xl border shadow-sm" />
-            <button (click)="removeImage()" 
-                    class="absolute top-2 right-2 bg-red-500 text-white 
+            <img [src]="previewImage" class="h-40 w-full object-cover rounded-xl border shadow-sm" />
+            <button (click)="removeImage()" class="absolute top-2 right-2 bg-red-500 text-white 
                            p-1.5 rounded-full hover:bg-red-600 transition shadow-lg">
               <i class="ri-close-line text-sm"></i>
             </button>
@@ -212,29 +195,21 @@
 
         <div class="relative">
           <i class="ri-home-4-line absolute left-3 top-3 text-gray-400 text-base"></i>
-          <input type="text" 
-                 [(ngModel)]="formName" 
-                 placeholder="Enter farm name" 
-                 class="w-full border border-gray-300 rounded-xl pl-9 pr-3 py-2.5
+          <input type="text" [(ngModel)]="formName" placeholder="Enter farm name" class="w-full border border-gray-300 rounded-xl pl-9 pr-3 py-2.5
                         bg-white text-gray-800 placeholder-gray-400 text-sm
                         focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                        outline-none transition" 
-                 (keyup.enter)="saveItem()" 
-                 autofocus />
+                        outline-none transition" (keyup.enter)="saveItem()" autofocus />
         </div>
       </div>
 
       <!-- Buttons - Compact -->
       <div class="flex justify-end gap-2">
-        <button (click)="closeModal()" 
-                class="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm
+        <button (click)="closeModal()" class="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm
                        hover:bg-gray-50 font-medium transition">
           Cancel
         </button>
 
-        <button (click)="saveItem()" 
-                [disabled]="!formName.trim()" 
-                class="bg-gradient-to-r from-orange-500 to-amber-600 
+        <button (click)="saveItem()" [disabled]="!formName.trim()" class="bg-gradient-to-r from-orange-500 to-amber-600 
                        text-white px-5 py-2.5 rounded-lg shadow text-sm
                        hover:from-orange-600 hover:to-amber-700 transition
                        disabled:opacity-50 disabled:cursor-not-allowed font-medium">
@@ -245,23 +220,19 @@
   </div>
 
   <!-- IMAGE PREVIEW MODAL -->
-  <div *ngIf="showImagePreview" 
-       class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4"
-       (click)="closeImagePreview()">
+  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4"
+    (click)="closeImagePreview()">
     <div class="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center"
-         (click)="$event.stopPropagation()">
+      (click)="$event.stopPropagation()">
 
       <!-- Close Button -->
-      <button (click)="closeImagePreview()" 
-              class="absolute top-3 right-3 bg-white/10 hover:bg-white/20 
+      <button (click)="closeImagePreview()" class="absolute top-3 right-3 bg-white/10 hover:bg-white/20 
                      text-white p-2.5 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
         <i class="ri-close-line text-xl"></i>
       </button>
 
       <!-- Download Button -->
-      <button (click)="downloadImage()" 
-              *ngIf="previewImageUrl" 
-              class="absolute top-3 left-3 bg-orange-500 hover:bg-orange-600 
+      <button (click)="downloadImage()" *ngIf="previewImageUrl" class="absolute top-3 left-3 bg-orange-500 hover:bg-orange-600 
                      text-white px-3 py-2 rounded-lg flex items-center gap-2 
                      shadow-lg transition z-10 text-sm">
         <i class="ri-download-2-line text-base"></i>
@@ -278,11 +249,8 @@
 
       <!-- Image Container -->
       <div class="flex items-center justify-center w-full h-full p-4 md:p-16">
-        <img *ngIf="previewImageUrl" 
-             [src]="previewImageUrl" 
-             [alt]="previewImageName"
-             class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
-             (error)="handlePreviewImageError()" />
+        <img *ngIf="previewImageUrl" [src]="previewImageUrl" [alt]="previewImageName"
+          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (error)="handlePreviewImageError()" />
 
         <!-- Error state -->
         <div *ngIf="!previewImageUrl" class="text-center text-white">
@@ -292,16 +260,6 @@
         </div>
       </div>
 
-      <!-- Image Info -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/10 
-                  backdrop-blur-sm px-4 py-2 rounded-lg">
-        <p class="text-white text-xs md:text-sm">
-          <span class="hidden sm:inline">Click outside to close</span>
-          <span class="sm:hidden">Tap outside to close</span>
-          <span class="mx-2">•</span>
-          <span>Press ESC to close</span>
-        </p>
-      </div>
     </div>
   </div>
 </div>

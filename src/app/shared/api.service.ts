@@ -8,8 +8,8 @@ import * as bootstrap from 'bootstrap';
 })
 export class ApiService {
 
-baseurl = 'https://localhost:7193/api/';
- // baseurl =  'https://backend.suyashpatil.in/api/';
+//baseurl = 'https://localhost:7193/api/';
+  baseurl =  'https://backend.suyashpatil.in/api/';
   //baseurl = 'https://labmvcapi.bsite.net/api/';
 
   constructor(private http: HttpClient) {}

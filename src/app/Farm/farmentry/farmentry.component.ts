@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../services/loader.service';
+import { ImageCompressionService } from '../../shared/Imagecompression.service';
 
 interface FarmEntry {
   farM_ENTRY_ID: number;
@@ -94,6 +95,7 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     private api: ApiService,
     private toastr: ToastrService,
     public loader: LoaderService,
+    private imageCompression: ImageCompressionService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -263,7 +265,7 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFileSelect(event: any) {
+  async onFileSelect(event: any) {
     const files = Array.from(event.target.files) as File[];
     
     if (this.selectedFiles.length + files.length > 4) {
@@ -271,20 +273,48 @@ export class FarmentryComponent implements OnInit, OnDestroy {
       return;
     }
 
-    files.forEach(file => {
+    // Show loading indicator
+    this.toastr.info('Compressing images...', '', { timeOut: 2000 });
+
+    for (const file of files) {
       if (!file.type.startsWith('image/')) {
-        this.toastr.error('Only image files are allowed');
-        return;
+        this.toastr.error(`${file.name} is not an image file`);
+        continue;
       }
 
-      this.selectedFiles.push(file);
-      
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.previewImages.push(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
+      try {
+        // Show original size
+        const originalSizeKB = this.imageCompression.getFileSizeKB(file);
+        console.log(`Original size of ${file.name}: ${originalSizeKB.toFixed(2)} KB`);
+
+        // Compress the image to 50KB
+        const compressedFile = await this.imageCompression.compressImage(file, 50);
+        
+        // Show compressed size
+        const compressedSizeKB = this.imageCompression.getFileSizeKB(compressedFile);
+        console.log(`Compressed size of ${file.name}: ${compressedSizeKB.toFixed(2)} KB`);
+
+        this.selectedFiles.push(compressedFile);
+        
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.previewImages.push(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+
+        // Show success message
+        this.toastr.success(
+          `${file.name} compressed from ${originalSizeKB.toFixed(1)}KB to ${compressedSizeKB.toFixed(1)}KB`,
+          'Image Compressed',
+          { timeOut: 3000 }
+        );
+        
+      } catch (error) {
+        console.error('Compression error:', error);
+        this.toastr.error(`Failed to compress ${file.name}`);
+      }
+    }
   }
 
   removeImage(index: number) {
@@ -448,7 +478,7 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     }
   }
 
-  onEditFileSelect(event: any) {
+  async onEditFileSelect(event: any) {
     const files = Array.from(event.target.files) as File[];
     
     const totalImages = this.existingImages.length + this.selectedEditFiles.length + files.length;
@@ -457,20 +487,48 @@ export class FarmentryComponent implements OnInit, OnDestroy {
       return;
     }
 
-    files.forEach(file => {
+    // Show loading indicator
+    this.toastr.info('Compressing images...', '', { timeOut: 2000 });
+
+    for (const file of files) {
       if (!file.type.startsWith('image/')) {
-        this.toastr.error('Only image files are allowed');
-        return;
+        this.toastr.error(`${file.name} is not an image file`);
+        continue;
       }
 
-      this.selectedEditFiles.push(file);
-      
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.editPreviewImages.push(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
+      try {
+        // Show original size
+        const originalSizeKB = this.imageCompression.getFileSizeKB(file);
+        console.log(`Original size of ${file.name}: ${originalSizeKB.toFixed(2)} KB`);
+
+        // Compress the image to 50KB
+        const compressedFile = await this.imageCompression.compressImage(file, 50);
+        
+        // Show compressed size
+        const compressedSizeKB = this.imageCompression.getFileSizeKB(compressedFile);
+        console.log(`Compressed size of ${file.name}: ${compressedSizeKB.toFixed(2)} KB`);
+
+        this.selectedEditFiles.push(compressedFile);
+        
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.editPreviewImages.push(e.target.result);
+        };
+        reader.readAsDataURL(compressedFile);
+
+        // Show success message
+        this.toastr.success(
+          `${file.name} compressed from ${originalSizeKB.toFixed(1)}KB to ${compressedSizeKB.toFixed(1)}KB`,
+          'Image Compressed',
+          { timeOut: 3000 }
+        );
+        
+      } catch (error) {
+        console.error('Compression error:', error);
+        this.toastr.error(`Failed to compress ${file.name}`);
+      }
+    }
   }
 
   removeEditImage(index: number) {
@@ -637,8 +695,9 @@ export class FarmentryComponent implements OnInit, OnDestroy {
       }
     }
   }
+  
   isIncomeEntry(): boolean {
-  const incomTypes = ['self work', 'farm profit'];
-  return incomTypes.includes(this.entryTypeName.toLowerCase());
-}
+    const incomTypes = ['self work', 'farm profit'];
+    return incomTypes.includes(this.entryTypeName.toLowerCase());
+  }
 }
