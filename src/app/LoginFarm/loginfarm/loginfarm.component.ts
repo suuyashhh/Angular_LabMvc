@@ -22,6 +22,7 @@ export class LoginfarmComponent {
     PASSWORD: ''  
   };
   isLoading = false;
+  showPassword = false; // Add this property for password visibility toggle
 
   constructor(
     private http: HttpClient,
@@ -38,13 +39,20 @@ export class LoginfarmComponent {
     }
   }
 
+  /**
+   * Toggle password visibility
+   */
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
   login() {
     // basic validation
     if (!this.loginObj.CONTACT || !this.loginObj.PASSWORD) {
       this.toastr.error('Please enter contact and password', 'Validation');
       return;
     }
-debugger;
+
     this.isLoading = true;
     this.loader.show();
 

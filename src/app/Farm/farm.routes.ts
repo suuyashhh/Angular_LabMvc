@@ -20,11 +20,6 @@ export const FARM_ROUTES: Routes = [
     path:'farmentry',
     loadComponent:()=> import('../Farm/farmentry/farmentry.component')
         .then(m => m.FarmentryComponent)
- },
- {
-    path:'showentry',
-    loadComponent:()=> import('../Farm/showentry/showentry.component')
-        .then(m => m.ShowentryComponent)
  }
   
 ];
