@@ -14,6 +14,7 @@ export class FarmEntryTypesComponent implements OnInit {
   farmName: string = '';
   farmImage: string = '';
   userId: string = '';
+  showMenu = false;
   
   // Farm entry types data
   farmEntryTypes = [
@@ -141,6 +142,19 @@ navigateToEntryType(entryType: any) {
     }
   });
 }
+ toggleMenu() {
+    this.showMenu = !this.showMenu;
+  }
+
+  closeMenu() {
+    this.showMenu = false;
+  }
+  
+  navigateToHome() {
+    this.router.navigate(['/SF/home']);
+  }
+
+
 
   // Navigate back to farms list
   navigateBack() {

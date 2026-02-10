@@ -1,23 +1,28 @@
 <div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
 
-  <!-- NAVBAR -->
-  <nav class="fixed inset-x-4 md:inset-x-10 top-4 rounded-2xl 
+  <!-- NAVBAR - More Compact -->
+  <nav class="fixed inset-x-3 md:inset-x-6 top-3 rounded-xl 
               bg-gradient-to-r from-orange-500 to-amber-600 
-              text-white z-50 shadow-xl">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="flex items-center justify-between h-14">
-        <div class="flex items-center gap-3">
+              text-white z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-3 md:px-4">
+      <div class="flex items-center justify-between h-12 md:h-14">
+        
+        <!-- Left: User Info -->
+        <div class="flex items-center gap-2 md:gap-3">
           <img src="../../assets/img/avatars/1.png"
-            class="w-9 h-9 rounded-full object-cover border-2 border-white/40" />
-          <span class="font-semibold text-lg">{{userName}}</span>
+            class="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover border-2 border-white/40" />
+          <span class="font-semibold text-sm md:text-base">{{userName}}</span>
         </div>
 
-        <div class="flex items-center gap-3">
-          <button routerLink="/SDF/Notification" class="relative p-2 rounded-full hover:bg-white/20 transition">
-            <i class="ri-notification-3-line text-lg"></i>
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-2">
+          <button routerLink="/SDF/Notification" 
+                  class="relative p-1.5 md:p-2 rounded-full hover:bg-white/20 transition">
+            <i class="ri-notification-3-line text-base md:text-lg"></i>
           </button>
-          <button class="px-3 py-1.5 rounded-lg bg-white text-orange-600 font-semibold 
-                         hover:bg-orange-100 shadow transition text-sm" (click)="confirmLogout()">
+          <button class="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-white text-orange-600 font-medium 
+                         hover:bg-orange-100 shadow transition text-xs md:text-sm" 
+                  (click)="confirmLogout()">
             Logout
           </button>
         </div>
@@ -26,179 +31,211 @@
   </nav>
 
   <!-- Logout Confirm Modal -->
-  <div *ngIf="showLogoutConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-    <div class="bg-white rounded-xl p-5 w-72 shadow-lg text-center">
-      <h3 class="font-semibold text-gray-800 mb-3">Confirm Logout</h3>
+  <div *ngIf="showLogoutConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+    <div class="bg-white rounded-xl p-5 w-full max-w-xs md:max-w-sm shadow-lg text-center">
+      <h3 class="font-semibold text-gray-800 mb-2 text-base">Confirm Logout</h3>
       <p class="text-sm text-gray-600 mb-4">Are you sure you want to logout?</p>
 
-      <div class="flex justify-end gap-3">
-        <button class="px-4 py-2 rounded-lg border-2 border-gray-400 text-gray-800 bg-white
-         hover:bg-gray-100 transition" (click)="showLogoutConfirm = false">
+      <div class="flex justify-end gap-2">
+        <button class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm
+                       hover:bg-gray-50 transition" 
+                (click)="showLogoutConfirm = false">
           Cancel
         </button>
-
-        <button class="px-3 py-1 rounded bg-red-600 text-white" (click)="logoutConfirmed()">
+        <button class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm
+                       hover:bg-red-700 transition" 
+                (click)="logoutConfirmed()">
           Logout
         </button>
       </div>
     </div>
   </div>
 
-  <!-- PAGE CONTENT -->
-  <div class="pt-24 px-6">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-gray-800">Farm Categories</h1>
-      <button (click)="openModal()" class="bg-gradient-to-r from-orange-500 to-amber-600 
-                     text-white px-5 py-2.5 rounded-xl shadow-lg 
-                     hover:from-orange-600 hover:to-amber-700 transition 
-                     flex items-center gap-2">
-        <span class="text-xl">+</span> Add
-      </button>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="items.length === 0" class="text-center py-20">
-      <div class="text-6xl mb-4">🌱</div>
-      <h3 class="text-xl font-semibold text-gray-700 mb-2">No Farm Categories Yet</h3>
-      <p class="text-gray-500 mb-8">Get started by adding your first farm</p>
-      <button (click)="openModal()" class="bg-gradient-to-r from-orange-500 to-amber-600 
-                     text-white px-6 py-3 rounded-xl shadow-lg 
-                     hover:from-orange-600 hover:to-amber-700 transition">
-        + Add Your First Farm
-      </button>
-    </div>
-
-    <!-- Cards Grid -->
-    <div *ngIf="items.length > 0" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
-
-      <div *ngFor="let item of items; let i = index" class="bg-white rounded-2xl shadow-lg border border-amber-100 
-                  overflow-hidden relative group hover:shadow-xl transition 
-                  hover:-translate-y-1">
-
-        <!-- Menu Button -->
-        <button (click)="toggleMenu(i); $event.stopPropagation()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
-                       z-20 p-1 rounded-full hover:bg-white/80">
-          <i class="ri-more-2-fill text-lg"></i>
+  <!-- PAGE CONTENT - Compact Header -->
+  <div class="pt-20 md:pt-24 px-4 md:px-6 pb-6">
+    <div class="max-w-7xl mx-auto">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-5 md:mb-6">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">Farm Categories</h1>
+        <button (click)="openModal()" 
+                class="bg-gradient-to-r from-orange-500 to-amber-600 
+                       text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl 
+                       shadow-lg hover:from-orange-600 hover:to-amber-700 transition 
+                       flex items-center gap-1.5 md:gap-2 text-sm md:text-base font-medium">
+          <i class="ri-add-line text-lg md:text-xl"></i>
+          <span>Add</span>
         </button>
+      </div>
 
-        <!-- Dropdown -->
-        <div *ngIf="menuIndex === i" class="absolute right-3 top-12 bg-white shadow-xl rounded-xl 
-                    border border-gray-100 w-32 z-30 py-2">
-          <button (click)="editItem(item); $event.stopPropagation()" class="block w-full text-left px-4 py-2.5 hover:bg-amber-50 
-                         flex items-center gap-2 text-gray-700">
-            <i class="ri-edit-line text-amber-600"></i> Edit
+      <!-- Empty State -->
+      <div *ngIf="items.length === 0" class="text-center py-12 md:py-20">
+        <div class="text-5xl md:text-6xl mb-3 md:mb-4">🌱</div>
+        <h3 class="text-lg md:text-xl font-semibold text-gray-700 mb-2">No Farm Categories Yet</h3>
+        <p class="text-sm md:text-base text-gray-500 mb-6 md:mb-8">Get started by adding your first farm</p>
+        <button (click)="openModal()" 
+                class="bg-gradient-to-r from-orange-500 to-amber-600 
+                       text-white px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl 
+                       shadow-lg hover:from-orange-600 hover:to-amber-700 transition text-sm md:text-base">
+          <i class="ri-add-line mr-1"></i> Add Your First Farm
+        </button>
+      </div>
+
+      <!-- Cards Grid - More Compact -->
+      <div *ngIf="items.length > 0" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5">
+
+        <div *ngFor="let item of items; let i = index" 
+             class="bg-white rounded-xl md:rounded-2xl shadow-md border border-amber-100 
+                    overflow-hidden relative group hover:shadow-lg transition 
+                    hover:-translate-y-0.5">
+
+          <!-- Menu Button - Smaller -->
+          <button (click)="toggleMenu(i); $event.stopPropagation()" 
+                  class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 
+                         z-20 p-1 rounded-full hover:bg-white/90 transition">
+            <i class="ri-more-2-fill text-base md:text-lg"></i>
           </button>
-          <button (click)="deleteItem(item); $event.stopPropagation()" class="block w-full text-left px-4 py-2.5 text-red-500 
-                         hover:bg-red-50 flex items-center gap-2">
-            <i class="ri-delete-bin-line"></i> Delete
-          </button>
-        </div>
 
-        <!-- Image -->
-        <div class="h-44 bg-gradient-to-br from-amber-100 to-orange-100 
-                    flex items-center justify-center overflow-hidden cursor-pointer"
-          (click)="item.image ? openImagePreview(item) : null">
-          <img *ngIf="item.image; else noImage" [src]="item.image" class="h-full w-full object-cover group-hover:scale-105 
-                      transition-transform duration-300" [alt]="item.farM_NAME" (error)="handleImageError($event)" />
-          <ng-template #noImage>
-            <div class="flex flex-col items-center justify-center text-amber-600">
-              <i class="ri-image-line text-5xl mb-2"></i>
-              <span class="text-sm font-medium">No Image</span>
-            </div>
-          </ng-template>
-        </div>
+          <!-- Dropdown - Compact -->
+          <div *ngIf="menuIndex === i" 
+               class="absolute right-2 top-9 bg-white shadow-xl rounded-lg 
+                      border border-gray-100 w-28 z-30 py-1 text-sm">
+            <button (click)="editItem(item); $event.stopPropagation()" 
+                    class="block w-full text-left px-3 py-2 hover:bg-amber-50 
+                           flex items-center gap-2 text-gray-700">
+              <i class="ri-edit-line text-amber-600 text-sm"></i>
+              <span class="text-xs md:text-sm">Edit</span>
+            </button>
+            <button (click)="deleteItem(item); $event.stopPropagation()" 
+                    class="block w-full text-left px-3 py-2 text-red-500 
+                           hover:bg-red-50 flex items-center gap-2">
+              <i class="ri-delete-bin-line text-sm"></i>
+              <span class="text-xs md:text-sm">Delete</span>
+            </button>
+          </div>
 
-        <!-- Name -->
-        <!-- Replace the Name section with this: -->
-        <div class="p-4 text-center cursor-pointer hover:bg-amber-50 transition rounded-b-xl"
-          (click)="navigateToFarmEntryTypes(item)">
-          <h3 class="font-semibold text-gray-800 truncate" [title]="item.farM_NAME">
-            {{ item.farM_NAME }}
-          </h3>
-          <p class="text-xs text-gray-500 mt-1">Farm ID: {{ item.farM_ID }}</p>
+          <!-- Image - Smaller Height -->
+          <div class="h-32 md:h-36 lg:h-40 bg-gradient-to-br from-amber-100 to-orange-100 
+                      flex items-center justify-center overflow-hidden cursor-pointer"
+               (click)="item.image ? openImagePreview(item) : null">
+            <img *ngIf="item.image; else noImage" 
+                 [src]="item.image" 
+                 class="h-full w-full object-cover group-hover:scale-105 
+                        transition-transform duration-300" 
+                 [alt]="item.farM_NAME" 
+                 (error)="handleImageError($event)" />
+            <ng-template #noImage>
+              <div class="flex flex-col items-center justify-center text-amber-600">
+                <i class="ri-image-line text-3xl md:text-4xl mb-1"></i>
+                <span class="text-xs font-medium">No Image</span>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Name - Compact -->
+          <div class="p-3 md:p-4 text-center cursor-pointer hover:bg-amber-50 transition rounded-b-xl"
+               (click)="navigateToFarmEntryTypes(item)">
+            <h3 class="font-semibold text-gray-800 truncate text-sm md:text-base" 
+                [title]="item.farM_NAME">
+              {{ item.farM_NAME }}
+            </h3>
+            <p class="text-xs text-gray-500 mt-0.5">Farm ID: {{ item.farM_ID }}</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ADD/EDIT MODAL -->
+  <!-- ADD/EDIT MODAL - More Compact -->
   <div *ngIf="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-7 
-                relative border border-amber-100">
+    <div class="bg-white w-full max-w-md rounded-xl md:rounded-2xl shadow-2xl p-5 md:p-6 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
 
-      <button (click)="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
-                     p-1 rounded-full hover:bg-gray-100">
+      <button (click)="closeModal()" 
+              class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
+                     p-1 rounded-full hover:bg-gray-100 transition">
         <i class="ri-close-line text-xl"></i>
       </button>
 
-      <h2 class="text-2xl font-bold text-gray-800 mb-1">
+      <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-1">
         {{ editMode ? 'Edit Farm' : 'Add New Farm' }}
       </h2>
-      <p class="text-gray-500 mb-6 text-sm">
+      <p class="text-gray-500 mb-5 text-sm">
         {{ editMode ? 'Update farm details' : 'Add a new farm category' }}
       </p>
 
-      <!-- Upload -->
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-3">
+      <!-- Upload - Compact -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
           Farm Image <span class="text-gray-400 text-xs">(Optional)</span>
         </label>
 
-        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 
-                    text-center hover:border-orange-400 transition cursor-pointer" (click)="fileInput.click()">
-          <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-3"></i>
-          <p class="text-gray-600 mb-2">Click to upload</p>
+        <div class="border-2 border-dashed border-gray-300 rounded-xl p-5 
+                    text-center hover:border-orange-400 hover:bg-orange-50/30 transition cursor-pointer" 
+             (click)="fileInput.click()">
+          <i class="ri-upload-cloud-2-line text-3xl text-gray-400 mb-2"></i>
+          <p class="text-sm text-gray-600 mb-1">Click to upload</p>
           <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP up to 5MB</p>
         </div>
 
         <input #fileInput type="file" (change)="onFileSelect($event)" accept="image/*" class="hidden" />
 
-        <div *ngIf="previewImage" class="mt-4">
+        <!-- Preview -->
+        <div *ngIf="previewImage" class="mt-3">
           <p class="text-sm font-medium text-gray-700 mb-2">Preview</p>
           <div class="relative">
-            <img [src]="previewImage" class="h-48 w-full object-cover rounded-xl border shadow-sm" />
-            <button (click)="removeImage()" class="absolute top-2 right-2 bg-red-500 text-white 
-                           p-1.5 rounded-full hover:bg-red-600 transition">
+            <img [src]="previewImage" 
+                 class="h-40 w-full object-cover rounded-xl border shadow-sm" />
+            <button (click)="removeImage()" 
+                    class="absolute top-2 right-2 bg-red-500 text-white 
+                           p-1.5 rounded-full hover:bg-red-600 transition shadow-lg">
               <i class="ri-close-line text-sm"></i>
             </button>
           </div>
         </div>
 
-        <!-- Show current image info in edit mode -->
-        <div *ngIf="editMode && existingImagePath && !previewImage" class="mt-4">
+        <!-- Current image info in edit mode -->
+        <div *ngIf="editMode && existingImagePath && !previewImage" class="mt-3">
           <p class="text-sm font-medium text-gray-700 mb-2">Current Image</p>
-          <div class="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-            <i class="ri-image-line mr-2"></i>
-            {{ existingFileName || 'Image file' }}
+          <div class="text-xs text-gray-500 bg-gray-50 p-2.5 rounded-lg flex items-center gap-2">
+            <i class="ri-image-line"></i>
+            <span class="truncate">{{ existingFileName || 'Image file' }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Name Input -->
-      <div class="mb-8">
-        <label class="block text-sm font-medium text-gray-700 mb-3">
+      <!-- Name Input - Compact -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
           Farm Name <span class="text-red-500">*</span>
         </label>
 
         <div class="relative">
-          <i class="ri-home-4-line absolute left-3 top-3.5 text-gray-400"></i>
-          <input type="text" [(ngModel)]="formName" placeholder="Enter farm name" class="w-full border border-gray-300 rounded-xl pl-10 pr-4 py-3.5
-                        bg-white text-gray-800 placeholder-gray-400
+          <i class="ri-home-4-line absolute left-3 top-3 text-gray-400 text-base"></i>
+          <input type="text" 
+                 [(ngModel)]="formName" 
+                 placeholder="Enter farm name" 
+                 class="w-full border border-gray-300 rounded-xl pl-9 pr-3 py-2.5
+                        bg-white text-gray-800 placeholder-gray-400 text-sm
                         focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                        outline-none transition" (keyup.enter)="saveItem()" autofocus />
+                        outline-none transition" 
+                 (keyup.enter)="saveItem()" 
+                 autofocus />
         </div>
       </div>
 
-      <!-- Buttons -->
-      <div class="flex justify-end gap-3">
-        <button (click)="closeModal()" class="px-5 py-3 rounded-xl border border-gray-300 text-gray-700 
+      <!-- Buttons - Compact -->
+      <div class="flex justify-end gap-2">
+        <button (click)="closeModal()" 
+                class="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm
                        hover:bg-gray-50 font-medium transition">
           Cancel
         </button>
 
-        <button (click)="saveItem()" [disabled]="!formName.trim()" class="bg-gradient-to-r from-orange-500 to-amber-600 
-                       text-white px-6 py-3 rounded-xl shadow 
+        <button (click)="saveItem()" 
+                [disabled]="!formName.trim()" 
+                class="bg-gradient-to-r from-orange-500 to-amber-600 
+                       text-white px-5 py-2.5 rounded-lg shadow text-sm
                        hover:from-orange-600 hover:to-amber-700 transition
                        disabled:opacity-50 disabled:cursor-not-allowed font-medium">
           {{ editMode ? 'Update' : 'Save' }}
@@ -208,50 +245,57 @@
   </div>
 
   <!-- IMAGE PREVIEW MODAL -->
-  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4"
-    (click)="closeImagePreview()">
+  <div *ngIf="showImagePreview" 
+       class="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4"
+       (click)="closeImagePreview()">
     <div class="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center"
-      (click)="$event.stopPropagation()">
+         (click)="$event.stopPropagation()">
 
       <!-- Close Button -->
-      <button (click)="closeImagePreview()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 
-                     text-white p-3 rounded-full backdrop-blur-sm transition z-10">
-        <i class="ri-close-line text-2xl"></i>
+      <button (click)="closeImagePreview()" 
+              class="absolute top-3 right-3 bg-white/10 hover:bg-white/20 
+                     text-white p-2.5 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-close-line text-xl"></i>
       </button>
 
       <!-- Download Button -->
-      <button (click)="downloadImage()" *ngIf="previewImageUrl" class="absolute top-4 left-4 bg-orange-500 hover:bg-orange-600 
-                     text-white px-4 py-2.5 rounded-lg flex items-center gap-2 
-                     shadow-lg transition z-10">
-        <i class="ri-download-2-line text-lg"></i>
-        <span class="font-medium">Download</span>
+      <button (click)="downloadImage()" 
+              *ngIf="previewImageUrl" 
+              class="absolute top-3 left-3 bg-orange-500 hover:bg-orange-600 
+                     text-white px-3 py-2 rounded-lg flex items-center gap-2 
+                     shadow-lg transition z-10 text-sm">
+        <i class="ri-download-2-line text-base"></i>
+        <span class="font-medium hidden sm:inline">Download</span>
       </button>
 
       <!-- Image Name -->
-      <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-white/10 
-                  backdrop-blur-sm px-6 py-2 rounded-lg z-10 max-w-xs">
-        <p class="text-white font-medium truncate" [title]="previewImageName">
+      <div class="absolute top-3 left-1/2 -translate-x-1/2 bg-white/10 
+                  backdrop-blur-sm px-4 py-2 rounded-lg z-10 max-w-xs">
+        <p class="text-white text-sm font-medium truncate" [title]="previewImageName">
           {{ previewImageName }}
         </p>
       </div>
 
       <!-- Image Container -->
-      <div class="flex items-center justify-center w-full h-full p-4 md:p-20">
-        <img *ngIf="previewImageUrl" [src]="previewImageUrl" [alt]="previewImageName"
-          class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" (error)="handlePreviewImageError()" />
+      <div class="flex items-center justify-center w-full h-full p-4 md:p-16">
+        <img *ngIf="previewImageUrl" 
+             [src]="previewImageUrl" 
+             [alt]="previewImageName"
+             class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
+             (error)="handlePreviewImageError()" />
 
-        <!-- Error state for image preview -->
+        <!-- Error state -->
         <div *ngIf="!previewImageUrl" class="text-center text-white">
-          <i class="ri-image-off-line text-6xl mb-4 opacity-70"></i>
-          <p class="text-lg font-medium mb-2">Image Not Available</p>
+          <i class="ri-image-off-line text-5xl mb-3 opacity-70"></i>
+          <p class="text-base font-medium mb-1">Image Not Available</p>
           <p class="text-sm opacity-80">The image could not be loaded</p>
         </div>
       </div>
 
       <!-- Image Info -->
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/10 
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/10 
                   backdrop-blur-sm px-4 py-2 rounded-lg">
-        <p class="text-white text-sm">
+        <p class="text-white text-xs md:text-sm">
           <span class="hidden sm:inline">Click outside to close</span>
           <span class="sm:hidden">Tap outside to close</span>
           <span class="mx-2">•</span>

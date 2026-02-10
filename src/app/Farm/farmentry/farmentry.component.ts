@@ -373,4 +373,14 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   closeMenu() {
     this.showMenu = false;
   }
+  
+    triggerFileInput() {
+    if (this.isBrowser) {
+      const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+  }
+
 }
