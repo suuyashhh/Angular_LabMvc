@@ -126,18 +126,20 @@
 
                   <div class="flex-1 min-w-0">
                     <h5 class="font-semibold text-gray-800 mb-1 truncate text-sm md:text-base">{{ entry.reason }}</h5>
-                    <div class="flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                      <i class="ri-stack-line"></i>
-                      <span>Qty: 1</span>
-                    </div>
+
                   </div>
                 </div>
 
                 <!-- Right: Price & View Icon -->
                 <div class="flex flex-col items-end gap-1 md:gap-2 flex-shrink-0">
-                  <span class="text-base md:text-lg font-bold text-red-600">-₹{{ entry.price }}</span>
+                  <span class="text-base md:text-lg font-bold" [ngClass]="{
+          'text-green-600': isIncomeEntry(),
+          'text-red-600': !isIncomeEntry()
+        }">
+                    {{ isIncomeEntry() ? '+' : '-' }}₹{{ entry.price }}
+                  </span>
                   <div class="w-6 h-6 md:w-7 md:h-7 rounded-full bg-orange-100 flex items-center justify-center
-                              group-hover:bg-orange-200 transition shadow-sm">
+              group-hover:bg-orange-200 transition shadow-sm">
                     <i class="ri-eye-line text-orange-600 text-xs md:text-sm"></i>
                   </div>
                 </div>
@@ -258,6 +260,331 @@
                        disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm md:text-base">
           <i class="ri-save-line mr-2"></i>Save Entry
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW ENTRY MODAL - Read Only -->
+  <div *ngIf="showViewModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] px-4">
+    <div class="bg-white w-full max-w-2xl rounded-xl md:rounded-2xl shadow-2xl p-5 md:p-7 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+
+      <button (click)="closeViewModal()" class="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-700 
+                     p-1 rounded-full hover:bg-gray-100 transition">
+        <i class="ri-close-line text-xl md:text-2xl"></i>
+      </button>
+
+      <div class="flex items-center gap-2 md:gap-3 mb-5 md:mb-6">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 
+                    flex items-center justify-center">
+          <i class="ri-eye-line text-xl md:text-2xl text-orange-600"></i>
+        </div>
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Entry Details</h2>
+          <p class="text-xs md:text-sm text-gray-500">View entry information</p>
+        </div>
+      </div>
+
+      <!-- Form - Read Only -->
+      <div class="space-y-4 md:space-y-5">
+
+        <!-- Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+          <div class="relative">
+            <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg md:text-xl"></i>
+            <input type="date" [value]="selectedEntry ? selectedEntry.date.split('T')[0] : ''" disabled class="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border border-gray-300
+                          rounded-lg md:rounded-xl bg-gray-50 text-gray-600 text-sm md:text-base
+                          cursor-not-allowed" />
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Reason / Description</label>
+          <textarea [value]="selectedEntry?.reason" disabled rows="3" class="w-full border border-gray-300 rounded-lg md:rounded-xl px-3 md:px-4 py-2.5 md:py-3 
+                           bg-gray-50 text-gray-600 text-sm md:text-base
+                           resize-none cursor-not-allowed"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Price (₹)</label>
+          <div class="relative">
+            <i
+              class="ri-money-rupee-circle-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg md:text-xl"></i>
+            <input type="number" [value]="selectedEntry?.price" disabled class="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border border-gray-300 
+                          rounded-lg md:rounded-xl bg-gray-50 text-gray-600 text-sm md:text-base
+                          cursor-not-allowed" />
+          </div>
+        </div>
+
+        <!-- Images Display -->
+        <div *ngIf="viewImages.length > 0">
+          <label class="block text-sm font-medium text-gray-700 mb-2 md:mb-3">
+            Attached Images ({{ viewImages.length }})
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
+            <div *ngFor="let img of viewImages; let i = index" class="relative group">
+              <img [src]="img" (click)="openImagePreview(img, i)" class="w-full h-24 md:h-28 object-cover rounded-lg md:rounded-xl border-2 border-orange-200 shadow-sm cursor-pointer
+                       hover:border-orange-400 transition" />
+              <div (click)="openImagePreview(img, i)"
+                class="absolute inset-0 bg-black/0 group-hover:bg-black/40 
+                          rounded-lg md:rounded-xl flex items-center justify-center transition-all duration-300 cursor-pointer">
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center shadow-lg">
+                    <i class="ri-eye-line text-orange-600 text-base md:text-xl"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="absolute top-1.5 left-1.5 md:top-2 md:left-2 bg-orange-500 text-white 
+                          text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full font-semibold shadow">
+                {{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Images State -->
+        <div *ngIf="viewImages.length === 0">
+          <label class="block text-sm font-medium text-gray-700 mb-2 md:mb-3">Attached Images</label>
+          <div class="text-center py-6 md:py-8 bg-gradient-to-br from-amber-50 to-orange-50 
+                      rounded-lg md:rounded-xl border border-amber-100">
+            <div class="text-3xl md:text-4xl mb-2">🖼️</div>
+            <p class="text-sm text-gray-500">No images attached</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-2 md:gap-3 mt-6 md:mt-8 pt-3 md:pt-4 border-t">
+        <button (click)="closeViewModal()" class="px-4 md:px-5 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-medium transition text-sm md:text-base">
+          Close
+        </button>
+        <button (click)="openEditFromView()" class="bg-gradient-to-r from-orange-500 to-amber-600 
+                       text-white px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl shadow-lg
+                       hover:from-orange-600 hover:to-amber-700 transition font-medium
+                       flex items-center gap-2 text-sm md:text-base">
+          <i class="ri-edit-line"></i>
+          <span>Edit</span>
+        </button>
+        <button (click)="deleteEntryFromView()" class="bg-red-500 text-white px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl shadow-lg
+                       hover:bg-red-600 transition font-medium
+                       flex items-center gap-2 text-sm md:text-base">
+          <i class="ri-delete-bin-line"></i>
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT ENTRY MODAL -->
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] px-4">
+    <div class="bg-white w-full max-w-2xl rounded-xl md:rounded-2xl shadow-2xl p-5 md:p-7 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+
+      <button (click)="closeEditModal()" class="absolute top-3 right-3 md:top-4 md:right-4 text-gray-400 hover:text-gray-700 
+                     p-1 rounded-full hover:bg-gray-100 transition">
+        <i class="ri-close-line text-xl md:text-2xl"></i>
+      </button>
+
+      <div class="flex items-center gap-2 md:gap-3 mb-5 md:mb-6">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-orange-100 to-amber-100 
+                    flex items-center justify-center">
+          <i class="ri-edit-line text-xl md:text-2xl text-orange-600"></i>
+        </div>
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Edit Entry</h2>
+          <p class="text-xs md:text-sm text-gray-500">Update entry details</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4 md:space-y-5">
+
+        <!-- Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Date <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg md:text-xl"></i>
+            <input type="date" [(ngModel)]="editFormData.date" class="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border border-gray-300 
+                          rounded-lg md:rounded-xl bg-white text-gray-800 text-sm md:text-base
+                          focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                          outline-none transition" />
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Reason / Description <span class="text-red-500">*</span>
+          </label>
+          <textarea [(ngModel)]="editFormData.reason" placeholder="Enter reason or description" rows="3" class="w-full border border-gray-300 rounded-lg md:rounded-xl px-3 md:px-4 py-2.5 md:py-3 
+                           bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                           focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                           outline-none resize-none transition"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Price (₹) <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i
+              class="ri-money-rupee-circle-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg md:text-xl"></i>
+            <input type="number" [(ngModel)]="editFormData.price" placeholder="0" min="0" class="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border border-gray-300 
+                          rounded-lg md:rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                          focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                          outline-none transition" />
+          </div>
+        </div>
+
+        <!-- Current Images Section -->
+        <div *ngIf="existingImages.length > 0">
+          <label class="block text-sm font-medium text-gray-700 mb-2 md:mb-3">
+            <div class="flex items-center justify-between">
+              <span>Current Images</span>
+              <span class="text-xs text-gray-500 font-normal">
+                {{ existingImages.length }} of 4
+              </span>
+            </div>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
+            <div *ngFor="let img of existingImages; let i = index" class="relative group">
+              <img [src]="img"
+                class="w-full h-24 md:h-28 object-cover rounded-lg md:rounded-xl border-2 border-orange-200 shadow-sm"
+                [alt]="'Current image ' + (i + 1)" />
+
+              <button (click)="removeExistingImage(i)" class="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white 
+                             w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center
+                             shadow-lg transition-all duration-200
+                             sm:opacity-0 sm:group-hover:opacity-100 active:scale-95" title="Remove image">
+                <i class="ri-close-line text-xs md:text-base leading-none"></i>
+              </button>
+
+              <div class="absolute top-1.5 left-1.5 md:top-2 md:left-2 bg-orange-500 text-white 
+                          text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full font-semibold shadow">
+                {{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New Images Section -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 md:mb-3">
+            <div class="flex items-center justify-between">
+              <span>Add New Images</span>
+              <span class="text-xs font-normal" [class.text-red-500]="getRemainingSlots() === 0"
+                [class.text-green-600]="getRemainingSlots() > 0">
+                {{ getRemainingSlots() > 0 ? 'Can add ' + getRemainingSlots() + ' more' : 'Maximum reached' }}
+              </span>
+            </div>
+          </label>
+
+          <div *ngIf="getRemainingSlots() > 0" class="border-2 border-dashed border-gray-300 rounded-lg md:rounded-xl p-5 md:p-6 text-center 
+                      hover:border-orange-400 hover:bg-orange-50/50 transition cursor-pointer"
+            (click)="triggerEditFileInput()">
+            <i class="ri-upload-cloud-2-line text-3xl md:text-4xl text-gray-400 mb-2 md:mb-3"></i>
+            <p class="text-sm md:text-base text-gray-600 mb-1 md:mb-2 font-medium">Click to upload images</p>
+            <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP • Max {{ getRemainingSlots() }} more image(s)</p>
+          </div>
+
+          <div *ngIf="getRemainingSlots() === 0"
+            class="border-2 border-dashed border-orange-300 rounded-lg md:rounded-xl p-5 md:p-6 text-center bg-orange-50">
+            <i class="ri-image-fill text-3xl md:text-4xl text-orange-400 mb-2 md:mb-3"></i>
+            <p class="text-sm md:text-base text-orange-600 font-medium mb-1">Maximum images reached (4/4)</p>
+            <p class="text-xs text-gray-500">Remove existing images to add new ones</p>
+          </div>
+
+          <input id="editFileInput" type="file" (change)="onEditFileSelect($event)" accept="image/*" multiple
+            class="hidden" />
+
+          <div *ngIf="editPreviewImages.length > 0" class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3 mt-3 md:mt-4">
+            <div *ngFor="let img of editPreviewImages; let i = index" class="relative group">
+              <img [src]="img"
+                class="w-full h-24 md:h-28 object-cover rounded-lg md:rounded-xl border-2 border-green-300 shadow-sm"
+                [alt]="'New image ' + (i + 1)" />
+
+              <button (click)="removeEditImage(i)" class="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white 
+                             w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center
+                             shadow-lg transition-all duration-200
+                             sm:opacity-0 sm:group-hover:opacity-100 active:scale-95" title="Remove image">
+                <i class="ri-close-line text-xs md:text-base leading-none"></i>
+              </button>
+
+              <div class="absolute top-1.5 left-1.5 md:top-2 md:left-2 bg-green-500 text-white 
+                          text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full font-semibold shadow">
+                New
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-2 md:gap-3 mt-6 md:mt-8 pt-3 md:pt-4 border-t">
+        <button (click)="closeEditModal()" class="px-4 md:px-5 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-medium transition text-sm md:text-base">
+          Cancel
+        </button>
+        <button (click)="updateEntry()" [disabled]="!editFormData.reason.trim() || editFormData.price <= 0" class="bg-gradient-to-r from-orange-500 to-amber-600 
+                       text-white px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl shadow-lg
+                       hover:from-orange-600 hover:to-amber-700 transition
+                       disabled:opacity-50 disabled:cursor-not-allowed font-medium
+                       flex items-center gap-2 text-sm md:text-base">
+          <i class="ri-save-line"></i>
+          <span>Update Entry</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE PREVIEW MODAL -->
+  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[70] p-4"
+    (click)="closeImagePreview()">
+
+    <div class="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center"
+      (click)="$event.stopPropagation()">
+
+      <button (click)="closeImagePreview()" class="absolute top-3 right-3 bg-white/10 hover:bg-white/20 
+                     text-white p-2.5 md:p-3 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-close-line text-xl md:text-2xl"></i>
+      </button>
+
+      <div class="absolute top-3 left-1/2 -translate-x-1/2 bg-white/10 
+                  backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-lg z-10 shadow-lg">
+        <p class="text-white font-medium text-xs md:text-sm">
+          {{ currentImageIndex + 1 }} / {{ viewImages.length }}
+        </p>
+      </div>
+
+      <button *ngIf="currentImageIndex > 0" (click)="previousImage(); $event.stopPropagation()" class="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 
+                     text-white p-3 md:p-4 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-arrow-left-s-line text-xl md:text-2xl"></i>
+      </button>
+
+      <button *ngIf="currentImageIndex < viewImages.length - 1" (click)="nextImage(); $event.stopPropagation()" class="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 
+                     text-white p-3 md:p-4 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-arrow-right-s-line text-xl md:text-2xl"></i>
+      </button>
+
+      <div class="flex items-center justify-center w-full h-full p-4 md:p-16">
+        <img [src]="previewImageUrl" alt="Preview" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+      </div>
+
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/10 
+                  backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-lg">
+        <p class="text-white text-xs md:text-sm">
+          <span class="hidden sm:inline">Click outside to close</span>
+          <span class="sm:hidden">Tap outside to close</span>
+        </p>
       </div>
     </div>
   </div>

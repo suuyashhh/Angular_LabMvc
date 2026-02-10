@@ -43,6 +43,8 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   // UI state
   showMenu = false;
   showModal = false;
+  showViewModal = false;
+  showEditModal = false;
   searchQuery = '';
   
   // Entries data
@@ -50,15 +52,38 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   filteredEntries: FarmEntry[] = [];
   groupedEntries: { date: string; count: number; entries: FarmEntry[] }[] = [];
   
-  // Form data
+  // Selected entry for view/edit
+  selectedEntry: FarmEntry | null = null;
+  viewImages: string[] = [];
+  
+  // Form data for adding
   formData = {
     reason: '',
     price: 0,
     date: new Date().toISOString().split('T')[0]
   };
   
+  // Form data for editing
+  editFormData = {
+    reason: '',
+    price: 0,
+    date: ''
+  };
+  
+  // Add modal files
   selectedFiles: File[] = [];
   previewImages: string[] = [];
+  
+  // Edit modal files
+  selectedEditFiles: File[] = [];
+  editPreviewImages: string[] = [];
+  existingImages: string[] = [];
+  
+  // Image preview
+  showImagePreview = false;
+  previewImageUrl: string = '';
+  currentImageIndex = 0;
+  
   totalAmount = 0;
   
   private isBrowser: boolean;
@@ -80,7 +105,9 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Optional: Clear data when leaving
+    if (this.isBrowser) {
+      document.body.style.overflow = '';
+    }
   }
 
   private loadFarmEntryData() {
@@ -210,6 +237,7 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     this.calculateTotal();
   }
 
+  // ============= ADD MODAL =============
   openAddModal() {
     this.showModal = true;
     this.resetForm();
@@ -230,7 +258,7 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     this.previewImages = [];
     
     if (this.isBrowser) {
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const fileInput = document.querySelector('#fileInput') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     }
   }
@@ -324,40 +352,257 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ============= VIEW MODAL =============
   viewEntry(entry: FarmEntry) {
-    // Store entry data for the detail page
-    const entryData = {
-      farM_ENTRY_ID: entry.farM_ENTRY_ID,
-      entrY_TYPE: entry.entrY_TYPE,
-      reason: entry.reason,
-      price: entry.price,
-      farM_ID: entry.farM_ID,
-      useR_ID: entry.useR_ID,
-      imagE1: entry.imagE1 || '',
-      imagE2: entry.imagE2 || '',
-      imagE3: entry.imagE3 || '',
-      imagE4: entry.imagE4 || '',
-      date: entry.date,
-      farmId: this.farmId,
-      farmName: this.farmName,
-      farmImage: this.farmImage,
-      userId: this.userId,
-      entryTypeName: this.entryTypeName,
-      entryTypeImage: this.entryTypeImage
+    this.selectedEntry = entry;
+    this.loadViewImages();
+    this.showViewModal = true;
+    if (this.isBrowser) {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  closeViewModal() {
+    this.showViewModal = false;
+    this.selectedEntry = null;
+    this.viewImages = [];
+    if (this.isBrowser) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  private loadViewImages() {
+    if (!this.selectedEntry) return;
+    
+    const img1 = this.selectedEntry.imagE1 || '';
+    const img2 = this.selectedEntry.imagE2 || '';
+    const img3 = this.selectedEntry.imagE3 || '';
+    const img4 = this.selectedEntry.imagE4 || '';
+    
+    this.viewImages = [img1, img2, img3, img4].filter(img => img && img.trim() !== '');
+  }
+
+  openEditFromView() {
+    if (!this.selectedEntry) return;
+    
+    this.editFormData = {
+      reason: this.selectedEntry.reason,
+      price: this.selectedEntry.price,
+      date: this.selectedEntry.date.split('T')[0]
     };
     
-    sessionStorage.setItem('currentEntryDetail', JSON.stringify(entryData));
+    this.existingImages = [...this.viewImages];
+    this.selectedEditFiles = [];
+    this.editPreviewImages = [];
     
-    this.router.navigate(['/SF/showentry'], {
-      state: { entryData: entryData },
-      queryParams: {
-        farmEntryId: entry.farM_ENTRY_ID,
-        farmId: this.farmId
+    this.showViewModal = false;
+    this.showEditModal = true;
+  }
+
+  deleteEntryFromView() {
+    if (!this.selectedEntry) return;
+
+    if (!confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
+      return;
+    }
+
+    this.loader.show();
+
+    this.api.delete('FarmEntry/Delete', {
+      farmEntryId: this.selectedEntry.farM_ENTRY_ID,
+      farmId: this.selectedEntry.farM_ID,
+      userId: this.selectedEntry.useR_ID
+    }).subscribe({
+      next: (result: any) => {
+        if (result && result.success) {
+          this.toastr.success('Entry deleted successfully');
+          this.closeViewModal();
+          this.loadEntries();
+        } else {
+          this.toastr.error(result?.message || 'Failed to delete entry');
+          this.loader.hide();
+        }
+      },
+      error: (err) => {
+        console.error('Delete error:', err);
+        this.toastr.error(err.error?.message || 'Failed to delete entry');
+        this.loader.hide();
       }
     });
   }
 
-  // Navigation methods
+  // ============= EDIT MODAL =============
+  closeEditModal() {
+    this.showEditModal = false;
+    this.resetEditForm();
+  }
+
+  resetEditForm() {
+    this.selectedEditFiles = [];
+    this.editPreviewImages = [];
+    this.existingImages = [];
+    
+    if (this.isBrowser) {
+      const fileInput = document.getElementById('editFileInput') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+    }
+  }
+
+  onEditFileSelect(event: any) {
+    const files = Array.from(event.target.files) as File[];
+    
+    const totalImages = this.existingImages.length + this.selectedEditFiles.length + files.length;
+    if (totalImages > 4) {
+      this.toastr.warning('Maximum 4 images allowed in total');
+      return;
+    }
+
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) {
+        this.toastr.error('Only image files are allowed');
+        return;
+      }
+
+      this.selectedEditFiles.push(file);
+      
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.editPreviewImages.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  removeEditImage(index: number) {
+    this.selectedEditFiles.splice(index, 1);
+    this.editPreviewImages.splice(index, 1);
+  }
+
+  removeExistingImage(index: number) {
+    this.existingImages.splice(index, 1);
+    this.toastr.info('Image removed');
+  }
+
+  getRemainingSlots(): number {
+    return 4 - (this.existingImages.length + this.selectedEditFiles.length);
+  }
+
+  async updateEntry() {
+    if (!this.selectedEntry) return;
+
+    if (!this.editFormData.reason.trim()) {
+      this.toastr.error('Please enter a reason');
+      return;
+    }
+
+    if (this.editFormData.price <= 0) {
+      this.toastr.error('Please enter a valid price');
+      return;
+    }
+
+    try {
+      this.loader.show();
+      
+      // Prepare image paths array
+      let imagePaths = ['', '', '', ''];
+      
+      // Keep existing images (extract relative paths)
+      for (let i = 0; i < this.existingImages.length; i++) {
+        const img = this.existingImages[i];
+        if (img) {
+          // If it's a full URL, extract the path part
+          if (img.includes('/FarmImgs/')) {
+            const parts = img.split('/FarmImgs/');
+            imagePaths[i] = '/FarmImgs/' + parts[parts.length - 1];
+          } else {
+            imagePaths[i] = img;
+          }
+        }
+      }
+      
+      // Upload new images
+      let currentIndex = this.existingImages.length;
+      for (let i = 0; i < this.selectedEditFiles.length && currentIndex < 4; i++) {
+        const formData = new FormData();
+        formData.append('file', this.selectedEditFiles[i]);
+        
+        const uploadResult: any = await this.api.upload('FileUpload/Upload', formData).toPromise();
+        
+        if (uploadResult && uploadResult.success) {
+          imagePaths[currentIndex] = uploadResult.filePath;
+          currentIndex++;
+        }
+      }
+      
+      // Update entry
+      const payload = {
+        farM_ENTRY_ID: this.selectedEntry.farM_ENTRY_ID,
+        entrY_TYPE: this.selectedEntry.entrY_TYPE,
+        reason: this.editFormData.reason.trim(),
+        price: this.editFormData.price,
+        farM_ID: this.selectedEntry.farM_ID,
+        useR_ID: this.selectedEntry.useR_ID,
+        image1: imagePaths[0],
+        image2: imagePaths[1],
+        image3: imagePaths[2],
+        image4: imagePaths[3],
+        date: this.editFormData.date
+      };
+      
+      console.log('Update payload:', payload);
+      
+      const result: any = await this.api.put('FarmEntry/Update', payload).toPromise();
+      
+      if (result.success) {
+        this.toastr.success('Entry updated successfully');
+        this.closeEditModal();
+        this.selectedEntry = null;
+        this.loadEntries();
+      } else {
+        this.toastr.error(result.message || 'Failed to update entry');
+        this.loader.hide();
+      }
+      
+    } catch (error: any) {
+      console.error('Update error:', error);
+      this.toastr.error(error?.error?.message || error?.message || 'Error updating entry');
+      this.loader.hide();
+    }
+  }
+
+  // ============= IMAGE PREVIEW =============
+  openImagePreview(imageUrl: string, index: number) {
+    this.previewImageUrl = imageUrl;
+    this.currentImageIndex = index;
+    this.showImagePreview = true;
+    if (this.isBrowser) {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  closeImagePreview() {
+    this.showImagePreview = false;
+    this.previewImageUrl = '';
+    if (this.isBrowser) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  nextImage() {
+    if (this.currentImageIndex < this.viewImages.length - 1) {
+      this.currentImageIndex++;
+      this.previewImageUrl = this.viewImages[this.currentImageIndex];
+    }
+  }
+
+  previousImage() {
+    if (this.currentImageIndex > 0) {
+      this.currentImageIndex--;
+      this.previewImageUrl = this.viewImages[this.currentImageIndex];
+    }
+  }
+
+  // ============= NAVIGATION =============
   navigateBack() {
     this.router.navigate(['/SF/farmentrytypes']);
   }
@@ -373,8 +618,9 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   closeMenu() {
     this.showMenu = false;
   }
-  
-    triggerFileInput() {
+
+  // ============= FILE INPUT TRIGGERS =============
+  triggerFileInput() {
     if (this.isBrowser) {
       const fileInput = document.getElementById('fileInput') as HTMLInputElement;
       if (fileInput) {
@@ -383,4 +629,16 @@ export class FarmentryComponent implements OnInit, OnDestroy {
     }
   }
 
+  triggerEditFileInput() {
+    if (this.isBrowser) {
+      const fileInput = document.getElementById('editFileInput') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+  }
+  isIncomeEntry(): boolean {
+  const incomTypes = ['self work', 'farm profit'];
+  return incomTypes.includes(this.entryTypeName.toLowerCase());
+}
 }
