@@ -20,6 +20,11 @@ export const FARM_ROUTES: Routes = [
     path:'farmentry',
     loadComponent:()=> import('../Farm/farmentry/farmentry.component')
         .then(m => m.FarmentryComponent)
+ },
+ {
+    path:'all-history',  
+    loadComponent:()=> import('../Farm/allhistory-farm/allhistory-farm.component')
+        .then(m => m.AllHistoryComponent)
  }
   
 ];
