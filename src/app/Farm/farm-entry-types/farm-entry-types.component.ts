@@ -22,31 +22,43 @@ export class FarmEntryTypesComponent implements OnInit {
       id: 1,
       title: 'Worker',
       image: '../../../assets/img/farmImages/worker.png',
-      route: '/SF/worker'
+      route: '/SF/worker',
+      isHistory: false
     },
     {
       id: 2,
       title: 'Chemical Fertilizer',
       image: '../../../assets/img/farmImages/chemicalfertilizer.png',
-      route: '/SF/chemical-fertilizer'
+      route: '/SF/chemical-fertilizer',
+      isHistory: false
     },
     {
       id: 3,
       title: 'Self Work',
       image: '../../../assets/img/farmImages/selfwork.png',
-      route: '/SF/self-work'
+      route: '/SF/self-work',
+      isHistory: false
     },
     {
       id: 4,
       title: 'Farm Profit',
       image: '../../../assets/img/farmImages/farmprofit.png',
-      route: '/SF/farm-profit'
+      route: '/SF/farm-profit',
+      isHistory: false
     },
     {
       id: 5,
       title: 'Report',
       image: '../../../assets/img/farmImages/farmreport.png',
-      route: '/SF/report'
+      route: '/SF/report',
+      isHistory: false
+    },
+    {
+      id: 6,
+      title: 'All History',
+      image: '../../../assets/DairryFarmImg/HistoryRecord.png',
+      route: '/SF/all-history',  // ✅ FIXED: Added leading slash
+      isHistory: true
     }
   ];
 
@@ -87,8 +99,6 @@ export class FarmEntryTypesComponent implements OnInit {
       if (params['farmId']) {
         this.farmId = Number(params['farmId']);
         this.farmName = params['farmName'] || '';
-        // Note: farmImage and userId won't be in query params, 
-        // so this is a fallback only
         console.log('Loaded farm data from query params');
       }
     });
@@ -108,41 +118,65 @@ export class FarmEntryTypesComponent implements OnInit {
     });
   }
 
-// Navigate to specific farm entry type
-navigateToEntryType(entryType: any) {
-  if (!this.farmId) {
-    alert('No farm selected! Please go back and select a farm.');
-    this.router.navigate(['/SF/home']);
-    return;
+  // Navigate to specific farm entry type or all history
+  navigateToEntryType(entryType: any) {
+    if (!this.farmId) {
+      alert('No farm selected! Please go back and select a farm.');
+      this.router.navigate(['/SF/home']);
+      return;
+    }
+
+    // If it's the "All History" option, navigate to all-history component
+    if (entryType.isHistory) {
+      const historyData = {
+        farmId: this.farmId,
+        farmName: this.farmName,
+        farmImage: this.farmImage,
+        userId: this.userId
+      };
+
+      // Store in sessionStorage for persistence
+      sessionStorage.setItem('selectedFarm', JSON.stringify(historyData));
+
+      // Navigate to all-history page
+      this.router.navigate(['/SF/all-history'], {
+        state: { farmData: historyData },
+        queryParams: {
+          farmId: this.farmId,
+          userId: this.userId
+        }
+      });
+      return;
+    }
+
+    // For regular entry types, navigate to farmentry page
+    const completeData = {
+      // Farm data
+      farmId: this.farmId,
+      farmName: this.farmName,
+      farmImage: this.farmImage,
+      userId: this.userId,
+      // Entry type data
+      entryTypeId: entryType.id,
+      entryTypeName: entryType.title,
+      entryTypeImage: entryType.image,
+      entryTypeRoute: entryType.route
+    };
+
+    // Store in sessionStorage for persistence
+    sessionStorage.setItem('currentFarmEntry', JSON.stringify(completeData));
+
+    // Navigate to farmentry page
+    this.router.navigate(['/SF/farmentry'], {
+      state: { farmEntryData: completeData },
+      queryParams: {
+        farmId: this.farmId,
+        entryTypeId: entryType.id
+      }
+    });
   }
 
-  // Prepare complete data to pass to the farm entry page
-  const completeData = {
-    // Farm data
-    farmId: this.farmId,
-    farmName: this.farmName,
-    farmImage: this.farmImage,
-    userId: this.userId,
-    // Entry type data
-    entryTypeId: entryType.id,
-    entryTypeName: entryType.title,
-    entryTypeImage: entryType.image,
-    entryTypeRoute: entryType.route
-  };
-
-  // Store in sessionStorage for persistence
-  sessionStorage.setItem('currentFarmEntry', JSON.stringify(completeData));
-
-  // Navigate to farmentry page
-  this.router.navigate(['/SF/farmentry'], {
-    state: { farmEntryData: completeData },
-    queryParams: {
-      farmId: this.farmId,
-      entryTypeId: entryType.id
-    }
-  });
-}
- toggleMenu() {
+  toggleMenu() {
     this.showMenu = !this.showMenu;
   }
 
@@ -153,8 +187,6 @@ navigateToEntryType(entryType: any) {
   navigateToHome() {
     this.router.navigate(['/SF/home']);
   }
-
-
 
   // Navigate back to farms list
   navigateBack() {
