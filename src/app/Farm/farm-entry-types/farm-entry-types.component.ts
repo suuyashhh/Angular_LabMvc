@@ -50,7 +50,7 @@ export class FarmEntryTypesComponent implements OnInit {
       id: 5,
       title: 'Report',
       image: '../../../assets/img/farmImages/farmreport.png',
-      route: '/SF/report',
+      route: '/SF/FarmReport',
       isHistory: false
     },
     {
@@ -125,6 +125,28 @@ export class FarmEntryTypesComponent implements OnInit {
       this.router.navigate(['/SF/home']);
       return;
     }
+
+  // In farm-entry-types.component.ts
+if (entryType.route === '/SF/FarmReport') {
+  const farmData = {
+    farmId: this.farmId,
+    farmName: this.farmName,
+    farmImage: this.farmImage,
+    userId: Number(this.userId) // ✅ Convert to number
+  };
+
+  sessionStorage.setItem('selectedFarm', JSON.stringify(farmData));
+
+  this.router.navigate(['/SF/FarmReport'], {
+    state: { farmData: farmData },
+    queryParams: {
+      farmId: this.farmId,
+      userId: this.userId, // This can remain string for URL
+      farmName: this.farmName
+    }
+  });
+  return;
+}
 
     // If it's the "All History" option, navigate to all-history component
     if (entryType.isHistory) {

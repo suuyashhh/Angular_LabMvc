@@ -1,0 +1,140 @@
+/* Animation for loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth entrance animation for report cards */
+.bg-white {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Progress bar animation */
+@keyframes progressBar {
+  from {
+    width: 0%;
+  }
+}
+
+.h-2\.5 > div {
+  animation: progressBar 1s ease-out;
+}
+
+/* Hover effects for expense items */
+.hover\:shadow-md:hover {
+  transition: all 0.3s ease;
+  transform: translateY(-2px);
+}
+
+/* Print styles */
+@media print {
+  /* Hide header, footer, and buttons */
+  header,
+  footer,
+  button {
+    display: none !important;
+  }
+
+  /* Remove fixed positioning */
+  main {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Ensure white background for printing */
+  body,
+  .min-h-screen {
+    background: white !important;
+  }
+
+  /* Remove shadows and borders for cleaner print */
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  /* Page breaks */
+  .bg-white {
+    page-break-inside: avoid;
+  }
+
+  /* Adjust colors for print */
+  .bg-gradient-to-r,
+  .bg-gradient-to-br {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+/* Responsive font scaling */
+@media (max-width: 640px) {
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.75rem;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fef3c7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f59e0b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse effect for important values */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.font-bold.text-2xl,
+.font-bold.text-3xl {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Gradient text effect for net profit */
+.text-green-700,
+.text-red-700 {
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
