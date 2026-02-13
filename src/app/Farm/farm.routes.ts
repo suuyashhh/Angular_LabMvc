@@ -25,6 +25,11 @@ export const FARM_ROUTES: Routes = [
     path:'all-history',  
     loadComponent:()=> import('../Farm/allhistory-farm/allhistory-farm.component')
         .then(m => m.AllHistoryComponent)
+ } ,
+ {
+    path:'FarmReport',  
+    loadComponent:()=> import('../Farm/farmreport/farmreport.component')
+        .then(m => m.FarmreportComponent)
  }
   
 ];
