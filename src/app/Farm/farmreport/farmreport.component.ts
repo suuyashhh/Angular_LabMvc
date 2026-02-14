@@ -252,24 +252,7 @@ export class FarmreportComponent implements OnInit {
     this.showMenu = false;
   }
 
-  navigateBack() {
-    const farmData = {
-      farmId: this.farmId,
-      farmName: this.farmName,
-      farmImage: this.farmImage,
-      userId: this.userId
-    };
-    
-    sessionStorage.setItem('selectedFarm', JSON.stringify(farmData));
-    
-    this.router.navigate(['/SF/farm-entry-types'], {
-      state: { farmData },
-      queryParams: { 
-        farmId: this.farmId,
-        userId: this.userId 
-      }
-    });
-  }
+
 
   navigateToHome() {
     this.router.navigate(['/SF/home']);
@@ -307,5 +290,9 @@ export class FarmreportComponent implements OnInit {
     a.download = `Farm_Report_${this.farmName}_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+   navigateBack() {
+    this.router.navigate(['/SF/farmentrytypes']);
   }
 }
