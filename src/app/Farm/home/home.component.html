@@ -9,17 +9,16 @@
 
         <!-- Left: User Info -->
         <div class="flex items-center gap-2 md:gap-3">
-          <img src="../../assets/img/avatars/1.png"
-            class="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover border-2 border-white/40" />
+        <!-- Replace the existing avatar image with this -->
+<img src="../../assets/img/avatars/1.png"
+     (click)="openUserProfileModal()"
+     class="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover border-2 border-white/40 cursor-pointer hover:border-white transition" 
+     title="Update Profile" />
           <span class="font-semibold text-sm md:text-base">{{userName}}</span>
         </div>
 
         <!-- Right: Actions -->
         <div class="flex items-center gap-2">
-          <button routerLink="/SDF/Notification"
-            class="relative p-1.5 md:p-2 rounded-full hover:bg-white/20 transition">
-            <i class="ri-notification-3-line text-base md:text-lg"></i>
-          </button>
           <button class="px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-white text-orange-600 font-medium 
                          hover:bg-orange-100 shadow transition text-xs md:text-sm" (click)="confirmLogout()">
             Logout
@@ -271,6 +270,173 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- USER PROFILE UPDATE MODAL -->
+<div *ngIf="showUserProfileModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+  <div class="bg-white w-full max-w-md rounded-xl md:rounded-2xl shadow-2xl p-5 md:p-6 
+              relative border border-orange-100 max-h-[90vh] overflow-y-auto">
+
+    <button (click)="closeUserProfileModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 
+                   p-1 rounded-full hover:bg-gray-100 transition">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+
+    <div class="flex items-center gap-3 mb-5">
+      <div class="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 
+                  flex items-center justify-center text-white text-2xl font-bold">
+        {{ getUserInitials() }}
+      </div>
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800">Update Profile</h2>
+        <p class="text-gray-500 text-sm">Manage your account details</p>
+      </div>
+    </div>
+
+    <!-- User Name Input -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Full Name <span class="text-red-500">*</span>
+      </label>
+      <div class="relative">
+        <i class="ri-user-line absolute left-3 top-3 text-gray-400 text-base"></i>
+        <input type="text" [(ngModel)]="userProfileForm.userName" 
+               placeholder="Enter your full name"
+               class="w-full border border-gray-300 rounded-xl pl-9 pr-3 py-2.5
+                      bg-white text-gray-800 placeholder-gray-400 text-sm
+                      focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                      outline-none transition" />
+      </div>
+    </div>
+
+    <!-- Contact Input (Read-only) -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Contact Number
+      </label>
+      <div class="relative">
+        <i class="ri-phone-line absolute left-3 top-3 text-gray-400 text-base"></i>
+        <input type="text" [(ngModel)]="userProfileForm.contact" 
+               placeholder="Contact number"
+               readonly
+               class="w-full border border-gray-300 rounded-xl pl-9 pr-3 py-2.5
+                      bg-gray-50 text-gray-600 placeholder-gray-400 text-sm
+                      cursor-not-allowed outline-none" />
+      </div>
+      <p class="text-xs text-gray-500 mt-1">Contact number cannot be changed</p>
+    </div>
+
+    <!-- Password Input -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Password <span class="text-red-500">*</span>
+      </label>
+      <div class="relative">
+        <i class="ri-lock-line absolute left-3 top-3 text-gray-400 text-base"></i>
+        <input [type]="showPassword ? 'text' : 'password'" 
+               [(ngModel)]="userProfileForm.password" 
+               placeholder="Enter password"
+               class="w-full border border-gray-300 rounded-xl pl-9 pr-10 py-2.5
+                      bg-white text-gray-800 placeholder-gray-400 text-sm
+                      focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                      outline-none transition" />
+        <button type="button" (click)="showPassword = !showPassword"
+                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+          <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-base"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Subscription Period -->
+    <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 mb-4 border border-orange-200">
+      <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+        <i class="ri-calendar-check-line text-orange-600"></i>
+        Subscription Period
+      </h3>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">From Date</label>
+          <input type="date" [(ngModel)]="userProfileForm.fromDate"
+                 class="w-full border border-gray-300 rounded-lg px-2.5 py-2
+                        bg-white text-gray-800 text-xs
+                        focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                        outline-none transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">To Date</label>
+          <input type="date" [(ngModel)]="userProfileForm.toDate"
+                 class="w-full border border-gray-300 rounded-lg px-2.5 py-2
+                        bg-white text-gray-800 text-xs
+                        focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                        outline-none transition" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-2 pt-2">
+      <button (click)="closeUserProfileModal()" 
+              class="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm
+                     hover:bg-gray-50 font-medium transition">
+        Cancel
+      </button>
+
+      <button (click)="updateUserProfile()" 
+              [disabled]="!isUserProfileFormValid()"
+              class="bg-gradient-to-r from-orange-500 to-amber-600 
+                     text-white px-5 py-2.5 rounded-lg shadow text-sm
+                     hover:from-orange-600 hover:to-amber-700 transition
+                     disabled:opacity-50 disabled:cursor-not-allowed font-medium
+                     flex items-center gap-2">
+        <i class="ri-save-line"></i>
+        Update Profile
+      </button>
+    </div>
+  </div>
+</div>
+<!-- DELETE CONFIRMATION MODAL -->
+<div *ngIf="showDeleteConfirm" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+  <div class="bg-white rounded-xl md:rounded-2xl p-5 md:p-6 w-full max-w-sm shadow-2xl 
+              border border-red-100 animate-scale-in">
+    
+    <!-- Icon -->
+    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+      <i class="ri-delete-bin-line text-3xl text-red-600"></i>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-xl font-bold text-gray-800 text-center mb-2">
+      Delete Farm?
+    </h3>
+
+    <!-- Message -->
+    <p class="text-gray-600 text-center mb-1 text-sm">
+      Are you sure you want to delete
+    </p>
+    <p class="text-orange-600 font-semibold text-center mb-2">
+      "{{ itemToDelete?.farM_NAME }}"
+    </p>
+    <p class="text-gray-500 text-center text-xs mb-6">
+      This action cannot be undone.
+    </p>
+
+    <!-- Buttons -->
+    <div class="flex gap-3">
+      <button (click)="cancelDelete()" 
+              class="flex-1 px-4 py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 
+                     hover:bg-gray-50 font-medium transition text-sm">
+        Cancel
+      </button>
+      
+      <button (click)="confirmDelete()" 
+              class="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-white 
+                     hover:bg-red-700 font-medium transition text-sm
+                     flex items-center justify-center gap-2">
+        <i class="ri-delete-bin-line"></i>
+        Delete
+      </button>
     </div>
   </div>
 </div>

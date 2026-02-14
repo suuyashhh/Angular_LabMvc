@@ -42,6 +42,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   previewImageUrl: string | null = null;
   previewImageName: string = '';
   
+  // User profile modal
+  showUserProfileModal = false;
+  showPassword = false;
+  userProfileForm = {
+    userId: '',
+    userName: '',
+    contact: '',
+    password: '',
+    fromDate: '',
+    toDate: ''
+  };
+  // Add these properties with your other properties
+showDeleteConfirm = false;
+itemToDelete: Farm | null = null;
+  
   // Image compression settings
   private readonly TARGET_FILE_SIZE = 50 * 1024; // 50KB target
   private readonly MAX_ALLOWED_SIZE = 50 * 1024; // Maximum allowed size 50KB
@@ -62,27 +77,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-  }
-
-  navigateToFarmEntryTypes(farm: Farm) {
-    // Store farm data in sessionStorage for persistence
-    const farmData = {
-      farmId: farm.farM_ID,
-      farmName: farm.farM_NAME,
-      farmImage: farm.image,
-      userId: farm.useR_ID
-    };
-    
-    sessionStorage.setItem('selectedFarm', JSON.stringify(farmData));
-    
-    // Navigate with both state and queryParams for reliability
-    this.router.navigate(['/SF/farmentrytypes'], {
-      state: { farmData: farmData },
-      queryParams: {
-        farmId: farm.farM_ID,
-        farmName: farm.farM_NAME
-      }
-    });
   }
 
   ngOnInit() {
@@ -131,6 +125,27 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
     
     this.subscriptions.add(sub);
+  }
+
+  navigateToFarmEntryTypes(farm: Farm) {
+    // Store farm data in sessionStorage for persistence
+    const farmData = {
+      farmId: farm.farM_ID,
+      farmName: farm.farM_NAME,
+      farmImage: farm.image,
+      userId: farm.useR_ID
+    };
+    
+    sessionStorage.setItem('selectedFarm', JSON.stringify(farmData));
+    
+    // Navigate with both state and queryParams for reliability
+    this.router.navigate(['/SF/farmentrytypes'], {
+      state: { farmData: farmData },
+      queryParams: {
+        farmId: farm.farM_ID,
+        farmName: farm.farM_NAME
+      }
+    });
   }
 
   openModal() {
@@ -525,35 +540,49 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   deleteItem(item: Farm) {
-    if (!confirm(`Are you sure you want to delete "${item.farM_NAME}"? This action cannot be undone.`)) {
-      return;
-    }
-    
-    this.loader.show();
-    
-    const sub = this.api.delete('HomeFarm/Delete', { 
-      farmId: item.farM_ID,
-      userId: this.userId 
-    })
-    .subscribe({
-      next: (result: any) => {
-        if (result && result.success) {
-          this.toastr.success('Farm deleted successfully');
-          this.getAll();
-        } else {
-          this.toastr.error(result?.message || 'Failed to delete farm');
-          this.loader.hide();
-        }
-      },
-      error: (err) => {
-        console.error('Delete error:', err);
-        this.toastr.error(err.error?.message || err.message || 'Failed to delete farm');
+  // Show the custom modal instead of browser confirm
+  this.itemToDelete = item;
+  this.showDeleteConfirm = true;
+  this.menuIndex = null; // Close the dropdown menu
+}
+
+cancelDelete() {
+  this.showDeleteConfirm = false;
+  this.itemToDelete = null;
+}
+
+confirmDelete() {
+  if (!this.itemToDelete) return;
+  
+  this.showDeleteConfirm = false;
+  this.loader.show();
+  
+  const sub = this.api.delete('HomeFarm/Delete', { 
+    farmId: this.itemToDelete.farM_ID,
+    userId: this.userId 
+  })
+  .subscribe({
+    next: (result: any) => {
+      if (result && result.success) {
+        this.toastr.success('Farm deleted successfully');
+        this.itemToDelete = null;
+        this.getAll();
+      } else {
+        this.toastr.error(result?.message || 'Failed to delete farm');
+        this.itemToDelete = null;
         this.loader.hide();
       }
-    });
-    
-    this.subscriptions.add(sub);
-  }
+    },
+    error: (err) => {
+      console.error('Delete error:', err);
+      this.toastr.error(err.error?.message || err.message || 'Failed to delete farm');
+      this.itemToDelete = null;
+      this.loader.hide();
+    }
+  });
+  
+  this.subscriptions.add(sub);
+}
 
   toggleMenu(index: number) {
     this.menuIndex = this.menuIndex === index ? null : index;
@@ -569,15 +598,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleKeyPress(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      if (this.showImagePreview) {
-        this.closeImagePreview();
-      } else if (this.showModal) {
-        this.closeModal();
-      }
+ handleKeyPress(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    if (this.showDeleteConfirm) {
+      this.cancelDelete();
+    } else if (this.showUserProfileModal) {
+      this.closeUserProfileModal();
+    } else if (this.showImagePreview) {
+      this.closeImagePreview();
+    } else if (this.showModal) {
+      this.closeModal();
     }
   }
+}
 
   openImagePreview(item: Farm) {
     if (!item.image) {
@@ -666,5 +699,143 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   handlePreviewImageError() {
     this.previewImageUrl = null;
+  }
+
+  // User Profile Modal Methods
+  openUserProfileModal() {
+    this.showUserProfileModal = true;
+    this.loadUserDetails();
+    this.menuIndex = null;
+  }
+
+  closeUserProfileModal() {
+    this.showUserProfileModal = false;
+    this.showPassword = false;
+    this.resetUserProfileForm();
+  }
+
+  resetUserProfileForm() {
+    this.userProfileForm = {
+      userId: '',
+      userName: '',
+      contact: '',
+      password: '',
+      fromDate: '',
+      toDate: ''
+    };
+  }
+
+async loadUserDetails() {
+  if (!this.userId) {
+    this.toastr.error('User ID not found');
+    return;
+  }
+
+  this.loader.show();
+
+  try {
+    const result: any = await this.api
+      .post(`LoginFarm/GetUserDetails/${this.userId}`, {})
+      .toPromise();
+
+    if (result) {
+      this.userProfileForm = {
+        userId: result.useR_ID?.toString() || this.userId,
+        userName: result.useR_NAME || '',
+        contact: result.contact || '',
+        password: result.password || '',
+        fromDate: result.froM_DATE ? this.formatDateForInput(result.froM_DATE) : '',
+        toDate: result.tO_DATE ? this.formatDateForInput(result.tO_DATE) : ''
+      };
+
+      this.loader.hide();
+    } else {
+      this.toastr.error('Failed to load user details');
+      this.loader.hide();
+    }
+
+  } catch (error: any) {
+    console.error('Error loading user details:', error);
+    this.toastr.error(error?.error || 'Failed to load user details');
+    this.loader.hide();
+  }
+}
+
+
+  formatDateForInput(dateString: string | Date): string {
+    if (!dateString) return '';
+
+    try {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return '';
+    }
+  }
+
+  isUserProfileFormValid(): boolean {
+    return !!(
+      this.userProfileForm.userName?.trim() &&
+      this.userProfileForm.password?.trim()
+    );
+  }
+
+  async updateUserProfile() {
+    if (!this.isUserProfileFormValid()) {
+      this.toastr.error('Please fill in all required fields');
+      return;
+    }
+
+    this.loader.show();
+
+    try {
+      const payload = {
+        useR_ID: this.userId,
+        useR_NAME: this.userProfileForm.userName.trim(),
+        contact: this.userProfileForm.contact,
+        password: this.userProfileForm.password.trim(),
+        froM_DATE: this.userProfileForm.fromDate ? new Date(this.userProfileForm.fromDate).toISOString() : null,
+        tO_DATE: this.userProfileForm.toDate ? new Date(this.userProfileForm.toDate).toISOString() : null
+      };
+
+      const result: any = await this.api.post('LoginFarm/UpdatetUserDetails', payload).toPromise();
+
+      if (result) {
+        // Update local user name
+        this.userName = result.useR_NAME || this.userProfileForm.userName;
+
+        // Update cookie with new user name
+        const userDetails = this.auth.getFarmUserDetailsFromCookie();
+        if (userDetails) {
+          userDetails.useR_NAME = this.userName;
+          this.auth.setFarmUserDetailsCookie(userDetails);
+        }
+
+        this.toastr.success('Profile updated successfully');
+        this.closeUserProfileModal();
+        this.loader.hide();
+      } else {
+        this.toastr.error('Failed to update profile');
+        this.loader.hide();
+      }
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      this.toastr.error(error?.error?.message || 'Failed to update profile');
+      this.loader.hide();
+    }
+  }
+
+  getUserInitials(): string {
+    if (!this.userName) return 'U';
+
+    const names = this.userName.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    }
+    return this.userName.substring(0, 2).toUpperCase();
   }
 }

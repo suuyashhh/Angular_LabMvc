@@ -47,6 +47,7 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   showViewModal = false;
   showEditModal = false;
   searchQuery = '';
+  showDeleteEntryConfirm = false;
   
   // Entries data
   entries: FarmEntry[] = [];
@@ -430,36 +431,44 @@ export class FarmentryComponent implements OnInit, OnDestroy {
   }
 
   deleteEntryFromView() {
-    if (!this.selectedEntry) return;
+  if (!this.selectedEntry) return;
+  
+  // Show the custom modal instead of browser confirm
+  this.showDeleteEntryConfirm = true;
+}
 
-    if (!confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
-      return;
-    }
+cancelDeleteEntry() {
+  this.showDeleteEntryConfirm = false;
+}
 
-    this.loader.show();
+confirmDeleteEntry() {
+  if (!this.selectedEntry) return;
+  
+  this.showDeleteEntryConfirm = false;
+  this.loader.show();
 
-    this.api.delete('FarmEntry/Delete', {
-      farmEntryId: this.selectedEntry.farM_ENTRY_ID,
-      farmId: this.selectedEntry.farM_ID,
-      userId: this.selectedEntry.useR_ID
-    }).subscribe({
-      next: (result: any) => {
-        if (result && result.success) {
-          this.toastr.success('Entry deleted successfully');
-          this.closeViewModal();
-          this.loadEntries();
-        } else {
-          this.toastr.error(result?.message || 'Failed to delete entry');
-          this.loader.hide();
-        }
-      },
-      error: (err) => {
-        console.error('Delete error:', err);
-        this.toastr.error(err.error?.message || 'Failed to delete entry');
+  this.api.delete('FarmEntry/Delete', {
+    farmEntryId: this.selectedEntry.farM_ENTRY_ID,
+    farmId: this.selectedEntry.farM_ID,
+    userId: this.selectedEntry.useR_ID
+  }).subscribe({
+    next: (result: any) => {
+      if (result && result.success) {
+        this.toastr.success('Entry deleted successfully');
+        this.closeViewModal();
+        this.loadEntries();
+      } else {
+        this.toastr.error(result?.message || 'Failed to delete entry');
         this.loader.hide();
       }
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Delete error:', err);
+      this.toastr.error(err.error?.message || 'Failed to delete entry');
+      this.loader.hide();
+    }
+  });
+}
 
   // ============= EDIT MODAL =============
   closeEditModal() {
