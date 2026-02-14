@@ -84,11 +84,23 @@
                     overflow-hidden relative group hover:shadow-lg transition 
                     hover:-translate-y-0.5">
 
-          <!-- Menu Button - Smaller -->
-          <button (click)="toggleMenu(i); $event.stopPropagation()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 
-                         z-20 p-1 rounded-full hover:bg-white/90 transition">
-            <i class="ri-more-2-fill text-base md:text-lg"></i>
-          </button>
+          <!-- Top Right Buttons Container -->
+          <div class="absolute top-2 right-2 flex items-center gap-1.5 z-20">
+            <!-- Image Preview Button - Only show if image exists -->
+
+            <button *ngIf="item.image" (click)="openImagePreview(item); $event.stopPropagation()" title="View Image"
+              class="p-1.5 rounded-full bg-white/80 text-orange-500 
+               hover:bg-orange-500 hover:text-white 
+               shadow transition backdrop-blur-sm">
+              <i class="ri-image-2-line text-sm md:text-base"></i>
+            </button>
+
+            <!-- Menu Button -->
+            <button (click)="toggleMenu(i); $event.stopPropagation()" class="text-gray-400 hover:text-gray-700 p-1 rounded-full 
+                           hover:bg-white/90 transition">
+              <i class="ri-more-2-fill text-base md:text-lg"></i>
+            </button>
+          </div>
 
           <!-- Dropdown - Compact -->
           <div *ngIf="menuIndex === i" class="absolute right-2 top-9 bg-white shadow-xl rounded-lg 
@@ -105,10 +117,9 @@
             </button>
           </div>
 
-          <!-- Image - Smaller Height -->
+          <!-- Image - NO CLICK HANDLER -->
           <div class="h-32 md:h-36 lg:h-40 bg-gradient-to-br from-amber-100 to-orange-100 
-                      flex items-center justify-center overflow-hidden cursor-pointer"
-            (click)="item.image ? openImagePreview(item) : null">
+                      flex items-center justify-center overflow-hidden" (click)="navigateToFarmEntryTypes(item)">
             <img *ngIf="item.image; else noImage" [src]="item.image" class="h-full w-full object-cover group-hover:scale-105 
                         transition-transform duration-300" [alt]="item.farM_NAME" (error)="handleImageError($event)" />
             <ng-template #noImage>
@@ -119,7 +130,7 @@
             </ng-template>
           </div>
 
-          <!-- Name - Compact -->
+          <!-- Name - Keep only navigation click -->
           <div class="p-3 md:p-4 text-center cursor-pointer hover:bg-amber-50 transition rounded-b-xl"
             (click)="navigateToFarmEntryTypes(item)">
             <h3 class="font-semibold text-gray-800 truncate text-sm md:text-base" [title]="item.farM_NAME">
