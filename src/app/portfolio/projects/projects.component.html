@@ -253,6 +253,71 @@
         </div>
       </div>
 
+      
+      <!-- Fabrication Card -->
+      <div class="relative bg-dark rounded-lg border border-gray-800 overflow-hidden 
+                  transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/10
+                  group hover:border-secondary/50">
+        <div class="relative h-64 overflow-hidden">
+          <!-- Carousel Images -->
+          <div class="relative h-full w-full transition-transform duration-500 group-hover:scale-105">
+            <img src="../../../assets/img/Farm/Farm1.png" alt="Fabrication App"
+              class="carousel-image absolute inset-0 w-full h-full object-cover"
+              [class.opacity-100]="imageIndex['farm'] === 1" [class.opacity-0]="imageIndex['farm'] !== 1">
+            <img src="../../../assets/img/Farm/Farm2.png" alt="Fabrication App"
+              class="carousel-image absolute inset-0 w-full h-full object-cover"
+              [class.opacity-100]="imageIndex['farm'] === 2" [class.opacity-0]="imageIndex['farm'] !== 2">
+            <img src="../../../assets/img/Farm/Farm3.png" alt="Fabrication App"
+              class="carousel-image absolute inset-0 w-full h-full object-cover"
+              [class.opacity-100]="imageIndex['farm'] === 3" [class.opacity-0]="imageIndex['farm'] !== 3">
+            <img src="../../../assets/img/Farm/Farm4.png" alt="Fabrication App"
+              class="carousel-image absolute inset-0 w-full h-full object-cover"
+              [class.opacity-100]="imageIndex['farm'] === 4" [class.opacity-0]="imageIndex['farm'] !== 4">
+          </div>
+
+          <!-- Carousel Navigation -->
+          <button
+            class="absolute top-1/2 left-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            (click)="prevImage('farm'); $event.stopPropagation()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            class="absolute top-1/2 right-4 -translate-y-1/2 bg-purple-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-lg hover:bg-purple-700"
+            (click)="nextImage('farm'); $event.stopPropagation()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="p-6 transition-all duration-300 group-hover:bg-dark/90"
+          style="background-color: rgb(30 41 59 / 0.9)!important;">
+          <h3 class="text-2xl font-bold mb-3 text-accent group-hover:text-purple-400 transition-colors">Farm Management
+            App</h3>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="tech-badge hover:bg-blue-500/10 hover:text-blue-400 transition-colors">Angular</span>
+            <span class="tech-badge hover:bg-pink-500/10 hover:text-pink-400 transition-colors">SQL</span>
+            <span class="tech-badge hover:bg-purple-500/10 hover:text-purple-400 transition-colors">. Net Core</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <a href="https://github.com/suuyashhh"
+              class="py-2 px-2 bg-accent/10 border border-accent/50 rounded-lg text-center text-accent hover:bg-accent/20 hover:border-accent transition-all duration-300 text-sm">
+              <i class="fas fa-code mr-1"></i> Code
+            </a>
+            <a href="https://dairyfarm.revolutionit.in/Fabrication_Admin"
+              class="py-2 px-2 bg-primary/10 border border-primary/50 rounded-lg text-center text-primary hover:bg-primary/20 hover:border-primary transition-all duration-300 text-sm">
+              <i class="fas fa-external-link-alt mr-1"></i> Live Demo
+            </a>
+            <a href="../../../assets/APK'S/Fabrication.apk"
+              class="py-2 px-2 bg-green-500/10 border border-green-500/50 rounded-lg text-center text-green-400 hover:bg-green-500/20 hover:border-green-500 transition-all duration-300 text-sm">
+              <i class="fab fa-android mr-1"></i> Android
+            </a>
+            <a href="#" (click)="showToast($event)"
+              class="py-2 px-2 bg-purple-500/10 border border-purple-500/50 rounded-lg text-center text-purple-400 hover:bg-purple-500/20 hover:border-purple-500 transition-all duration-300 text-sm">
+              <i class="fas fa-desktop mr-1"></i> Desktop
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Websites Section (hidden by default) -->

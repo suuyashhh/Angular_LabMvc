@@ -31,12 +31,12 @@ export class ProjectsComponent implements OnInit {
   }
 
   nextImage(project: string): void {
-    const maxImages = project === 'dairy' || project === 'fabrication' || project === 'laboratory' ? 4 : 2;
+    const maxImages = project === 'dairy' || project === 'fabrication' || project === 'laboratory' || project === 'farm' ? 4 : 2;
     this.imageIndex[project] = this.imageIndex[project] % maxImages + 1;
   }
 
   prevImage(project: string): void {
-    const maxImages = project === 'dairy' || project === 'fabrication' || project === 'laboratory' ? 4 : 2;
+    const maxImages = project === 'dairy' || project === 'fabrication' || project === 'laboratory' || project === 'farm' ? 4 : 2;
     this.imageIndex[project] = (this.imageIndex[project] - 2 + maxImages) % maxImages + 1;
   }
 
