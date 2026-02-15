@@ -19,6 +19,8 @@ module.exports = {
         'float': 'float 6s ease-in-out infinite',
         'slideDown': 'slideDown 0.3s ease-out',
         'gradient': 'gradient 8s ease infinite',
+        'fadeIn': 'fadeIn 1s ease-out',
+        'wave': 'wave 2s infinite',
       },
       keyframes: {
         float: {
@@ -32,6 +34,15 @@ module.exports = {
         gradient: {
           '0%, 100%': { 'background-position': '0% 50%' },
           '50%': { 'background-position': '100% 50%' },
+        },
+        fadeIn: {
+          '0%': { opacity: 0, transform: 'translateY(20px)' },
+          '100%': { opacity: 1, transform: 'translateY(0)' }
+        },
+        wave: {
+          '0%, 60%, 100%': { transform: 'rotate(0deg)' },
+          '10%, 30%': { transform: 'rotate(14deg)' },
+          '20%, 40%': { transform: 'rotate(-8deg)' },
         }
       }
     }

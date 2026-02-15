@@ -1,52 +1,89 @@
-<div id="suyash-page">
-    <!-- Video Background -->
-    <div id="suyash-video-container">
-        <video #backgroundVideo autoplay muted loop playsinline preload="auto" id="suyash-background-video">
-            <source src="../../../assets/videos/bg.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div id="suyash-overlay"></div>
-    </div>
+<div class="min-h-screen w-full relative">
+  <!-- Video Background -->
+  <div class="fixed inset-0 -z-10 pointer-events-none">
+    <video #backgroundVideo autoplay muted loop playsinline preload="auto"
+      class="absolute inset-0 w-full h-full object-cover">
+      <source src="../../../assets/videos/bg.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="absolute inset-0 bg-black/30"></div>
+  </div>
 
-    <!-- Main Content -->
-    <main id="suyash-container">
-        <div id="suyash-profile-section" aria-labelledby="suyash-profile-heading" style="margin-top:50px">
-            <div id="suyash-profile-image" style="width: 100px; height: 100px; border-width: 2px;">
-                <img src="../../../assets/images/suyashPro.jpg" alt="Suyash Patil" loading="lazy">
-            </div>
-            <h1 id="suyash-profile-heading" class="suyash-name" style="font-size: 1.6rem;">Suyash Patil</h1>
-            <p class="suyash-title" style="font-size: 0.9rem;">.Net Developer <span class="suyash-emoji">💻</span></p>
-            <div id="suyash-social-icons" style="gap: 12px;">
-                <a href="https://github.com/suuyashhh" target="_blank" aria-label="GitHub Profile" rel="noopener">
-                    <i class="fab fa-github" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank" aria-label="LinkedIn Profile" rel="noopener">
-                    <i class="fab fa-linkedin" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://wa.me/918180821173" aria-label="WhatsApp" target="_blank" rel="noopener">
-                    <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i>
-                </a>
-            </div>
+  <!-- Main Content -->
+  <main class="relative z-10 flex flex-col items-center justify-center min-h-screen w-full px-4 sm:px-6 md:px-8 pt-20 sm:pt-24 md:pt-28 pb-6 sm:pb-10 md:pb-16 overflow-y-auto">
+    <div class="flex flex-col items-center w-full max-w-md sm:max-w-lg animate-fadeIn">
+
+      <!-- Profile Card -->
+      <section class="flex flex-col items-center w-full mb-6 sm:mb-8 md:mb-10">
+        <!-- Profile Photo - Simple circle -->
+        <div class="relative mb-4 sm:mb-5 md:mb-6">
+          <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-slate-800">
+            <img src="../../../assets/images/suyashPro.jpg"
+                 alt="Suyash Patil"
+                 loading="lazy"
+                 class="block w-full h-full object-cover object-center">
+          </div>
         </div>
 
-        <nav id="suyash-menu-section" aria-label="Portfolio Navigation">
-            <!-- Using routerLink with explicit paths -->
-            <a routerLink="/portfolio/about" class="suyash-menu-item" data-text="About">
-                <span>About</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/projects" class="suyash-menu-item" data-text="All Projects Application">
-                <span>All Projects Applications</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/resume" class="suyash-menu-item" data-text="Resume">
-                <span>Resume</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/contact" class="suyash-menu-item" data-text="Contact">
-                <span>Contact</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        </nav>
-    </main>
+        <!-- Name -->
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2 text-center drop-shadow-lg">
+          Suyash Patil
+        </h1>
+
+        <!-- Title -->
+        <p class="text-base sm:text-lg md:text-xl text-white/90 mb-4 sm:mb-5 text-center">
+          .Net Developer <span class="inline-block animate-wave origin-[70%_70%]">💻</span>
+        </p>
+
+        <!-- Social Links -->
+        <div class="flex items-center justify-center gap-4 sm:gap-5 md:gap-6">
+          <a href="https://github.com/suuyashhh"
+             target="_blank"
+             rel="noopener"
+             aria-label="GitHub"
+             class="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-cyan-400 transition-all duration-200 hover:scale-110 text-lg sm:text-xl md:text-2xl">
+            <i class="fab fa-github"></i>
+          </a>
+          <a href="https://www.linkedin.com/in/suyash-patil-877398282/"
+             target="_blank"
+             rel="noopener"
+             aria-label="LinkedIn"
+             class="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-cyan-400 transition-all duration-200 hover:scale-110 text-lg sm:text-xl md:text-2xl">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="https://wa.me/918180821173"
+             target="_blank"
+             rel="noopener"
+             aria-label="WhatsApp"
+             class="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-cyan-400 transition-all duration-200 hover:scale-110 text-lg sm:text-xl md:text-2xl">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- Navigation Menu -->
+      <nav class="w-full max-w-md flex flex-col gap-3 sm:gap-4" aria-label="Portfolio Navigation">
+        <a routerLink="/portfolio/about"
+           class="flex items-center justify-between h-14 sm:h-16 px-5 sm:px-6 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium text-sm sm:text-base hover:bg-white/20 hover:border-white/30 transition-all duration-300 active:scale-[0.98]">
+          <span>About</span>
+          <i class="fas fa-chevron-right text-sm opacity-80"></i>
+        </a>
+        <a routerLink="/portfolio/projects"
+           class="flex items-center justify-between h-14 sm:h-16 px-5 sm:px-6 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium text-sm sm:text-base hover:bg-white/20 hover:border-white/30 transition-all duration-300 active:scale-[0.98]">
+          <span>All Projects Applications</span>
+          <i class="fas fa-chevron-right text-sm opacity-80"></i>
+        </a>
+        <a routerLink="/portfolio/resume"
+           class="flex items-center justify-between h-14 sm:h-16 px-5 sm:px-6 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium text-sm sm:text-base hover:bg-white/20 hover:border-white/30 transition-all duration-300 active:scale-[0.98]">
+          <span>Resume</span>
+          <i class="fas fa-chevron-right text-sm opacity-80"></i>
+        </a>
+        <a routerLink="/portfolio/contact"
+           class="flex items-center justify-between h-14 sm:h-16 px-5 sm:px-6 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium text-sm sm:text-base hover:bg-white/20 hover:border-white/30 transition-all duration-300 active:scale-[0.98]">
+          <span>Contact</span>
+          <i class="fas fa-chevron-right text-sm opacity-80"></i>
+        </a>
+      </nav>
+    </div>
+  </main>
 </div>

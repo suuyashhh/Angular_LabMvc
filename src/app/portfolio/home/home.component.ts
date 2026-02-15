@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('backgroundVideo') videoRef!: ElementRef<HTMLVideoElement>;

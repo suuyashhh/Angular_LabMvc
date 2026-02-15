@@ -1,50 +1,45 @@
-<main class="relative z-10 max-w-6xl mx-auto px-6 py-20">
+<main class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20" >
 
   <!-- Particle background -->
-  <div id="particles-js" class="fixed inset-0 -z-10"></div>
+  <div id="particles-js" class="fixed inset-0 -z-10 pointer-events-none"></div>
 
-  <!-- Tab Navigation -->
-  <div class="card inline-flex bg-dark-800 p-1 rounded-lg border border-gray-700 space-x-2 mb-10">
-
+  <!-- Tab Navigation - Responsive -->
+  <div class="inline-flex flex-col sm:flex-row gap-2 sm:gap-0 p-1 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 mb-8 sm:mb-10">
     <button
-      class="px-4 py-2 rounded-md font-medium transition-all duration-300 flex items-center"
-      [class.active-tab]="activeTab === 'webApps'"
-      [class.inactive-tab]="activeTab !== 'webApps'"
+      class="px-4 py-3 sm:py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
+      [ngClass]="activeTab === 'webApps' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' : 'bg-white/10 text-gray-300 hover:bg-white/20'"
       (click)="switchTab('webApps')">
-      <i class="fas fa-laptop-code mr-2"></i>
+      <i class="fas fa-laptop-code"></i>
       Web Applications
     </button>
-
     <button
-      class="px-4 py-2 rounded-md font-medium transition-all duration-300 flex items-center"
-      [class.active-tab]="activeTab === 'websites'"
-      [class.inactive-tab]="activeTab !== 'websites'"
+      class="px-4 py-3 sm:py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
+      [ngClass]="activeTab === 'websites' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' : 'bg-white/10 text-gray-300 hover:bg-white/20'"
       (click)="switchTab('websites')">
-      <i class="fas fa-globe mr-2"></i>
+      <i class="fas fa-globe"></i>
       Websites
     </button>
-
   </div>
 
   <!-- Projects Section -->
-  <section class="mb-20">
+  <section class="mb-12 sm:mb-16 lg:mb-20">
 
-    <h2 class="text-3xl font-bold pb-2 border-b-2 border-accent inline-block text-gradient mb-8">
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold pb-2 border-b-2 border-accent inline-block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-6 sm:mb-8">
       My Recent Works
     </h2>
 
     <!-- ================= WEB APPS SECTION ================= -->
     <div *ngIf="activeTab === 'webApps'" 
-         class="grid md:grid-cols-2 gap-8">
+         class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
 
       <ng-container *ngFor="let project of projects">
         <div *ngIf="project.category === 'webApp'" 
-             class="relative bg-dark rounded-lg border border-gray-800 overflow-hidden 
-                    transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl 
-                    hover:shadow-purple-500/10 group hover:border-accent/50">
+             class="relative bg-slate-800/90 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-slate-700/50 overflow-hidden 
+                    transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/20 
+                    group hover:border-accent/50">
 
           <!-- Image Carousel -->
-          <div class="relative h-64 overflow-hidden cursor-pointer"
+          <div class="relative h-56 sm:h-64 overflow-hidden cursor-pointer"
                (click)="openImagePreview(project)">
 
             <img *ngFor="let image of project.images; let i = index"
@@ -57,16 +52,16 @@
             <!-- Navigation -->
             <button
               (click)="prevImage(project.id); $event.stopPropagation()"
-              class="absolute top-1/2 left-4 -translate-y-1/2 carousel-nav-btn text-white 
-                     w-8 h-8 rounded-full flex items-center justify-center z-10">
-              <i class="fas fa-chevron-left"></i>
+              class="absolute top-1/2 left-2 sm:left-4 -translate-y-1/2 bg-purple-600/90 hover:bg-purple-700 text-white 
+                     w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center z-10 transition-colors">
+              <i class="fas fa-chevron-left text-sm"></i>
             </button>
 
             <button
               (click)="nextImage(project.id); $event.stopPropagation()"
-              class="absolute top-1/2 right-4 -translate-y-1/2 carousel-nav-btn text-white 
-                     w-8 h-8 rounded-full flex items-center justify-center z-10">
-              <i class="fas fa-chevron-right"></i>
+              class="absolute top-1/2 right-2 sm:right-4 -translate-y-1/2 bg-purple-600/90 hover:bg-purple-700 text-white 
+                     w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center z-10 transition-colors">
+              <i class="fas fa-chevron-right text-sm"></i>
             </button>
 
             <!-- Click to preview indicator -->
@@ -79,18 +74,18 @@
           </div>
 
           <!-- Details -->
-          <div class="p-6 bg-slate-800/90">
+          <div class="p-4 sm:p-6 bg-slate-800/90">
 
-            <h3 class="text-2xl font-bold mb-3 text-purple-400">
+            <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-purple-400">
               {{ project.title }}
             </h3>
 
-            <p class="text-gray-300 mb-5">
+            <p class="text-gray-300 text-sm sm:text-base mb-4 sm:mb-5 line-clamp-2">
               {{ project.description }}
             </p>
 
             <!-- Tech -->
-            <div class="flex flex-wrap gap-2 mb-6">
+            <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
               <span *ngFor="let tech of project.tech"
                     class="px-2 py-1 text-xs bg-purple-500/10 border border-purple-500/40 rounded text-purple-400">
                 {{ tech }}
@@ -144,16 +139,16 @@
 
     <!-- ================= WEBSITES SECTION ================= -->
     <div *ngIf="activeTab === 'websites'" 
-         class="grid md:grid-cols-2 gap-8">
+         class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
 
       <ng-container *ngFor="let project of projects">
         <div *ngIf="project.category === 'website'" 
-             class="relative bg-dark rounded-lg border border-gray-800 overflow-hidden 
-                    transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl 
-                    hover:shadow-purple-500/10 group hover:border-accent/50">
+             class="relative bg-slate-800/90 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-slate-700/50 overflow-hidden 
+                    transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/20 
+                    group hover:border-accent/50">
 
           <!-- Image -->
-          <div class="relative h-64 overflow-hidden cursor-pointer"
+          <div class="relative h-56 sm:h-64 overflow-hidden cursor-pointer"
                (click)="openImagePreview(project)">
 
             <img *ngFor="let image of project.images; let i = index"
@@ -167,16 +162,16 @@
             <ng-container *ngIf="project.images.length > 1">
               <button
                 (click)="prevImage(project.id); $event.stopPropagation()"
-                class="absolute top-1/2 left-4 -translate-y-1/2 carousel-nav-btn text-white 
-                       w-8 h-8 rounded-full flex items-center justify-center z-10">
-                <i class="fas fa-chevron-left"></i>
+                class="absolute top-1/2 left-2 sm:left-4 -translate-y-1/2 bg-purple-600/90 hover:bg-purple-700 text-white 
+                       w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center z-10 transition-colors">
+                <i class="fas fa-chevron-left text-sm"></i>
               </button>
 
               <button
                 (click)="nextImage(project.id); $event.stopPropagation()"
-                class="absolute top-1/2 right-4 -translate-y-1/2 carousel-nav-btn text-white 
-                       w-8 h-8 rounded-full flex items-center justify-center z-10">
-                <i class="fas fa-chevron-right"></i>
+                class="absolute top-1/2 right-2 sm:right-4 -translate-y-1/2 bg-purple-600/90 hover:bg-purple-700 text-white 
+                       w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center z-10 transition-colors">
+                <i class="fas fa-chevron-right text-sm"></i>
               </button>
             </ng-container>
 
@@ -189,18 +184,18 @@
           </div>
 
           <!-- Details -->
-          <div class="p-6 bg-slate-800/90">
+          <div class="p-4 sm:p-6 bg-slate-800/90">
 
-            <h3 class="text-2xl font-bold mb-3 text-purple-400">
+            <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-purple-400">
               {{ project.title }}
             </h3>
 
-            <p class="text-gray-300 mb-5">
+            <p class="text-gray-300 text-sm sm:text-base mb-4 sm:mb-5 line-clamp-2">
               {{ project.description }}
             </p>
 
             <!-- Tech -->
-            <div class="flex flex-wrap gap-2 mb-6">
+            <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
               <span *ngFor="let tech of project.tech"
                     class="px-2 py-1 text-xs bg-purple-500/10 border border-purple-500/40 rounded text-purple-400">
                 {{ tech }}
@@ -232,8 +227,8 @@
   </section>
 
   <!-- Footer -->
-  <footer class="relative border-t border-white/10 mt-12">
-    <div class="max-w-6xl mx-auto text-center mt-12">
+  <footer class="relative border-t border-white/10 mt-8 sm:mt-12">
+    <div class="max-w-6xl mx-auto text-center py-8 sm:py-12 px-4">
       <div class="flex justify-center space-x-6 mb-4">
         <a href="https://www.linkedin.com/in/suyash-patil-877398282/"
            class="text-light hover:text-accent transition-colors text-xl">
@@ -259,21 +254,21 @@
 
 <!-- ================= IMAGE PREVIEW MODAL ================= -->
 <div *ngIf="showImagePreview" 
-     class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-fadeIn"
      (click)="closeImagePreview()">
   
-  <div class="relative max-w-7xl max-h-[90vh] p-4">
+  <div class="relative max-w-7xl w-full max-h-[90vh] p-4 sm:p-6">
     
-    <!-- Close Button (Top Right) -->
+    <!-- Close Button (Top Right) - Responsive -->
     <button
       (click)="closeImagePreview()"
-      class="absolute -top-12 right-0 modal-close-btn text-white w-10 h-10 rounded-full 
+      class="absolute -top-10 sm:-top-12 right-0 bg-purple-600/90 hover:bg-purple-700 text-white w-10 h-10 rounded-full 
              flex items-center justify-center transition-colors z-10 shadow-lg">
-      <i class="fas fa-times text-xl"></i>
+      <i class="fas fa-times text-lg sm:text-xl"></i>
     </button>
 
     <!-- Project Title -->
-    <div class="absolute -top-12 left-0 text-white text-lg font-semibold">
+    <div class="absolute -top-10 sm:-top-12 left-0 text-white text-base sm:text-lg font-semibold truncate max-w-[70%]">
       {{ previewProjectTitle }}
     </div>
 
@@ -283,25 +278,25 @@
       <!-- Main Image -->
       <img [src]="previewImage" 
            [alt]="previewProjectTitle"
-           class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+           class="max-w-full max-h-[75vh] sm:max-h-[85vh] object-contain rounded-lg shadow-2xl"
            (click)="$event.stopPropagation()">
 
-      <!-- Left Navigation Button -->
+      <!-- Left Navigation Button - Hidden on very small screens -->
       <button
         (click)="prevImageInPreview(); $event.stopPropagation()"
-        class="absolute top-1/2 -left-16 -translate-y-1/2 modal-nav-btn text-white 
-               w-12 h-12 rounded-full flex items-center justify-center 
+        class="absolute top-1/2 left-2 sm:-left-12 md:-left-16 -translate-y-1/2 bg-purple-600/90 hover:bg-purple-700 text-white 
+               w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center 
                transition-all duration-300 shadow-lg z-10 hover:scale-110">
-        <i class="fas fa-chevron-left text-xl"></i>
+        <i class="fas fa-chevron-left text-base sm:text-xl"></i>
       </button>
 
       <!-- Right Navigation Button -->
       <button
         (click)="nextImageInPreview(); $event.stopPropagation()"
-        class="absolute top-1/2 -right-16 -translate-y-1/2 modal-nav-btn text-white 
-               w-12 h-12 rounded-full flex items-center justify-center 
+        class="absolute top-1/2 right-2 sm:-right-12 md:-right-16 -translate-y-1/2 bg-purple-600/90 hover:bg-purple-700 text-white 
+               w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center 
                transition-all duration-300 shadow-lg z-10 hover:scale-110">
-        <i class="fas fa-chevron-right text-xl"></i>
+        <i class="fas fa-chevron-right text-base sm:text-xl"></i>
       </button>
 
       <!-- Image Counter -->
@@ -314,10 +309,10 @@
       <!-- Close Button (Bottom Center) -->
       <button
         (click)="closeImagePreview(); $event.stopPropagation()"
-        class="absolute -bottom-16 left-1/2 -translate-x-1/2 modal-close-red text-white 
-               px-6 py-2 rounded-full flex items-center justify-center 
+        class="absolute -bottom-12 sm:-bottom-16 left-1/2 -translate-x-1/2 bg-red-600/90 hover:bg-red-700 text-white 
+               px-4 py-2 sm:px-6 rounded-full flex items-center justify-center gap-2 text-sm sm:text-base
                transition-colors shadow-lg">
-        <i class="fas fa-times mr-2"></i>
+        <i class="fas fa-times"></i>
         Close Preview
       </button>
       

@@ -1,61 +1,56 @@
-<nav class="fixed w-full z-50 backdrop-blur-md bg-dark/80 border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a [routerLink]="['/portfolio/home']" class="text-2xl font-bold tracking-tight text-cyan-400">&lt;Suyash /&gt;</a>
-            </div>
+<nav class="fixed top-0 left-0 right-0 w-full z-[100] backdrop-blur-md bg-dark/90 border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-14 sm:h-16">
+      <div class="flex items-center">
+        <a [routerLink]="['/portfolio/home']" class="text-xl sm:text-2xl font-bold tracking-tight text-cyan-400 hover:text-cyan-300 transition-colors">&lt;Suyash /&gt;</a>
+      </div>
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-12">
-                <a [routerLink]="['/portfolio/home']" 
-                   [class.active]="isActive('home')"
-                   class="nav-link">Home</a>
-                <a [routerLink]="['/portfolio/about']" 
-                   [class.active]="isActive('about')"
-                   class="nav-link">About</a>
-                <a [routerLink]="['/portfolio/projects']" 
-                   [class.active]="isActive('projects')"
-                   class="nav-link">Projects</a>
-                <a [routerLink]="['/portfolio/resume']" 
-                   [class.active]="isActive('resume')"
-                   class="nav-link">Resume</a>
-                <a [routerLink]="['/portfolio/contact']" 
-                   [class.active]="isActive('contact')"
-                   class="nav-link">Contact</a>
-            </div>
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-6 lg:gap-12">
+        <a [routerLink]="['/portfolio/home']"
+           class="relative text-gray-300 font-semibold text-base tracking-wide transition-colors duration-300 hover:text-cyan-400 after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-0.5 after:w-0 after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full"
+           [ngClass]="{'text-cyan-400 after:w-full': isActive('home')}">Home</a>
+        <a [routerLink]="['/portfolio/about']"
+           class="relative text-gray-300 font-semibold text-base tracking-wide transition-colors duration-300 hover:text-cyan-400 after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-0.5 after:w-0 after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full"
+           [ngClass]="{'text-cyan-400 after:w-full': isActive('about')}">About</a>
+        <a [routerLink]="['/portfolio/projects']"
+           class="relative text-gray-300 font-semibold text-base tracking-wide transition-colors duration-300 hover:text-cyan-400 after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-0.5 after:w-0 after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full"
+           [ngClass]="{'text-cyan-400 after:w-full': isActive('projects')}">Projects</a>
+        <a [routerLink]="['/portfolio/resume']"
+           class="relative text-gray-300 font-semibold text-base tracking-wide transition-colors duration-300 hover:text-cyan-400 after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-0.5 after:w-0 after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full"
+           [ngClass]="{'text-cyan-400 after:w-full': isActive('resume')}">Resume</a>
+        <a [routerLink]="['/portfolio/contact']"
+           class="relative text-gray-300 font-semibold text-base tracking-wide transition-colors duration-300 hover:text-cyan-400 after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-0.5 after:w-0 after:bg-cyan-400 after:transition-all after:duration-300 hover:after:w-full"
+           [ngClass]="{'text-cyan-400 after:w-full': isActive('contact')}">Contact</a>
+      </div>
 
-            <!-- Mobile Menu Button -->
-            <div class="flex md:hidden items-center">
-                <button (click)="toggleMobileMenu()" class="text-cyan-400 text-2xl">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
+      <!-- Mobile Menu Button -->
+      <div class="flex md:hidden items-center">
+        <button (click)="toggleMobileMenu()" class="p-2 text-cyan-400 hover:text-cyan-300 hover:bg-white/5 rounded-lg transition-colors" aria-label="Toggle menu">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- Mobile menu -->
-    <div id="mobile-menu"
-        [class.hidden]="!mobileMenuOpen"
-        class="flex flex-col items-center justify-center space-y-6 py-8 bg-dark/95 text-center animate-slideDown">
-        <a [routerLink]="['/portfolio/home']" 
-           [class.active]="isActive('home')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Home</a>
-        <a [routerLink]="['/portfolio/about']" 
-           [class.active]="isActive('about')"
-           (click)="closeMobileMenu()"
-           class="nav-link">About</a>
-        <a [routerLink]="['/portfolio/projects']" 
-           [class.active]="isActive('projects')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Projects</a>
-        <a [routerLink]="['/portfolio/resume']" 
-           [class.active]="isActive('resume')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Resume</a>
-        <a [routerLink]="['/portfolio/contact']" 
-           [class.active]="isActive('contact')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Contact</a>
-    </div>
+  <!-- Mobile menu -->
+  <div id="mobile-menu"
+       [class.hidden]="!mobileMenuOpen"
+       class="md:hidden flex flex-col items-center py-6 gap-4 bg-dark/95 border-t border-white/10 animate-slideDown">
+    <a [routerLink]="['/portfolio/home']" (click)="closeMobileMenu()"
+       class="text-gray-300 font-medium hover:text-cyan-400 transition-colors py-2"
+       [class.text-cyan-400]="isActive('home')">Home</a>
+    <a [routerLink]="['/portfolio/about']" (click)="closeMobileMenu()"
+       class="text-gray-300 font-medium hover:text-cyan-400 transition-colors py-2"
+       [class.text-cyan-400]="isActive('about')">About</a>
+    <a [routerLink]="['/portfolio/projects']" (click)="closeMobileMenu()"
+       class="text-gray-300 font-medium hover:text-cyan-400 transition-colors py-2"
+       [class.text-cyan-400]="isActive('projects')">Projects</a>
+    <a [routerLink]="['/portfolio/resume']" (click)="closeMobileMenu()"
+       class="text-gray-300 font-medium hover:text-cyan-400 transition-colors py-2"
+       [class.text-cyan-400]="isActive('resume')">Resume</a>
+    <a [routerLink]="['/portfolio/contact']" (click)="closeMobileMenu()"
+       class="text-gray-300 font-medium hover:text-cyan-400 transition-colors py-2"
+       [class.text-cyan-400]="isActive('contact')">Contact</a>
+  </div>
 </nav>
