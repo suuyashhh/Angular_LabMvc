@@ -7,7 +7,7 @@ import { LoginfarmComponent } from './LoginFarm/loginfarm/loginfarm.component';
 
 export const routes: Routes = [
 
-  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+  { path: '', redirectTo: 'farm', pathMatch: 'full' },
   { path: 'lab', component: LoginComponent },
 
   { path: 'login', component: LoginComponent },

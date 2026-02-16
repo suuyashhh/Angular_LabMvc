@@ -8,8 +8,8 @@ import * as bootstrap from 'bootstrap';
 })
 export class ApiService {
 
-baseurl = 'https://localhost:7193/api/';
-//  baseurl =  'https://backend.suyashpatil.in/api/';
+//baseurl = 'https://localhost:7193/api/';
+  baseurl =  'https://backend.suyashpatil.in/api/';
   //baseurl = 'https://labmvcapi.bsite.net/api/';
 
   constructor(private http: HttpClient) {}
@@ -80,6 +80,30 @@ formatDate(dateString: string): string {
   const day = dateString.substring(6, 8);
   return `${day}-${month}-${year}-`;
   // return `${year}-${month}-${day}`;
+}
+
+// Add these methods to your existing ApiService class:
+
+upload(api: string, formData: FormData) {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+    // Don't set Content-Type for FormData, let browser set it
+  });
+  
+  return this.http.post(this.baseurl + api, formData, { headers });
+}
+
+deleteFile(api: string, params: any = {}) {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+  
+  return this.http.delete(this.baseurl + api, {
+    headers: headers,
+    params: params
+  });
 }
 
 }
