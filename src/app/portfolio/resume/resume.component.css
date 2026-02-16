@@ -1,0 +1,119 @@
+/* ================= GRADIENT TEXT ================= */
+.text-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================= SPINNER ANIMATION ================= */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================= LOADING OVERLAY TRANSITION ================= */
+#loadingOverlay {
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* ================= BUTTON HOVER EFFECTS ================= */
+button {
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.02);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* ================= PDF CONTAINER ================= */
+iframe {
+  background-color: #f8f9fa;
+}
+
+/* Ensure iframe is responsive */
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ================= SCROLLBAR STYLING ================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 184, 166, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 184, 166, 0.7);
+}
+
+/* ================= RESPONSIVE ADJUSTMENTS ================= */
+
+/* Mobile devices */
+@media (max-width: 639px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 640px) and (max-width: 1023px) {
+  iframe {
+    min-height: 500px;
+  }
+}
+
+/* Desktop devices */
+@media (min-width: 1024px) {
+  iframe {
+    min-height: 600px;
+  }
+}
+
+/* ================= SMOOTH TRANSITIONS ================= */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ================= FOCUS STATES FOR ACCESSIBILITY ================= */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(20, 184, 166, 0.6);
+  outline-offset: 2px;
+}
+
+/* ================= PRINT STYLES ================= */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  iframe {
+    width: 100%;
+    height: auto;
+  }
+}
