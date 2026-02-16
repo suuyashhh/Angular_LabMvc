@@ -105,7 +105,7 @@ export class ProjectsComponent implements OnInit {
       tech: ['Angular', 'SQL', '.Net Core'],
       links: {
         code: 'https://github.com/suuyashhh',
-        demo: 'https://dairyfarm.revolutionit.in/Fabrication_Admin',
+        demo: 'https://suyashpatil.in/farm',
         android: '../../../assets/APK\'S/Fabrication.apk'
       },
       category: 'webApp'
