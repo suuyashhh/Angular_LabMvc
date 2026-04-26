@@ -264,4 +264,59 @@ clearFarmUserDetailsCookie(): void {
   document.cookie = 'FarmCredentials=; path=/; max-age=0';
 }
 
+
+
+// ===== Smart Parking Auth Methods =====
+
+  private parkingUser: any = null;
+
+  /** Initialize parking user from sessionStorage (call in constructor or on-demand) */
+  private initParkingUser(): void {
+    if (isPlatformBrowser(this.platformId) && !this.parkingUser) {
+      const stored = sessionStorage.getItem('parking_user');
+      if (stored) {
+        try {
+          this.parkingUser = JSON.parse(stored);
+        } catch {
+          this.parkingUser = null;
+        }
+      }
+    }
+  }
+
+  /** Set Parking user details in sessionStorage (used by SmartParking provider-login) */
+  setCurrentUser(user: any): void {
+    this.parkingUser = user;
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.setItem('parking_user', JSON.stringify(user));
+    }
+  }
+
+  /** Get currently stored Parking user (used by SmartParking components) */
+  getCurrentUser(): any {
+    this.initParkingUser();
+    return this.parkingUser;
+  }
+
+  /** Check if a parking user is logged in */
+  isParkingLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    this.initParkingUser();
+    return !!this.parkingUser;
+  }
+
+  /** Logout parking user */
+  parkingLogout(): void {
+    this.parkingUser = null;
+    if (isPlatformBrowser(this.platformId)) {
+      sessionStorage.removeItem('parking_user');
+    }
+    try {
+      this.toaster.success('Logged out from Parking', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+    this.router.navigate(['/Parking']);
+  }
+
 }

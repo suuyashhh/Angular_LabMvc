@@ -1,0 +1,299 @@
+.dashboard-wrapper {
+    height: calc(100vh - 60px); /* 100vh minus footer height */
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #333;
+    margin: 0;
+}
+
+.logo span {
+    color: #ff9900;
+}
+
+.cart-icon {
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff9900;
+    color: white;
+    font-size: 0.7rem;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-container {
+    flex: 1;
+    height: 100%;
+    margin-top: 60px; /* Space for fixed header */
+    position: relative;
+}
+
+/* Search UI Overlay */
+.map-search-overlay {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    right: 10px;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.search-box {
+    background-color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.search-box.active {
+    background-color: #f1f3f4;
+    border-color: #1a73e8;
+}
+
+.menu-trigger {
+    background: none;
+    border: none;
+    color: #5f6368;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: 0 12px;
+    font-size: 1.1rem;
+    outline: none;
+    color: #202124;
+}
+
+.icon-btn, .action-btn {
+    background: none;
+    border: none;
+    color: #5f6368;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.action-btn.active-blue {
+    color: #1a73e8;
+}
+
+.line-divider {
+    width: 1px;
+    height: 24px;
+    background-color: #dadce0;
+    margin: 0 8px;
+}
+
+.filter-pills {
+    display: flex;
+    overflow-x: auto;
+    padding: 4px 0;
+    gap: 8px;
+}
+
+.filter-pills::-webkit-scrollbar {
+    display: none;
+}
+
+.pill {
+    background-color: white;
+    padding: 8px 16px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #3c4043;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.pill span {
+    font-size: 1.2rem;
+    color: #1a73e8;
+}
+
+/* Map Control Buttons (Bottom Right) */
+.map-controls {
+    position: absolute;
+    bottom: 25px;
+    right: 15px;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.zoom-group {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.control-btn {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5f6368;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.zoom-group .control-btn {
+    box-shadow: none;
+}
+
+.control-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.h-divider {
+    height: 1px;
+    background-color: #dadce0;
+    width: 60%;
+    align-self: center;
+}
+
+.control-btn span {
+    font-size: 1.2rem;
+}
+
+@media (min-width: 768px) {
+    .dashboard-wrapper {
+        height: 100vh;
+    }
+    .map-search-overlay {
+        left: 20px;
+        width: 400px;
+    }
+    .map-controls {
+        bottom: 40px;
+        right: 40px;
+    }
+}
+
+/* Route Info Card */
+.route-info-card {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 500;
+    animation: slideDown 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .route-info-card {
+        left: 20px;
+        width: 400px;
+        right: auto;
+    }
+}
+
+.route-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.route-eta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+}
+
+.route-eta h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.text-green {
+    color: #34a853;
+    font-size: 28px;
+}
+
+.route-distance {
+    color: #666;
+    margin: 5px 0 15px 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.stop-btn {
+    background: #ea4335;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.stop-btn:active {
+    transform: scale(0.95);
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

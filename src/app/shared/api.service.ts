@@ -12,6 +12,11 @@ baseurl = 'https://localhost:7193/api/';
   //baseurl =  'https://backend.suyashpatil.in/api/';
   //baseurl = 'https://labmvcapi.bsite.net/api/';
 
+  /** Alias for baseurl — used by SmartParking components */
+  get baseUrl(): string {
+    return this.baseurl;
+  }
+
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
@@ -30,6 +35,10 @@ baseurl = 'https://localhost:7193/api/';
 
 
 get(api: string, params: any = {}) {
+  // External URLs (Nominatim, OSRM, etc.) should not prepend baseurl or inject comId
+  if (api.startsWith('http')) {
+    return this.http.get(api, { params: params });
+  }
   params['comId'] = this.getComId();
   return this.http.get(this.baseurl + api, {
     headers: this.getHeaders(),
@@ -38,9 +47,11 @@ get(api: string, params: any = {}) {
 }
 
 post(api: string, data: any) {
-  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-  data.CRT_BY = userDetails.name || '';
-  data.COM_ID = this.getComId();
+  const userDetails = JSON.parse(localStorage.getItem('userDetails') || 'null');
+  if (userDetails) {
+    data.CRT_BY = userDetails.name || '';
+    data.COM_ID = this.getComId();
+  }
 
   return this.http.post(this.baseurl + api, data, { headers: this.getHeaders() });
 }
@@ -104,6 +115,25 @@ deleteFile(api: string, params: any = {}) {
     headers: headers,
     params: params
   });
+}
+
+/** Post FormData (multipart/form-data) — used by SmartParking parking-provider */
+postFormData(api: string, formData: FormData) {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+    // Don't set Content-Type for FormData, let browser set it
+  });
+  return this.http.post(this.baseurl + api, formData, { headers });
+}
+
+/** Extract a user-friendly error message from an HTTP error response */
+extractErrorMessage(err: any): string {
+  if (err?.error?.message) return err.error.message;
+  if (err?.error?.title) return err.error.title;
+  if (typeof err?.error === 'string') return err.error;
+  if (err?.message) return err.message;
+  return 'An unexpected error occurred';
 }
 
 }

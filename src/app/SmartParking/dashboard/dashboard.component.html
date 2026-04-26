@@ -1,0 +1,66 @@
+<div class="dashboard-wrapper">
+    <header class="header">
+        <h1 class="logo">Smart<span>PARKING</span></h1>
+        <div class="cart-icon">
+            <span class="material-icons-outlined">shopping_cart</span>
+            <span class="badge">1</span>
+        </div>
+    </header>
+
+    <div class="map-container">
+        <!-- Floating Google Maps search UI -->
+        <div class="map-search-overlay">
+            <div class="search-box" [class.active]="isDirectionsMode">
+                <input type="text" 
+                       [(ngModel)]="searchQuery" 
+                       (keyup.enter)="onSearch()" 
+                       placeholder="{{ isDirectionsMode ? 'Choose destination...' : 'Search OpenStreetMap' }}" 
+                       class="search-input">
+                <button class="icon-btn" (click)="onSearch()">
+                    <span class="material-icons-outlined">search</span>
+                </button>
+                <div class="line-divider"></div>
+                <button class="action-btn" (click)="getDirections()" [class.active-blue]="isDirectionsMode">
+                    <span class="material-icons-outlined">directions</span>
+                </button>
+            </div>
+            
+            <div class="filter-pills" *ngIf="!isDirectionsMode">
+                <button class="pill" (click)="searchQuery='Parking'; onSearch()"><span class="material-icons-outlined">local_parking</span>Parking</button>
+                <button class="pill" (click)="searchQuery='EV Charging'; onSearch()"><span class="material-icons-outlined">ev_station</span>EV Charging</button>
+                <button class="pill" (click)="searchQuery='Restaurants'; onSearch()"><span class="material-icons-outlined">restaurant</span>Restaurants</button>
+            </div>
+        </div>
+
+        <!-- Live Route Info Card -->
+        <div class="route-info-card" *ngIf="isDirectionsMode && routeInfo">
+            <div class="route-info-content">
+                <div class="route-eta">
+                    <span class="material-icons-outlined text-green">two_wheeler</span>
+                    <h2>{{ routeInfo.duration }}</h2>
+                </div>
+                <p class="route-distance">{{ routeInfo.distance }} to destination</p>
+                <button class="stop-btn" (click)="stopDirections()">Exit Navigation</button>
+            </div>
+        </div>
+
+        <!-- Float Control Buttons -->
+        <div class="map-controls">
+            <button class="control-btn" (click)="getCurrentLocation()" title="My Location">
+                <span class="material-icons-outlined">my_location</span>
+            </button>
+            <div class="zoom-group">
+                <button class="control-btn" (click)="zoomIn()" title="Zoom In">
+                    <span class="material-icons-outlined">add</span>
+                </button>
+                <div class="h-divider"></div>
+                <button class="control-btn" (click)="zoomOut()" title="Zoom Out">
+                    <span class="material-icons-outlined">remove</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div id="map" style="width: 100%; height: 100%; z-index: 1;"></div>
+    </div>
+</div>

@@ -43,5 +43,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./admin/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES)
+  },
+  {
+    path: 'Parking',
+    loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
   }
 ];

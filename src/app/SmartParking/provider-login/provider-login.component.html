@@ -1,0 +1,134 @@
+<div class="login-page-wrapper">
+  <!-- Left Side: Visual Branding (Hidden on small screens) -->
+  <aside class="branding-section">
+    <div class="branding-overlay"></div>
+    <img src="assets/images/login_bg.png" alt="Smart Parking Logo" class="branding-bg-img" />
+    <div class="branding-content">
+      <div class="brand-badge animate-fade-down">
+         <span class="material-icons-outlined">local_parking</span>
+         <span>SMART PARKING <strong>PRO</strong></span>
+      </div>
+      <h1 class="animate-fade-up">Manage your parking <br> with intelligence.</h1>
+      <p class="animate-fade-up-slow">Optimize space allocation, track real-time occupancy, and maximize revenue with our comprehensive provider suite.</p>
+      
+      <div class="brand-metrics animate-fade-up-slower">
+        <div class="metric">
+          <strong>24/7</strong>
+          <span>Support</span>
+        </div>
+        <div class="metric">
+          <strong>99.9%</strong>
+          <span>Uptime</span>
+        </div>
+        <div class="metric">
+          <strong>50K+</strong>
+          <span>Locations</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right Side: Login Form -->
+  <main class="login-auth-section">
+    <div class="back-nav">
+      <button class="ghost-btn" (click)="goBack()">
+        <span class="material-icons-outlined">arrow_back</span>
+        <span>Back Home</span>
+      </button>
+    </div>
+
+    <div class="auth-card animate-zoom-in">
+      <header class="auth-card-header">
+        <h2>Welcome back</h2>
+        <p>Access your provider dashboard and manage your spaces.</p>
+      </header>
+
+      <div class="social-auth-grid">
+        <button class="social-pill" type="button">
+          <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" />
+          <span>Sign in with Google</span>
+        </button>
+      </div>
+
+      <div class="auth-divider">
+        <span>or use your work email</span>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-banner" *ngIf="errorMessage">
+        <span class="material-icons-outlined">error_outline</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="auth-form">
+        <div class="input-group">
+          <label for="phone">Phone Number</label>
+          <div class="input-wrapper" [class.focused]="isEmailFocused">
+            <span class="material-icons-outlined field-icon">phone</span>
+            <input
+              id="phone"
+              type="tel"
+              name="phone"
+              [(ngModel)]="loginData.phone"
+              required
+              placeholder="Enter your phone number"
+              (focus)="isEmailFocused = true"
+              (blur)="isEmailFocused = false"
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper" [class.focused]="isPasswordFocused">
+            <span class="material-icons-outlined field-icon">lock</span>
+            <input
+              id="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              name="password"
+              [(ngModel)]="loginData.password"
+              required
+              placeholder="••••••••"
+              (focus)="isPasswordFocused = true"
+              (blur)="isPasswordFocused = false"
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+            >
+              <span class="material-icons-outlined">
+                {{ hidePassword ? 'visibility' : 'visibility_off' }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <label class="custom-checkbox">
+            <input type="checkbox" name="remember" [(ngModel)]="loginData.remember" />
+            <span class="checkbox-box"></span>
+            <span>Keep me logged in</span>
+          </label>
+          <a class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="primary-btn" [disabled]="!loginData.phone || !loginData.password || isLoading">
+          <span *ngIf="isLoading" class="spinner"></span>
+          <span>{{ isLoading ? 'Authenticating...' : 'Authenticate Now' }}</span>
+          <span *ngIf="!isLoading" class="material-icons-outlined">login</span>
+        </button>
+      </form>
+
+      <footer class="auth-card-footer">
+        <p>Not a provider? <a routerLink="/Parking">Become a partner</a></p>
+      </footer>
+    </div>
+    
+    <div class="auth-legal-footer">
+       <span>&copy; 2026 Smart Parking Inc.</span>
+       <span>Privacy Policy &nbsp;&bull;&nbsp; Terms of Service</span>
+    </div>
+  </main>
+</div>
