@@ -32,9 +32,14 @@ export class ParkingProviderComponent implements OnInit {
 
   getSpotImage(path: string | null) {
     if (!path) return null;
-    // Remove '/api/' from the end of baseUrl and fix path slashes
-    const root = this.apiService.baseUrl.replace(/\/api\/$/, '/');
-    return root + path.replace(/\\/g, '/');
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    
+    // Remove '/api/' from the end of baseUrl
+    const root = this.apiService.baseUrl.replace(/\/api\/?$/, '');
+    // Ensure path starts with a single slash
+    const normalizedPath = path.startsWith('/') ? path : '/' + path;
+    
+    return root + normalizedPath.replace(/\\/g, '/');
   }
 
   ngOnInit() {
@@ -45,7 +50,7 @@ export class ParkingProviderComponent implements OnInit {
   loadParkingLocations() {
     const user = this.authService.getCurrentUser();
     if (user && user.userid) {
-      this.apiService.get(`ParkingProvoder/GetParkingLocations?userId=${user.userid}`).subscribe({
+      this.apiService.get(`ParkingProvider/GetParkingLocations?userId=${user.userid}`).subscribe({
         next: (res: any) => {
           this.parkingList = res;
         },
@@ -173,7 +178,7 @@ export class ParkingProviderComponent implements OnInit {
         formData.append('images', file);
     });
 
-    this.apiService.postFormData('ParkingProvoder/SaveParkingLocation', formData).subscribe({
+    this.apiService.postFormData('ParkingProvider/SaveParkingLocation', formData).subscribe({
         next: (res) => {
             console.log('Success:', res);
             alert('Parking location saved successfully!');
