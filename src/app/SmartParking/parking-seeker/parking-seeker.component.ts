@@ -22,6 +22,7 @@ export class ParkingSeekerComponent implements OnInit {
   userLat: number | null = null;
   userLng: number | null = null;
   parkingList: any[] = [];
+  isLoading = false;
 
   // Modal & Slider State
   selectedSpot: any = null;
@@ -54,6 +55,7 @@ export class ParkingSeekerComponent implements OnInit {
   }
 
   loadAllParkingLocations() {
+    this.isLoading = true;
     this.loader.withLoader(
       this.apiService.get('ParkingProvider/GetAllParkingLocations')
     ).subscribe({
@@ -79,8 +81,10 @@ export class ParkingSeekerComponent implements OnInit {
           if (b.distance === null) return -1;
           return a.distance - b.distance;
         });
+        this.isLoading = false;
       },
       error: (err) => {
+        this.isLoading = false;
         console.error('Error loading parking locations', err);
         this.toastr.error('Failed to load parking locations');
       }

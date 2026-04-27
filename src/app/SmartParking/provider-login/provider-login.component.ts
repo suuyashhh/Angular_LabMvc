@@ -23,6 +23,7 @@ export class ProviderLoginComponent {
   hidePassword = true;
   isEmailFocused = false;
   isPasswordFocused = false;
+  isLoading = false;
   errorMessage = '';
 
   loginData = {
@@ -40,6 +41,7 @@ export class ProviderLoginComponent {
     }
 
     this.errorMessage = '';
+    this.isLoading = true;
 
     const body = { PHONE: this.loginData.phone, PASS: this.loginData.password };
 
@@ -49,6 +51,7 @@ export class ProviderLoginComponent {
       next: (response: any) => {
         console.log('Login successful:', response);
         this.toastr.success('Login successful!', 'Welcome');
+        this.isLoading = false;
 
         if (response) {
           this.authService.setCurrentUser(response);
@@ -60,6 +63,7 @@ export class ProviderLoginComponent {
         }, 800);
       },
       error: (err) => {
+        this.isLoading = false;
         this.errorMessage = this.apiService.extractErrorMessage(err);
         this.toastr.error(this.errorMessage, 'Login Failed');
         console.error('Auth error:', err);
