@@ -1,11 +1,119 @@
 <div class="seeker-container">
   <div class="header">
     <h2>Find Parking</h2>
-    <p>Search for available parking spots near you.</p>
+    <p>Available parking spots near you.</p>
   </div>
 
-  <div class="search-placeholder">
-    <span class="material-icons-outlined">search</span>
-    <p>Use the map to find your next parking spot.</p>
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Finding nearest spots...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && parkingList.length === 0">
+    <div class="empty-icon material-icons-outlined">search_off</div>
+    <h3>No spots found</h3>
+    <p>Try searching in a different area.</p>
+  </div>
+
+  <!-- Parking Grid -->
+  <div class="parking-grid" *ngIf="!isLoading && parkingList.length > 0">
+    <div class="parking-card" *ngFor="let spot of parkingList" (click)="openDetailModal(spot)">
+      <div class="card-image">
+        <img [src]="getSpotImage(spot.img1)" *ngIf="spot.img1" alt="Parking spot">
+        <div class="no-img" *ngIf="!spot.img1">
+           <span class="material-icons-outlined">image</span>
+        </div>
+        <div class="price-tag">₹{{spot.price}}/hr</div>
+        <div class="distance-badge" *ngIf="spot.distance !== null">
+          <span class="material-icons-outlined">location_on</span>
+          {{formatDistance(spot.distance)}}
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="card-header">
+          <div class="vehicle-type">
+             <span class="material-icons-outlined">{{spot.vehicalType === '2' ? 'moped' : 'directions_car'}}</span>
+             {{spot.vehicalType === '2' ? '2-Wheeler' : '4-Wheeler'}}
+          </div>
+        </div>
+        <p class="address">{{spot.fullAddress}}</p>
+        <div class="card-footer">
+          <a [href]="'tel:' + spot.contact" class="btn-contact" (click)="$event.stopPropagation()">
+            <span class="material-icons-outlined">call</span>
+            Call
+          </a>
+          <button class="btn-book" (click)="$event.stopPropagation()">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" *ngIf="isDetailModalOpen" (click)="closeDetailModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeDetailModal()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+
+      <div class="modal-body" *ngIf="selectedSpot">
+        <!-- Image Slider -->
+        <div class="slider-container" *ngIf="spotImages.length > 0">
+          <div class="slider-wrapper">
+            <img [src]="spotImages[currentImageIndex]" class="slide-img" alt="Parking spot detail">
+            
+            <button class="slide-btn prev" (click)="prevImage()" *ngIf="spotImages.length > 1">
+              <span class="material-icons-outlined">chevron_left</span>
+            </button>
+            <button class="slide-btn next" (click)="nextImage()" *ngIf="spotImages.length > 1">
+              <span class="material-icons-outlined">chevron_right</span>
+            </button>
+
+            <div class="slide-counter" *ngIf="spotImages.length > 1">
+              {{currentImageIndex + 1}} / {{spotImages.length}}
+            </div>
+          </div>
+        </div>
+
+        <div class="no-images-placeholder" *ngIf="spotImages.length === 0">
+          <span class="material-icons-outlined">image_not_supported</span>
+          <p>No images available for this spot</p>
+        </div>
+
+        <!-- Spot Details -->
+        <div class="spot-details">
+          <div class="detail-header">
+            <div class="price-badge">₹{{selectedSpot.price}}/hr</div>
+            <div class="distance-badge-inline" *ngIf="selectedSpot.distance !== null">
+              <span class="material-icons-outlined">location_on</span>
+              {{formatDistance(selectedSpot.distance)}}
+            </div>
+          </div>
+
+          <h3 class="detail-address">{{selectedSpot.fullAddress}}</h3>
+          
+          <div class="detail-meta">
+            <div class="meta-item">
+              <span class="material-icons-outlined">{{selectedSpot.vehicalType === '2' ? 'moped' : 'directions_car'}}</span>
+              <span>{{selectedSpot.vehicalType === '2' ? '2-Wheeler' : '4-Wheeler'}}</span>
+            </div>
+            <div class="meta-item">
+              <span class="material-icons-outlined">contact_phone</span>
+              <span>{{selectedSpot.contact}}</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <a [href]="'tel:' + selectedSpot.contact" class="btn-call-large">
+              <span class="material-icons-outlined">call</span>
+              Call Provider
+            </a>
+            <button class="btn-book-large">
+              <span class="material-icons-outlined">bolt</span>
+              Reserve Spot
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -40,7 +40,7 @@
   <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Add Parking Details</h3>
+        <h3>{{parkingData.Unique_Id > 0 ? 'Edit Parking Details' : 'Add Parking Details'}}</h3>
         <button type="button" class="close-btn" (click)="closeModal()">
           <span class="material-icons-outlined">close</span>
         </button>
@@ -115,7 +115,8 @@
 
           <div class="modal-footer">
             <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
-            <button type="submit" class="btn-submit">Submit</button>
+            <button type="button" class="btn-delete" *ngIf="parkingData.Unique_Id > 0" (click)="deleteSpot(parkingData.Unique_Id)">Delete</button>
+            <button type="submit" class="btn-submit">{{parkingData.Unique_Id > 0 ? 'Update' : 'Submit'}}</button>
           </div>
         </form>
       </div>

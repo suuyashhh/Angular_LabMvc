@@ -60,24 +60,34 @@ export class ParkingProviderComponent implements OnInit {
   }
 
   viewDetails(spot: any) {
-    // Repurpose: Path data into parkingData and open edit modal
+    // Robustly find the ID regardless of naming convention (Unique_Id, unique_Id, uniqueId, etc.)
+    const id = spot.unique_Id || spot.Unique_Id || spot.uniqueId || spot.UniqueId || spot.id || spot.ID || 0;
+    
     this.parkingData = {
-      ...this.parkingData,
-      SpotId: spot.spotId || spot.id, // Assuming there's an ID
-      address: spot.fullAddress,
-      rate: spot.price,
-      contactNumber: spot.contact,
-      vehicleType: spot.vehicalType,
-      latitude: spot.latitudeLangitude?.split(',')[0] || '',
-      longitude: spot.latitudeLangitude?.split(',')[1] || ''
+      Unique_Id: id,
+      address: spot.fullAddress || spot.FullAddress || '',
+      rate: spot.price || spot.Price || null,
+      contactNumber: spot.contact || spot.Contact || '',
+      vehicleType: (spot.vehicalType || spot.VehicalType || '2').toString(),
+      latitude: (spot.latitudeLangitude || spot.LatitudeLangitude)?.split(',')[0] || '',
+      longitude: (spot.latitudeLangitude || spot.LatitudeLangitude)?.split(',')[1] || ''
     };
     
     // Set previews for existing images
     this.imagePreviews = [];
-    if (spot.img1) this.imagePreviews.push(this.getSpotImage(spot.img1)!);
-    if (spot.img2) this.imagePreviews.push(this.getSpotImage(spot.img2)!);
-    if (spot.img3) this.imagePreviews.push(this.getSpotImage(spot.img3)!);
-    if (spot.img4) this.imagePreviews.push(this.getSpotImage(spot.img4)!);
+    const images = [
+      spot.img1 || spot.Img1,
+      spot.img2 || spot.Img2,
+      spot.img3 || spot.Img3,
+      spot.img4 || spot.Img4
+    ];
+
+    images.forEach(img => {
+      if (img) {
+        const fullPath = this.getSpotImage(img);
+        if (fullPath) this.imagePreviews.push(fullPath);
+      }
+    });
 
     this.isModalOpen = true;
   }
@@ -97,6 +107,7 @@ export class ParkingProviderComponent implements OnInit {
 
   resetForm() {
     this.parkingData = {
+        Unique_Id: 0,
         latitude: '',
         longitude: '',
         rate: null,
@@ -155,6 +166,24 @@ export class ParkingProviderComponent implements OnInit {
     this.selectedFiles.splice(index, 1);
   }
 
+  deleteSpot(id: any) {
+    if (!id) return;
+    
+    if (confirm('Are you sure you want to delete this parking location?')) {
+      this.apiService.delete(`ParkingProvider/DeleteParkingLocation?uniqueId=${id}`).subscribe({
+        next: (res: any) => {
+          alert('Parking location deleted successfully!');
+          this.closeModal();
+          this.loadParkingLocations();
+        },
+        error: (err) => {
+          console.error('Error deleting spot', err);
+          alert('Failed to delete spot: ' + this.apiService.extractErrorMessage(err));
+        }
+      });
+    }
+  }
+
   submitForm() {
     const user = this.authService.getCurrentUser();
     if (!user) {
@@ -163,8 +192,8 @@ export class ParkingProviderComponent implements OnInit {
     }
 
     const formData = new FormData();
-    if (this.parkingData.SpotId) {
-        formData.append('SpotId', this.parkingData.SpotId.toString());
+    if (this.parkingData.Unique_Id) {
+        formData.append('Unique_Id', this.parkingData.Unique_Id.toString());
     }
     formData.append('UserId', (user.userid || 0).toString());
     formData.append('VehicalType', this.parkingData.vehicleType);
@@ -181,21 +210,9 @@ export class ParkingProviderComponent implements OnInit {
     this.apiService.postFormData('ParkingProvider/SaveParkingLocation', formData).subscribe({
         next: (res) => {
             console.log('Success:', res);
-            alert('Parking location saved successfully!');
+            alert(this.parkingData.Unique_Id ? 'Parking location updated successfully!' : 'Parking location saved successfully!');
             this.closeModal();
             this.loadParkingLocations(); // Refresh the list
-
-            // Reset form
-            this.parkingData = {
-                latitude: '',
-                longitude: '',
-                rate: null,
-                contactNumber: '',
-                address: '',
-                vehicleType: '2'
-            };
-            this.imagePreviews = [];
-            this.selectedFiles = [];
         },
         error: (err) => {
             console.error('Error:', err);
