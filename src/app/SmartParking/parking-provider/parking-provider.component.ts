@@ -17,28 +17,25 @@ export class ParkingProviderComponent implements OnInit {
   isModalOpen = false;
 
   parkingData: any = {
+    Unique_Id: 0,
     latitude: '',
     longitude: '',
     rate: null,
     contactNumber: '',
     address: '',
-    vehicleType: '2' // '2' for 2-wheeler, '4' for 4-wheeler
+    vehicleType: '2'
   };
 
   imagePreviews: string[] = [];
   selectedFiles: File[] = [];
+  existingImages: string[] = []; // ← NEW: tracks server-side image paths
   parkingList: any[] = [];
-  selectedParking: any = null;
 
   getSpotImage(path: string | null) {
     if (!path) return null;
     if (path.startsWith('http') || path.startsWith('data:')) return path;
-    
-    // Remove '/api/' from the end of baseUrl
     const root = this.apiService.baseUrl.replace(/\/api\/?$/, '');
-    // Ensure path starts with a single slash
     const normalizedPath = path.startsWith('/') ? path : '/' + path;
-    
     return root + normalizedPath.replace(/\\/g, '/');
   }
 
@@ -51,18 +48,15 @@ export class ParkingProviderComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     if (user && user.userid) {
       this.apiService.get(`ParkingProvider/GetParkingLocations?userId=${user.userid}`).subscribe({
-        next: (res: any) => {
-          this.parkingList = res;
-        },
+        next: (res: any) => { this.parkingList = res; },
         error: (err) => console.error('Error loading spots', err)
       });
     }
   }
 
-  viewDetails(spot: any) {
-    // Robustly find the ID regardless of naming convention (Unique_Id, unique_Id, uniqueId, etc.)
+ viewDetails(spot: any) {
     const id = spot.unique_Id || spot.Unique_Id || spot.uniqueId || spot.UniqueId || spot.id || spot.ID || 0;
-    
+
     this.parkingData = {
       Unique_Id: id,
       address: spot.fullAddress || spot.FullAddress || '',
@@ -72,24 +66,34 @@ export class ParkingProviderComponent implements OnInit {
       latitude: (spot.latitudeLangitude || spot.LatitudeLangitude)?.split(',')[0] || '',
       longitude: (spot.latitudeLangitude || spot.LatitudeLangitude)?.split(',')[1] || ''
     };
-    
-    // Set previews for existing images
-    this.imagePreviews = [];
-    const images = [
+
+    const rawImages = [
       spot.img1 || spot.Img1,
       spot.img2 || spot.Img2,
       spot.img3 || spot.Img3,
       spot.img4 || spot.Img4
-    ];
+    ].filter(Boolean);
 
-    images.forEach(img => {
-      if (img) {
-        const fullPath = this.getSpotImage(img);
-        if (fullPath) this.imagePreviews.push(fullPath);
-      }
-    });
+    // API returns full URLs already — use them directly for preview
+    // But store RELATIVE paths for FormData submission
+    this.imagePreviews = rawImages; // already full URLs from API
+    this.existingImages = rawImages.map(url => this.extractRelativePath(url)); // convert back to /ParkingImages/xxx.jpg
+    this.selectedFiles = [];
 
     this.isModalOpen = true;
+  }
+
+  // NEW helper: extract relative path from full URL
+  extractRelativePath(url: string): string {
+    if (!url) return '';
+    // If already relative, return as-is
+    if (!url.startsWith('http')) return url;
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname; // returns /ParkingImages/filename.jpg
+    } catch {
+      return url;
+    }
   }
 
   openModal() {
@@ -107,71 +111,70 @@ export class ParkingProviderComponent implements OnInit {
 
   resetForm() {
     this.parkingData = {
-        Unique_Id: 0,
-        latitude: '',
-        longitude: '',
-        rate: null,
-        contactNumber: '',
-        address: '',
-        vehicleType: '2'
+      Unique_Id: 0,
+      latitude: '',
+      longitude: '',
+      rate: null,
+      contactNumber: '',
+      address: '',
+      vehicleType: '2'
     };
     this.imagePreviews = [];
     this.selectedFiles = [];
+    this.existingImages = []; // ← NEW
   }
 
   getLocation() {
     if (navigator.geolocation) {
-      const options = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      };
-
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.parkingData.latitude = position.coords.latitude.toString();
           this.parkingData.longitude = position.coords.longitude.toString();
         },
-        (error) => {
-          console.error('Error getting location', error);
-        },
-        options
+        (error) => console.error('Error getting location', error),
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
-    } else {
-      console.error('Geolocation is not supported by this browser.');
     }
   }
 
   onImageUpload(event: any) {
     const files = event.target.files;
     if (files) {
-      const remainingSlots = 4 - this.selectedFiles.length;
+      const totalUsed = this.existingImages.length + this.selectedFiles.length;
+      const remainingSlots = 4 - totalUsed;
       const filesToProcess = Math.min(files.length, remainingSlots);
-      
+
       for (let i = 0; i < filesToProcess; i++) {
         const file = files[i];
         this.selectedFiles.push(file);
-        
         const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.imagePreviews.push(e.target.result);
-        };
+        reader.onload = (e: any) => { this.imagePreviews.push(e.target.result); };
         reader.readAsDataURL(file);
       }
     }
   }
 
+  // ← FIXED: correctly removes from existingImages OR selectedFiles
   removeImage(index: number) {
+    const existingCount = this.existingImages.length;
+
+    if (index < existingCount) {
+      // Removing an existing server image
+      this.existingImages.splice(index, 1);
+    } else {
+      // Removing a newly selected file
+      const newFileIndex = index - existingCount;
+      this.selectedFiles.splice(newFileIndex, 1);
+    }
+
     this.imagePreviews.splice(index, 1);
-    this.selectedFiles.splice(index, 1);
   }
 
   deleteSpot(id: any) {
     if (!id) return;
-    
     if (confirm('Are you sure you want to delete this parking location?')) {
       this.apiService.delete(`ParkingProvider/DeleteParkingLocation?uniqueId=${id}`).subscribe({
-        next: (res: any) => {
+        next: () => {
           alert('Parking location deleted successfully!');
           this.closeModal();
           this.loadParkingLocations();
@@ -184,17 +187,16 @@ export class ParkingProviderComponent implements OnInit {
     }
   }
 
-  submitForm() {
+ submitForm() {
     const user = this.authService.getCurrentUser();
-    if (!user) {
-        alert('Please login first');
-        return;
-    }
+    if (!user) { alert('Please login first'); return; }
 
     const formData = new FormData();
-    if (this.parkingData.Unique_Id) {
-        formData.append('Unique_Id', this.parkingData.Unique_Id.toString());
+
+    if (this.parkingData.Unique_Id && this.parkingData.Unique_Id > 0) {
+      formData.append('Unique_Id', this.parkingData.Unique_Id.toString());
     }
+
     formData.append('UserId', (user.userid || 0).toString());
     formData.append('VehicalType', this.parkingData.vehicleType);
     formData.append('LatitudeLangitude', `${this.parkingData.latitude},${this.parkingData.longitude}`);
@@ -202,23 +204,30 @@ export class ParkingProviderComponent implements OnInit {
     formData.append('price', (this.parkingData.rate || 0).toString());
     formData.append('contact', this.parkingData.contactNumber);
 
-    // Append images
+    // ✅ Send existing images as img1..img4 so backend ISNULL() keeps them
+    // existingImages are relative paths like /ParkingImages/abc.jpg
+    const imgFields = ['img1', 'img2', 'img3', 'img4'];
+    this.existingImages.forEach((path, i) => {
+      if (path && i < 4) {
+        formData.append(imgFields[i], path);
+      }
+    });
+
+    // New uploaded files go into 'images' — backend saves these and fills remaining img slots
     this.selectedFiles.forEach((file) => {
-        formData.append('images', file);
+      formData.append('images', file);
     });
 
     this.apiService.postFormData('ParkingProvider/SaveParkingLocation', formData).subscribe({
-        next: (res) => {
-            console.log('Success:', res);
-            alert(this.parkingData.Unique_Id ? 'Parking location updated successfully!' : 'Parking location saved successfully!');
-            this.closeModal();
-            this.loadParkingLocations(); // Refresh the list
-        },
-        error: (err) => {
-            console.error('Error:', err);
-            alert('Failed to save parking location: ' + this.apiService.extractErrorMessage(err));
-        }
+      next: () => {
+        alert(this.parkingData.Unique_Id > 0 ? 'Updated successfully!' : 'Saved successfully!');
+        this.closeModal();
+        this.loadParkingLocations();
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        alert('Failed: ' + this.apiService.extractErrorMessage(err));
+      }
     });
   }
 }
-
