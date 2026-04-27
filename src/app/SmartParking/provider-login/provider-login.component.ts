@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/auth.service';
 import { ApiService } from '../../shared/api.service';
+import { ToastrService } from 'ngx-toastr';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-provider-login',
@@ -16,10 +18,11 @@ export class ProviderLoginComponent {
   private router = inject(Router);
   private apiService = inject(ApiService);
   private authService = inject(AuthService);
+  private toastr = inject(ToastrService);
+  private loader = inject(LoaderService);
   hidePassword = true;
   isEmailFocused = false;
   isPasswordFocused = false;
-  isLoading = false;
   errorMessage = '';
 
   loginData = {
@@ -32,19 +35,20 @@ export class ProviderLoginComponent {
 
   onLogin() {
     if (!this.loginData.phone || !this.loginData.password) {
-      this.errorMessage = 'Please enter both phone and password.';
+      this.toastr.warning('Please enter both phone and password.');
       return;
     }
 
-    this.isLoading = true;
     this.errorMessage = '';
 
     const body = { PHONE: this.loginData.phone, PASS: this.loginData.password };
 
-    this.apiService.post('ParkingLogin/login', body).subscribe({
+    this.loader.withLoader(
+      this.apiService.post('ParkingLogin/login', body)
+    ).subscribe({
       next: (response: any) => {
-        this.isLoading = false;
         console.log('Login successful:', response);
+        this.toastr.success('Login successful!', 'Welcome');
 
         if (response) {
           this.authService.setCurrentUser(response);
@@ -56,8 +60,8 @@ export class ProviderLoginComponent {
         }, 800);
       },
       error: (err) => {
-        this.isLoading = false;
         this.errorMessage = this.apiService.extractErrorMessage(err);
+        this.toastr.error(this.errorMessage, 'Login Failed');
         console.error('Auth error:', err);
       }
     });

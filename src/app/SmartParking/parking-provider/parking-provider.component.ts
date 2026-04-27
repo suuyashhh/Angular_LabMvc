@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-parking-provider',
@@ -14,6 +16,8 @@ import { AuthService } from '../../shared/auth.service';
 export class ParkingProviderComponent implements OnInit {
   apiService = inject(ApiService);
   authService = inject(AuthService);
+  toastr = inject(ToastrService);
+  loader = inject(LoaderService);
   isModalOpen = false;
 
   parkingData: any = {
@@ -47,9 +51,14 @@ export class ParkingProviderComponent implements OnInit {
   loadParkingLocations() {
     const user = this.authService.getCurrentUser();
     if (user && user.userid) {
-      this.apiService.get(`ParkingProvider/GetParkingLocations?userId=${user.userid}`).subscribe({
+      this.loader.withLoader(
+        this.apiService.get(`ParkingProvider/GetParkingLocations?userId=${user.userid}`)
+      ).subscribe({
         next: (res: any) => { this.parkingList = res; },
-        error: (err) => console.error('Error loading spots', err)
+        error: (err) => {
+          console.error('Error loading spots', err);
+          this.toastr.error('Failed to load parking locations');
+        }
       });
     }
   }
@@ -173,15 +182,17 @@ export class ParkingProviderComponent implements OnInit {
   deleteSpot(id: any) {
     if (!id) return;
     if (confirm('Are you sure you want to delete this parking location?')) {
-      this.apiService.delete(`ParkingProvider/DeleteParkingLocation?uniqueId=${id}`).subscribe({
+      this.loader.withLoader(
+        this.apiService.delete(`ParkingProvider/DeleteParkingLocation?uniqueId=${id}`)
+      ).subscribe({
         next: () => {
-          alert('Parking location deleted successfully!');
+          this.toastr.success('Parking location deleted successfully!');
           this.closeModal();
           this.loadParkingLocations();
         },
         error: (err) => {
           console.error('Error deleting spot', err);
-          alert('Failed to delete spot: ' + this.apiService.extractErrorMessage(err));
+          this.toastr.error('Failed to delete spot: ' + this.apiService.extractErrorMessage(err));
         }
       });
     }
@@ -189,7 +200,7 @@ export class ParkingProviderComponent implements OnInit {
 
  submitForm() {
     const user = this.authService.getCurrentUser();
-    if (!user) { alert('Please login first'); return; }
+    if (!user) { this.toastr.warning('Please login first'); return; }
 
     const formData = new FormData();
 
@@ -218,15 +229,17 @@ export class ParkingProviderComponent implements OnInit {
       formData.append('images', file);
     });
 
-    this.apiService.postFormData('ParkingProvider/SaveParkingLocation', formData).subscribe({
+    this.loader.withLoader(
+      this.apiService.postFormData('ParkingProvider/SaveParkingLocation', formData)
+    ).subscribe({
       next: () => {
-        alert(this.parkingData.Unique_Id > 0 ? 'Updated successfully!' : 'Saved successfully!');
+        this.toastr.success(this.parkingData.Unique_Id > 0 ? 'Updated successfully!' : 'Saved successfully!');
         this.closeModal();
         this.loadParkingLocations();
       },
       error: (err) => {
         console.error('Error:', err);
-        alert('Failed: ' + this.apiService.extractErrorMessage(err));
+        this.toastr.error('Failed: ' + this.apiService.extractErrorMessage(err));
       }
     });
   }

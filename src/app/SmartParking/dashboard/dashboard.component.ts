@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarService } from '../../shared/sidebar.service';
 import { ApiService } from '../../shared/api.service';
+import { ToastrService } from 'ngx-toastr';
+import { LoaderService } from '../../services/loader.service';
 
 declare const L: any;
 
@@ -16,6 +18,8 @@ declare const L: any;
 export class DashboardComponent implements OnInit, AfterViewInit {
   sidebarService = inject(SidebarService);
   apiService = inject(ApiService);
+  toastr = inject(ToastrService);
+  loader = inject(LoaderService);
 
   searchQuery: string = '';
   isDirectionsMode: boolean = false;
@@ -72,7 +76,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     if (!this.searchQuery.trim()) return;
 
-    this.apiService.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(this.searchQuery)}&format=json`).subscribe({
+    this.loader.withLoader(
+      this.apiService.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(this.searchQuery)}&format=json`)
+    ).subscribe({
       next: (data: any) => {
         if (data && data.length > 0) {
           const lat = parseFloat(data[0].lat);
@@ -84,20 +90,23 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           }
           this.destinationMarker = L.marker([lat, lon]).addTo(this.map).bindPopup(data[0].display_name).openPopup();
         } else {
-          alert("Location not found.");
+          this.toastr.warning("Location not found.");
         }
       },
-      error: (e: any) => console.error("Search error", e)
+      error: (e: any) => {
+        console.error("Search error", e);
+        this.toastr.error("Failed to search location.");
+      }
     });
   }
 
   getDirections(fitBounds: boolean = true) {
       if (!this.destinationMarker) {
-         alert("Please search for a destination first!");
+         this.toastr.warning("Please search for a destination first!");
          return;
       }
       if (!this.userLocation) {
-         alert("Your live location is not available. Please allow location access or click the 'My Location' button.");
+         this.toastr.warning("Your live location is not available. Please allow location access or click the 'My Location' button.");
          return;
       }
 
@@ -132,7 +141,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                };
             }
         },
-        error: (err: any) => console.error("OSRM Route Error", err)
+        error: (err: any) => {
+          console.error("OSRM Route Error", err);
+          this.toastr.error("Failed to calculate route.");
+        }
       });
   }
 

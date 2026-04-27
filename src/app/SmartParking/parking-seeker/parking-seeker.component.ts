@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-parking-seeker',
@@ -14,11 +16,12 @@ import { AuthService } from '../../shared/auth.service';
 export class ParkingSeekerComponent implements OnInit {
   apiService = inject(ApiService);
   authService = inject(AuthService);
+  toastr = inject(ToastrService);
+  loader = inject(LoaderService);
 
   userLat: number | null = null;
   userLng: number | null = null;
   parkingList: any[] = [];
-  isLoading = true;
 
   // Modal & Slider State
   selectedSpot: any = null;
@@ -51,8 +54,9 @@ export class ParkingSeekerComponent implements OnInit {
   }
 
   loadAllParkingLocations() {
-    this.isLoading = true;
-    this.apiService.get('ParkingProvider/GetAllParkingLocations').subscribe({
+    this.loader.withLoader(
+      this.apiService.get('ParkingProvider/GetAllParkingLocations')
+    ).subscribe({
       next: (res: any) => {
         this.parkingList = res.map((spot: any) => {
           const coords = spot.latitudeLangitude?.split(',') || [];
@@ -75,12 +79,10 @@ export class ParkingSeekerComponent implements OnInit {
           if (b.distance === null) return -1;
           return a.distance - b.distance;
         });
-
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading parking locations', err);
-        this.isLoading = false;
+        this.toastr.error('Failed to load parking locations');
       }
     });
   }
