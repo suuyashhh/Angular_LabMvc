@@ -22,7 +22,9 @@ export class ParkingSeekerComponent implements OnInit {
   userLat: number | null = null;
   userLng: number | null = null;
   parkingList: any[] = [];
+  originalParkingList: any[] = [];
   isLoading = false;
+  activeFilter = 'all';
 
   // Modal & Slider State
   selectedSpot: any = null;
@@ -36,6 +38,7 @@ export class ParkingSeekerComponent implements OnInit {
 
   getCurrentLocation() {
     if (navigator.geolocation) {
+      this.isLoading = true;
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.userLat = position.coords.latitude;
@@ -60,7 +63,7 @@ export class ParkingSeekerComponent implements OnInit {
       this.apiService.get('ParkingProvider/GetAllParkingLocations')
     ).subscribe({
       next: (res: any) => {
-        this.parkingList = res.map((spot: any) => {
+        this.originalParkingList = res.map((spot: any) => {
           const coords = spot.latitudeLangitude?.split(',') || [];
           const spotLat = parseFloat(coords[0]);
           const spotLng = parseFloat(coords[1]);
@@ -76,11 +79,14 @@ export class ParkingSeekerComponent implements OnInit {
           };
         });
 
-        this.parkingList.sort((a, b) => {
+        // Default sort by distance
+        this.originalParkingList.sort((a, b) => {
           if (a.distance === null) return 1;
           if (b.distance === null) return -1;
           return a.distance - b.distance;
         });
+
+        this.applyFilter(this.activeFilter);
         this.isLoading = false;
       },
       error: (err) => {
@@ -89,6 +95,23 @@ export class ParkingSeekerComponent implements OnInit {
         this.toastr.error('Failed to load parking locations');
       }
     });
+  }
+
+  applyFilter(type: string) {
+    this.activeFilter = type;
+    let filtered = [...this.originalParkingList];
+
+    if (type === '2-wheeler') {
+      filtered = filtered.filter(s => s.vehicalType === '2' || s.VehicalType === '2');
+    } else if (type === '4-wheeler') {
+      filtered = filtered.filter(s => s.vehicalType === '4' || s.VehicalType === '4');
+    } else if (type === 'distance') {
+      filtered = filtered.filter(s => s.distance !== null && s.distance < 1);
+    } else if (type === 'budget') {
+      filtered = filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+    }
+
+    this.parkingList = filtered;
   }
 
   calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -119,16 +142,24 @@ export class ParkingSeekerComponent implements OnInit {
 
   formatDistance(dist: number | null): string {
     if (dist === null) return 'Distance unknown';
+    if (dist < 1) return `${(dist * 1000).toFixed(0)} m away`;
     return `${dist} km away`;
   }
 
   openDetailModal(spot: any) {
     this.selectedSpot = spot;
     this.spotImages = [];
-    if (spot.img1) this.spotImages.push(this.getSpotImage(spot.img1)!);
-    if (spot.img2) this.spotImages.push(this.getSpotImage(spot.img2)!);
-    if (spot.img3) this.spotImages.push(this.getSpotImage(spot.img3)!);
-    if (spot.img4) this.spotImages.push(this.getSpotImage(spot.img4)!);
+    
+    const rawImages = [
+      spot.img1 || spot.Img1,
+      spot.img2 || spot.Img2,
+      spot.img3 || spot.Img3,
+      spot.img4 || spot.Img4
+    ];
+
+    this.spotImages = rawImages
+      .filter(img => img && img.trim() !== '')
+      .map(img => this.getSpotImage(img)!);
     
     this.currentImageIndex = 0;
     this.isDetailModalOpen = true;
@@ -155,3 +186,4 @@ export class ParkingSeekerComponent implements OnInit {
     }
   }
 }
+
