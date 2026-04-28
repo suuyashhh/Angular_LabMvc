@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { SidebarService } from '../../shared/sidebar.service';
 import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
@@ -20,6 +21,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   apiService = inject(ApiService);
   toastr = inject(ToastrService);
   loader = inject(LoaderService);
+  route = inject(ActivatedRoute);
 
   searchQuery: string = '';
   isDirectionsMode: boolean = false;
@@ -32,11 +34,48 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private defaultParkingIcon: any;
   private userLocation: { lat: number, lng: number } | null = null;
 
+  pendingCoords: { lat: number, lng: number } | null = null;
+
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['destLat'] && params['destLng']) {
+        this.pendingCoords = {
+          lat: parseFloat(params['destLat']),
+          lng: parseFloat(params['destLng'])
+        };
+        // Activate directions mode immediately to show the "Choosing destination..." UI
+        this.isDirectionsMode = true;
+      }
+    });
   }
 
   ngAfterViewInit() {
     this.initMap();
+    if (this.pendingCoords) {
+      setTimeout(() => {
+        this.handleDirectionParams();
+      }, 500); // Give map a moment to initialize
+    }
+  }
+
+  handleDirectionParams() {
+    if (!this.pendingCoords || !this.map) return;
+
+    if (this.destinationMarker) {
+      this.map.removeLayer(this.destinationMarker);
+    }
+
+    this.destinationMarker = L.marker([this.pendingCoords.lat, this.pendingCoords.lng])
+      .addTo(this.map)
+      .bindPopup('Target Parking Spot')
+      .openPopup();
+
+    this.map.flyTo([this.pendingCoords.lat, this.pendingCoords.lng], 15);
+    
+    // Check if user location is already available
+    if (this.userLocation) {
+      this.getDirections(true);
+    }
   }
 
   initMap() {
@@ -151,6 +190,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   stopDirections() {
       this.isDirectionsMode = false;
       this.routeInfo = null;
+      this.pendingCoords = null; // Clear pending state
       if (this.routeLayer) {
           this.map.removeLayer(this.routeLayer);
           this.routeLayer = null;
@@ -180,6 +220,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             this.userMarker.setLatLng(e.latlng);
         }
         
+        // Auto-start directions if coming from Seeker component and route not yet calculated
+        if (this.pendingCoords && !this.routeInfo) {
+          this.getDirections(true);
+        }
+
         // Live update route actively if moving towards destination
         if (this.isDirectionsMode && this.destinationMarker) {
             this.getDirections(false);
