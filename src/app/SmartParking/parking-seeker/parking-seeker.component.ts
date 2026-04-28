@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
@@ -18,6 +19,7 @@ export class ParkingSeekerComponent implements OnInit {
   authService = inject(AuthService);
   toastr = inject(ToastrService);
   loader = inject(LoaderService);
+  router = inject(Router);
 
   userLat: number | null = null;
   userLng: number | null = null;
@@ -184,6 +186,20 @@ export class ParkingSeekerComponent implements OnInit {
     } else {
       this.currentImageIndex = this.spotImages.length - 1;
     }
+  }
+
+  showDirection(spot: any) {
+    if (!spot.latitudeLangitude) {
+      this.toastr.warning('Location coordinates not available for this spot.');
+      return;
+    }
+    const coords = spot.latitudeLangitude.split(',');
+    const lat = coords[0];
+    const lng = coords[1];
+
+    this.router.navigate(['/Parking/dashboard'], {
+      queryParams: { destLat: lat, destLng: lng }
+    });
   }
 }
 

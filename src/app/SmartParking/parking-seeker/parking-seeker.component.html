@@ -100,8 +100,8 @@
             <a [href]="'tel:' + spot.contact" (click)="$event.stopPropagation()" class="pk-btn-call">
               <span class="material-icons-outlined">call</span>Call
             </a>
-            <button (click)="$event.stopPropagation(); openDetailModal(spot)" class="pk-btn-book">
-              <span class="material-icons-outlined">bolt</span>Details
+            <button (click)="$event.stopPropagation(); showDirection(spot)" class="pk-btn-book">
+              <span class="material-icons-outlined">near_me</span>Direction
             </button>
           </div>
         </div>
@@ -191,9 +191,9 @@
             <span class="material-icons-outlined">call</span>
             Call Provider
           </a>
-          <button class="pk-btn-reserve">
-            <span class="material-icons-outlined">bolt</span>
-            Reserve Spot
+          <button class="pk-btn-reserve" (click)="showDirection(selectedSpot)">
+            <span class="material-icons-outlined">near_me</span>
+            Get Directions
           </button>
         </div>
       </div>
