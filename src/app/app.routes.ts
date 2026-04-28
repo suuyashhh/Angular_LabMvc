@@ -5,6 +5,7 @@ import { LogindairyComponent } from './LoginDairFarm/logindairy/logindairy.compo
 import { dairyAuthGuard } from './shared/dairy-auth.guard';
 import { LoginfarmComponent } from './LoginFarm/loginfarm/loginfarm.component';
 import { farmAuthGuard } from './shared/farm-auth.guard';
+import { parkingAuthGuard } from './shared/parking-auth.guard';
 
 export const routes: Routes = [
 
@@ -46,6 +47,7 @@ export const routes: Routes = [
   },
   {
     path: 'Parking',
+    canActivate: [parkingAuthGuard],
     loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
   }

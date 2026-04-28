@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiService } from './api.service';
 import { LoaderService } from '../services/loader.service';
-import { finalize } from 'rxjs';
+import { finalize, BehaviorSubject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
@@ -21,7 +21,9 @@ export class AuthService {
     private api: ApiService,
     private loader: LoaderService,
     private toaster: ToastrService
-  ) { }
+  ) {
+    this.initParkingUser();
+  }
 
   // Generate UUID (optional utility)
   generateUUIDToken(): string {
@@ -269,6 +271,8 @@ clearFarmUserDetailsCookie(): void {
 // ===== Smart Parking Auth Methods =====
 
   private parkingUser: any = null;
+  private parkingUserSubject = new BehaviorSubject<any>(null);
+  public parkingUser$ = this.parkingUserSubject.asObservable();
 
   /** Initialize parking user from sessionStorage (call in constructor or on-demand) */
   private initParkingUser(): void {
@@ -277,8 +281,10 @@ clearFarmUserDetailsCookie(): void {
       if (stored) {
         try {
           this.parkingUser = JSON.parse(stored);
+          this.parkingUserSubject.next(this.parkingUser);
         } catch {
           this.parkingUser = null;
+          this.parkingUserSubject.next(null);
         }
       }
     }
@@ -287,6 +293,7 @@ clearFarmUserDetailsCookie(): void {
   /** Set Parking user details in sessionStorage (used by SmartParking provider-login) */
   setCurrentUser(user: any): void {
     this.parkingUser = user;
+    this.parkingUserSubject.next(user);
     if (isPlatformBrowser(this.platformId)) {
       sessionStorage.setItem('parking_user', JSON.stringify(user));
     }
@@ -308,6 +315,7 @@ clearFarmUserDetailsCookie(): void {
   /** Logout parking user */
   parkingLogout(): void {
     this.parkingUser = null;
+    this.parkingUserSubject.next(null);
     if (isPlatformBrowser(this.platformId)) {
       sessionStorage.removeItem('parking_user');
     }
