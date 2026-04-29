@@ -254,3 +254,35 @@
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+
+/* Custom Map Popup Styles */
+:host ::ng-deep .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    padding: 5px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+:host ::ng-deep .custom-popup h6 {
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+}
+
+:host ::ng-deep .custom-popup p {
+    color: #5f6368;
+    line-height: 1.6;
+}
+
+:host ::ng-deep .custom-popup .btn-primary {
+    background-color: #1a73e8;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+:host ::ng-deep .custom-popup .btn-primary:hover {
+    background-color: #1557b0;
+}
