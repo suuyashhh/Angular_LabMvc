@@ -33,6 +33,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private routeLayer: any = null;
   private defaultParkingIcon: any;
   private userLocation: { lat: number, lng: number } | null = null;
+  private parkingMarkers: any[] = [];
+  parkingLocations: any[] = [];
+
+  private bikeIcon: any;
+  private carIcon: any;
+  private defaultIcon: any;
 
   pendingCoords: { lat: number, lng: number } | null = null;
 
@@ -47,6 +53,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.isDirectionsMode = true;
       }
     });
+    this.loadParkingLocations();
   }
 
   ngAfterViewInit() {
@@ -56,6 +63,25 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.handleDirectionParams();
       }, 500); // Give map a moment to initialize
     }
+
+    // Listen for directions button clicks from markers
+    window.addEventListener('getDirections', (e: any) => {
+      const { lat, lng, address } = e.detail;
+      this.handleDirectionsFromPopup(lat, lng, address);
+    });
+  }
+
+  handleDirectionsFromPopup(lat: number, lng: number, address: string) {
+    if (this.destinationMarker) {
+      this.map.removeLayer(this.destinationMarker);
+    }
+
+    this.destinationMarker = L.marker([lat, lng])
+      .addTo(this.map)
+      .bindPopup(address || 'Destination')
+      .openPopup();
+
+    this.getDirections(true);
   }
 
   handleDirectionParams() {
@@ -79,24 +105,109 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   initMap() {
-    this.map = L.map('map').setView([18.5204, 73.8567], 14);
+    // Default center on India
+    this.map = L.map('map').setView([20.5937, 78.9629], 5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    this.defaultParkingIcon = L.icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3005/3005355.png', 
-      iconSize: [38, 38],
-      iconAnchor: [19, 38],
-      popupAnchor: [0, -38]
+    this.carIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3710/3710267.png',
+      iconSize: [45, 45],
+      iconAnchor: [22, 45],
+      popupAnchor: [0, -45]
     });
 
-    L.marker([18.5204, 73.8567], { icon: this.defaultParkingIcon })
-      .addTo(this.map)
-      .bindPopup('<b>Parking Slot A1</b><br>Available: Yes');
+    this.bikeIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3710/3710271.png',
+      iconSize: [45, 45],
+      iconAnchor: [22, 45],
+      popupAnchor: [0, -45]
+    });
 
+    this.defaultIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/2776/2776000.png', // Red pin with 'P'
+      iconSize: [45, 45],
+      iconAnchor: [22, 45],
+      popupAnchor: [0, -45]
+    });
+
+    this.displayParkingMarkers();
     this.getCurrentLocation();
+  }
+
+  loadParkingLocations() {
+    this.apiService.get('ParkingProvider/GetAllParkingLocations').subscribe({
+      next: (data: any) => {
+        this.parkingLocations = data;
+        if (this.map) {
+          this.displayParkingMarkers();
+        }
+      },
+      error: (err: any) => {
+        console.error("Error loading parking locations", err);
+        this.toastr.error("Failed to load parking locations");
+      }
+    });
+  }
+
+  displayParkingMarkers() {
+    if (!this.map || !this.parkingLocations || !this.parkingLocations.length) return;
+
+    // Clear existing parking markers
+    this.parkingMarkers.forEach(m => this.map.removeLayer(m));
+    this.parkingMarkers = [];
+
+    const group = L.featureGroup();
+
+    this.parkingLocations.forEach(loc => {
+      // Handle both camelCase and PascalCase from API response
+      const latLngStr = loc.latitudeLangitude || loc.LatitudeLangitude;
+      const fullAddress = loc.fullAddress || loc.FullAddress || 'Parking Spot';
+      const price = loc.price || loc.Price || 'N/A';
+      const vehicalType = String(loc.vehicalType || loc.VehicalType || '');
+      const contact = loc.contact || loc.Contact || 'N/A';
+
+      if (latLngStr) {
+        const coords = latLngStr.split(',');
+        if (coords.length === 2) {
+          const lat = parseFloat(coords[0].trim());
+          const lng = parseFloat(coords[1].trim());
+
+          if (!isNaN(lat) && !isNaN(lng)) {
+            // Determine icon based on vehicle type
+            let customIcon = this.defaultIcon;
+            if (vehicalType === '2') customIcon = this.bikeIcon;
+            else if (vehicalType === '4') customIcon = this.carIcon;
+
+            const marker = L.marker([lat, lng], { icon: customIcon })
+              .addTo(this.map)
+              .bindPopup(`
+                <div class="custom-popup">
+                  <h6 style="margin: 0 0 5px; color: #1a73e8;">${fullAddress}</h6>
+                  <p style="margin: 0 5px; font-size: 13px;">
+                    <b>Price:</b> ₹${price}/hr<br>
+                    <b>Vehicle:</b> ${vehicalType === '2' ? '2-Wheeler' : vehicalType === '4' ? '4-Wheeler' : vehicalType}<br>
+                    <b>Contact:</b> ${contact}
+                  </p>
+                  <button class="btn btn-sm btn-primary w-100 mt-2" 
+                    onclick="window.dispatchEvent(new CustomEvent('getDirections', {detail: {lat: ${lat}, lng: ${lng}, address: '${fullAddress.replace(/'/g, "\\'")}'}}))">
+                    Get Directions
+                  </button>
+                </div>
+              `);
+            this.parkingMarkers.push(marker);
+            group.addLayer(marker);
+          }
+        }
+      }
+    });
+
+    // Zoom to fit all markers if there are any
+    if (this.parkingMarkers.length > 0) {
+      this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+    }
   }
 
   toggleSidebar() {
