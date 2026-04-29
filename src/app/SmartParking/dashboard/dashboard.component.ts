@@ -40,6 +40,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private carIcon: any;
   private defaultIcon: any;
 
+  showLocationModal: boolean = false;
   pendingCoords: { lat: number, lng: number } | null = null;
 
   ngOnInit() {
@@ -49,11 +50,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           lat: parseFloat(params['destLat']),
           lng: parseFloat(params['destLng'])
         };
-        // Activate directions mode immediately to show the "Choosing destination..." UI
         this.isDirectionsMode = true;
       }
     });
     this.loadParkingLocations();
+    this.checkLocationPermissionStatus();
+  }
+
+  checkLocationPermissionStatus() {
+    const status = sessionStorage.getItem('locationRequested');
+    if (!status) {
+      this.showLocationModal = true;
+    }
   }
 
   ngAfterViewInit() {
@@ -134,7 +142,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     });
 
     this.displayParkingMarkers();
-    this.getCurrentLocation();
+    
+    // Only auto-locate if permission was already handled in this session
+    if (sessionStorage.getItem('locationRequested') === 'granted') {
+      this.getCurrentLocation();
+    }
   }
 
   loadParkingLocations() {
@@ -353,6 +365,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   zoomOut() {
     this.map.zoomOut();
+  }
+
+  allowLocation() {
+    this.showLocationModal = false;
+    sessionStorage.setItem('locationRequested', 'granted');
+    this.getCurrentLocation();
+  }
+
+  dismissLocation() {
+    this.showLocationModal = false;
+    sessionStorage.setItem('locationRequested', 'denied');
   }
 }
 

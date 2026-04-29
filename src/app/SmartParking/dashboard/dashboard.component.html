@@ -55,4 +55,19 @@
         <!-- Leaflet Map Container -->
         <div id="map" style="width: 100%; height: 100%; z-index: 1;"></div>
     </div>
+
+    <!-- Location Access Modal -->
+    <div class="location-modal-overlay" *ngIf="showLocationModal">
+        <div class="location-modal">
+            <div class="modal-icon">
+                <span class="material-icons-outlined">near_me</span>
+            </div>
+            <h3>Enable Location Access</h3>
+            <p>SmartParking needs your location to show available spots near you and provide accurate navigation instructions.</p>
+            <div class="modal-actions">
+                <button class="btn-not-now" (click)="dismissLocation()">Not Now</button>
+                <button class="btn-allow" (click)="allowLocation()">Allow Access</button>
+            </div>
+        </div>
+    </div>
 </div>
