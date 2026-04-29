@@ -135,15 +135,26 @@ export class ParkingProviderComponent implements OnInit {
 
   getLocation() {
     if (navigator.geolocation) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      };
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.parkingData.latitude = position.coords.latitude.toString();
           this.parkingData.longitude = position.coords.longitude.toString();
           this.getAddress(position.coords.latitude, position.coords.longitude);
         },
-        (error) => console.error('Error getting location', error),
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        (error) => {
+          console.error('Error getting location', error);
+          this.toastr.error('Failed to get location. Please ensure location permissions are granted.');
+        },
+        options
       );
+    } else {
+      this.toastr.error('Geolocation is not supported by this browser.');
     }
   }
 

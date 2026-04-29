@@ -68,8 +68,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.initMap();
     if (this.pendingCoords) {
       setTimeout(() => {
-        this.handleDirectionParams();
-      }, 500); // Give map a moment to initialize
+        if (this.map) {
+          this.map.invalidateSize();
+          this.handleDirectionParams();
+        }
+      }, 500);
     }
 
     // Listen for directions button clicks from markers
@@ -115,6 +118,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   initMap() {
     // Default center on India
     this.map = L.map('map').setView([20.5937, 78.9629], 5);
+    
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 100);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
@@ -324,25 +331,40 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   getCurrentLocation() {
-    this.map.locate({ setView: true, maxZoom: 16, watch: true });
+    if (!navigator.geolocation) {
+      this.toastr.error("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
 
     const userIcon = L.icon({
-       iconUrl: 'https://cdn-icons-png.flaticon.com/512/7133/7133312.png',
-       iconSize: [40, 40],
-       iconAnchor: [20, 20]
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/7133/7133312.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+      popupAnchor: [0, -20]
     });
 
-    this.map.on('locationfound', (e: any) => {
-        this.userLocation = { lat: e.latlng.lat, lng: e.latlng.lng };
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        this.userLocation = { lat, lng };
 
         if (!this.userMarker) {
-            this.userMarker = L.marker(e.latlng, { icon: userIcon })
-               .addTo(this.map)
-               .bindPopup('<b>You are here</b>');
+          this.userMarker = L.marker([lat, lng], { icon: userIcon })
+            .addTo(this.map)
+            .bindPopup('<b>You are here</b>');
         } else {
-            this.userMarker.setLatLng(e.latlng);
+          this.userMarker.setLatLng([lat, lng]);
         }
-        
+
+        this.map.flyTo([lat, lng], 16);
+
         // Auto-start directions if coming from Seeker component and route not yet calculated
         if (this.pendingCoords && !this.routeInfo) {
           this.getDirections(true);
@@ -350,13 +372,28 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
         // Live update route actively if moving towards destination
         if (this.isDirectionsMode && this.destinationMarker) {
-            this.getDirections(false);
+          this.getDirections(false);
         }
-    });
-
-    this.map.on('locationerror', (e: any) => {
-      console.warn("Could not find location", e.message);
-    });
+      },
+      (error) => {
+        console.warn("Geolocation error:", error);
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            this.toastr.error("Permission denied. Please enable location in your device settings.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            this.toastr.error("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            this.toastr.error("Location request timed out.");
+            break;
+          default:
+            this.toastr.error("An unknown error occurred while getting location.");
+            break;
+        }
+      },
+      options
+    );
   }
 
   zoomIn() {
