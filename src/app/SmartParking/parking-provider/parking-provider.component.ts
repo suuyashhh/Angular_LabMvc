@@ -139,11 +139,26 @@ export class ParkingProviderComponent implements OnInit {
         (position) => {
           this.parkingData.latitude = position.coords.latitude.toString();
           this.parkingData.longitude = position.coords.longitude.toString();
+          this.getAddress(position.coords.latitude, position.coords.longitude);
         },
         (error) => console.error('Error getting location', error),
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
     }
+  }
+
+  getAddress(lat: number, lng: number) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+    this.loader.withLoader(this.apiService.get(url)).subscribe({
+      next: (res: any) => {
+        if (res && res.display_name) {
+          this.parkingData.address = res.display_name;
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching address', err);
+      }
+    });
   }
 
   onImageUpload(event: any) {
