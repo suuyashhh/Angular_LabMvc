@@ -16,23 +16,20 @@
                     <span class="material-icons-outlined">directions</span>
                 </button>
             </div>
-            
-            <div class="filter-pills" *ngIf="!isDirectionsMode">
-                <button class="pill" (click)="searchQuery='Parking'; onSearch()"><span class="material-icons-outlined">local_parking</span>Parking</button>
-                <button class="pill" (click)="searchQuery='EV Charging'; onSearch()"><span class="material-icons-outlined">ev_station</span>EV Charging</button>
-                <button class="pill" (click)="searchQuery='Restaurants'; onSearch()"><span class="material-icons-outlined">restaurant</span>Restaurants</button>
-            </div>
         </div>
 
         <!-- Live Route Info Card -->
-        <div class="route-info-card" *ngIf="isDirectionsMode && routeInfo">
+        <div class="route-info-card" *ngIf="isDirectionsMode && routeInfo && showRouteCard">
             <div class="route-info-content">
                 <div class="route-eta">
                     <span class="material-icons-outlined text-green">two_wheeler</span>
                     <h2>{{ routeInfo.duration }}</h2>
                 </div>
                 <p class="route-distance">{{ routeInfo.distance }} to destination</p>
-                <button class="stop-btn" (click)="stopDirections()">Exit Navigation</button>
+                <div class="route-card-actions">
+                    <button class="stop-btn" (click)="stopDirections()">Exit Navigation</button>
+                    <button class="ok-btn" (click)="showRouteCard = false">OK</button>
+                </div>
             </div>
         </div>
 
