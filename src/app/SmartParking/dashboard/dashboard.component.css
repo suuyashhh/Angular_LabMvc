@@ -1,12 +1,10 @@
 .dashboard-wrapper {
-    height: calc(100vh - 110px); /* 100vh minus header (50px) and footer (60px) */
+    height: calc(100vh - 110px);
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
 }
-
-
 
 .map-container {
     flex: 1;
@@ -189,8 +187,8 @@
     left: 10px;
     right: 10px;
     background: white;
-    border-radius: 12px;
-    padding: 15px;
+    border-radius: 16px;
+    padding: 18px 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 500;
     animation: slideDown 0.3s ease;
@@ -230,24 +228,64 @@
 
 .route-distance {
     color: #666;
-    margin: 5px 0 15px 0;
+    margin: 5px 0 4px 0;
     font-size: 14px;
     font-weight: 500;
 }
 
+/* ✅ Route Card Buttons — clean pill style */
+.route-card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+    width: 100%;
+}
+
+.ok-btn {
+    padding: 9px 28px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+    min-width: 70px;
+}
+
+.ok-btn:hover {
+    background: #1558b0;
+    transform: translateY(-1px);
+}
+
+.ok-btn:active {
+    transform: scale(0.96);
+}
+
 .stop-btn {
+    padding: 9px 20px;
     background: #ea4335;
     color: white;
     border: none;
-    padding: 8px 24px;
     border-radius: 20px;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+    min-width: 130px;
+}
+
+.stop-btn:hover {
+    background: #c62828;
+    transform: translateY(-1px);
 }
 
 .stop-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
 @keyframes slideDown {

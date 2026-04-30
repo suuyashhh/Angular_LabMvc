@@ -41,6 +41,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private defaultIcon: any;
 
   showLocationModal: boolean = false;
+  showRouteCard: boolean = true;
   pendingCoords: { lat: number, lng: number } | null = null;
 
   ngOnInit() {
@@ -127,25 +128,46 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    this.carIcon = L.icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3710/3710267.png',
-      iconSize: [45, 45],
-      iconAnchor: [22, 45],
-      popupAnchor: [0, -45]
+    // ✅ 4-Wheeler / Car — Google Maps style location pin with Material Icon car inside (blue)
+    this.carIcon = L.divIcon({
+      className: '',
+      html: `<div style="position:relative;width:42px;height:52px;display:flex;flex-direction:column;align-items:center;">
+        <div style="width:42px;height:42px;background:#1a73e8;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.4);">
+          <span class="material-icons-outlined" style="transform:rotate(45deg);color:white;font-size:22px;line-height:1;">directions_car</span>
+        </div>
+        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:10px solid #1a73e8;margin-top:-1px;"></div>
+      </div>`,
+      iconSize: [42, 52],
+      iconAnchor: [21, 52],
+      popupAnchor: [0, -52]
     });
 
-    this.bikeIcon = L.icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/3710/3710271.png',
-      iconSize: [45, 45],
-      iconAnchor: [22, 45],
-      popupAnchor: [0, -45]
+    // ✅ 2-Wheeler / Bike — same blue Google Maps style pin with Material Icon motorcycle
+    this.bikeIcon = L.divIcon({
+      className: '',
+      html: `<div style="position:relative;width:42px;height:52px;display:flex;flex-direction:column;align-items:center;">
+        <div style="width:42px;height:42px;background:#1a73e8;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.4);">
+          <span class="material-icons-outlined" style="transform:rotate(45deg);color:white;font-size:22px;line-height:1;">two_wheeler</span>
+        </div>
+        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:10px solid #1a73e8;margin-top:-1px;"></div>
+      </div>`,
+      iconSize: [42, 52],
+      iconAnchor: [21, 52],
+      popupAnchor: [0, -52]
     });
 
-    this.defaultIcon = L.icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/2776/2776000.png', // Red pin with 'P'
-      iconSize: [45, 45],
-      iconAnchor: [22, 45],
-      popupAnchor: [0, -45]
+    // ✅ Default parking icon — grey pin with P letter
+    this.defaultIcon = L.divIcon({
+      className: '',
+      html: `<div style="position:relative;width:42px;height:52px;display:flex;flex-direction:column;align-items:center;">
+        <div style="width:42px;height:42px;background:#6c757d;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.4);">
+          <span style="transform:rotate(45deg);color:white;font-weight:bold;font-size:20px;">P</span>
+        </div>
+        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:10px solid #6c757d;margin-top:-1px;"></div>
+      </div>`,
+      iconSize: [42, 52],
+      iconAnchor: [21, 52],
+      popupAnchor: [0, -52]
     });
 
     this.displayParkingMarkers();
@@ -195,7 +217,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           const lng = parseFloat(coords[1].trim());
 
           if (!isNaN(lat) && !isNaN(lng)) {
-            // Determine icon based on vehicle type
+            // ✅ Determine icon based on vehicle type
+            // vehicalType === '2' → 2-Wheeler → bikeIcon (motorcycle)
+            // vehicalType === '4' → 4-Wheeler → carIcon
+            // anything else      → defaultIcon (red P pin)
             let customIcon = this.defaultIcon;
             if (vehicalType === '2') customIcon = this.bikeIcon;
             else if (vehicalType === '4') customIcon = this.carIcon;
@@ -320,6 +345,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   stopDirections() {
       this.isDirectionsMode = false;
       this.routeInfo = null;
+      this.showRouteCard = true;
       this.pendingCoords = null; // Clear pending state
       if (this.routeLayer) {
           this.map.removeLayer(this.routeLayer);
@@ -415,4 +441,3 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     sessionStorage.setItem('locationRequested', 'denied');
   }
 }
-
