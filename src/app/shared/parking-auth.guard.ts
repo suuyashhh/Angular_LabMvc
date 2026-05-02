@@ -6,16 +6,18 @@ export const parkingAuthGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  // Allow access to the login page and dashboard without authentication
-  if (state.url.includes('provider-login') || state.url.includes('dashboard')) {
+  // Allow access to public pages without authentication
+  const publicPages = ['provider-login', 'provider-registration', 'dashboard'];
+  if (publicPages.some(page => state.url.includes(page))) {
     return true;
   }
 
+  // Check if user is logged in (has 'parking_user' in session)
   if (auth.isParkingLoggedIn()) {
     return true;
   } else {
-    // If not logged in, redirect to the public parking dashboard
-    router.navigate(['/Parking/dashboard']);
+    // If not logged in and trying to access private page, redirect to login
+    router.navigate(['/Parking/provider-login']);
     return false;
   }
 };
