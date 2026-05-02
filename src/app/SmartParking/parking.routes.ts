@@ -19,6 +19,10 @@ export const PARKING_ROUTES : Routes = [
         loadComponent: () => import('./provider-login/provider-login.component').then(m => m.ProviderLoginComponent)
     },
     {
+        path:'provider-registration',
+        loadComponent: () => import('./provider-registration/provider-registration.component').then(m => m.ProviderRegistrationComponent)
+    },
+    {
         path:'parking-seeker',
         loadComponent: () => import('./parking-seeker/parking-seeker.component').then(m => m.ParkingSeekerComponent)
     }
