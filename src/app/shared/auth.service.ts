@@ -277,13 +277,14 @@ clearFarmUserDetailsCookie(): void {
   private initParkingUser(): void {
     if (!isPlatformBrowser(this.platformId) || this.parkingUser) return;
 
-    const stored = localStorage.getItem('parking_user');
-    if (!stored) return;
-
     try {
+      const stored = localStorage.getItem('parking_user');
+      if (!stored) return;
+
       this.parkingUser = this.normalizeParkingUser(JSON.parse(stored));
       this.parkingUserSubject.next(this.parkingUser);
-    } catch {
+    } catch (e) {
+      console.warn('LocalStorage access failed or data corrupted', e);
       this.clearParkingSession(false, false);
     }
   }
@@ -303,7 +304,11 @@ clearFarmUserDetailsCookie(): void {
 
   private getParkingToken(): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;
-    return localStorage.getItem('parking_token');
+    try {
+      return localStorage.getItem('parking_token');
+    } catch {
+      return null;
+    }
   }
 
   setCurrentUser(parkingSession: any): void {

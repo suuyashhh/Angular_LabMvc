@@ -1,20 +1,20 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { SidebarComponent } from '../../shared/SmartParkingsidebar/sidebar.component';
-import { FooterComponent } from '../../shared/SmartParkingfooter/footer.component';
+import { SmartParkingSidebarComponent } from '../../shared/SmartParkingsidebar/sidebar.component';
+import { SmartParkingFooterComponent } from '../../shared/SmartParkingfooter/footer.component';
 import { SidebarService } from '../../shared/sidebar.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../shared/auth.service';
 import { catchError, EMPTY, exhaustMap, filter, interval, startWith, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-landing',
+  selector: 'app-parking-landing',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, FooterComponent, CommonModule],
+  imports: [RouterOutlet, SmartParkingSidebarComponent, SmartParkingFooterComponent, CommonModule],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
-export class LandingComponent implements OnInit, OnDestroy {
+export class SmartParkingLandingComponent implements OnInit, OnDestroy {
   sidebarService = inject(SidebarService);
   authService = inject(AuthService);
   private router = inject(Router);

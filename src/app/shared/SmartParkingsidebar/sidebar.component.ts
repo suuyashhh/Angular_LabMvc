@@ -5,13 +5,13 @@ import { SidebarService } from '../sidebar.service';
 import { AuthService } from '../auth.service';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'app-parking-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
+export class SmartParkingSidebarComponent {
   sidebarService = inject(SidebarService);
   authService = inject(AuthService);
 

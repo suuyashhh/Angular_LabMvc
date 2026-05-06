@@ -10,11 +10,6 @@ export const parkingAuthGuard: CanActivateFn = (route, state) => {
   const publicPages = ['provider-login', 'provider-registration', 'dashboard'];
   const isPublicPage = publicPages.some(page => state.url.includes(page));
 
-  if (auth.getCurrentUser() && !auth.isParkingLoggedIn()) {
-    auth.handleParkingSessionExpired('the user loged in other device', true);
-    return router.createUrlTree(['/Parking/provider-login']);
-  }
-
   if (isPublicPage) {
     if (!auth.getCurrentUser()) {
       return true;
@@ -24,6 +19,11 @@ export const parkingAuthGuard: CanActivateFn = (route, state) => {
       map(() => true),
       catchError(() => of(router.createUrlTree(['/Parking/provider-login'])))
     );
+  }
+
+  if (auth.getCurrentUser() && !auth.isParkingLoggedIn()) {
+    auth.handleParkingSessionExpired('the user loged in other device', true);
+    return router.createUrlTree(['/Parking/provider-login']);
   }
 
   if (!auth.isParkingLoggedIn()) {
