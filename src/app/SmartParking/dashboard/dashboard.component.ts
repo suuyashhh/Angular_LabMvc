@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   checkLocationPermissionStatus() {
-    const status = sessionStorage.getItem('locationRequested');
+    const status = localStorage.getItem('locationRequested');
     if (!status) {
       this.showLocationModal = true;
     }
@@ -173,7 +173,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.displayParkingMarkers();
     
     // Only auto-locate if permission was already handled in this session
-    if (sessionStorage.getItem('locationRequested') === 'granted') {
+    if (localStorage.getItem('locationRequested') === 'granted') {
       this.getCurrentLocation();
     }
   }
@@ -432,12 +432,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   allowLocation() {
     this.showLocationModal = false;
-    sessionStorage.setItem('locationRequested', 'granted');
+    localStorage.setItem('locationRequested', 'granted');
     this.getCurrentLocation();
   }
 
   dismissLocation() {
     this.showLocationModal = false;
-    sessionStorage.setItem('locationRequested', 'denied');
+    localStorage.setItem('locationRequested', 'denied');
   }
 }
