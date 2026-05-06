@@ -19,12 +19,31 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token') || '';
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
+  private isSmartParkingApi(api: string): boolean {
+    return api.startsWith('ParkingLogin/') || api.startsWith('ParkingProvider/');
+  }
+
+  private getAuthToken(api: string): string {
+    if (typeof window === 'undefined') return '';
+
+    if (this.isSmartParkingApi(api)) {
+      return localStorage.getItem('parking_token') || '';
+    }
+
+    return localStorage.getItem('token') || '';
+  }
+
+  private getHeaders(api: string = ''): HttpHeaders {
+    const token = this.getAuthToken(api);
+    const headerConfig: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headerConfig['Authorization'] = `Bearer ${token}`;
+    }
+
+    return new HttpHeaders(headerConfig);
   }
 
   private getComId(): string {
@@ -39,32 +58,38 @@ get(api: string, params: any = {}) {
   if (api.startsWith('http')) {
     return this.http.get(api, { params: params });
   }
-  params['comId'] = this.getComId();
+  if (!this.isSmartParkingApi(api)) {
+    params['comId'] = this.getComId();
+  }
   return this.http.get(this.baseurl + api, {
-    headers: this.getHeaders(),
+    headers: this.getHeaders(api),
     params: params
   });
 }
 
 post(api: string, data: any) {
   const userDetails = JSON.parse(localStorage.getItem('userDetails') || 'null');
-  if (userDetails) {
+  if (userDetails && !this.isSmartParkingApi(api)) {
     data.CRT_BY = userDetails.name || '';
     data.COM_ID = this.getComId();
   }
 
-  return this.http.post(this.baseurl + api, data, { headers: this.getHeaders() });
+  return this.http.post(this.baseurl + api, data, { headers: this.getHeaders(api) });
 }
 
 put(api: string, data: any) {
-  data.COM_ID = this.getComId();
-  return this.http.put(this.baseurl + api, data, { headers: this.getHeaders() });
+  if (!this.isSmartParkingApi(api)) {
+    data.COM_ID = this.getComId();
+  }
+  return this.http.put(this.baseurl + api, data, { headers: this.getHeaders(api) });
 }
 
 delete(api: string, params: any = {}) {
-  params['comId'] = this.getComId();
+  if (!this.isSmartParkingApi(api)) {
+    params['comId'] = this.getComId();
+  }
   return this.http.delete(this.baseurl + api, {
-    headers: this.getHeaders(),
+    headers: this.getHeaders(api),
     params: params
   });
 }
@@ -96,7 +121,7 @@ formatDate(dateString: string): string {
 // Add these methods to your existing ApiService class:
 
 upload(api: string, formData: FormData) {
-  const token = localStorage.getItem('token') || '';
+  const token = this.getAuthToken(api);
   const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
     // Don't set Content-Type for FormData, let browser set it
@@ -106,7 +131,7 @@ upload(api: string, formData: FormData) {
 }
 
 deleteFile(api: string, params: any = {}) {
-  const token = localStorage.getItem('token') || '';
+  const token = this.getAuthToken(api);
   const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
   });
@@ -119,7 +144,7 @@ deleteFile(api: string, params: any = {}) {
 
 /** Post FormData (multipart/form-data) — used by SmartParking parking-provider */
 postFormData(api: string, formData: FormData) {
-  const token = localStorage.getItem('token') || '';
+  const token = this.getAuthToken(api);
   const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
     // Don't set Content-Type for FormData, let browser set it

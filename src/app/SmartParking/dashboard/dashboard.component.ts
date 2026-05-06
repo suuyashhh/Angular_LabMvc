@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   checkLocationPermissionStatus() {
-    const status = sessionStorage.getItem('locationRequested');
+    const status = localStorage.getItem('locationRequested');
     if (!status) {
       this.showLocationModal = true;
     }
@@ -118,6 +118,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   initMap() {
     // Default center on India
+    if (typeof L === 'undefined') {
+      console.error('Leaflet library (L) is not defined. Make sure it is loaded correctly in index.html.');
+      this.toastr.error('Map failed to load. Please check your internet connection or browser settings.');
+      return;
+    }
+
     this.map = L.map('map').setView([20.5937, 78.9629], 5);
     
     setTimeout(() => {
@@ -173,7 +179,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.displayParkingMarkers();
     
     // Only auto-locate if permission was already handled in this session
-    if (sessionStorage.getItem('locationRequested') === 'granted') {
+    if (localStorage.getItem('locationRequested') === 'granted') {
       this.getCurrentLocation();
     }
   }
@@ -196,7 +202,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   displayParkingMarkers() {
     if (!this.map || !this.parkingLocations || !this.parkingLocations.length) return;
 
-    // Clear existing parking markers
+    if (typeof L === 'undefined') return;
+    
+    // Clear existing markers
     this.parkingMarkers.forEach(m => this.map.removeLayer(m));
     this.parkingMarkers = [];
 
@@ -432,12 +440,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   allowLocation() {
     this.showLocationModal = false;
-    sessionStorage.setItem('locationRequested', 'granted');
+    localStorage.setItem('locationRequested', 'granted');
     this.getCurrentLocation();
   }
 
   dismissLocation() {
     this.showLocationModal = false;
-    sessionStorage.setItem('locationRequested', 'denied');
+    localStorage.setItem('locationRequested', 'denied');
   }
 }

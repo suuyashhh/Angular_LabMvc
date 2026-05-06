@@ -4,12 +4,12 @@ import { FooterPortComponent } from '../../shared/footer-port/footer-port.compon
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-landing',
+  selector: 'app-portfolio-landing',
   standalone: true,
   imports: [NavbarPortComponent,FooterPortComponent,RouterOutlet],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
-export class LandingComponent {
+export class PortfolioLandingComponent {
 
 }

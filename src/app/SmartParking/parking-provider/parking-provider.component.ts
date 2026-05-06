@@ -44,18 +44,27 @@ export class ParkingProviderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getLocation();
-    this.loadParkingLocations();
+    this.authService.validateParkingSession(true).subscribe({
+      next: () => {
+        this.getLocation();
+        this.loadParkingLocations();
+      },
+      error: () => {}
+    });
   }
 
   loadParkingLocations() {
     const user = this.authService.getCurrentUser();
-    if (user && user.userid) {
+    const userId = user?.userId ?? user?.userid ?? user?.USERID;
+    if (userId) {
       this.loader.withLoader(
-        this.apiService.get(`ParkingProvider/GetParkingLocations?userId=${user.userid}`)
+        this.apiService.get('ParkingProvider/GetParkingLocations')
       ).subscribe({
         next: (res: any) => { this.parkingList = res; },
         error: (err) => {
+          if (this.handleParkingAuthError(err)) {
+            return;
+          }
           console.error('Error loading spots', err);
           this.toastr.error('Failed to load parking locations');
         }
@@ -217,6 +226,9 @@ export class ParkingProviderComponent implements OnInit {
           this.loadParkingLocations();
         },
         error: (err) => {
+          if (this.handleParkingAuthError(err)) {
+            return;
+          }
           console.error('Error deleting spot', err);
           this.toastr.error('Failed to delete spot: ' + this.apiService.extractErrorMessage(err));
         }
@@ -227,6 +239,8 @@ export class ParkingProviderComponent implements OnInit {
  submitForm() {
     const user = this.authService.getCurrentUser();
     if (!user) { this.toastr.warning('Please login first'); return; }
+    const userId = user?.userId ?? user?.userid ?? user?.USERID;
+    if (!userId) { this.toastr.warning('Please login first'); return; }
 
     const formData = new FormData();
 
@@ -234,7 +248,7 @@ export class ParkingProviderComponent implements OnInit {
       formData.append('Unique_Id', this.parkingData.Unique_Id.toString());
     }
 
-    formData.append('UserId', (user.userid || 0).toString());
+    formData.append('UserId', userId.toString());
     formData.append('VehicalType', this.parkingData.vehicleType);
     formData.append('LatitudeLangitude', `${this.parkingData.latitude},${this.parkingData.longitude}`);
     formData.append('FullAddress', this.parkingData.address);
@@ -264,9 +278,24 @@ export class ParkingProviderComponent implements OnInit {
         this.loadParkingLocations();
       },
       error: (err) => {
+        if (this.handleParkingAuthError(err)) {
+          return;
+        }
         console.error('Error:', err);
         this.toastr.error('Failed: ' + this.apiService.extractErrorMessage(err));
       }
     });
+  }
+
+  private handleParkingAuthError(err: any): boolean {
+    if (err?.status === 401 || err?.status === 403) {
+      this.authService.handleParkingSessionExpired(
+        'the user loged in other device',
+        true
+      );
+      return true;
+    }
+
+    return false;
   }
 }
