@@ -51,7 +51,7 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/lab',
-        android: '../../../assets/APK\'S/Lab.apk'
+        android: '/assets/apks/Lab.apk'
       },
       category: 'webApp'
     },
@@ -69,8 +69,8 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/dairyfarm',
-        android: '../../../assets/APK\'S/DairyFarm.apk',
-        desktop: '../../../assets/DeskTopAPK\'S/Dairy Farm.lnk'
+        android: '/assets/apks/DairyFarm.apk',
+        desktop: '/assets/desktop-files/Dairy-Farm.lnk'
       },
       category: 'webApp'
     },
@@ -88,7 +88,7 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://dairyfarm.revolutionit.in/Fabrication_Admin',
-        android: '../../../assets/APK\'S/Fabrication.apk'
+        android: '/assets/apks/Fabrication.apk'
       },
       category: 'webApp'
     },
@@ -106,7 +106,7 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/farm',
-        android: '../../../assets/APK\'S/Fabrication.apk'
+        android: '/assets/apks/Fabrication.apk'
       },
       category: 'webApp'
     },
@@ -124,7 +124,7 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/parking/dashboard',
-        android: '../../../assets/APK\'S/SmartParking.apk'
+        android: '/assets/apks/SmartParking.apk'
       },
       category: 'webApp'
     },    
