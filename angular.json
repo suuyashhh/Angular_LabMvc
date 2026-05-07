@@ -24,6 +24,11 @@
               "src/favicon.ico",
               "src/assets",
               {
+                "glob": "web.config",
+                "input": "src",
+                "output": "/"
+              },
+              {
                 "glob": "_redirects",
                 "input": "src/assets",
                 "output": "/"
