@@ -111,6 +111,24 @@ export class ProjectsComponent implements OnInit {
       category: 'webApp'
     },
     {
+      id: 'SmartParking',
+      title: 'SmartParking - App',
+      description: 'SmartParking is a Smart City based parking management application developed for a college project',
+      images: [
+        '../../../assets/img/SmartParking/SP1.png',
+        '../../../assets/img/SmartParking/SP4.png',
+        '../../../assets/img/SmartParking/SP2.png',
+        '../../../assets/img/SmartParking/SP3.png'
+      ],
+      tech: ['Angular', 'SQL', '.Net Core', 'Android Studio'],
+      links: {
+        code: 'https://github.com/suuyashhh',
+        demo: 'https://suyashpatil.in/parking/dashboard',
+        android: '../../../assets/APK\'S/SmartParking.apk'
+      },
+      category: 'webApp'
+    },    
+    {
       id: 'portfolio',
       title: 'Lab Website',
       description: 'A modern personal Lab website showcasing my skills and projects.',
