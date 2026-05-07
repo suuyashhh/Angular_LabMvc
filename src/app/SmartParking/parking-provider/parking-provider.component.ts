@@ -128,12 +128,13 @@ export class ParkingProviderComponent implements OnInit {
   }
 
   resetForm() {
+    const user = this.authService.getCurrentUser();
     this.parkingData = {
       Unique_Id: 0,
       latitude: '',
       longitude: '',
       rate: null,
-      contactNumber: '',
+      contactNumber: user?.phone || '',
       address: '',
       vehicleType: '2'
     };
