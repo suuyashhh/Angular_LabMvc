@@ -82,7 +82,7 @@ export class SmartParkingLandingComponent implements OnInit, OnDestroy {
   }
 
   login() {
-    this.router.navigate(['/Parking/provider-login']);
+    this.router.navigate(['/parking/provider-login']);
   }
 
   private validateParkingSession() {

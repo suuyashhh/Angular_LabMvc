@@ -197,7 +197,7 @@ export class ParkingSeekerComponent implements OnInit {
     const lat = coords[0];
     const lng = coords[1];
 
-    this.router.navigate(['/Parking/dashboard'], {
+      this.router.navigate(['/parking/dashboard'], {
       queryParams: { destLat: lat, destLng: lng }
     });
   }

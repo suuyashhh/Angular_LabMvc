@@ -22,14 +22,7 @@ export const parkingAuthGuard: CanActivateFn = (route, state) => {
   const isPublicPage = publicPages.has(currentPath);
 
   if (isPublicPage) {
-    if (!auth.getCurrentUser()) {
-      return true;
-    }
-
-    return auth.validateParkingSession(true).pipe(
-      map(() => true),
-      catchError(() => of(router.createUrlTree(['/parking/provider-login'])))
-    );
+    return true;
   }
 
   if (auth.getCurrentUser() && !auth.isParkingLoggedIn()) {

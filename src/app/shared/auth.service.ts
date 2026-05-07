@@ -371,9 +371,13 @@ clearFarmUserDetailsCookie(): void {
         }
       }),
       catchError((err) => {
-        if (err?.status === 401 || err?.status === 403) {
-          this.handleParkingSessionExpired(this.parkingSessionExpiredMessage, showExpiredToast);
-        }
+        // Clear stale browser session data for any failed validation request.
+        // This prevents repeated validate loops when the backend rejects the token
+        // or the browser blocks the 401 response because of missing CORS headers.
+        const message = err?.status === 401 || err?.status === 403
+          ? this.parkingSessionExpiredMessage
+          : 'Parking session could not be validated. Please login again.';
+        this.clearParkingSession(showExpiredToast, false, message, 'Session Expired');
         return throwError(() => err);
       })
     );
@@ -432,7 +436,7 @@ clearFarmUserDetailsCookie(): void {
     }
 
     if (navigateToLogin) {
-      this.router.navigateByUrl('/Parking/provider-login', { replaceUrl: true });
+      this.router.navigateByUrl('/parking/provider-login', { replaceUrl: true });
     }
   }
 

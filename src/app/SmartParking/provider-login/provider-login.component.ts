@@ -68,7 +68,7 @@ export class ProviderLoginComponent implements OnInit {
 
         // Premium touch: small delay for visual feedback
         setTimeout(() => {
-          this.router.navigate(['/Parking/dashboard']);
+          this.router.navigate(['/parking/dashboard']);
         }, 800);
       },
       error: (err) => {
@@ -81,7 +81,7 @@ export class ProviderLoginComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/Parking']);
+    this.router.navigate(['/parking']);
   }
 
   togglePasswordVisibility() {
