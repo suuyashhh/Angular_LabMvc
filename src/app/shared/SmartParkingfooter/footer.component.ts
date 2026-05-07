@@ -34,10 +34,10 @@ export class SmartParkingFooterComponent {
     const isLoggedIn = this.authService.isParkingLoggedIn();
     
     return [
-      { icon: 'home', label: 'Home', active: this.isActive('/Parking/dashboard'), link: '/Parking/dashboard' },
+      { icon: 'home', label: 'Home', active: this.isActive('/parking/dashboard'), link: '/parking/dashboard' },
       isLoggedIn 
-        ? { icon: 'local_parking', label: 'Provide', active: this.isActive('/Parking/parking-provider'), link: '/Parking/parking-provider' }
-        : { icon: 'search', label: 'Search', active: this.isActive('/Parking/parking-seeker'), link: '/Parking/parking-seeker' },
+        ? { icon: 'local_parking', label: 'Provide', active: this.isActive('/parking/parking-provider'), link: '/parking/parking-provider' }
+        : { icon: 'search', label: 'Search', active: this.isActive('/parking/parking-seeker'), link: '/parking/parking-seeker' },
       { icon: 'menu', label: 'Menu', active: this.sidebarService.isOpen, action: true },
     ];
   }

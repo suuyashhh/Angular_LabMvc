@@ -61,7 +61,7 @@ export class ProviderRegistrationComponent {
         this.toastr.success('Registration successful!', 'Success');
         this.isLoading = false;
         setTimeout(() => {
-          this.router.navigate(['/Parking/provider-login']);
+        this.router.navigate(['/parking/provider-login']);
         }, 1500);
       },
       error: (err) => {

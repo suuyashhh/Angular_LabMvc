@@ -29,6 +29,9 @@ export const PARKING_ROUTES : Routes = [
     {
         path:'parking-seeker',
         loadComponent: () => import('./parking-seeker/parking-seeker.component').then(m => m.ParkingSeekerComponent)
+    },
+    {
+        path:'**',
+        redirectTo:'dashboard'
     }
 ];
-

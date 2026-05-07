@@ -10,10 +10,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const token = authService.getToken();
+  const isBackendApiRequest = req.url.includes('/api/');
   const isSmartParkingProtectedRequest =
-    req.url.includes('/ParkingProvider/') ||
-    req.url.includes('/ParkingLogin/validate') ||
-    req.url.includes('/ParkingLogin/logout');
+    req.url.includes('ParkingProvider/') ||
+    req.url.includes('ParkingLogin/validate') ||
+    req.url.includes('ParkingLogin/logout');
 
   const clonedRequest = req.headers.has('Authorization')
     ? req
@@ -31,6 +32,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         );
       }
 
+      return throwError(() => err);
+    }
+
+    if (!isBackendApiRequest) {
       return throwError(() => err);
     }
 

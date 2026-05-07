@@ -7,31 +7,35 @@ export const parkingAuthGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const publicPages = ['provider-login', 'provider-registration', 'dashboard'];
-  const isPublicPage = publicPages.some(page => state.url.includes(page));
+  const currentPath = ((state.url.split('?')[0] || '/parking').replace(/\/+$/, '') || '/parking').toLowerCase();
+  const publicPages = new Set([
+    '/parking/dashboard',
+    '/parking/provider-login',
+    '/parking/provider-registration',
+    '/parking/parking-seeker'
+  ]);
+
+  if (currentPath === '/parking') {
+    return router.createUrlTree(['/parking/dashboard']);
+  }
+
+  const isPublicPage = publicPages.has(currentPath);
 
   if (isPublicPage) {
-    if (!auth.getCurrentUser()) {
-      return true;
-    }
-
-    return auth.validateParkingSession(true).pipe(
-      map(() => true),
-      catchError(() => of(router.createUrlTree(['/Parking/provider-login'])))
-    );
+    return true;
   }
 
   if (auth.getCurrentUser() && !auth.isParkingLoggedIn()) {
     auth.handleParkingSessionExpired('the user loged in other device', true);
-    return router.createUrlTree(['/Parking/provider-login']);
+    return router.createUrlTree(['/parking/provider-login']);
   }
 
   if (!auth.isParkingLoggedIn()) {
-    return router.createUrlTree(['/Parking/provider-login']);
+    return router.createUrlTree(['/parking/provider-login']);
   }
 
   return auth.validateParkingSession(true).pipe(
     map(() => true),
-    catchError(() => of(router.createUrlTree(['/Parking/provider-login'])))
+    catchError(() => of(router.createUrlTree(['/parking/provider-login'])))
   );
 };
