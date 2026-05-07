@@ -377,7 +377,7 @@ clearFarmUserDetailsCookie(): void {
         const message = err?.status === 401 || err?.status === 403
           ? this.parkingSessionExpiredMessage
           : 'Parking session could not be validated. Please login again.';
-        this.clearParkingSession(showExpiredToast, false, message, 'Session Expired');
+        this.clearParkingSession(showExpiredToast, true, message, 'Session Expired');
         return throwError(() => err);
       })
     );
@@ -436,7 +436,7 @@ clearFarmUserDetailsCookie(): void {
     }
 
     if (navigateToLogin) {
-      this.router.navigateByUrl('/parking/provider-login', { replaceUrl: true });
+      this.router.navigateByUrl('/parking/dashboard', { replaceUrl: true });
     }
   }
 
