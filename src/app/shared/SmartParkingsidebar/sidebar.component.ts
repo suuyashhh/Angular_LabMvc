@@ -5,13 +5,13 @@ import { SidebarService } from '../sidebar.service';
 import { AuthService } from '../auth.service';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'app-parking-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
+export class SmartParkingSidebarComponent {
   sidebarService = inject(SidebarService);
   authService = inject(AuthService);
 
@@ -40,11 +40,11 @@ export class SidebarComponent {
   activeTab: string = 'categories';
 
   categories = [
-    { name: 'Dashboard', icon: 'dashboard', link: '/Parking/dashboard', hasSub: false },
-    { name: 'Provide Parking', icon: 'local_parking', link: '/Parking/parking-provider', hasSub: false },
+    { name: 'Dashboard', icon: 'dashboard', link: '/parking/dashboard', hasSub: false },
+    { name: 'Provide Parking', icon: 'local_parking', link: '/parking/parking-provider', hasSub: false },
     { name: 'Parking History', icon: 'history', hasSub: false },
     { name: 'Support', icon: 'help_outline', hasSub: false },
-    { name: 'Login', icon: 'login', link: '/Parking/provider-login', hasSub: false }
+    { name: 'Login', icon: 'login', link: '/parking/provider-login', hasSub: false }
   ];
 
 }

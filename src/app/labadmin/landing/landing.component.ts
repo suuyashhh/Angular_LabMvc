@@ -7,7 +7,7 @@ import { SidebarComponent } from "../../shared/sidebar/sidebar.component";
 import { FooterComponent } from "../../shared/footer/footer.component";
 
 @Component({
-  selector: 'app-landing',
+  selector: 'app-labadmin-landing',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,7 +19,7 @@ import { FooterComponent } from "../../shared/footer/footer.component";
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css']
 })
-export class LandingComponent implements OnInit {
+export class LabAdminLandingComponent implements OnInit {
   user: any;
   isSidebarVisible: boolean = false;
 

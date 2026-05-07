@@ -1,23 +1,41 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { catchError, map, of } from 'rxjs';
 
 export const parkingAuthGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  // Allow access to public pages without authentication
-  const publicPages = ['provider-login', 'provider-registration', 'dashboard'];
-  if (publicPages.some(page => state.url.includes(page))) {
+  const currentPath = ((state.url.split('?')[0] || '/parking').replace(/\/+$/, '') || '/parking').toLowerCase();
+  const publicPages = new Set([
+    '/parking/dashboard',
+    '/parking/provider-login',
+    '/parking/provider-registration',
+    '/parking/parking-seeker'
+  ]);
+
+  if (currentPath === '/parking') {
+    return router.createUrlTree(['/parking/dashboard']);
+  }
+
+  const isPublicPage = publicPages.has(currentPath);
+
+  if (isPublicPage) {
     return true;
   }
 
-  // Check if user is logged in (has 'parking_user' in session)
-  if (auth.isParkingLoggedIn()) {
-    return true;
-  } else {
-    // If not logged in and trying to access private page, redirect to login
-    router.navigate(['/Parking/provider-login']);
-    return false;
+  if (auth.getCurrentUser() && !auth.isParkingLoggedIn()) {
+    auth.handleParkingSessionExpired('the user loged in other device', true);
+    return router.createUrlTree(['/parking/provider-login']);
   }
+
+  if (!auth.isParkingLoggedIn()) {
+    return router.createUrlTree(['/parking/provider-login']);
+  }
+
+  return auth.validateParkingSession(true).pipe(
+    map(() => true),
+    catchError(() => of(router.createUrlTree(['/parking/provider-login'])))
+  );
 };

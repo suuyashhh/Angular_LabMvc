@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../shared/auth.service';
@@ -14,7 +14,7 @@ import { LoaderService } from '../../services/loader.service';
   templateUrl: './provider-login.component.html',
   styleUrls: ['./provider-login.component.css']
 })
-export class ProviderLoginComponent {
+export class ProviderLoginComponent implements OnInit {
   private router = inject(Router);
   private apiService = inject(ApiService);
   private authService = inject(AuthService);
@@ -33,6 +33,15 @@ export class ProviderLoginComponent {
   };
 
   currentYear = new Date().getFullYear();
+
+  ngOnInit() {
+    this.authService.clearParkingClientSessionOnly();
+    this.loginData = {
+      phone: '',
+      password: '',
+      remember: true
+    };
+  }
 
   onLogin() {
     if (!this.loginData.phone || !this.loginData.password) {
@@ -59,7 +68,7 @@ export class ProviderLoginComponent {
 
         // Premium touch: small delay for visual feedback
         setTimeout(() => {
-          this.router.navigate(['/Parking/dashboard']);
+          this.router.navigate(['/parking/dashboard']);
         }, 800);
       },
       error: (err) => {
@@ -72,7 +81,7 @@ export class ProviderLoginComponent {
   }
 
   goBack() {
-    this.router.navigate(['/Parking']);
+    this.router.navigate(['/parking']);
   }
 
   togglePasswordVisibility() {

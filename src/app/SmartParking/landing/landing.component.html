@@ -9,7 +9,7 @@
             <img src="../../assets/img/avatars/1.png" alt="User Avatar" class="avatar-img">
             <span class="status-indicator online"></span>
           </div>
-          <span class="user-name-label">{{ user?.userName || user?.name || 'Guest User' }}</span>
+          <span class="user-name-label">{{ user?.name || user?.userName || 'Guest User' }}</span>
           <i class="ri-arrow-down-s-line trigger-icon"></i>
         </button>
 
@@ -20,7 +20,7 @@
               <span class="status-indicator online"></span>
             </div>
             <div class="user-info-container">
-              <h6 class="mb-0 user-full-name">{{ user?.userName || user?.name || 'Guest User' }}</h6>
+              <h6 class="mb-0 user-full-name">{{ user?.name || user?.userName || 'Guest User' }}</h6>
               <small class="text-muted">{{ user?.role || 'User' }}</small>
             </div>
           </li>
@@ -45,11 +45,11 @@
           </li>
           <li><hr class="dropdown-divider mx-3"></li>
           <li class="px-3 py-2">
-            <button *ngIf="user?.userName !== 'Guest'" class="btn btn-logout w-100 d-flex align-items-center justify-content-center" (click)="logout()">
+            <button *ngIf="user?.userId" class="btn btn-logout w-100 d-flex align-items-center justify-content-center" (click)="logout()">
               <i class="ri-logout-box-r-line me-2"></i>
               <span>Logout</span>
             </button>
-            <button *ngIf="user?.userName === 'Guest'" class="btn btn-login w-100 d-flex align-items-center justify-content-center" (click)="login()">
+            <button *ngIf="!user?.userId" class="btn btn-login w-100 d-flex align-items-center justify-content-center" (click)="login()">
               <i class="ri-login-box-line me-2"></i>
               <span>Login</span>
             </button>
@@ -59,11 +59,11 @@
     </div>
   </header>
 
-  <app-sidebar></app-sidebar>
+  <app-parking-sidebar></app-parking-sidebar>
   
   <main class="content-area">
     <router-outlet></router-outlet>
   </main>
 
-  <app-footer></app-footer>
+  <app-parking-footer></app-parking-footer>
 </div>
