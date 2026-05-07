@@ -1,7 +1,8 @@
 <div class="dashboard-wrapper">
     <div class="map-container">
-        <!-- Floating Google Maps search UI -->
-        <div class="map-search-overlay">
+
+        <!-- ✅ Hide search when modal is open OR when a popup is open -->
+        <div class="map-search-overlay" *ngIf="!showLocationModal && !isPopupOpen">
             <div class="search-box" [class.active]="isDirectionsMode">
                 <input type="text" 
                        [(ngModel)]="searchQuery" 

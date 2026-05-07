@@ -50,5 +50,11 @@ export const routes: Routes = [
     canActivate: [parkingAuthGuard],
     loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.SmartParkingLandingComponent),
     loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
+  },
+  {
+    path: 'parking',
+    canActivate: [parkingAuthGuard],
+    loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.SmartParkingLandingComponent),
+    loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
   }
 ];

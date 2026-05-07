@@ -26,7 +26,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   searchQuery: string = '';
   isDirectionsMode: boolean = false;
   routeInfo: { distance: string, duration: string } | null = null;
-  
+  isPopupOpen: boolean = false; // ✅ NEW FLAG
+
   private map: any;
   private userMarker: any = null;
   private destinationMarker: any = null;
@@ -59,7 +60,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   checkLocationPermissionStatus() {
-    const status = localStorage.getItem('locationRequested');
+    const status = sessionStorage.getItem('locationRequested');
     if (!status) {
       this.showLocationModal = true;
     }
@@ -76,7 +77,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       }, 500);
     }
 
-    // Listen for directions button clicks from markers
     window.addEventListener('getDirections', (e: any) => {
       const { lat, lng, address } = e.detail;
       this.handleDirectionsFromPopup(lat, lng, address);
@@ -109,23 +109,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       .openPopup();
 
     this.map.flyTo([this.pendingCoords.lat, this.pendingCoords.lng], 15);
-    
-    // Check if user location is already available
+
     if (this.userLocation) {
       this.getDirections(true);
     }
   }
 
   initMap() {
-    // Default center on India
-    if (typeof L === 'undefined') {
-      console.error('Leaflet library (L) is not defined. Make sure it is loaded correctly in index.html.');
-      this.toastr.error('Map failed to load. Please check your internet connection or browser settings.');
-      return;
-    }
-
     this.map = L.map('map').setView([20.5937, 78.9629], 5);
-    
+
     setTimeout(() => {
       this.map.invalidateSize();
     }, 100);
@@ -134,7 +126,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // ✅ 4-Wheeler / Car — Google Maps style location pin with Material Icon car inside (blue)
+    // ✅ Close popup on map click → resets isPopupOpen
+    this.map.on('click', () => {
+      this.isPopupOpen = false;
+    });
+
     this.carIcon = L.divIcon({
       className: '',
       html: `<div style="position:relative;width:42px;height:52px;display:flex;flex-direction:column;align-items:center;">
@@ -148,7 +144,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       popupAnchor: [0, -52]
     });
 
-    // ✅ 2-Wheeler / Bike — same blue Google Maps style pin with Material Icon motorcycle
     this.bikeIcon = L.divIcon({
       className: '',
       html: `<div style="position:relative;width:42px;height:52px;display:flex;flex-direction:column;align-items:center;">
@@ -162,7 +157,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       popupAnchor: [0, -52]
     });
 
-    // ✅ Default parking icon — grey pin with P letter
     this.defaultIcon = L.divIcon({
       className: '',
       html: `<div style="position:relative;width:42px;height:52px;display:flex;flex-direction:column;align-items:center;">
@@ -177,9 +171,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     });
 
     this.displayParkingMarkers();
-    
-    // Only auto-locate if permission was already handled in this session
-    if (localStorage.getItem('locationRequested') === 'granted') {
+
+    if (sessionStorage.getItem('locationRequested') === 'granted') {
       this.getCurrentLocation();
     }
   }
@@ -202,16 +195,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   displayParkingMarkers() {
     if (!this.map || !this.parkingLocations || !this.parkingLocations.length) return;
 
-    if (typeof L === 'undefined') return;
-    
-    // Clear existing markers
     this.parkingMarkers.forEach(m => this.map.removeLayer(m));
     this.parkingMarkers = [];
 
     const group = L.featureGroup();
 
     this.parkingLocations.forEach(loc => {
-      // Handle both camelCase and PascalCase from API response
       const latLngStr = loc.latitudeLangitude || loc.LatitudeLangitude;
       const fullAddress = loc.fullAddress || loc.FullAddress || 'Parking Spot';
       const price = loc.price || loc.Price || 'N/A';
@@ -225,10 +214,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           const lng = parseFloat(coords[1].trim());
 
           if (!isNaN(lat) && !isNaN(lng)) {
-            // ✅ Determine icon based on vehicle type
-            // vehicalType === '2' → 2-Wheeler → bikeIcon (motorcycle)
-            // vehicalType === '4' → 4-Wheeler → carIcon
-            // anything else      → defaultIcon (red P pin)
             let customIcon = this.defaultIcon;
             if (vehicalType === '2') customIcon = this.bikeIcon;
             else if (vehicalType === '4') customIcon = this.carIcon;
@@ -249,6 +234,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                   </button>
                 </div>
               `);
+
+            // ✅ Track popup open/close state
+            marker.on('popupopen', () => {
+              this.isPopupOpen = true;
+            });
+            marker.on('popupclose', () => {
+              this.isPopupOpen = false;
+            });
+
             this.parkingMarkers.push(marker);
             group.addLayer(marker);
           }
@@ -256,7 +250,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // Zoom to fit all markers if there are any
     if (this.parkingMarkers.length > 0) {
       this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
     }
@@ -270,10 +263,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     if (this.isDirectionsMode) {
       this.stopDirections();
     }
-    
+
     if (this.routeLayer) {
-        this.map.removeLayer(this.routeLayer);
-        this.routeLayer = null;
+      this.map.removeLayer(this.routeLayer);
+      this.routeLayer = null;
     }
 
     if (!this.searchQuery.trim()) return;
@@ -286,7 +279,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           const lat = parseFloat(data[0].lat);
           const lon = parseFloat(data[0].lon);
           this.map.flyTo([lat, lon], 15);
-          
+
           if (this.destinationMarker) {
             this.map.removeLayer(this.destinationMarker);
           }
@@ -303,65 +296,64 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   getDirections(fitBounds: boolean = true) {
-      if (!this.destinationMarker) {
-         this.toastr.warning("Please search for a destination first!");
-         return;
-      }
-      if (!this.userLocation) {
-         this.toastr.warning("Your live location is not available. Please allow location access or click the 'My Location' button.");
-         return;
-      }
+    if (!this.destinationMarker) {
+      this.toastr.warning("Please search for a destination first!");
+      return;
+    }
+    if (!this.userLocation) {
+      this.toastr.warning("Your live location is not available. Please allow location access or click the 'My Location' button.");
+      return;
+    }
 
-      this.isDirectionsMode = true;
+    this.isDirectionsMode = true;
 
-      const destLat = this.destinationMarker.getLatLng().lat;
-      const destLon = this.destinationMarker.getLatLng().lng;
-      
-      const startLat = this.userLocation.lat;
-      const startLon = this.userLocation.lng;
+    const destLat = this.destinationMarker.getLatLng().lat;
+    const destLon = this.destinationMarker.getLatLng().lng;
+    const startLat = this.userLocation.lat;
+    const startLon = this.userLocation.lng;
 
-      this.apiService.get(`https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${destLon},${destLat}?overview=full&geometries=geojson`).subscribe({
-        next: (data: any) => {
-            if (this.routeLayer) {
-              this.map.removeLayer(this.routeLayer);
-            }
-            if (data.routes && data.routes.length > 0) {
-               const route = data.routes[0];
-               this.routeLayer = L.geoJSON(route.geometry, {
-                  style: { color: '#1a73e8', weight: 5, opacity: 0.8 }
-               }).addTo(this.map);
-
-               if (fitBounds) {
-                   this.map.fitBounds(this.routeLayer.getBounds(), { padding: [50, 50] });
-               }
-
-               const distKm = (route.distance / 1000).toFixed(1);
-               const durMin = Math.ceil(route.duration / 60);
-               this.routeInfo = {
-                   distance: `${distKm} km`,
-                   duration: `${durMin} min`
-               };
-            }
-        },
-        error: (err: any) => {
-          console.error("OSRM Route Error", err);
-          this.toastr.error("Failed to calculate route.");
+    this.apiService.get(`https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${destLon},${destLat}?overview=full&geometries=geojson`).subscribe({
+      next: (data: any) => {
+        if (this.routeLayer) {
+          this.map.removeLayer(this.routeLayer);
         }
-      });
+        if (data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          this.routeLayer = L.geoJSON(route.geometry, {
+            style: { color: '#1a73e8', weight: 5, opacity: 0.8 }
+          }).addTo(this.map);
+
+          if (fitBounds) {
+            this.map.fitBounds(this.routeLayer.getBounds(), { padding: [50, 50] });
+          }
+
+          const distKm = (route.distance / 1000).toFixed(1);
+          const durMin = Math.ceil(route.duration / 60);
+          this.routeInfo = {
+            distance: `${distKm} km`,
+            duration: `${durMin} min`
+          };
+        }
+      },
+      error: (err: any) => {
+        console.error("OSRM Route Error", err);
+        this.toastr.error("Failed to calculate route.");
+      }
+    });
   }
 
   stopDirections() {
-      this.isDirectionsMode = false;
-      this.routeInfo = null;
-      this.showRouteCard = true;
-      this.pendingCoords = null; // Clear pending state
-      if (this.routeLayer) {
-          this.map.removeLayer(this.routeLayer);
-          this.routeLayer = null;
-      }
-      if (this.userLocation) {
-          this.map.setView([this.userLocation.lat, this.userLocation.lng], 15);
-      }
+    this.isDirectionsMode = false;
+    this.routeInfo = null;
+    this.showRouteCard = true;
+    this.pendingCoords = null;
+    if (this.routeLayer) {
+      this.map.removeLayer(this.routeLayer);
+      this.routeLayer = null;
+    }
+    if (this.userLocation) {
+      this.map.setView([this.userLocation.lat, this.userLocation.lng], 15);
+    }
   }
 
   getCurrentLocation() {
@@ -399,19 +391,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
         this.map.flyTo([lat, lng], 16);
 
-        // Auto-start directions if coming from Seeker component and route not yet calculated
         if (this.pendingCoords && !this.routeInfo) {
           this.getDirections(true);
         }
 
-        // Live update route actively if moving towards destination
         if (this.isDirectionsMode && this.destinationMarker) {
           this.getDirections(false);
         }
       },
       (error) => {
         console.warn("Geolocation error:", error);
-        switch(error.code) {
+        switch (error.code) {
           case error.PERMISSION_DENIED:
             this.toastr.error("Permission denied. Please enable location in your device settings.");
             break;
@@ -440,12 +430,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   allowLocation() {
     this.showLocationModal = false;
-    localStorage.setItem('locationRequested', 'granted');
+    sessionStorage.setItem('locationRequested', 'granted');
     this.getCurrentLocation();
   }
 
   dismissLocation() {
     this.showLocationModal = false;
-    localStorage.setItem('locationRequested', 'denied');
+    sessionStorage.setItem('locationRequested', 'denied');
   }
 }
