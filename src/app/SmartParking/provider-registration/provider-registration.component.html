@@ -1,126 +1,97 @@
-<div class="registration-page-wrapper">
-  <!-- Left Side: Visual Branding -->
-  <aside class="branding-section">
-    <div class="branding-overlay"></div>
-    <div class="branding-content">
-      <div class="brand-badge animate-fade-down">
-         <span class="material-icons-outlined">local_parking</span>
-         <span>SMART PARKING <strong>PARTNER</strong></span>
-      </div>
-      <h1 class="animate-fade-up">Join the future of <br> smart parking.</h1>
-      <p class="animate-fade-up-slow">Start managing your parking assets with our powerful platform. Increase efficiency and boost your revenue today.</p>
-      
-      <div class="brand-features animate-fade-up-slower">
-        <div class="feature-item">
-          <span class="material-icons-outlined">insights</span>
-          <div class="feature-text">
-            <strong>Real-time Analytics</strong>
-            <span>Track every slot and every rupee.</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="material-icons-outlined">security</span>
-          <div class="feature-text">
-            <strong>Secure Payments</strong>
-            <span>Direct and encrypted transactions.</span>
-          </div>
-        </div>
-        <div class="feature-item">
-          <span class="material-icons-outlined">support_agent</span>
-          <div class="feature-text">
-            <strong>Dedicated Support</strong>
-            <span>We help you grow your business.</span>
-          </div>
-        </div>
-      </div>
+<section class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-badge">
+      <span class="material-icons-outlined">storefront</span>
+      <span>Partner Registration</span>
     </div>
-  </aside>
 
-  <!-- Right Side: Registration Form -->
-  <main class="auth-section">
-    <div class="auth-card animate-zoom-in">
-      <header class="auth-card-header">
-        <h2>Create Provider Account</h2>
-        <p>Enter your details to start your journey with us.</p>
-      </header>
+    <header class="auth-header">
+      <h1>Create Provider Account</h1>
+    </header>
 
-      <!-- Error Message -->
-      <div class="error-banner" *ngIf="errorMessage">
-        <span class="material-icons-outlined">error_outline</span>
-        <span>{{ errorMessage }}</span>
+    <div class="error-banner" *ngIf="errorMessage">
+      <span class="material-icons-outlined">error_outline</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="onRegister()" #regForm="ngForm" class="auth-form">
+      <div class="field-grid">
+        <div class="field-block">
+          <label for="name">Full Name</label>
+          <div class="field-control">
+            <span class="material-icons-outlined field-icon">person</span>
+            <input id="name" type="text" name="name" [(ngModel)]="regData.NAME" required placeholder="Enter full name" />
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label for="phone">Phone Number</label>
+          <div class="field-control">
+            <span class="material-icons-outlined field-icon">phone</span>
+            <input id="phone" type="tel" name="phone" [(ngModel)]="regData.PHONE" required placeholder="Enter phone number" />
+          </div>
+        </div>
       </div>
 
-      <form (ngSubmit)="onRegister()" #regForm="ngForm" class="auth-form">
-        <div class="input-grid">
-          <div class="input-group">
-            <label for="name">Full Name</label>
-            <div class="input-wrapper">
-              <span class="material-icons-outlined field-icon">person</span>
-              <input id="name" type="text" name="name" [(ngModel)]="regData.NAME" required placeholder="John Doe" />
-            </div>
-          </div>
+      <div class="field-block">
+        <label for="email">Email Address</label>
+        <div class="field-control">
+          <span class="material-icons-outlined field-icon">mail</span>
+          <input id="email" type="email" name="email" [(ngModel)]="regData.EMAIL" required placeholder="Enter email address" />
+        </div>
+      </div>
 
-          <div class="input-group">
-            <label for="phone">Phone Number</label>
-            <div class="input-wrapper">
-              <span class="material-icons-outlined field-icon">phone</span>
-              <input id="phone" type="tel" name="phone" [(ngModel)]="regData.PHONE" required placeholder="+91 98765 43210" />
-            </div>
+      <div class="field-grid">
+        <div class="field-block">
+          <label for="password">Password</label>
+          <div class="field-control">
+            <span class="material-icons-outlined field-icon">lock</span>
+            <input
+              id="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              name="password"
+              [(ngModel)]="regData.PASS"
+              required
+              placeholder="Create a password"
+            />
+            <button class="toggle-visibility" type="button" (click)="togglePasswordVisibility()" aria-label="Toggle password visibility">
+              <span class="material-icons-outlined">{{ hidePassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
           </div>
         </div>
 
-        <div class="input-group">
-          <label for="email">Email Address</label>
-          <div class="input-wrapper">
-            <span class="material-icons-outlined field-icon">email</span>
-            <input id="email" type="email" name="email" [(ngModel)]="regData.EMAIL" required placeholder="john@example.com" />
+        <div class="field-block">
+          <label for="confirmPass">Confirm Password</label>
+          <div class="field-control">
+            <span class="material-icons-outlined field-icon">verified_user</span>
+            <input
+              id="confirmPass"
+              [type]="hidePassword ? 'password' : 'text'"
+              name="confirmPass"
+              [(ngModel)]="regData.confirmPass"
+              required
+              placeholder="Re-enter password"
+            />
           </div>
         </div>
+      </div>
 
-        <div class="input-grid">
-          <div class="input-group">
-            <label for="password">Password</label>
-            <div class="input-wrapper">
-              <span class="material-icons-outlined field-icon">lock</span>
-              <input id="password" [type]="hidePassword ? 'password' : 'text'" name="password" [(ngModel)]="regData.PASS" required placeholder="••••••••" />
-              <button class="password-toggle" type="button" (click)="togglePasswordVisibility()">
-                <span class="material-icons-outlined">{{ hidePassword ? 'visibility' : 'visibility_off' }}</span>
-              </button>
-            </div>
-          </div>
+      <label class="terms-choice">
+        <input type="checkbox" name="terms" required />
+        <span>I agree to the <a href="javascript:void(0)">Terms of Service</a> and <a href="javascript:void(0)">Privacy Policy</a>.</span>
+      </label>
 
-          <div class="input-group">
-            <label for="confirmPass">Confirm Password</label>
-            <div class="input-wrapper">
-              <span class="material-icons-outlined field-icon">lock_reset</span>
-              <input id="confirmPass" [type]="hidePassword ? 'password' : 'text'" name="confirmPass" [(ngModel)]="regData.confirmPass" required placeholder="••••••••" />
-            </div>
-          </div>
-        </div>
+      <button type="submit" class="submit-button" [disabled]="!regForm.form.valid || isLoading">
+        <span *ngIf="isLoading" class="loader"></span>
+        <span>{{ isLoading ? 'Creating Account...' : 'Create Account' }}</span>
+      </button>
+    </form>
 
-        <div class="form-terms">
-          <label class="custom-checkbox">
-            <input type="checkbox" name="terms" required />
-            <span class="checkbox-box"></span>
-            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
-          </label>
-        </div>
+    <footer class="auth-footer">
+      <p>Already have an account?</p>
+      <a routerLink="/parking/provider-login">Sign in here</a>
+    </footer>
+  </div>
 
-        <button type="submit" class="primary-btn" [disabled]="!regForm.form.valid || isLoading">
-          <span *ngIf="isLoading" class="spinner"></span>
-          <span>{{ isLoading ? 'Creating Account...' : 'Register as Provider' }}</span>
-          <span *ngIf="!isLoading" class="material-icons-outlined">how_to_reg</span>
-        </button>
-      </form>
-
-      <footer class="auth-card-footer">
-          <p>Already have an account? <a routerLink="/parking/provider-login">Sign In instead</a></p>
-      </footer>
-    </div>
-    
-    <div class="auth-legal-footer">
-       <span>&copy; {{ currentYear }} Smart Parking Inc.</span>
-       <span>Empowering parking owners worldwide.</span>
-    </div>
-  </main>
-</div>
+  <p class="auth-legal">&copy; {{ currentYear }} Smart Parking. Built for modern parking providers.</p>
+</section>
