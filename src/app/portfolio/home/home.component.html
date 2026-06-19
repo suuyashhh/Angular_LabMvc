@@ -406,8 +406,8 @@
 
     <!-- Featured Projects Section -->
     <div
-      class="pt-8 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left w-full max-w-xl mx-auto mt-8">
-      <div class="flex items-center space-x-2.5 mb-6">
+      class="pt-8 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left w-full max-w-xl md:max-w-4xl mx-auto mt-8">
+      <div class="flex items-center space-x-2.5 mb-6 max-w-xl mx-auto md:max-w-none">
         <!-- Project Icon -->
         <span class="text-xl">💻</span>
         <h2 class="text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50">
@@ -415,73 +415,81 @@
         </h2>
       </div>
 
-      <!-- Projects Cards Container -->
-      <div class="space-y-6">
+      <!-- Projects Grid Container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl md:max-w-none mx-auto">
         
         <!-- Loop over the first 2 projects -->
         <div *ngFor="let project of projects"
-          class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row">
+          class="bg-white border border-dashed border-zinc-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md hover:border-zinc-300 transition-all duration-300 flex flex-col group">
           
-          <!-- Image Thumbnail with Carousel Controls -->
-          <div (click)="openImagePreview(project)"
-               class="relative w-full sm:w-40 h-40 sm:h-auto shrink-0 bg-zinc-50 border-b sm:border-b-0 sm:border-r border-dashed border-zinc-150 cursor-pointer overflow-hidden group select-none">
-            <img [src]="project.images[currentImageIndex[project.id]]" [alt]="project.title" 
-                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          <!-- Image Carousel Area (Vertical Card Top) -->
+          <div class="relative h-48 sm:h-56 overflow-hidden cursor-pointer bg-zinc-50 border-b border-dashed border-zinc-150"
+               (click)="openImagePreview(project)">
+
+            <img *ngFor="let image of project.images; let i = index"
+                 [src]="image"
+                 [alt]="project.title"
+                 [class.opacity-100]="currentImageIndex[project.id] === i"
+                 [class.opacity-0]="currentImageIndex[project.id] !== i"
+                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300">
             
-            <!-- Carousel Navigation Controls -->
+            <!-- Carousel Controls -->
             <button
               *ngIf="project.images.length > 1"
               (click)="prevImage(project.id); $event.stopPropagation()"
-              class="absolute top-1/2 left-2.5 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
+              class="absolute top-1/2 left-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
               aria-label="Previous image">
-              <i class="fas fa-chevron-left text-[9px]"></i>
+              <i class="fas fa-chevron-left text-xs"></i>
             </button>
 
             <button
               *ngIf="project.images.length > 1"
               (click)="nextImage(project.id); $event.stopPropagation()"
-              class="absolute top-1/2 right-2.5 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
+              class="absolute top-1/2 right-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
               aria-label="Next image">
-              <i class="fas fa-chevron-right text-[9px]"></i>
+              <i class="fas fa-chevron-right text-xs"></i>
             </button>
 
-            <!-- Zoom overlay -->
-            <div class="absolute inset-0 bg-zinc-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-              <i class="fas fa-magnifying-glass-plus text-white text-base drop-shadow-md"></i>
+            <!-- Click to preview indicator -->
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-zinc-950/75 backdrop-blur-sm text-white px-3.5 py-1.5 rounded-full text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1.5 shadow-md z-10">
+              <i class="fas fa-magnifying-glass-plus text-[10px]"></i> Zoom Project
             </div>
           </div>
 
-          <!-- Content Details -->
+          <!-- Details Area -->
           <div class="p-5 flex-grow flex flex-col justify-between">
             <div>
-              <h3 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-tight mb-1.5">
+              <h3 class="text-lg font-bold text-zinc-900 group-hover:text-zinc-950 transition-colors leading-snug mb-2">
                 {{ project.title }}
               </h3>
-              <p class="text-xs sm:text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 mb-4 line-clamp-2">
+              <p class="text-xs sm:text-sm text-zinc-500 font-medium leading-relaxed mb-4 line-clamp-2">
                 {{ project.description }}
               </p>
             </div>
 
             <div>
+              <!-- Tech tags -->
               <div class="flex flex-wrap gap-1.5 mb-4">
                 <span *ngFor="let tech of project.tech"
-                      class="px-2 py-0.5 text-[10px] sm:text-xs font-semibold bg-zinc-50 dark:bg-zinc-800 border border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-650 dark:text-zinc-300 rounded-full">
+                      class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold bg-zinc-50 border border-dashed border-zinc-200 text-zinc-650 rounded-full shadow-sm">
                   {{ tech }}
                 </span>
               </div>
 
-              <div class="flex gap-2">
+              <!-- Links -->
+              <div class="grid grid-cols-2 gap-2 mt-auto">
                 <a [href]="project.links.code" target="_blank" rel="noopener"
-                   class="flex-1 py-1.5 bg-zinc-50 dark:bg-zinc-800 border border-dashed border-zinc-200 dark:border-zinc-700 text-center text-zinc-700 dark:text-zinc-300 text-xs font-semibold rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer">
-                  <i class="fas fa-code text-[10px]"></i> <span>Code</span>
+                   class="py-2 bg-zinc-50 border border-dashed border-zinc-200 text-center text-zinc-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                  <i class="fas fa-code text-[11px] sm:text-xs"></i> <span>Code</span>
                 </a>
                 <a [href]="project.links.demo" target="_blank" rel="noopener"
-                   class="flex-1 py-1.5 bg-zinc-950 dark:bg-zinc-50 text-center text-zinc-50 dark:text-zinc-950 text-xs font-semibold rounded-xl hover:bg-zinc-900 dark:hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer">
-                  <i class="fas fa-arrow-up-right-from-square text-[9px]"></i> <span>Demo</span>
+                   class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                  <i class="fas fa-arrow-up-right-from-square text-[10px] sm:text-[11px]"></i> <span>Demo</span>
                 </a>
               </div>
             </div>
           </div>
+
         </div>
 
       </div>
