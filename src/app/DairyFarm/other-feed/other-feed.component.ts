@@ -49,12 +49,14 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   dairyUserId: number = 0;
   isLoading: boolean = false;
 
-  // Image Upload
+  // Image Upload with Compression
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   isUploadingImage: boolean = false;
   imageError: string = '';
   previewImageUrl: string = '';
+  imageSize: string = '';
+  compressingImage: boolean = false;
 
   // Button loading states
   isSaving: boolean = false;
@@ -102,70 +104,122 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-  // ==================== IMAGE UPLOAD METHODS ====================
-  onImageSelected(event: any): void {
+  // ==================== IMAGE UPLOAD METHODS WITH COMPRESSION ====================
+  async onImageSelected(event: any): Promise<void> {
     const file = event.target.files[0];
 
     if (!file) {
       return;
     }
 
-    // Validate file size (1MB max)
-    if (file.size > 1 * 1024 * 1024) {
-      this.imageError = 'Image size should be less than 1MB';
-      this.selectedFile = null;
-      this.imagePreview = null;
+    this.compressingImage = true;
+    this.imageSize = this.formatFileSize(file.size);
+
+    // Check file type
+    if (!file.type.match(/image\/(jpeg|png|jpg)/)) {
+      this.imageError = 'Only JPG, JPEG, and PNG images are allowed';
+      this.compressingImage = false;
       return;
     }
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    if (!validTypes.includes(file.type)) {
-      this.imageError = 'Only JPG, PNG, and GIF images are allowed';
-      this.selectedFile = null;
-      this.imagePreview = null;
+    // Check initial size (allow up to 10MB for compression)
+    if (file.size > 10 * 1024 * 1024) {
+      this.imageError = 'File size must be less than 10MB';
+      this.compressingImage = false;
       return;
     }
 
-    this.imageError = '';
-    this.selectedFile = file;
+    try {
+      // Show compressing message
+      this.imageError = 'Compressing image...';
 
-    // Create preview and compress if needed
-    this.compressAndPreviewImage(file);
+      // Compress the image
+      const compressedFile = await this.compressImageTo1MB(file);
+
+      if (!compressedFile) {
+        throw new Error('Compression failed');
+      }
+
+      // Read the compressed file
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+        this.imageError = '';
+        this.compressingImage = false;
+
+        // Show compressed size
+        const compressedSize = this.formatFileSize(compressedFile.size);
+        this.imageSize = `${this.formatFileSize(file.size)} → ${compressedSize} (compressed)`;
+
+        // Store the FULL Base64 data URL (with prefix) in the form
+        this.feedForm.patchValue({
+          feedImage: e.target.result
+        });
+      };
+
+      reader.onerror = () => {
+        this.imageError = 'Failed to read compressed image';
+        this.compressingImage = false;
+      };
+
+      reader.readAsDataURL(compressedFile);
+
+    } catch (error: any) {
+      console.error('Image compression error:', error);
+      this.imageError = error.message || 'Failed to compress image';
+      this.compressingImage = false;
+
+      // Fallback: use original image if compression fails but size is small
+      if (file.size <= 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.imagePreview = e.target.result;
+          this.imageError = 'Using original image (already under 1MB)';
+          // Store the FULL Base64 data URL (with prefix) in the form
+          this.feedForm.patchValue({
+            feedImage: e.target.result
+          });
+        };
+        reader.readAsDataURL(file);
+        this.compressingImage = false;
+      }
+    }
   }
 
-  compressAndPreviewImage(file: File): void {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
+  // Main compression function - optimized for reliability
+  compressImageTo1MB(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
       const img = new Image();
-      img.src = e.target.result;
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        img.src = e.target.result;
+      };
 
       img.onload = () => {
-        // Create canvas for compression
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
         if (!ctx) {
-          this.createBasicPreview(file);
+          reject(new Error('Canvas context not available'));
           return;
         }
 
         // Set maximum dimensions
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
-
         let width = img.width;
         let height = img.height;
 
-        // Calculate new dimensions while maintaining aspect ratio
+        // Calculate new dimensions
         if (width > height) {
           if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
+            height = Math.round((height * MAX_WIDTH) / width);
             width = MAX_WIDTH;
           }
         } else {
           if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
+            width = Math.round((width * MAX_HEIGHT) / height);
             height = MAX_HEIGHT;
           }
         }
@@ -173,39 +227,85 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
         canvas.width = width;
         canvas.height = height;
 
-        // Draw and compress
+        // Draw image with higher quality for resizing
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Get compressed base64 with quality 0.7 (70% quality)
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-        this.imagePreview = compressedBase64;
+        // Function to compress with quality adjustment
+        const compressWithQuality = (quality: number): Promise<File> => {
+          return new Promise((resolveQuality, rejectQuality) => {
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) {
+                  rejectQuality(new Error('Failed to create blob'));
+                  return;
+                }
+
+                // Check if size is under 1MB
+                if (blob.size <= 1024 * 1024) {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolveQuality(compressedFile);
+                } else if (quality > 0.3) {
+                  // Reduce quality and try again
+                  compressWithQuality(quality - 0.1).then(resolveQuality).catch(rejectQuality);
+                } else {
+                  // If still too large, resize more aggressively
+                  if (width > 400 || height > 400) {
+                    width = Math.round(width * 0.8);
+                    height = Math.round(height * 0.8);
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    compressWithQuality(0.7).then(resolveQuality).catch(rejectQuality);
+                  } else {
+                    // Last resort: use the smallest possible
+                    const finalFile = new File([blob], file.name, {
+                      type: 'image/jpeg',
+                      lastModified: Date.now()
+                    });
+                    resolveQuality(finalFile);
+                  }
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          });
+        };
+
+        // Start compression with 0.9 quality
+        compressWithQuality(0.9).then(resolve).catch(reject);
       };
 
       img.onerror = () => {
-        this.createBasicPreview(file);
+        reject(new Error('Failed to load image'));
       };
-    };
 
-    reader.onerror = () => {
-      this.imageError = 'Failed to read image file';
-      this.selectedFile = null;
-      this.imagePreview = null;
-    };
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   }
 
-  createBasicPreview(file: File): void {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imagePreview = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
   removeImage(): void {
     this.selectedFile = null;
     this.imagePreview = null;
+    this.imageSize = '';
+    this.imageError = '';
     this.feedForm.patchValue({ feedImage: '' });
 
     if (this.fileInput) {
@@ -213,34 +313,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  async uploadImage(): Promise<string> {
-    if (!this.selectedFile) {
-      return this.feedForm.get('feedImage')?.value || '';
-    }
-
-    this.isUploadingImage = true;
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const base64Image = reader.result as string;
-        this.isUploadingImage = false;
-        resolve(base64Image);
-      };
-
-      reader.onerror = () => {
-        this.isUploadingImage = false;
-        reject('Failed to read image file');
-      };
-
-      reader.readAsDataURL(this.selectedFile!);
-    });
-  }
-
   // ==================== IMAGE PREVIEW METHODS ====================
-
-
   openImagePreviewWithUrl(imageUrl: string | null): void {
     this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
     this.showImagePreviewModal();
@@ -249,7 +322,6 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   closeImagePreview(): void {
     this.hideImagePreviewModal();
   }
-
 
   showImagePreviewModal(): void {
     const modalElement = this.imagePreviewModal?.nativeElement;
@@ -277,27 +349,20 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     }
   }
 
-
   handleCardImageError(feed: any): void {
     feed.feedImage = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
   }
 
   // ==================== VIEW MODAL METHODS ====================
   async openViewModal(feed: any): Promise<void> {
-    // ✅ Store the original object for Edit/Delete actions
-    this.selectedFeed = feed;          // <-- IMPORTANT: Store original object
-    this.selectedFeedView = { ...feed }; // copy for display
+    this.selectedFeed = feed;
+    this.selectedFeedView = { ...feed };
 
-    // Reset loading state
     this.isLoadingImage = true;
-
-    // Initially show default image
     this.viewImageUrl = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
 
-    // Show the modal immediately
     this.showViewModal();
 
-    // Now fetch the actual image from API
     await this.loadFeedImageForView(feed);
   }
 
@@ -319,14 +384,11 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       }))
       .subscribe({
         next: (response: any) => {
-          // Try different possible property names for the image
           const image = response?.feedImage || response?.FeedImage || response?.feedImageUrl || response?.imageUrl;
 
           if (image && image.trim() !== '') {
-            // Update the view image URL with the actual image from API
             this.viewImageUrl = image;
 
-            // Also update the selected feed objects for consistency
             if (this.selectedFeedView) {
               this.selectedFeedView.feedImage = image;
             }
@@ -335,7 +397,6 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
             }
           } else {
             console.warn('No image found for feed ID:', expenseId);
-            // Keep the default image
           }
         },
         error: (error: any) => {
@@ -346,7 +407,6 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
   }
 
   handleViewImageError(): void {
-    // If the image fails to load, show default image
     this.viewImageUrl = '../../../assets/DairryFarmImg/Dryfeed_9137270.png';
     this.isLoadingImage = false;
   }
@@ -366,12 +426,10 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.viewImageUrl = '';
     this.isLoadingImage = false;
 
-    // ❗ only clear when fully closing, not when going to edit/delete
     if (resetSelection) {
       this.selectedFeed = null;
     }
   }
-
 
   showViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -401,6 +459,8 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
+    this.imageSize = '';
+    this.compressingImage = false;
 
     this.feedForm.reset();
     this.feedForm.patchValue({
@@ -433,6 +493,8 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
+    this.imageSize = '';
+    this.compressingImage = false;
 
     this.feedForm.patchValue({
       feed_name: feed.feed_name || '',
@@ -442,10 +504,8 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       feedImage: feed.feedImage || ''
     });
 
-    // Show loader before API call to get image
     this.loader.show();
 
-    // Call API to get the image by ID
     this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
@@ -453,6 +513,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
           const image = res?.feedImage || res?.FeedImage || feed.feedImage;
           if (image) {
             this.feedForm.patchValue({ feedImage: image });
+            this.imagePreview = image;
           }
           this.showModal();
         },
@@ -491,10 +552,8 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       feedImage: feed.feedImage || ''
     });
 
-    // Show loader before API call to get image
     this.loader.show();
 
-    // Call API to get the image by ID
     this.api.get(`OtherFeeds/GetFeedImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
@@ -502,6 +561,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
           const image = res?.feedImage || res?.FeedImage || feed.feedImage;
           if (image) {
             this.feedForm.patchValue({ feedImage: image });
+            this.imagePreview = image;
           }
           this.showModal();
         },
@@ -523,10 +583,11 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
 
-    // Reset image upload state
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
+    this.imageSize = '';
+    this.compressingImage = false;
   }
 
   showModal(): void {
@@ -633,28 +694,17 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      // Use the compressed preview image if available
-      if (this.imagePreview) {
-        this.feedForm.patchValue({ feedImage: this.imagePreview });
-      } else if (this.selectedFile) {
-        // Fallback to regular upload if no preview
-        const base64Image = await this.uploadImage();
-        this.feedForm.patchValue({ feedImage: base64Image });
-      }
+    // Image is already compressed and stored in form
+    const feedImageBase64 = this.feedForm.value.feedImage;
 
-      if (this.modalMode === 'add') {
-        await this.addFeed();
-      } else if (this.modalMode === 'edit') {
-        await this.updateFeed();
-      }
-    } catch (error) {
-      console.error('Image upload error:', error);
-      this.toastr.error('Failed to upload image');
+    if (this.modalMode === 'add') {
+      this.addFeed(feedImageBase64);
+    } else if (this.modalMode === 'edit') {
+      this.updateFeed(feedImageBase64);
     }
   }
 
-  async addFeed(): Promise<void> {
+  addFeed(imageBase64: string | null): void {
     this.isSaving = true;
 
     const payload = {
@@ -665,7 +715,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       price: Number(this.feedForm.value.price),
       quantity: this.feedForm.value.quantity,
       date: this.formatDateForAPI(this.feedForm.value.date),
-      feedImage: this.feedForm.value.feedImage || ''
+      feedImage: imageBase64 || ''
     };
 
     this.loader.show();
@@ -688,7 +738,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       });
   }
 
-  async updateFeed(): Promise<void> {
+  updateFeed(imageBase64: string | null): void {
     if (!this.selectedFeed?.expense_id) {
       this.toastr.error('Invalid feed data');
       return;
@@ -705,7 +755,7 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       price: Number(this.feedForm.value.price),
       quantity: this.feedForm.value.quantity,
       date: this.formatDateForAPI(this.feedForm.value.date),
-      feedImage: this.feedForm.value.feedImage || ''
+      feedImage: imageBase64 || ''
     };
 
     this.loader.show();
@@ -782,7 +832,6 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       );
     }
 
-    // Regroup after filtering
     this.groupFeedsByDate();
   }
 
@@ -869,15 +918,14 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const feed = this.selectedFeed; // store before closing
+    const feed = this.selectedFeed;
 
-    this.closeViewModal(false); // ❗ DO NOT reset selectedFeed
+    this.closeViewModal(false);
 
     setTimeout(() => {
       this.openEditModal(feed);
     }, 300);
   }
-
 
   deleteFromViewModal(): void {
     if (!this.selectedFeed) {
@@ -885,15 +933,12 @@ export class OtherFeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const feed = this.selectedFeed; // store before closing
+    const feed = this.selectedFeed;
 
-    this.closeViewModal(false); // ❗ DO NOT reset selectedFeed
+    this.closeViewModal(false);
 
     setTimeout(() => {
       this.openDeleteModal(feed);
     }, 300);
   }
-
-
-
 }

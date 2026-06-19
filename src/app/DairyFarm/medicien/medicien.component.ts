@@ -42,7 +42,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
   // Modal
   modalMode: 'add' | 'edit' | 'delete' = 'add';
-  selectedMedicine: any = null; // Changed from selectedMedicien to selectedMedicine
+  selectedMedicine: any = null;
   deleteReason: string = '';
 
   // View Modal
@@ -55,18 +55,21 @@ export class MedicienComponent implements OnInit, OnDestroy {
   // Search
   searchTerm: string = '';
   isLoadingViewImage = false;
+
   // Misc
   submitted: boolean = false;
   dairyUserId: number = 0;
   isLoading: boolean = false;
 
-  // Image Upload
+  // Image Upload with Compression
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   isUploadingImage: boolean = false;
   imageError: string = '';
   previewImageUrl: string = '';
   isImagePreviewOpen: boolean = false;
+  imageSize: string = '';
+  compressingImage: boolean = false;
 
   // Button loading states
   isSaving: boolean = false;
@@ -101,12 +104,12 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
   initForm(): void {
     this.medicienForm = new FormGroup({
-      Animal_id: new FormControl('', [Validators.required]), // Keep original field name to match API
+      Animal_id: new FormControl('', [Validators.required]),
       animal_name: new FormControl('', [Validators.required]),
       price: new FormControl('', [Validators.required, Validators.min(1)]),
       reason: new FormControl('', [Validators.required]),
       date: new FormControl(this.getTodayDate(), [Validators.required]),
-      AnimalImage: new FormControl('') // Keep original field name to match API
+      AnimalImage: new FormControl('')
     });
   }
 
@@ -117,70 +120,122 @@ export class MedicienComponent implements OnInit, OnDestroy {
     return Number(id) || 0;
   }
 
-  // ==================== IMAGE UPLOAD METHODS ====================
-  onImageSelected(event: any): void {
+  // ==================== IMAGE UPLOAD METHODS WITH COMPRESSION ====================
+  async onImageSelected(event: any): Promise<void> {
     const file = event.target.files[0];
 
     if (!file) {
       return;
     }
 
-    // Validate file size (1MB max)
-    if (file.size > 1 * 1024 * 1024) {
-      this.imageError = 'Image size should be less than 1MB';
-      this.selectedFile = null;
-      this.imagePreview = null;
+    this.compressingImage = true;
+    this.imageSize = this.formatFileSize(file.size);
+
+    // Check file type
+    if (!file.type.match(/image\/(jpeg|png|jpg)/)) {
+      this.imageError = 'Only JPG, JPEG, and PNG images are allowed';
+      this.compressingImage = false;
       return;
     }
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    if (!validTypes.includes(file.type)) {
-      this.imageError = 'Only JPG, PNG, and GIF images are allowed';
-      this.selectedFile = null;
-      this.imagePreview = null;
+    // Check initial size (allow up to 10MB for compression)
+    if (file.size > 10 * 1024 * 1024) {
+      this.imageError = 'File size must be less than 10MB';
+      this.compressingImage = false;
       return;
     }
 
-    this.imageError = '';
-    this.selectedFile = file;
+    try {
+      // Show compressing message
+      this.imageError = 'Compressing image...';
 
-    // Create preview and compress if needed
-    this.compressAndPreviewImage(file);
+      // Compress the image
+      const compressedFile = await this.compressImageTo1MB(file);
+
+      if (!compressedFile) {
+        throw new Error('Compression failed');
+      }
+
+      // Read the compressed file
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+        this.imageError = '';
+        this.compressingImage = false;
+
+        // Show compressed size
+        const compressedSize = this.formatFileSize(compressedFile.size);
+        this.imageSize = `${this.formatFileSize(file.size)} → ${compressedSize} (compressed)`;
+
+        // Store the FULL Base64 data URL (with prefix) in the form
+        this.medicienForm.patchValue({
+          AnimalImage: e.target.result
+        });
+      };
+
+      reader.onerror = () => {
+        this.imageError = 'Failed to read compressed image';
+        this.compressingImage = false;
+      };
+
+      reader.readAsDataURL(compressedFile);
+
+    } catch (error: any) {
+      console.error('Image compression error:', error);
+      this.imageError = error.message || 'Failed to compress image';
+      this.compressingImage = false;
+
+      // Fallback: use original image if compression fails but size is small
+      if (file.size <= 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.imagePreview = e.target.result;
+          this.imageError = 'Using original image (already under 1MB)';
+          // Store the FULL Base64 data URL (with prefix) in the form
+          this.medicienForm.patchValue({
+            AnimalImage: e.target.result
+          });
+        };
+        reader.readAsDataURL(file);
+        this.compressingImage = false;
+      }
+    }
   }
 
-  compressAndPreviewImage(file: File): void {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
+  // Main compression function - optimized for reliability
+  compressImageTo1MB(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
       const img = new Image();
-      img.src = e.target.result;
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        img.src = e.target.result;
+      };
 
       img.onload = () => {
-        // Create canvas for compression
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
         if (!ctx) {
-          this.createBasicPreview(file);
+          reject(new Error('Canvas context not available'));
           return;
         }
 
         // Set maximum dimensions
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
-
         let width = img.width;
         let height = img.height;
 
-        // Calculate new dimensions while maintaining aspect ratio
+        // Calculate new dimensions
         if (width > height) {
           if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
+            height = Math.round((height * MAX_WIDTH) / width);
             width = MAX_WIDTH;
           }
         } else {
           if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
+            width = Math.round((width * MAX_HEIGHT) / height);
             height = MAX_HEIGHT;
           }
         }
@@ -188,39 +243,85 @@ export class MedicienComponent implements OnInit, OnDestroy {
         canvas.width = width;
         canvas.height = height;
 
-        // Draw and compress
+        // Draw image with higher quality for resizing
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Get compressed base64 with quality 0.7 (70% quality)
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-        this.imagePreview = compressedBase64;
+        // Function to compress with quality adjustment
+        const compressWithQuality = (quality: number): Promise<File> => {
+          return new Promise((resolveQuality, rejectQuality) => {
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) {
+                  rejectQuality(new Error('Failed to create blob'));
+                  return;
+                }
+
+                // Check if size is under 1MB
+                if (blob.size <= 1024 * 1024) {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolveQuality(compressedFile);
+                } else if (quality > 0.3) {
+                  // Reduce quality and try again
+                  compressWithQuality(quality - 0.1).then(resolveQuality).catch(rejectQuality);
+                } else {
+                  // If still too large, resize more aggressively
+                  if (width > 400 || height > 400) {
+                    width = Math.round(width * 0.8);
+                    height = Math.round(height * 0.8);
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    compressWithQuality(0.7).then(resolveQuality).catch(rejectQuality);
+                  } else {
+                    // Last resort: use the smallest possible
+                    const finalFile = new File([blob], file.name, {
+                      type: 'image/jpeg',
+                      lastModified: Date.now()
+                    });
+                    resolveQuality(finalFile);
+                  }
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          });
+        };
+
+        // Start compression with 0.9 quality
+        compressWithQuality(0.9).then(resolve).catch(reject);
       };
 
       img.onerror = () => {
-        this.createBasicPreview(file);
+        reject(new Error('Failed to load image'));
       };
-    };
 
-    reader.onerror = () => {
-      this.imageError = 'Failed to read image file';
-      this.selectedFile = null;
-      this.imagePreview = null;
-    };
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
 
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   }
 
-  createBasicPreview(file: File): void {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.imagePreview = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
   removeImage(): void {
     this.selectedFile = null;
     this.imagePreview = null;
+    this.imageSize = '';
+    this.imageError = '';
     this.medicienForm.patchValue({ AnimalImage: '' });
 
     if (this.fileInput) {
@@ -228,37 +329,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
     }
   }
 
-  async uploadImage(): Promise<string> {
-    if (!this.selectedFile) {
-      return this.medicienForm.get('AnimalImage')?.value || '';
-    }
-
-    this.isUploadingImage = true;
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const base64Image = reader.result as string;
-        this.isUploadingImage = false;
-        resolve(base64Image);
-      };
-
-      reader.onerror = () => {
-        this.isUploadingImage = false;
-        reject('Failed to read image file');
-      };
-
-      reader.readAsDataURL(this.selectedFile!);
-    });
-  }
-
   // ==================== IMAGE PREVIEW METHODS ====================
   openImagePreviewWithUrl(imageUrl: string | null): void {
     this.previewImageUrl = imageUrl || '../../../assets/DairryFarmImg/tablet_16443237.png';
     this.showImagePreviewModal();
   }
-
 
   closeImagePreview(): void {
     this.hideImagePreviewModal();
@@ -290,7 +365,6 @@ export class MedicienComponent implements OnInit, OnDestroy {
     }
   }
 
-
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.src = '../../../assets/DairryFarmImg/tablet_16443237.png';
@@ -298,35 +372,27 @@ export class MedicienComponent implements OnInit, OnDestroy {
 
   // ==================== VIEW MODAL METHODS ====================
   async openViewModal(medicine: any): Promise<void> {
-    // ✅ Store the original object for Edit/Delete actions
-    this.selectedMedicine = medicine;          // <-- IMPORTANT: Store original object
-    this.selectedMedicineView = { ...medicine }; // copy for display
+    this.selectedMedicine = medicine;
+    this.selectedMedicineView = { ...medicine };
 
-    this.viewImageUrl = ''; // Reset image URL
+    this.viewImageUrl = '';
     this.isLoadingViewImage = true;
 
-    // Show the modal immediately
     this.showViewModal();
 
-    // Try to fetch the image in the background
     if (medicine.expense_id) {
       try {
         const imageData = await this.fetchMedicineImageById(medicine.expense_id);
 
-        // Check if the response has an image
         if (imageData && (imageData.AnimalImage || imageData.animalImage)) {
-          // Use whichever field contains the image
           const imageUrl = imageData.AnimalImage || imageData.animalImage;
 
-          // Check if it's a base64 image or a URL
           if (imageUrl.startsWith('data:image') || imageUrl.startsWith('http')) {
             this.viewImageUrl = imageUrl;
           } else if (imageUrl) {
-            // If it's not a data URL, assume it's a base64 string without the prefix
             this.viewImageUrl = 'data:image/jpeg;base64,' + imageUrl;
           }
         } else if (medicine.AnimalImage) {
-          // Fallback to the image from the medicine object
           const imgUrl = medicine.AnimalImage;
           if (imgUrl.startsWith('data:image') || imgUrl.startsWith('http')) {
             this.viewImageUrl = imgUrl;
@@ -334,12 +400,10 @@ export class MedicienComponent implements OnInit, OnDestroy {
             this.viewImageUrl = 'data:image/jpeg;base64,' + imgUrl;
           }
         } else {
-          // No image available, use default
           this.viewImageUrl = '../../../assets/DairryFarmImg/tablet_16443237.png';
         }
       } catch (error) {
         console.error('Error fetching medicine image:', error);
-        // Fallback to medicine data or default image
         if (medicine.AnimalImage) {
           const imgUrl = medicine.AnimalImage;
           if (imgUrl.startsWith('data:image') || imgUrl.startsWith('http')) {
@@ -353,13 +417,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
       } finally {
         this.isLoadingViewImage = false;
 
-        // Update the stored medicine object with the image
         if (this.selectedMedicine && this.viewImageUrl !== '../../../assets/DairryFarmImg/tablet_16443237.png') {
           this.selectedMedicine.AnimalImage = this.viewImageUrl;
         }
       }
     } else {
-      // No expense_id, use what's available
       if (medicine.AnimalImage) {
         const imgUrl = medicine.AnimalImage;
         if (imgUrl.startsWith('data:image') || imgUrl.startsWith('http')) {
@@ -395,7 +457,6 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.isLoadingViewImage = false;
   }
 
-
   closeViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
     if (modalElement) {
@@ -406,14 +467,10 @@ export class MedicienComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
 
-    // reset only view data
     this.selectedMedicineView = null;
     this.viewImageUrl = '';
     this.isLoadingViewImage = false;
-
-    // ✅ DO NOT clear selectedMedicine here
   }
-
 
   showViewModal(): void {
     const modalElement = this.viewModal?.nativeElement;
@@ -521,6 +578,8 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
+    this.imageSize = '';
+    this.compressingImage = false;
 
     this.medicienForm.reset();
     this.medicienForm.patchValue({
@@ -558,6 +617,8 @@ export class MedicienComponent implements OnInit, OnDestroy {
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
+    this.imageSize = '';
+    this.compressingImage = false;
 
     this.medicienForm.patchValue({
       Animal_id: this.selectedAnimalId,
@@ -565,13 +626,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
       price: medicine.price,
       reason: medicine.reason,
       date: this.formatDateForInput(medicine.date),
-      AnimalImage: medicine.AnimalImage || '' // Use the existing image from the medicine object
+      AnimalImage: medicine.AnimalImage || ''
     });
 
-    // Show loader before API call to get image
     this.loader.show();
 
-    // Call API to get the image by ID
     this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
@@ -579,6 +638,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
           const image = res?.AnimalImage || res?.animalImage || medicine.AnimalImage;
           if (image) {
             this.medicienForm.patchValue({ AnimalImage: image });
+            this.imagePreview = image;
           }
           this.showModal();
         },
@@ -621,10 +681,8 @@ export class MedicienComponent implements OnInit, OnDestroy {
       AnimalImage: medicine.AnimalImage || ''
     });
 
-    // Show loader before API call to get image
     this.loader.show();
 
-    // Call API to get the image by ID
     this.api.get(`DoctorDairy/GetMedicienImageById/${expenseId}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
@@ -632,6 +690,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
           const image = res?.AnimalImage || res?.animalImage || medicine.AnimalImage;
           if (image) {
             this.medicienForm.patchValue({ AnimalImage: image });
+            this.imagePreview = image;
           }
           this.showModal();
         },
@@ -653,10 +712,11 @@ export class MedicienComponent implements OnInit, OnDestroy {
       if (backdrop) backdrop.remove();
     }
 
-    // Reset image upload state
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = '';
+    this.imageSize = '';
+    this.compressingImage = false;
   }
 
   showModal(): void {
@@ -768,28 +828,17 @@ export class MedicienComponent implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      // Use the compressed preview image if available
-      if (this.imagePreview) {
-        this.medicienForm.patchValue({ AnimalImage: this.imagePreview });
-      } else if (this.selectedFile) {
-        // Fallback to regular upload if no preview
-        const base64Image = await this.uploadImage();
-        this.medicienForm.patchValue({ AnimalImage: base64Image });
-      }
+    // Image is already compressed and stored in form
+    const medicineImageBase64 = this.medicienForm.value.AnimalImage;
 
-      if (this.modalMode === 'add') {
-        await this.addMedicine();
-      } else if (this.modalMode === 'edit') {
-        await this.updateMedicine();
-      }
-    } catch (error) {
-      console.error('Image upload error:', error);
-      this.toastr.error('Failed to upload image');
+    if (this.modalMode === 'add') {
+      this.addMedicine(medicineImageBase64);
+    } else if (this.modalMode === 'edit') {
+      this.updateMedicine(medicineImageBase64);
     }
   }
 
-  async addMedicine(): Promise<void> {
+  addMedicine(imageBase64: string | null): void {
     this.isSaving = true;
 
     const payload = {
@@ -801,7 +850,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
       reason: this.medicienForm.value.reason,
       date: this.formatDateForAPI(this.medicienForm.value.date),
       Switch: 1,
-      AnimalImage: this.medicienForm.value.AnimalImage // Use correct field name
+      AnimalImage: imageBase64 || ''
     };
 
     this.loader.show();
@@ -824,7 +873,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
       });
   }
 
-  async updateMedicine(): Promise<void> {
+  updateMedicine(imageBase64: string | null): void {
     if (!this.selectedMedicine?.expense_id) {
       this.toastr.error('Invalid medicine data');
       return;
@@ -842,7 +891,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
       reason: this.medicienForm.value.reason,
       date: this.formatDateForAPI(this.medicienForm.value.date),
       Switch: 1,
-      AnimalImage: this.medicienForm.value.AnimalImage // Use correct field name
+      AnimalImage: imageBase64 || ''
     };
 
     this.loader.show();
@@ -920,7 +969,6 @@ export class MedicienComponent implements OnInit, OnDestroy {
       );
     }
 
-    // Regroup after filtering
     this.groupMedicinesByDate();
   }
 
@@ -999,6 +1047,7 @@ export class MedicienComponent implements OnInit, OnDestroy {
       return '';
     }
   }
+
   // ==================== VIEW MODAL ACTION METHODS ====================
   editFromViewModal(): void {
     if (!this.selectedMedicine) {
@@ -1006,12 +1055,8 @@ export class MedicienComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('Editing medicine from view modal:', this.selectedMedicine);
-
-    // Close the view modal
     this.closeViewModal();
 
-    // Open edit modal with the selected medicine
     setTimeout(() => {
       this.openEditModal(this.selectedMedicine);
     }, 300);
@@ -1023,15 +1068,10 @@ export class MedicienComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('Deleting medicine from view modal:', this.selectedMedicine);
-
-    // Close the view modal
     this.closeViewModal();
 
-    // Open delete modal with the selected medicine
     setTimeout(() => {
       this.openDeleteModal(this.selectedMedicine);
     }, 300);
   }
-
 }
