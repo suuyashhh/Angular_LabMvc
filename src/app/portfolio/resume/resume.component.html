@@ -1,115 +1,59 @@
-<!-- Main Content -->
-<main class="relative min-h-screen w-full">
+<main class="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-16 max-w-5xl min-h-screen flex flex-col items-center">
 
-    <!-- Particle background -->
-    <div id="particles-js" class="fixed inset-0 -z-10"></div>
-    
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12 lg:pb-16">
-        <div class="max-w-6xl mx-auto relative">
-            
-            <!-- Background Gradient Overlay -->
-            <div class="absolute inset-0 bg-gradient-to-b from-teal-500/10 to-transparent pointer-events-none rounded-2xl"></div>
+  <!-- Header Section -->
+  <div class="text-center space-y-3 mb-8 w-full">
+    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 font-sans">
+      Resume
+    </h1>
+    <p class="text-sm md:text-[1.05rem] text-zinc-500 font-medium max-w-lg mx-auto">
+      Review my education, technical capabilities, and professional work credentials.
+    </p>
+  </div>
 
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 lg:mb-10 gap-4 relative z-10">
-                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold pb-2 border-b-2 border-accent inline-block text-gradient">
-                    Resume
-                </h1>
-                <button onclick="downloadPDF()"
-                    class="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-teal-500/25 w-full sm:w-auto justify-center text-sm sm:text-base">
-                    <!-- Download Icon -->
-                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="w-4 h-4 sm:w-5 sm:h-5"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"></path>
-                    </svg>
-                    <span>Download Resume</span>
-                </button>
-            </div>
+  <!-- Action Controls -->
+  <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mb-8 w-full max-w-md">
+    <button onclick="downloadPDF()"
+            class="w-full sm:w-auto flex-1 bg-zinc-950 text-white px-6 py-3.5 rounded-2xl font-bold shadow-md hover:bg-zinc-900 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
+      <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 512 512">
+        <path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"></path>
+      </svg>
+      <span>Download PDF</span>
+    </button>
 
-            <!-- PDF Viewer Container - Desktop and Tablet -->
-            <div class="hidden sm:flex justify-center items-center bg-transparent rounded-lg relative">
-                <div class="w-full">
-                    <div class="bg-white rounded-lg shadow-2xl overflow-hidden relative">
-                        
-                        <!-- PDF Iframe with responsive height -->
-                        <div class="w-full" style="height: 70vh; min-height: 500px; max-height: 900px;">
-                            <iframe id="pdfViewer"
-                                src="../../../assets/img/SuyashPatilResume.pdf#zoom=FitH&view=FitH&toolbar=0&navpanes=0&scrollbar=0"
-                                class="w-full h-full border-none"
-                                title="Resume PDF Viewer">
-                            </iframe>
-                        </div>
+    <button onclick="openInNewTab()"
+            class="w-full sm:w-auto flex-1 bg-zinc-50 border border-dashed border-zinc-200 text-zinc-700 px-6 py-3.5 rounded-2xl font-bold shadow-sm hover:bg-zinc-100 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
+      <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+      <span>Open in New Tab</span>
+    </button>
+  </div>
 
-                        <!-- Loading Overlay -->
-                        <div id="loadingOverlay"
-                            class="absolute inset-0 bg-slate-100 flex items-center justify-center rounded-lg z-10">
-                            <div class="flex flex-col items-center">
-                                <div class="spinner rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-teal-600 mb-4 animate-spin"></div>
-                                <p class="text-slate-600 text-sm sm:text-base">Loading resume...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- PDF Viewer Container - Desktop & Tablet & Mobile (Single responsive wrapper) -->
+  <div class="w-full max-w-4xl bg-zinc-50/50 border border-dashed border-zinc-200 rounded-3xl p-2 sm:p-2.5 shadow-sm">
+    <div class="bg-white rounded-2xl border border-dashed border-zinc-150 overflow-hidden relative shadow-inner">
+      
+      <!-- Loading indicator -->
+      <div id="loadingOverlay"
+           class="absolute inset-0 bg-zinc-50 flex flex-col items-center justify-center z-10 transition-opacity duration-300">
+        <div class="w-8 h-8 rounded-full border-2 border-zinc-450 border-t-transparent animate-spin mb-3"></div>
+        <p class="text-zinc-500 font-semibold text-xs">Loading resume...</p>
+      </div>
 
-            <!-- Mobile View - PDF Preview with Download -->
-            <div class="sm:hidden bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg overflow-hidden">
-                
-                <!-- PDF Thumbnail/Preview for Mobile -->
-                <div class="relative w-full bg-white" style="height: 60vh; min-height: 400px;">
-                    <iframe id="pdfViewerMobile"
-                        src="../../../assets/img/SuyashPatilResume.pdf#zoom=FitH&view=FitH&toolbar=0&navpanes=0"
-                        class="w-full h-full border-none"
-                        title="Resume PDF Preview">
-                    </iframe>
-                    
-                 
-                </div>
-            </div>
+      <!-- PDF Frame -->
+      <div class="w-full h-[65vh] sm:h-[75vh] min-h-[450px] max-h-[850px]">
+        <iframe id="pdfViewer"
+                src="assets/img/SuyashPatilResume.pdf#zoom=FitH&view=FitH&toolbar=0&navpanes=0&scrollbar=0"
+                class="w-full h-full border-none"
+                title="Resume PDF Viewer"
+                onload="document.getElementById('loadingOverlay').style.display='none';">
+        </iframe>
+      </div>
 
-            <!-- Alternative View Button - Desktop/Tablet only -->
-            <div class="hidden sm:flex justify-center mt-4 sm:mt-6">
-                <button onclick="openInNewTab()"
-                    class="flex items-center gap-2 text-teal-400 hover:text-teal-300 transition-colors text-sm sm:text-base">
-                    <!-- External Link Icon -->
-                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round"
-                        stroke-linejoin="round" class="w-3 h-3 sm:w-4 sm:h-4">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15,3 21,3 21,9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    Open in new tab
-                </button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="relative border-t border-white/10 mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 lg:pt-12">
-            <div class="max-w-6xl mx-auto text-center">
-                <div class="flex justify-center space-x-4 sm:space-x-5 md:space-x-6 mb-3 sm:mb-4">
-                    <a href="https://www.linkedin.com/in/suyash-patil-877398282/" 
-                       class="text-light hover:text-accent transition-colors text-lg sm:text-xl"
-                       aria-label="LinkedIn">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                    <a href="https://github.com/suuyashhh" 
-                       class="text-light hover:text-accent transition-colors text-lg sm:text-xl"
-                       aria-label="GitHub">
-                        <i class="fab fa-github"></i>
-                    </a>
-                    <a href="#" 
-                       class="text-light hover:text-accent transition-colors text-lg sm:text-xl"
-                       aria-label="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="mailto:suyashpatil2113@gmail.com" 
-                       class="text-light hover:text-accent transition-colors text-lg sm:text-xl"
-                       aria-label="Email">
-                        <i class="fas fa-envelope"></i>
-                    </a>
-                </div>
-                <p class="text-xs sm:text-sm md:text-base text-light/70">© 2025 Suyash Patil.</p>
-            </div>
-        </footer>
     </div>
+  </div>
+
+  <!-- Clean Minimal Footer -->
+  <footer class="w-full mt-12 border-t border-dashed border-zinc-200 pt-6 text-center">
+    <p class="text-xs text-zinc-400 font-semibold select-none">© 2026 Suyash Patil. All rights reserved.</p>
+  </footer>
+
 </main>

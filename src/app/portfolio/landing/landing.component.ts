@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { NavbarPortComponent } from '../../shared/navbar-port/navbar-port.component';
 import { FooterPortComponent } from '../../shared/footer-port/footer-port.component';
 import { RouterOutlet } from '@angular/router';
@@ -8,7 +8,8 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [NavbarPortComponent,FooterPortComponent,RouterOutlet],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css'
+  styleUrl: './landing.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class PortfolioLandingComponent {
 
