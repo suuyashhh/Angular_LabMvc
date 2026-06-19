@@ -1,7 +1,7 @@
 /* Suyash PortFolio Scoped Styles */
 
 .portfolio-theme {
-    @apply bg-gradient-to-br from-dark via-[#0f172a] to-[#0a1120] text-light font-sans;
+    @apply bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300;
     
     /* ===== VARIABLES ===== */
     --primary-color: #ffffff;

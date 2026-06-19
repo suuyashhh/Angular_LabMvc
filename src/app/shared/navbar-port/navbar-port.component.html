@@ -1,61 +1,72 @@
-<nav class="fixed w-full z-50 backdrop-blur-md bg-dark/80 border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <a [routerLink]="['/portfolio/home']" class="text-2xl font-bold tracking-tight text-cyan-400">&lt;Suyash /&gt;</a>
-            </div>
-
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-12">
-                <a [routerLink]="['/portfolio/home']" 
-                   [class.active]="isActive('home')"
-                   class="nav-link">Home</a>
-                <a [routerLink]="['/portfolio/about']" 
-                   [class.active]="isActive('about')"
-                   class="nav-link">About</a>
-                <a [routerLink]="['/portfolio/projects']" 
-                   [class.active]="isActive('projects')"
-                   class="nav-link">Projects</a>
-                <a [routerLink]="['/portfolio/resume']" 
-                   [class.active]="isActive('resume')"
-                   class="nav-link">Resume</a>
-                <a [routerLink]="['/portfolio/contact']" 
-                   [class.active]="isActive('contact')"
-                   class="nav-link">Contact</a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <div class="flex md:hidden items-center">
-                <button (click)="toggleMobileMenu()" class="text-cyan-400 text-2xl">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
+<nav class="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50">
+  <!-- Outer container with dashed border and shadow -->
+  <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl px-4 py-3 md:px-6 md:py-4 flex items-center justify-between transition-all duration-300">
+    
+    <!-- Profile Photo / Branding -->
+    <div class="flex items-center space-x-3">
+      <a [routerLink]="['/portfolio/home']" class="flex items-center space-x-2 group">
+        <img src="assets/images/suyashPro.jpg" alt="Suyash Patil" class="w-10 h-10 md:w-11 md:h-11 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-md object-cover transition-transform duration-300 group-hover:scale-105">
+        <span class="text-lg font-bold tracking-tight text-zinc-800 dark:text-zinc-100 hidden sm:inline-block transition-colors duration-300 group-hover:text-zinc-950 dark:group-hover:text-white">&lt;Suyash /&gt;</span>
+      </a>
     </div>
 
-    <!-- Mobile menu -->
-    <div id="mobile-menu"
-        [class.hidden]="!mobileMenuOpen"
-        class="flex flex-col items-center justify-center space-y-6 py-8 bg-dark/95 text-center animate-slideDown">
+    <!-- Desktop Navigation and Control Section -->
+    <div class="hidden md:flex items-center space-x-6">
+      <!-- Navigation Pill Container -->
+      <div class="bg-zinc-50/80 dark:bg-zinc-800/80 border border-zinc-200/50 dark:border-zinc-700/50 rounded-full p-1 flex items-center shadow-inner gap-1">
         <a [routerLink]="['/portfolio/home']" 
-           [class.active]="isActive('home')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Home</a>
+           [class]="isActive('home') ? activeClass : inactiveClass">Home</a>
         <a [routerLink]="['/portfolio/about']" 
-           [class.active]="isActive('about')"
-           (click)="closeMobileMenu()"
-           class="nav-link">About</a>
+           [class]="isActive('about') ? activeClass : inactiveClass">About</a>
         <a [routerLink]="['/portfolio/projects']" 
-           [class.active]="isActive('projects')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Projects</a>
+           [class]="isActive('projects') ? activeClass : inactiveClass">Projects</a>
         <a [routerLink]="['/portfolio/resume']" 
-           [class.active]="isActive('resume')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Resume</a>
+           [class]="isActive('resume') ? activeClass : inactiveClass">Resume</a>
         <a [routerLink]="['/portfolio/contact']" 
-           [class.active]="isActive('contact')"
-           (click)="closeMobileMenu()"
-           class="nav-link">Contact</a>
+           [class]="isActive('contact') ? activeClass : inactiveClass">Contact</a>
+      </div>
+
+      <!-- Theme Toggle Button -->
+      <button (click)="toggleDarkMode()" 
+              class="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-300 shadow-sm cursor-pointer"
+              [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <i [class]="isDarkMode ? 'fas fa-sun text-sm text-yellow-500' : 'fas fa-moon text-sm text-zinc-650'"></i>
+      </button>
     </div>
+
+    <!-- Mobile Navigation Trigger and Control -->
+    <div class="flex md:hidden items-center space-x-3">
+      <!-- Mobile Theme Toggle -->
+      <button (click)="toggleDarkMode()" 
+              class="w-9 h-9 rounded-full border border-zinc-200 dark:border-zinc-700/85 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shadow-sm cursor-pointer">
+        <i [class]="isDarkMode ? 'fas fa-sun text-xs text-yellow-500' : 'fas fa-moon text-xs text-zinc-650'"></i>
+      </button>
+
+      <!-- Hamburger Button -->
+      <button (click)="toggleMobileMenu()" 
+              class="w-9 h-9 rounded-full border border-zinc-200 dark:border-zinc-700/85 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shadow-sm cursor-pointer focus:outline-none">
+        <i [class]="mobileMenuOpen ? 'fas fa-xmark text-sm' : 'fas fa-bars text-sm'"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div *ngIf="mobileMenuOpen" 
+       class="mt-2 md:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl p-4 flex flex-col items-center space-y-2 animate-slideDown">
+    <a [routerLink]="['/portfolio/home']" 
+       [class]="isActive('home') ? mobileActiveClass : mobileInactiveClass"
+       (click)="closeMobileMenu()">Home</a>
+    <a [routerLink]="['/portfolio/about']" 
+       [class]="isActive('about') ? mobileActiveClass : mobileInactiveClass"
+       (click)="closeMobileMenu()">About</a>
+    <a [routerLink]="['/portfolio/projects']" 
+       [class]="isActive('projects') ? mobileActiveClass : mobileInactiveClass"
+       (click)="closeMobileMenu()">Projects</a>
+    <a [routerLink]="['/portfolio/resume']" 
+       [class]="isActive('resume') ? mobileActiveClass : mobileInactiveClass"
+       (click)="closeMobileMenu()">Resume</a>
+    <a [routerLink]="['/portfolio/contact']" 
+       [class]="isActive('contact') ? mobileActiveClass : mobileInactiveClass"
+       (click)="closeMobileMenu()">Contact</a>
+  </div>
 </nav>

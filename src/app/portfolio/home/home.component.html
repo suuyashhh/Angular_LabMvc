@@ -1,57 +1,91 @@
-<div id="suyash-page">
-    <!-- Video Background -->
-    <div id="suyash-video-container">
-        <video #backgroundVideo autoplay muted loop playsinline preload="auto" id="suyash-background-video">
-            <source src="../../../assets/videos/bg.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div id="suyash-overlay"></div>
+<div class="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 md:pt-32 md:pb-16 select-none">
+  <div class="w-full max-w-2xl text-center space-y-8">
+    
+    <!-- Profile Image -->
+    <div class="relative w-32 h-32 md:w-36 md:h-36 mx-auto">
+      <!-- Dashed Border Outer Container -->
+      <div class="w-full h-full rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-1.5 flex items-center justify-center transition-all duration-300 hover:border-zinc-400 dark:hover:border-zinc-650">
+        <!-- Inner Profile Image -->
+        <img src="assets/images/suyashPro.jpg" alt="Suyash Patil" class="w-full h-full rounded-full object-cover shadow-lg border border-zinc-200 dark:border-zinc-800">
+      </div>
+      <!-- Green Active Status Badge -->
+      <span class="absolute bottom-2.5 right-2.5 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-950 shadow-md"></span>
     </div>
 
-    <!-- Main Content -->
-    <main id="suyash-container">
-        <div id="suyash-profile-section" aria-labelledby="suyash-profile-heading" style="margin-top:50px">
-            <div id="suyash-profile-image" style="width: 100px; height: 100px; border-width: 2px;">
-                <img src="../../../assets/images/suyashPro.jpg" alt="Suyash Patil" loading="lazy">
-            </div>
-            <h1 id="suyash-profile-heading" class="suyash-name" style="font-size: 1.6rem;">Suyash Patil</h1>
-            <p class="suyash-title" style="font-size: 0.9rem;">.Net Developer <span class="suyash-emoji">💻</span></p>
-            <div id="suyash-social-icons" style="gap: 12px;">
-                <a href="https://github.com/suuyashhh" target="_blank" aria-label="GitHub Profile" rel="noopener">
-                    <i class="fab fa-github" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank"
-                    aria-label="LinkedIn Profile" rel="noopener">
-                    <i class="fab fa-linkedin" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://wa.me/918180821173" aria-label="WhatsApp" target="_blank" rel="noopener">
-                    <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://www.instagram.com/suyashpatil_.03?igsh=bnZmYWxoY24xamNr" target="_blank"
-                    aria-label="Instagram Profile" rel="noopener">
-                    <i class="fab fa-instagram" style="font-size: 1.1rem;"></i>
-                </a>
-            </div>
-        </div>
+    <!-- Greeting with Waving Hand Capsule -->
+    <div class="flex items-center justify-center space-x-3.5">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-sans">
+        Hi, I'm Suyash
+      </h1>
+      <!-- Waving Hand Pill -->
+      <div class="px-3.5 py-1.5 border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded-full shadow-sm flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-default">
+        <span class="text-2xl animate-wave">👋</span>
+      </div>
+    </div>
 
-        <nav id="suyash-menu-section" aria-label="Portfolio Navigation">
-            <!-- Using routerLink with explicit paths -->
-            <a routerLink="/portfolio/about" class="suyash-menu-item" data-text="About">
-                <span>About</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/projects" class="suyash-menu-item" data-text="All Projects Application">
-                <span>All Projects Applications</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/resume" class="suyash-menu-item" data-text="Resume">
-                <span>Resume</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/contact" class="suyash-menu-item" data-text="Contact">
-                <span>Contact</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        </nav>
-    </main>
+    <!-- Description Lines -->
+    <div class="space-y-5 text-zinc-600 dark:text-zinc-400 font-medium text-sm md:text-[1.05rem] leading-relaxed max-w-lg mx-auto">
+      
+      <!-- Line 1: I make coding related videos and build, ship, code... -->
+      <div class="flex flex-wrap items-center justify-center gap-y-2.5">
+        <span>I make coding related videos and</span>
+        <div class="flex flex-wrap gap-1.5 ml-1">
+          <span class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">build</span>
+          <span class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">ship</span>
+          <span class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">code</span>
+          <span class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">gym</span>
+          <span class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">repeat</span>
+        </div>
+      </div>
+
+      <!-- Line 2: I build interactive Software using TS, Angular, Next.js -->
+      <div class="flex flex-wrap items-center justify-center gap-y-2.5">
+        <span>I build interactive Software using</span>
+        <div class="flex flex-wrap gap-1.5 ml-1">
+          <!-- TS Badge -->
+          <span class="px-2.5 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm inline-flex items-center gap-1.5 hover:scale-105 transition-transform cursor-default">
+            <span class="w-3.5 h-3.5 rounded bg-[#3178c6] text-white flex items-center justify-center text-[9px] font-black font-sans leading-none">TS</span>
+            TypeScript
+          </span>
+          <!-- Angular Badge -->
+          <span class="px-2.5 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm inline-flex items-center gap-1.5 hover:scale-105 transition-transform cursor-default">
+            <i class="fab fa-angular text-[#dd0031] text-xs"></i>
+            Angular
+          </span>
+          <!-- NextJS Badge -->
+          <span class="px-2.5 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm inline-flex items-center gap-1.5 hover:scale-105 transition-transform cursor-default">
+            <span class="w-3.5 h-3.5 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center text-[8px] font-black font-sans leading-none">N</span>
+            Next.js
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Links -->
+    <div class="flex items-center justify-center gap-5 pt-6">
+      <a href="https://twitter.com" target="_blank" rel="noopener" 
+         class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer"
+         title="X (Twitter)">
+        <svg class="w-4 h-4 fill-current text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors" viewBox="0 0 24 24">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+        </svg>
+      </a>
+      <a href="https://github.com/suuyashhh" target="_blank" rel="noopener" 
+         class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer"
+         title="GitHub">
+        <i class="fab fa-github text-base"></i>
+      </a>
+      <a href="https://youtube.com" target="_blank" rel="noopener" 
+         class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer"
+         title="YouTube">
+        <i class="fab fa-youtube text-base text-red-500"></i>
+      </a>
+      <a href="mailto:suyashpatil@gmail.com" 
+         class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer"
+         title="Email">
+        <i class="fas fa-envelope text-base text-blue-500"></i>
+      </a>
+    </div>
+
+  </div>
 </div>
