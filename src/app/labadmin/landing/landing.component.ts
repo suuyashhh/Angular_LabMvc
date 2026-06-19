@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../shared/auth.service';
 import { CommonModule } from '@angular/common';
@@ -17,7 +17,8 @@ import { FooterComponent } from "../../shared/footer/footer.component";
     FooterComponent
   ],
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.css']
+  styleUrls: ['./landing.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class LabAdminLandingComponent implements OnInit {
   user: any;
