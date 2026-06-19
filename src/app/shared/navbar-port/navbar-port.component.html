@@ -25,22 +25,10 @@
         <a [routerLink]="['/portfolio/contact']" 
            [class]="isActive('contact') ? activeClass : inactiveClass">Contact</a>
       </div>
-
-      <!-- Theme Toggle Button -->
-      <button (click)="toggleDarkMode()" 
-              class="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-300 shadow-sm cursor-pointer"
-              [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-        <i [class]="isDarkMode ? 'fas fa-sun text-sm text-yellow-500' : 'fas fa-moon text-sm text-zinc-650'"></i>
-      </button>
     </div>
 
     <!-- Mobile Navigation Trigger and Control -->
     <div class="flex md:hidden items-center space-x-3">
-      <!-- Mobile Theme Toggle -->
-      <button (click)="toggleDarkMode()" 
-              class="w-9 h-9 rounded-full border border-zinc-200 dark:border-zinc-700/85 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shadow-sm cursor-pointer">
-        <i [class]="isDarkMode ? 'fas fa-sun text-xs text-yellow-500' : 'fas fa-moon text-xs text-zinc-650'"></i>
-      </button>
 
       <!-- Hamburger Button -->
       <button (click)="toggleMobileMenu()" 

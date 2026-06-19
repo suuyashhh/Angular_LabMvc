@@ -22,9 +22,7 @@ export class NavbarPortComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Check initial dark mode from local storage or system preference
-    this.isDarkMode = localStorage.getItem('theme') === 'dark' || 
-                      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    this.isDarkMode = false;
     this.applyTheme();
   }
 
@@ -36,18 +34,9 @@ export class NavbarPortComponent implements OnInit {
     this.mobileMenuOpen = false;
   }
 
-  toggleDarkMode(): void {
-    this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
-    this.applyTheme();
-  }
-
   private applyTheme(): void {
-    if (this.isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
   }
 
   isActive(path: string): boolean {
