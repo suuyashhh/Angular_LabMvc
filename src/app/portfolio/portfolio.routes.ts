@@ -6,15 +6,10 @@ export const PORTFOLIO_ROUTES: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
- {
+  {
     path:'home',
     loadComponent:()=> import('../portfolio/home/home.component')
         .then(m => m.HomeComponent)
- },
-    {
-    path:'about',
-    loadComponent:()=> import('../portfolio/about/about.component')
-        .then(m => m.AboutComponent)
  },
  {
     path:'projects',
