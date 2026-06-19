@@ -20,12 +20,65 @@ export class HomeComponent implements OnInit, AfterViewChecked {
   tooltipX = 0;
   tooltipY = 0;
 
+  // Image preview modal properties
+  showImagePreview = false;
+  previewImage = '';
+  previewProjectTitle = '';
+  currentPreviewProjectId = '';
+  currentImageIndex: { [key: string]: number } = {};
+
+  projects: any[] = [
+    {
+      id: 'laboratory',
+      title: 'Laboratory - App',
+      description: 'Manage laboratory operations efficiently with our comprehensive solution.',
+      images: [
+        '../../../assets/img/LabApplication/LabApp2.png',
+        '../../../assets/img/LabApplication/LabApp1.png',
+        '../../../assets/img/LabApplication/LapApp3.png',
+        '../../../assets/img/LabApplication/LabApp4.png'
+      ],
+      tech: ['Angular', 'Tailwind CSS', 'Typescript', 'SQL', '.Net Core', 'Android Studio'],
+      links: {
+        code: 'https://github.com/suuyashhh',
+        demo: 'https://suyashpatil.in/lab'
+      }
+    },
+    {
+      id: 'dairy',
+      title: 'DairyFarm - App',
+      description: 'Manage your dairy farm operations efficiently with our comprehensive solution.',
+      images: [
+        '../../../assets/img/DairFarm/DF1.png',
+        '../../../assets/img/DairFarm/DF2.png',
+        '../../../assets/img/DairFarm/DF3.png',
+        '../../../assets/img/DairFarm/DF4.png'
+      ],
+      tech: ['Angular', '.Net Core Web Api', 'SQL', 'Android Studio'],
+      links: {
+        code: 'https://github.com/suuyashhh',
+        demo: 'https://suyashpatil.in/dairyfarm'
+      }
+    }
+  ];
+
   private hasScrolledToEnd = false;
 
-  constructor() {}
+  constructor() {
+    this.projects.forEach(project => {
+      this.currentImageIndex[project.id] = 0;
+    });
+  }
 
   ngOnInit() {
     this.fetchContributions();
+
+    // Keyboard navigation for image preview
+    document.addEventListener('keydown', (e) => {
+      if (this.showImagePreview && e.key === 'Escape') {
+        this.closeImagePreview();
+      }
+    });
   }
   showTooltip(day: any, event: MouseEvent) {
     this.hoveredDay = day;
@@ -171,5 +224,62 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
   showContribToast(day: any) {
     window.open('https://github.com/suuyashhh', '_blank');
+  }
+
+  openImagePreview(project: any): void {
+    this.previewImage = project.images[this.currentImageIndex[project.id]];
+    this.previewProjectTitle = project.title;
+    this.currentPreviewProjectId = project.id;
+    this.showImagePreview = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeImagePreview(): void {
+    this.showImagePreview = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  // Navigate to next image in carousel
+  nextImage(projectId: string): void {
+    const project = this.projects.find(p => p.id === projectId);
+    if (project) {
+      this.currentImageIndex[projectId] = 
+        (this.currentImageIndex[projectId] + 1) % project.images.length;
+    }
+  }
+
+  // Navigate to previous image in carousel
+  prevImage(projectId: string): void {
+    const project = this.projects.find(p => p.id === projectId);
+    if (project) {
+      this.currentImageIndex[projectId] = 
+        (this.currentImageIndex[projectId] - 1 + project.images.length) % project.images.length;
+    }
+  }
+
+  // Navigate to next image in preview modal
+  nextImageInPreview(): void {
+    const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
+    if (project) {
+      this.currentImageIndex[this.currentPreviewProjectId] = 
+        (this.currentImageIndex[this.currentPreviewProjectId] + 1) % project.images.length;
+      this.previewImage = project.images[this.currentImageIndex[this.currentPreviewProjectId]];
+    }
+  }
+
+  // Navigate to previous image in preview modal
+  prevImageInPreview(): void {
+    const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
+    if (project) {
+      this.currentImageIndex[this.currentPreviewProjectId] = 
+        (this.currentImageIndex[this.currentPreviewProjectId] - 1 + project.images.length) % project.images.length;
+      this.previewImage = project.images[this.currentImageIndex[this.currentPreviewProjectId]];
+    }
+  }
+
+  // Get current project images for counter
+  getCurrentProjectImages(): string[] {
+    const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
+    return project ? project.images : [];
   }
 }

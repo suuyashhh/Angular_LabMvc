@@ -403,5 +403,153 @@
 
       </div>
     </div>
+
+    <!-- Featured Projects Section -->
+    <div
+      class="pt-8 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left w-full max-w-xl mx-auto mt-8">
+      <div class="flex items-center space-x-2.5 mb-6">
+        <!-- Project Icon -->
+        <span class="text-xl">💻</span>
+        <h2 class="text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50">
+          Featured Projects
+        </h2>
+      </div>
+
+      <!-- Projects Cards Container -->
+      <div class="space-y-6">
+        
+        <!-- Loop over the first 2 projects -->
+        <div *ngFor="let project of projects"
+          class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row">
+          
+          <!-- Image Thumbnail with Carousel Controls -->
+          <div (click)="openImagePreview(project)"
+               class="relative w-full sm:w-40 h-40 sm:h-auto shrink-0 bg-zinc-50 border-b sm:border-b-0 sm:border-r border-dashed border-zinc-150 cursor-pointer overflow-hidden group select-none">
+            <img [src]="project.images[currentImageIndex[project.id]]" [alt]="project.title" 
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            
+            <!-- Carousel Navigation Controls -->
+            <button
+              *ngIf="project.images.length > 1"
+              (click)="prevImage(project.id); $event.stopPropagation()"
+              class="absolute top-1/2 left-2.5 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
+              aria-label="Previous image">
+              <i class="fas fa-chevron-left text-[9px]"></i>
+            </button>
+
+            <button
+              *ngIf="project.images.length > 1"
+              (click)="nextImage(project.id); $event.stopPropagation()"
+              class="absolute top-1/2 right-2.5 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
+              aria-label="Next image">
+              <i class="fas fa-chevron-right text-[9px]"></i>
+            </button>
+
+            <!-- Zoom overlay -->
+            <div class="absolute inset-0 bg-zinc-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+              <i class="fas fa-magnifying-glass-plus text-white text-base drop-shadow-md"></i>
+            </div>
+          </div>
+
+          <!-- Content Details -->
+          <div class="p-5 flex-grow flex flex-col justify-between">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-tight mb-1.5">
+                {{ project.title }}
+              </h3>
+              <p class="text-xs sm:text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 mb-4 line-clamp-2">
+                {{ project.description }}
+              </p>
+            </div>
+
+            <div>
+              <div class="flex flex-wrap gap-1.5 mb-4">
+                <span *ngFor="let tech of project.tech"
+                      class="px-2 py-0.5 text-[10px] sm:text-xs font-semibold bg-zinc-50 dark:bg-zinc-800 border border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-650 dark:text-zinc-300 rounded-full">
+                  {{ tech }}
+                </span>
+              </div>
+
+              <div class="flex gap-2">
+                <a [href]="project.links.code" target="_blank" rel="noopener"
+                   class="flex-1 py-1.5 bg-zinc-50 dark:bg-zinc-800 border border-dashed border-zinc-200 dark:border-zinc-700 text-center text-zinc-700 dark:text-zinc-300 text-xs font-semibold rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer">
+                  <i class="fas fa-code text-[10px]"></i> <span>Code</span>
+                </a>
+                <a [href]="project.links.demo" target="_blank" rel="noopener"
+                   class="flex-1 py-1.5 bg-zinc-950 dark:bg-zinc-50 text-center text-zinc-50 dark:text-zinc-950 text-xs font-semibold rounded-xl hover:bg-zinc-900 dark:hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1 shadow-sm cursor-pointer">
+                  <i class="fas fa-arrow-up-right-from-square text-[9px]"></i> <span>Demo</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- More Projects Button -->
+      <div class="mt-8 flex justify-center">
+        <a [routerLink]="['/portfolio/projects']"
+           class="inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 border border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-6 py-3 rounded-2xl font-bold shadow-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 cursor-pointer text-sm">
+          <span>More Projects</span>
+          <i class="fas fa-chevron-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= IMAGE PREVIEW MODAL ================= -->
+  <div *ngIf="showImagePreview" 
+       class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-md p-4 sm:p-6"
+       (click)="closeImagePreview()">
+    
+    <div class="relative w-full max-w-4xl h-full max-h-[85vh] flex flex-col justify-between" 
+         (click)="$event.stopPropagation()">
+      
+      <!-- Header Bar -->
+      <div class="flex items-center justify-between pb-3 border-b border-dashed border-zinc-800">
+        <h3 class="text-white font-bold text-base sm:text-lg truncate max-w-[80%]">
+          {{ previewProjectTitle }}
+        </h3>
+        <button
+          (click)="closeImagePreview()"
+          class="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <i class="fas fa-times text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Main Image View area -->
+      <div class="relative flex-1 flex items-center justify-center py-4 min-h-0">
+        <img [src]="previewImage" 
+             [alt]="previewProjectTitle"
+             class="max-w-full max-h-full object-contain rounded-2xl border-2 border-dashed border-zinc-800 shadow-2xl">
+
+        <!-- Navigation Arrows -->
+        <button
+          *ngIf="getCurrentProjectImages().length > 1"
+          (click)="prevImageInPreview()"
+          class="absolute left-3 w-10 h-10 rounded-full bg-zinc-900/90 border border-zinc-850 text-white flex items-center justify-center hover:bg-zinc-850 active:scale-95 transition-transform shadow-lg z-10 cursor-pointer">
+          <i class="fas fa-chevron-left text-sm"></i>
+        </button>
+        <button
+          *ngIf="getCurrentProjectImages().length > 1"
+          (click)="nextImageInPreview()"
+          class="absolute right-3 w-10 h-10 rounded-full bg-zinc-900/90 border border-zinc-850 text-white flex items-center justify-center hover:bg-zinc-850 active:scale-95 transition-transform shadow-lg z-10 cursor-pointer">
+          <i class="fas fa-chevron-right text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Bottom Counter & Action -->
+      <div class="flex items-center justify-between pt-3 border-t border-dashed border-zinc-800">
+        <span class="text-zinc-400 font-semibold text-xs bg-zinc-900 px-3 py-1.5 border border-zinc-850 rounded-full select-none">
+          {{ currentImageIndex[currentPreviewProjectId] + 1 }} / {{ getCurrentProjectImages().length }}
+        </span>
+        <button
+          (click)="closeImagePreview()"
+          class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2 rounded-full text-xs font-semibold hover:bg-red-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5">
+          <i class="fas fa-times text-[10px]"></i> Close Preview
+        </button>
+      </div>
+    </div>
   </div>
 </div>
