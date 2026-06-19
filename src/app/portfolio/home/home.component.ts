@@ -1,7 +1,6 @@
 import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { link } from 'fs';
 
 @Component({
   selector: 'app-home',
@@ -15,12 +14,33 @@ export class HomeComponent implements OnInit, AfterViewChecked {
   totalContributions = 0;
   isLoading = true;
   hasError = false;
+  
+  // Tooltip properties
+  hoveredDay: any = null;
+  tooltipX = 0;
+  tooltipY = 0;
+
   private hasScrolledToEnd = false;
 
   constructor() {}
 
   ngOnInit() {
     this.fetchContributions();
+  }
+  showTooltip(day: any, event: MouseEvent) {
+    this.hoveredDay = day;
+    const container = document.getElementById('contrib-card-container');
+    if (container) {
+      const containerRect = container.getBoundingClientRect();
+      const targetRect = (event.target as HTMLElement).getBoundingClientRect();
+      
+      this.tooltipX = targetRect.left - containerRect.left + (targetRect.width / 2);
+      this.tooltipY = targetRect.top - containerRect.top - 6;
+    }
+  }
+
+  hideTooltip() {
+    this.hoveredDay = null;
   }
 
   ngAfterViewChecked() {
