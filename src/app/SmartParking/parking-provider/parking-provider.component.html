@@ -1,0 +1,135 @@
+<div class="provider-container">
+  <div class="header">
+    <h2>Provide Parking</h2>
+  </div>
+
+  <div class="empty-state" *ngIf="parkingList.length === 0">
+    <div class="empty-icon material-icons-outlined">local_parking</div>
+    <h3>No spaces listed yet</h3>
+    <p>Tap the + button to add your first parking location.</p>
+  </div>
+
+  <!-- Parking Grid -->
+  <div class="parking-grid" *ngIf="parkingList.length > 0">
+    <div class="parking-card" *ngFor="let spot of parkingList" (click)="viewDetails(spot)">
+      <div class="card-image">
+        <img [src]="getSpotImage(spot.img1)" *ngIf="spot.img1" alt="Parking spot">
+        <div class="no-img" *ngIf="!spot.img1">
+          <span class="material-icons-outlined">image</span>
+        </div>
+        <div class="price-tag">₹{{spot.price}}/hr</div>
+      </div>
+      <div class="card-info">
+        <div class="vehicle-type">
+          <span class="material-icons-outlined">{{spot.vehicalType === '2' ? 'moped' : 'directions_car'}}</span>
+          {{spot.vehicalType === '2' ? '2-Wheeler' : '4-Wheeler'}}
+        </div>
+        <p class="address">{{spot.fullAddress}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB -->
+
+  <button class="fab" (click)="openModal()">
+    <span class="material-icons-outlined">add</span>
+  </button>
+
+
+  <!-- Modal -->
+  <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{parkingData.Unique_Id > 0 ? 'Edit Parking Details' : 'Add Parking Details'}}</h3>
+        <button type="button" class="close-btn" (click)="closeModal()">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="submitForm()">
+          <!-- Vehicle Type Switch -->
+          <div class="form-group toggle-group">
+            <label>Vehicle Type</label>
+            <div class="segmented-control">
+              <input type="radio" id="two-wheeler" name="vehicleType" value="2" [(ngModel)]="parkingData.vehicleType">
+              <label for="two-wheeler">2 Wheeler</label>
+
+              <input type="radio" id="four-wheeler" name="vehicleType" value="4" [(ngModel)]="parkingData.vehicleType">
+              <label for="four-wheeler">4 Wheeler</label>
+            </div>
+          </div>
+
+          <!-- Location (Auto) -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Latitude</label>
+              <input type="text" name="latitude" [(ngModel)]="parkingData.latitude" readonly placeholder="Fetching...">
+            </div>
+            <div class="form-group">
+              <label>Longitude</label>
+              <div class="input-with-icon">
+                <input type="text" name="longitude" [(ngModel)]="parkingData.longitude" readonly
+                  placeholder="Fetching...">
+                <button type="button" class="refresh-loc-btn" (click)="getLocation()" title="Refresh Location">
+                  <span class="material-icons-outlined">my_location</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Full Address</label>
+            <textarea name="address" [(ngModel)]="parkingData.address" rows="3"
+              placeholder="Enter complete address details" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Rate (₹/hr)</label>
+              <input type="number" name="rate" [(ngModel)]="parkingData.rate" placeholder="e.g. 50" required>
+            </div>
+            <div class="form-group">
+              <label>Contact No.</label>
+              <input type="tel" name="contactNumber" [(ngModel)]="parkingData.contactNumber"
+                placeholder="Enter mobile no." required>
+            </div>
+          </div>
+
+          <!-- Image Upload -->
+          <div class="form-group">
+            <label>Upload Images (Max 4)</label>
+            <div class="image-upload-container">
+              <div class="image-preview" *ngFor="let img of imagePreviews; let i = index">
+                <img [src]="img" alt="Parking spot preview">
+                <button type="button" class="remove-img-btn" (click)="removeImage(i)">
+                  <span class="material-icons-outlined">close</span>
+                </button>
+              </div>
+
+              <label class="upload-btn" *ngIf="imagePreviews.length < 4">
+                <span class="material-icons-outlined">add_photo_alternate</span>
+                <span>Add Photo</span>
+                <input type="file" multiple accept="image/*" (change)="onImageUpload($event)" hidden>
+              </label>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+
+            <button type="button" class="btn-delete" *ngIf="parkingData.Unique_Id && parkingData.Unique_Id > 0"
+              (click)="deleteSpot(parkingData.Unique_Id)">
+              Delete
+            </button>
+
+            <button type="submit" class="btn-submit">
+              {{ parkingData.Unique_Id > 0 ? 'Update' : 'Submit' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

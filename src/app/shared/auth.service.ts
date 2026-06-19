@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiService } from './api.service';
 import { LoaderService } from '../services/loader.service';
-import { finalize } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, of, tap, throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
@@ -14,6 +14,10 @@ import { ToastrService } from 'ngx-toastr';
 export class AuthService {
 
   private platformId = inject(PLATFORM_ID);
+  private parkingUser: any = null;
+  private parkingUserSubject = new BehaviorSubject<any>(null);
+  public parkingUser$ = this.parkingUserSubject.asObservable();
+  private readonly parkingSessionExpiredMessage = 'the user loged in other device';
 
   constructor(
     private router: Router,
@@ -21,7 +25,9 @@ export class AuthService {
     private api: ApiService,
     private loader: LoaderService,
     private toaster: ToastrService
-  ) { }
+  ) {
+    this.initParkingUser();
+  }
 
   // Generate UUID (optional utility)
   generateUUIDToken(): string {
@@ -263,5 +269,175 @@ farmLogout(): void {
 clearFarmUserDetailsCookie(): void {
   document.cookie = 'FarmCredentials=; path=/; max-age=0';
 }
+
+
+
+// ===== Smart Parking Auth Methods =====
+
+  private initParkingUser(): void {
+    if (!isPlatformBrowser(this.platformId) || this.parkingUser) return;
+
+    try {
+      const stored = localStorage.getItem('parking_user');
+      if (!stored) return;
+
+      this.parkingUser = this.normalizeParkingUser(JSON.parse(stored));
+      this.parkingUserSubject.next(this.parkingUser);
+    } catch (e) {
+      console.warn('LocalStorage access failed or data corrupted', e);
+      this.clearParkingSession(false, false);
+    }
+  }
+
+  private normalizeParkingUser(source: any): any {
+    const rawUser = source?.user ?? source ?? {};
+    const userId = rawUser.userId ?? rawUser.userid ?? rawUser.USERID ?? null;
+
+    return {
+      userId,
+      name: rawUser.name ?? rawUser.userName ?? rawUser.NAME ?? '',
+      email: rawUser.email ?? rawUser.EMAIL ?? '',
+      phone: rawUser.phone ?? rawUser.PHONE ?? '',
+      role: rawUser.role ?? 'Parking Provider'
+    };
+  }
+
+  private getParkingToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    try {
+      return localStorage.getItem('parking_token');
+    } catch {
+      return null;
+    }
+  }
+
+  setCurrentUser(parkingSession: any): void {
+    const normalizedUser = this.normalizeParkingUser(parkingSession);
+    if (!normalizedUser.userId) {
+      this.clearParkingSession(false, false);
+      return;
+    }
+
+    const token = parkingSession?.token ?? this.getParkingToken();
+
+    this.parkingUser = normalizedUser;
+    this.parkingUserSubject.next(normalizedUser);
+
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('parking_user', JSON.stringify(normalizedUser));
+      if (token) {
+        localStorage.setItem('parking_token', token);
+      }
+    }
+
+  }
+
+  getCurrentUser(): any {
+    this.initParkingUser();
+    return this.parkingUser;
+  }
+
+  isParkingLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    this.initParkingUser();
+    const hasUser = !!this.parkingUser?.userId;
+    const hasToken = !!this.getParkingToken();
+
+    if (hasUser !== hasToken) {
+      this.clearParkingSession(false, false);
+      return false;
+    }
+
+    return hasUser && hasToken;
+  }
+
+  validateParkingSession(showExpiredToast: boolean = false) {
+    const token = this.getParkingToken();
+    if (!token) {
+      if (this.parkingUser?.userId) {
+        this.clearParkingSession(false, false);
+      }
+      return of(null);
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get(`${this.api.baseurl}ParkingLogin/validate`, { headers }).pipe(
+      tap((response: any) => {
+        if (response?.user) {
+          this.setCurrentUser({ token, user: response.user });
+        }
+      }),
+      catchError((err) => {
+        // Clear stale browser session data for any failed validation request.
+        // This prevents repeated validate loops when the backend rejects the token
+        // or the browser blocks the 401 response because of missing CORS headers.
+        const message = err?.status === 401 || err?.status === 403
+          ? this.parkingSessionExpiredMessage
+          : 'Parking session could not be validated. Please login again.';
+        this.clearParkingSession(showExpiredToast, true, message, 'Session Expired');
+        return throwError(() => err);
+      })
+    );
+  }
+
+  handleParkingSessionExpired(message: string = this.parkingSessionExpiredMessage, showToast: boolean = true): void {
+    this.clearParkingSession(showToast, true, message, 'Session Expired');
+  }
+
+  clearParkingClientSessionOnly(): void {
+    this.clearParkingSession(false, false);
+  }
+
+  parkingLogout(): void {
+    const token = this.getParkingToken();
+    if (!token) {
+      this.clearParkingSession(true, true);
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.post(`${this.api.baseurl}ParkingLogin/logout`, {}, { headers }).subscribe({
+      next: () => this.clearParkingSession(true, true),
+      error: () => this.clearParkingSession(true, true)
+    });
+  }
+
+  private clearParkingSession(
+    showToast: boolean,
+    navigateToLogin: boolean,
+    message: string = 'Logged out from Parking',
+    title: string = 'Logout'
+  ): void {
+    this.parkingUser = null;
+    this.parkingUserSubject.next(null);
+
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('parking_user');
+      localStorage.removeItem('parking_token');
+      localStorage.removeItem('smartparking usercredentials');
+    }
+
+    if (showToast) {
+      try {
+        if (title === 'Session Expired') {
+          this.toaster.warning(message, title);
+        } else {
+          this.toaster.success(message, title);
+        }
+      } catch (e) {
+        console.warn('toaster unavailable', e);
+      }
+    }
+
+    if (navigateToLogin) {
+      this.router.navigateByUrl('/parking/dashboard', { replaceUrl: true });
+    }
+  }
 
 }

@@ -1,0 +1,91 @@
+<section class="auth-shell">
+  <div class="auth-card">
+    <button class="back-link" type="button" (click)="goBack()">
+      <span class="material-icons-outlined">west</span>
+      <span>Back</span>
+    </button>
+
+    <div class="auth-badge">
+      <span class="material-icons-outlined">local_parking</span>
+      <span>Smart Parking</span>
+    </div>
+
+    <header class="auth-header">
+      <h1>Provider Login</h1>
+    </header>
+
+    <div class="error-alert" *ngIf="errorMessage">
+      <span class="material-icons-outlined">error_outline</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="auth-form">
+      <div class="field-block" [class.focused]="isEmailFocused">
+        <label for="phone">Phone Number</label>
+        <div class="field-control">
+          <span class="material-icons-outlined field-icon">phone</span>
+          <input
+            id="phone"
+            type="tel"
+            name="phone"
+            [(ngModel)]="loginData.phone"
+            required
+            placeholder="Enter your registered phone number"
+            (focus)="isEmailFocused = true"
+            (blur)="isEmailFocused = false"
+          />
+        </div>
+      </div>
+
+      <div class="field-block" [class.focused]="isPasswordFocused">
+        <label for="password">Password</label>
+        <div class="field-control">
+          <span class="material-icons-outlined field-icon">lock</span>
+          <input
+            id="password"
+            [type]="hidePassword ? 'password' : 'text'"
+            name="password"
+            [(ngModel)]="loginData.password"
+            required
+            placeholder="Enter your password"
+            (focus)="isPasswordFocused = true"
+            (blur)="isPasswordFocused = false"
+          />
+          <button
+            type="button"
+            class="toggle-visibility"
+            (click)="togglePasswordVisibility()"
+            aria-label="Toggle password visibility"
+          >
+            <span class="material-icons-outlined">
+              {{ hidePassword ? 'visibility_off' : 'visibility' }}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-meta">
+        <label class="remember-choice">
+          <input type="checkbox" name="remember" [(ngModel)]="loginData.remember" />
+          <span>Keep me signed in</span>
+        </label>
+      </div>
+
+      <button
+        type="submit"
+        class="submit-button"
+        [disabled]="!loginData.phone || !loginData.password || isLoading"
+      >
+        <span *ngIf="isLoading" class="loader"></span>
+        <span>{{ isLoading ? 'Signing In...' : 'Sign In' }}</span>
+      </button>
+    </form>
+
+    <footer class="auth-footer">
+      <p>Don't have a provider account?</p>
+      <a routerLink="/parking/provider-registration">Create an account</a>
+    </footer>
+  </div>
+
+  <p class="auth-legal">&copy; {{ currentYear }} Smart Parking. All rights reserved.</p>
+</section>
