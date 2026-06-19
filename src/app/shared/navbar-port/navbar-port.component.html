@@ -1,6 +1,6 @@
 <nav class="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50">
   <!-- Outer container with dashed border and shadow -->
-  <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl px-4 py-3 md:px-6 md:py-4 flex items-center justify-between transition-all duration-300">
+  <div class="bg-white/75 dark:bg-zinc-900/75 backdrop-blur-lg border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl px-4 py-3 md:px-6 md:py-4 flex items-center justify-between transition-all duration-300">
     
     <!-- Profile Photo / Branding -->
     <div class="flex items-center space-x-3">
@@ -52,7 +52,7 @@
 
   <!-- Mobile Dropdown Menu -->
   <div *ngIf="mobileMenuOpen" 
-       class="mt-2 md:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl p-4 flex flex-col items-center space-y-2 animate-slideDown">
+       class="mt-2 md:hidden bg-white/75 dark:bg-zinc-900/75 backdrop-blur-lg border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-xl p-4 flex flex-col items-center space-y-2 animate-slideDown">
     <a [routerLink]="['/portfolio/home']" 
        [class]="isActive('home') ? mobileActiveClass : mobileInactiveClass"
        (click)="closeMobileMenu()">Home</a>
