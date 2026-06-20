@@ -112,8 +112,8 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('reveal-visible');
-          // Unobserve after animating once to keep it clean and performant
-          observer.unobserve(entry.target);
+        } else {
+          entry.target.classList.remove('reveal-visible');
         }
       });
     }, {
@@ -121,11 +121,9 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
       rootMargin: '0px 0px -60px 0px'
     });
 
-    // Query both direct reveals and lists that might contain staggered reveals
     const targets = document.querySelectorAll('.scroll-reveal');
     targets.forEach(target => observer.observe(target));
   }
-
   fetchContributions() {
     fetch('https://github-contributions-api.jogruber.de/v4/suuyashhh')
       .then(res => {
