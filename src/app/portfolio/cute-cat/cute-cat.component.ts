@@ -30,6 +30,13 @@ export class CuteCatComponent implements OnInit, OnDestroy {
   private lastFrameTimestamp = 0;
   private hasMouseMoved = false;
 
+  // Alternating cat GIF — toggles between the two variants on each page refresh
+  private readonly catGifs = [
+    'assets/img/oneko.gif',
+    'assets/img/oneko-tora.gif'
+  ];
+  catGifUrl = this.catGifs[0];
+
   // Sprite coordinate grid mapping (multiplied by 32px)
   private spriteSets: { [key: string]: number[][] } = {
     idle: [[-3, -3]],
@@ -100,6 +107,14 @@ export class CuteCatComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (!this.isBrowser) return;
+
+    // Toggle cat GIF on each page load using localStorage
+    const STORAGE_KEY = 'neko-cat-index';
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const currentIndex = stored === '1' ? 1 : 0;
+    this.catGifUrl = this.catGifs[currentIndex];
+    // Flip for next refresh
+    localStorage.setItem(STORAGE_KEY, currentIndex === 0 ? '1' : '0');
 
     // Set initial position to center of viewport
     this.x = window.innerWidth / 2;
