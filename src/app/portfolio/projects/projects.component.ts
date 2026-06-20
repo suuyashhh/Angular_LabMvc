@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -26,10 +26,12 @@ interface Project {
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent implements OnInit {
+export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
   activeTab: 'webApps' | 'websites' = 'webApps';
   currentImageIndex: { [key: string]: number } = {};
   
+  private observer: IntersectionObserver | null = null;
+
   // Image preview modal
   showImagePreview = false;
   previewImage = '';
@@ -187,9 +189,44 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  ngAfterViewInit() {
+    this.initScrollReveal();
+  }
+
+  initScrollReveal() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        } else {
+          entry.target.classList.remove('reveal-visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    const targets = document.querySelectorAll('.scroll-reveal');
+    targets.forEach(target => this.observer!.observe(target));
+  }
+
   // Switch between tabs
   switchTab(tab: 'webApps' | 'websites'): void {
     this.activeTab = tab;
+    setTimeout(() => {
+      this.initScrollReveal();
+    }, 50);
   }
 
   // Navigate to next image in carousel

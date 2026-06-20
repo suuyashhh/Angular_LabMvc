@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -7,9 +7,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit, AfterViewChecked {
+export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   weeks: any[][] = [];
   totalContributions = 0;
   isLoading = true;
@@ -107,6 +107,23 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  ngAfterViewInit() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        } else {
+          entry.target.classList.remove('reveal-visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    const targets = document.querySelectorAll('.scroll-reveal');
+    targets.forEach(target => observer.observe(target));
+  }
   fetchContributions() {
     fetch('https://github-contributions-api.jogruber.de/v4/suuyashhh')
       .then(res => {
@@ -282,4 +299,16 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
     return project ? project.images : [];
   }
-}
+
+  // Returns ordinal suffix for a date string — e.g. "18" → "th"
+  getOrdinal(dateStr: string): string {
+    const d = new Date(dateStr).getDate();
+    if (d > 3 && d < 21) return 'th';
+    switch (d % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+}

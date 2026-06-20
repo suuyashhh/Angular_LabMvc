@@ -57,6 +57,22 @@ export class ResumeComponent implements OnInit, AfterViewInit {
 
     // Fallback - hide loading after 2 seconds if iframe doesn't load
     setTimeout(hideLoading, 2000);
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        } else {
+          entry.target.classList.remove('reveal-visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    const targets = document.querySelectorAll('.scroll-reveal');
+    targets.forEach(target => observer.observe(target));
   }
 
   /**

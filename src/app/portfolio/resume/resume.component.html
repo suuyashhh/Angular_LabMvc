@@ -1,39 +1,41 @@
-<main class="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-16 max-w-5xl min-h-screen flex flex-col items-center">
+<main
+  class="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-16 max-w-5xl min-h-screen flex flex-col items-center">
 
   <!-- Header Section -->
-  <div class="text-center space-y-3 mb-8 w-full">
+  <div class="text-center space-y-3 mb-8 w-full scroll-reveal reveal-fade-up">
     <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 font-sans">
       Resume
     </h1>
-    <p class="text-sm md:text-[1.05rem] text-zinc-500 font-medium max-w-lg mx-auto">
-      Review my education, technical capabilities, and professional work credentials.
-    </p>
   </div>
 
   <!-- Action Controls -->
-  <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mb-8 w-full max-w-md">
+  <div
+    class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mb-8 w-full max-w-md scroll-reveal reveal-fade-up delay-100">
     <button onclick="downloadPDF()"
-            class="w-full sm:w-auto flex-1 bg-zinc-950 text-white px-6 py-3.5 rounded-2xl font-bold shadow-md hover:bg-zinc-900 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
+      class="w-full sm:w-auto flex-1 bg-zinc-950 text-white px-6 py-3.5 rounded-2xl font-bold shadow-md hover:bg-zinc-900 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
       <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 512 512">
-        <path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"></path>
+        <path
+          d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z">
+        </path>
       </svg>
       <span>Download PDF</span>
     </button>
 
     <button onclick="openInNewTab()"
-            class="w-full sm:w-auto flex-1 bg-zinc-50 border border-dashed border-zinc-200 text-zinc-700 px-6 py-3.5 rounded-2xl font-bold shadow-sm hover:bg-zinc-100 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
+      class="w-full sm:w-auto flex-1 bg-zinc-50 border border-dashed border-zinc-200 text-zinc-700 px-6 py-3.5 rounded-2xl font-bold shadow-sm hover:bg-zinc-100 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
       <i class="fas fa-arrow-up-right-from-square text-xs"></i>
       <span>Open in New Tab</span>
     </button>
   </div>
 
   <!-- PDF Viewer Container - Desktop & Tablet & Mobile (Single responsive wrapper) -->
-  <div class="w-full max-w-4xl bg-zinc-50/50 border border-dashed border-zinc-200 rounded-3xl p-2 sm:p-2.5 shadow-sm">
+  <div
+    class="w-full max-w-4xl bg-zinc-50/50 border border-dashed border-zinc-200 rounded-3xl p-2 sm:p-2.5 shadow-sm scroll-reveal reveal-scale-up delay-200">
     <div class="bg-white rounded-2xl border border-dashed border-zinc-150 overflow-hidden relative shadow-inner">
-      
+
       <!-- Loading indicator -->
       <div id="loadingOverlay"
-           class="absolute inset-0 bg-zinc-50 flex flex-col items-center justify-center z-10 transition-opacity duration-300">
+        class="absolute inset-0 bg-zinc-50 flex flex-col items-center justify-center z-10 transition-opacity duration-300">
         <div class="w-8 h-8 rounded-full border-2 border-zinc-450 border-t-transparent animate-spin mb-3"></div>
         <p class="text-zinc-500 font-semibold text-xs">Loading resume...</p>
       </div>
@@ -41,10 +43,9 @@
       <!-- PDF Frame -->
       <div class="w-full h-[65vh] sm:h-[75vh] min-h-[450px] max-h-[850px]">
         <iframe id="pdfViewer"
-                src="assets/img/SuyashPatilResume.pdf#zoom=FitH&view=FitH&toolbar=0&navpanes=0&scrollbar=0"
-                class="w-full h-full border-none"
-                title="Resume PDF Viewer"
-                onload="document.getElementById('loadingOverlay').style.display='none';">
+          src="assets/img/SuyashPatilResume.pdf#zoom=FitH&view=FitH&toolbar=0&navpanes=0&scrollbar=0"
+          class="w-full h-full border-none" title="Resume PDF Viewer"
+          onload="document.getElementById('loadingOverlay').style.display='none';">
         </iframe>
       </div>
 
@@ -52,8 +53,34 @@
   </div>
 
   <!-- Clean Minimal Footer -->
-  <footer class="w-full mt-12 border-t border-dashed border-zinc-200 pt-6 text-center">
-    <p class="text-xs text-zinc-400 font-semibold select-none">© 2026 Suyash Patil. All rights reserved.</p>
+
+
+  <footer class="w-full mt-1 border-t border-dashed border-zinc-200 dark:border-zinc-800 pt-1 pb-1 text-center">
+    <div id="suyash-social-icons" class="flex items-center justify-center gap-3 mb-1">
+
+      <a href="https://github.com/suuyashhh" target="_blank"
+        class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+        <i class="fab fa-github text-base text-zinc-800 dark:text-zinc-100"></i>
+      </a>
+
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank"
+        class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+        <i class="fab fa-linkedin text-base text-[#0077B5]"></i>
+      </a>
+
+      <!-- Instagram -->
+      <a href="https://www.instagram.com/suyashpatil_.03" target="_blank"
+        class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+        <i class="fab fa-instagram text-base text-[#E4405F]"></i>
+      </a>
+
+      <!-- WhatsApp -->
+      <a href="https://wa.me/918180821173" target="_blank"
+        class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+        <i class="fab fa-whatsapp text-base text-[#25D366]"></i>
+      </a>
+    </div>
   </footer>
 
 </main>
