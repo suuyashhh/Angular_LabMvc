@@ -299,4 +299,16 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
     const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
     return project ? project.images : [];
   }
-}
+
+  // Returns ordinal suffix for a date string — e.g. "18" → "th"
+  getOrdinal(dateStr: string): string {
+    const d = new Date(dateStr).getDate();
+    if (d > 3 && d < 21) return 'th';
+    switch (d % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
+}

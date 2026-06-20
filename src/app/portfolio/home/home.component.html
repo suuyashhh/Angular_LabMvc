@@ -1,5 +1,5 @@
 <div class="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 md:pt-32 md:pb-16 select-none">
-  <div class="w-full max-w-2xl text-center space-y-8">
+  <div class="w-full max-w-4xl text-center space-y-8">
 
     <!-- Profile Image -->
     <div class="relative w-32 h-32 md:w-36 md:h-36 mx-auto scroll-reveal reveal-scale-up">
@@ -82,7 +82,8 @@
         title="Email">
         <i class="fas fa-envelope text-base text-blue-500"></i>
       </a>
-    </div>    <!-- GitHub Contributions Section -->
+    </div>
+    <!-- GitHub Contributions Section -->
     <div class="pt-8 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left scroll-reveal reveal-fade-up">
       <h2 class="text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-4 text-center">
         GitHub Contributions
@@ -90,96 +91,107 @@
 
       <!-- Card Container -->
       <div id="contrib-card-container"
-        class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl p-4 md:p-6 shadow-sm">
+        class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl p-4 md:p-6 shadow-sm overflow-hidden">
 
         <!-- Loading State -->
-        <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-8 space-y-3">
-          <div class="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
-          <p class="text-xs text-zinc-550 dark:text-zinc-400">Fetching GitHub calendar...</p>
+        <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-10 space-y-3">
+          <div class="w-7 h-7 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">Fetching GitHub calendar...</p>
         </div>
 
         <!-- Error State -->
-        <div *ngIf="hasError" class="flex flex-col items-center justify-center py-8 text-center space-y-2">
+        <div *ngIf="hasError" class="flex flex-col items-center justify-center py-10 text-center space-y-2">
           <i class="fas fa-triangle-exclamation text-red-500 text-xl animate-pulse"></i>
           <p class="text-xs text-zinc-600 dark:text-zinc-400">Could not load contribution data.</p>
         </div>
 
         <!-- Graph content -->
-        <div *ngIf="!isLoading && !hasError" class="space-y-4">
-          <!-- Total contributions count header -->
-          <div class="flex items-center space-x-2.5 text-zinc-800 dark:text-zinc-200">
-            <svg class="w-5 h-5 fill-current text-zinc-800 dark:text-zinc-200" viewBox="0 0 24 24">
-              <path
-                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+        <div *ngIf="!isLoading && !hasError" class="gh-contrib-wrap">
+
+          <!-- Total count row -->
+          <div class="flex items-center gap-2 mb-3 text-zinc-700 dark:text-zinc-300">
+            <svg class="w-4 h-4 fill-current flex-shrink-0" viewBox="0 0 24 24">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
             </svg>
-            <span class="font-bold text-sm md:text-base tracking-tight">
-              Total Contributions: {{ totalContributions | number }}
-            </span>
+            <span class="text-xs font-semibold">{{ totalContributions | number }} contributions in the last year</span>
           </div>
 
-          <!-- The grid layout -->
-          <div class="flex items-end">
-            <!-- Day labels -->
-            <div
-              class="flex flex-col justify-between h-[84px] md:h-[94px] pr-2 text-[9px] md:text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold pb-1 select-none">
-              <span class="leading-none h-2.5"></span>
-              <span class="leading-none h-2.5">Mon</span>
-              <span class="leading-none h-2.5"></span>
-              <span class="leading-none h-2.5">Wed</span>
-              <span class="leading-none h-2.5"></span>
-              <span class="leading-none h-2.5">Fri</span>
-              <span class="leading-none h-2.5"></span>
+          <!-- Grid wrapper: day-labels + scrollable grid -->
+          <div class="gh-grid-outer">
+
+            <!-- Day-of-week labels (Mon, Wed, Fri) -->
+            <div class="gh-day-labels">
+              <span></span><!-- Sun -->
+              <span>Mon</span>
+              <span></span><!-- Tue -->
+              <span>Wed</span>
+              <span></span><!-- Thu -->
+              <span>Fri</span>
+              <span></span><!-- Sat -->
             </div>
 
-            <!-- Scrollable container for columns -->
-            <div class="flex-grow overflow-x-auto pb-1.5 scrollbar-none" id="contrib-grid-viewport"
-               (scroll)="hideTooltip()">
-              <div class="flex gap-[3px] md:gap-1 min-w-max">
-                <div *ngFor="let week of weeks; let wIdx = index" class="flex flex-col gap-[3px] md:gap-1">
-                  <!-- Month Label Header -->
-                  <div class="h-3.5 relative select-none w-2.5 md:w-3">
+            <!-- Scrollable columns area -->
+            <div class="gh-grid-scroll scrollbar-none" id="contrib-grid-viewport" (scroll)="hideTooltip()">
+              <div class="gh-grid-inner">
+
+                <!-- Month labels row -->
+                <div class="gh-month-row">
+                  <div *ngFor="let week of weeks; let wIdx = index" class="gh-month-cell">
+                    <span *ngIf="getMonthLabel(wIdx)" class="gh-month-label">{{ getMonthLabel(wIdx) }}</span>
+                  </div>
+                </div>
+
+                <!-- Week columns -->
+                <div class="gh-week-row">
+                  <div *ngFor="let week of weeks; let wIdx = index" class="gh-week-col">
                     <span
-                      class="absolute left-0 top-0 text-[9px] text-zinc-400 dark:text-zinc-500 font-semibold whitespace-nowrap w-12 overflow-hidden text-ellipsis">
-                      {{ getMonthLabel(wIdx) }}
+                      *ngFor="let day of week"
+                      class="gh-cell"
+                      [class.gh-l0]="day.level === 0"
+                      [class.gh-l1]="day.level === 1"
+                      [class.gh-l2]="day.level === 2"
+                      [class.gh-l3]="day.level === 3"
+                      [class.gh-l4]="day.level === 4"
+                      (mouseenter)="showTooltip(day, $event)"
+                      (mouseleave)="hideTooltip()"
+                      (click)="showContribToast(day)">
                     </span>
                   </div>
-                  <!-- 7 days of the week -->
-                  <span *ngFor="let day of week" [class]="getDayClass(day.level)"
-                    (mouseenter)="showTooltip(day, $event)" (mouseleave)="hideTooltip()"
-                    (click)="showContribToast(day)">
-                  </span>
                 </div>
+
               </div>
             </div>
           </div>
 
-          <!-- Legend Less -> More -->
-          <div
-            class="flex items-center space-x-2 text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold select-none pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
-            <span>Less</span>
-            <span
-              class="w-2.5 h-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/40 dark:border-zinc-700/30"></span>
-            <span
-              class="w-2.5 h-2.5 rounded-full bg-emerald-200 dark:bg-emerald-950/70 border border-emerald-100 dark:border-emerald-900/30"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 dark:bg-emerald-700/80"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-500/90"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
-            <span>More</span>
-          </div>
+          <!-- Bottom row: Learn link (left) + Legend (right) -->
+          <div class="gh-bottom-bar">
+            <a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/managing-contribution-settings-on-your-profile/why-are-my-contributions-not-showing-up-on-my-profile"
+               target="_blank" rel="noopener"
+               class="gh-learn-link">Learn how we count contributions</a>
 
-          <!-- Custom Tooltip -->
-          <div *ngIf="hoveredDay" [style.top.px]="tooltipY" [style.left.px]="tooltipX"
-            class="absolute z-50 -translate-x-1/2 -translate-y-full bg-zinc-950/95 dark:bg-white/95 text-zinc-50 dark:text-zinc-900 px-2.5 py-1.5 rounded-lg text-[10px] md:text-xs font-semibold shadow-lg backdrop-blur-sm pointer-events-none transition-all duration-150 border border-zinc-800/20 dark:border-zinc-200/20 whitespace-nowrap">
-            <span class="font-bold text-emerald-400 dark:text-emerald-600">{{ hoveredDay.count }}</span> {{
-            hoveredDay.count === 1 ? 'contribution' : 'contributions' }} on {{ hoveredDay.date | date:'mediumDate' }}
-            <!-- Tooltip Arrow -->
-            <div
-              class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-950/95 dark:border-t-white/95">
+            <div class="gh-legend">
+              <span class="gh-legend-label">Less</span>
+              <span class="gh-cell gh-l0"></span>
+              <span class="gh-cell gh-l1"></span>
+              <span class="gh-cell gh-l2"></span>
+              <span class="gh-cell gh-l3"></span>
+              <span class="gh-cell gh-l4"></span>
+              <span class="gh-legend-label">More</span>
             </div>
           </div>
 
-        </div>
+          <!-- Tooltip (GitHub-style dark pill) -->
+          <div *ngIf="hoveredDay"
+            [style.top.px]="tooltipY"
+            [style.left.px]="tooltipX"
+            class="gh-tooltip">
+            <span class="font-semibold">{{ hoveredDay.count }} {{ hoveredDay.count === 1 ? 'contribution' : 'contributions' }}</span>
+            &nbsp;on {{ hoveredDay.date | date:'MMMM d' }}<span class="gh-tooltip-ordinal">{{ getOrdinal(hoveredDay.date) }}</span>.
+            <!-- Arrow -->
+            <div class="gh-tooltip-arrow"></div>
+          </div>
 
+        </div>
       </div>
     </div>
 
@@ -281,7 +293,8 @@
           <span
             class="text-[10px] md:text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2 text-center">ASP.NET
             MVC</span>
-        </div>      </div>
+        </div>
+      </div>
     </div>
 
     <!-- Work Experience Section -->
@@ -289,7 +302,6 @@
       class="pt-8 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left w-full max-w-xl mx-auto mt-8 scroll-reveal reveal-fade-up">
       <div class="flex items-center space-x-2.5 mb-2">
         <!-- Calendar Icon -->
-        <span class="text-xl">📅</span>
         <h2 class="text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50">
           Work Experience
         </h2>
