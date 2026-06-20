@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -7,9 +7,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit, AfterViewChecked {
+export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   weeks: any[][] = [];
   totalContributions = 0;
   isLoading = true;
@@ -105,6 +105,25 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         this.hasScrolledToEnd = true;
       }
     }
+  }
+
+  ngAfterViewInit() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+          // Unobserve after animating once to keep it clean and performant
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    // Query both direct reveals and lists that might contain staggered reveals
+    const targets = document.querySelectorAll('.scroll-reveal');
+    targets.forEach(target => observer.observe(target));
   }
 
   fetchContributions() {
