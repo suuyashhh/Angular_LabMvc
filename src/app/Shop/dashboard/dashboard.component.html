@@ -1,0 +1,621 @@
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+
+  <!-- MAIN CONTENT -->
+  <main class="pt-24 md:pt-28 pb-20 px-4 md:px-6">
+    <div class="max-w-4xl mx-auto">
+
+      <!-- FINANCIAL SUMMARY WIDGETS -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <!-- Balance Card -->
+        <div class="bg-white rounded-xl p-4 border border-amber-100 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Net Balance</p>
+            <h3 class="text-xl md:text-2xl font-bold mt-1 text-emerald-600">
+              ₹{{ netBalance | number:'1.2-2' }}
+            </h3>
+          </div>
+          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-50 text-emerald-600">
+            <i class="ri-wallet-3-line text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION BAR -->
+      <div class="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 mb-6 border border-gray-200">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button (click)="openAddModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 
+                       text-white px-5 py-2.5 rounded-lg md:rounded-xl 
+                       hover:from-amber-600 hover:to-orange-700 transition-all duration-200
+                       flex items-center justify-center gap-2 font-semibold text-sm md:text-base
+                       shadow-sm hover:shadow-md">
+            <i class="ri-add-line text-lg md:text-xl"></i>
+            <span>Add Entry</span>
+          </button>
+
+          <div class="flex-1 relative">
+            <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            <input type="text" [(ngModel)]="searchQuery" (input)="searchEntries()"
+              placeholder="Search by description or status..." class="w-full pl-10 pr-4 py-2.5 border border-gray-200 
+                        rounded-lg md:rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                        focus:ring-2 focus:ring-amber-500 focus:border-amber-500
+                        outline-none transition-all duration-200" />
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base md:text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <i class="ri-history-line text-amber-500"></i>
+            <span>Shop Log History</span>
+          </h3>
+          <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+            Showing {{ filteredEntries.length }} entries
+          </span>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="groupedEntries.length === 0" class="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
+          <div class="text-6xl mb-4">🏪</div>
+          <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-2">No Records Found</h4>
+          <p class="text-sm text-gray-500 mb-6">Create your first entry to see history</p>
+          <button (click)="openAddModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 
+                       text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 
+                       transition font-semibold shadow">
+            Add First Entry
+          </button>
+        </div>
+
+        <!-- Entries List -->
+        <div *ngFor="let group of groupedEntries; let isLast = last" class="mb-6" [class.mb-0]="isLast">
+
+          <!-- Date Header -->
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+            <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
+            <span class="text-xs text-gray-400">({{ group.count }})</span>
+          </div>
+
+          <!-- Cards list -->
+          <div class="space-y-3">
+            <div *ngFor="let entry of group.entries" (click)="viewEntry(entry)" class="bg-white hover:bg-amber-50/20 rounded-xl p-4 
+                        border border-gray-200 hover:border-amber-300
+                        transition-all duration-200 cursor-pointer shadow-sm group">
+
+              <div class="flex items-start justify-between gap-4">
+                <!-- Left Details -->
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                  <!-- Payment Status Icon -->
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border"
+                       [ngClass]="entry.iS_PAID ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'">
+                    <i [class]="entry.iS_PAID ? 'ri-checkbox-circle-line text-xl' : 'ri-time-line text-xl'"></i>
+                  </div>
+
+                  <!-- Text Details -->
+                  <div class="flex-1 min-w-0 pt-0.5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-xs font-bold px-2 py-0.5 rounded-full"
+                            [ngClass]="entry.iS_PAID ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'">
+                        {{ entry.iS_PAID ? 'Paid' : 'Pending' }}
+                      </span>
+                      <span *ngIf="entry.imagE1 || entry.imagE2 || entry.imagE3 || entry.imagE4" class="text-xs text-gray-400 flex items-center gap-1">
+                        <i class="ri-image-line"></i> Photos
+                      </span>
+                    </div>
+                    <h5 class="font-medium text-gray-800 mt-1 truncate text-sm md:text-base">
+                      {{ entry.reason }}
+                    </h5>
+                  </div>
+                </div>
+
+                <!-- Right Price -->
+                <div class="flex-shrink-0 text-right">
+                  <span class="text-base md:text-lg font-bold" 
+                        [ngClass]="entry.iS_PAID ? 'text-emerald-600' : 'text-red-600'">
+                    ₹{{ entry.price | number:'1.2-2' }}
+                  </span>
+                  <p class="text-[10px] text-gray-400 mt-1">Click to view</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD ENTRY MODAL -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+
+      <!-- Close Button -->
+      <button (click)="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
+                     p-1.5 rounded-full hover:bg-gray-100 transition">
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 
+                    flex items-center justify-center">
+          <i class="ri-add-box-line text-2xl text-amber-600"></i>
+        </div>
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Add New Shop Log</h2>
+          <p class="text-xs md:text-sm text-gray-500">Record a new transaction for Tejas SWEETS</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Date -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Date <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <input type="date" [(ngModel)]="formData.date" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm md:text-base
+                            focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                            outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Payment Status Checkbox -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Payment Status
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-gray-50 border border-gray-200 rounded-xl select-none hover:bg-gray-100/50 transition">
+              <input type="checkbox" [(ngModel)]="formData.isPaid" class="w-5 h-5 accent-amber-500 rounded cursor-pointer" />
+              <div>
+                <span class="text-sm font-bold" [ngClass]="formData.isPaid ? 'text-emerald-600' : 'text-rose-600'">
+                  {{ formData.isPaid ? 'Paid' : 'Pending' }}
+                </span>
+                <p class="text-[10px] text-gray-400">
+                  {{ formData.isPaid ? 'Fully settled' : 'Outstanding credit' }}
+                </p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Description / Reason <span class="text-red-500">*</span>
+          </label>
+          <textarea [(ngModel)]="formData.reason" placeholder="Description" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                           bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                           focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                           outline-none resize-none transition"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Amount (₹) <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="ri-money-rupee-circle-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            <input type="number" [(ngModel)]="formData.price" placeholder="0.00" min="0.01" step="0.01" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                          rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                          focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                          outline-none transition" />
+          </div>
+        </div>
+
+        <!-- Images Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Upload Images <span class="text-gray-400 text-xs font-normal">(Maximum 4)</span>
+          </label>
+
+          <div class="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center 
+                      hover:border-amber-400 hover:bg-amber-50/20 transition cursor-pointer"
+            (click)="triggerFileInput()">
+            <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-2"></i>
+            <p class="text-sm text-gray-600 mb-1 font-semibold">Click to upload receipts/photos</p>
+            <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP (Images will be auto-compressed)</p>
+          </div>
+
+          <input id="fileInput" type="file" (change)="onFileSelect($event)" accept="image/*" multiple class="hidden" />
+
+          <!-- Image Previews -->
+          <div *ngIf="previewImages.length > 0" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+            <div *ngFor="let img of previewImages; let i = index" class="relative group rounded-xl overflow-hidden shadow-sm border border-amber-100">
+              <img [src]="img" class="w-full h-24 object-cover" />
+              <button (click)="removeImage(i)" class="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full 
+                             transition shadow flex items-center justify-center">
+                <i class="ri-close-line text-sm"></i>
+              </button>
+              <div class="absolute bottom-1 left-1.5 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                Image {{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+        <button (click)="closeModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-semibold transition text-sm md:text-base">
+          Cancel
+        </button>
+        <button (click)="saveEntry()" [disabled]="!formData.reason.trim() || formData.price <= 0" class="bg-gradient-to-r from-amber-500 to-orange-600 
+                       text-white px-6 py-2.5 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition
+                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm md:text-base">
+          <i class="ri-save-line mr-1.5"></i>Save Record
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW ENTRY MODAL -->
+  <div *ngIf="showViewModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+
+      <!-- Close button -->
+      <button (click)="closeViewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
+                     p-1.5 rounded-full hover:bg-gray-100 transition">
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 
+                    flex items-center justify-center">
+          <i class="ri-information-line text-2xl text-amber-600"></i>
+        </div>
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Transaction Details</h2>
+          <p class="text-xs md:text-sm text-gray-500">Record metadata and files</p>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="space-y-4">
+        <!-- Details grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-50/30 p-4 rounded-xl border border-amber-100/50">
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Date</p>
+            <p class="font-medium text-gray-800 mt-1">
+              {{ selectedEntry ? (selectedEntry.date | date:'dd-MMM-yyyy') : '' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Payment Status</p>
+            <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.iS_PAID ? 'text-emerald-700' : 'text-rose-700'">
+              <i [class]="selectedEntry?.iS_PAID ? 'ri-checkbox-circle-line text-base' : 'ri-time-line text-base'"></i>
+              <span>{{ selectedEntry?.iS_PAID ? 'Paid' : 'Pending' }}</span>
+            </p>
+          </div>
+          <div class="sm:col-span-2">
+            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Amount</p>
+            <p class="font-extrabold mt-1 text-base md:text-lg" [ngClass]="selectedEntry?.iS_PAID ? 'text-emerald-600' : 'text-red-600'">
+              ₹{{ selectedEntry?.price | number:'1.2-2' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Description</label>
+          <div class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 text-sm md:text-base min-h-[80px]">
+            {{ selectedEntry?.reason }}
+          </div>
+        </div>
+
+        <!-- Images Display -->
+        <div *ngIf="viewImages.length > 0">
+          <label class="block text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2">
+            Attached Receipts/Photos ({{ viewImages.length }})
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div *ngFor="let img of viewImages; let i = index" class="relative group rounded-xl overflow-hidden border border-amber-100 shadow-sm cursor-pointer"
+                 (click)="openImagePreview(img, i)">
+              <img [src]="img" class="w-full h-24 object-cover hover:scale-105 transition duration-300" />
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-300">
+                <i class="ri-eye-line text-white text-xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+              </div>
+              <div class="absolute top-1.5 left-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
+                {{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Images State -->
+        <div *ngIf="viewImages.length === 0">
+          <label class="block text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2">Attached Images</label>
+          <div class="text-center py-6 bg-amber-50/20 rounded-xl border border-amber-100/50">
+            <div class="text-3xl mb-1">🖼️</div>
+            <p class="text-xs text-gray-500">No receipts or photos attached to this log</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+        <button (click)="closeViewModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-semibold transition text-sm md:text-base">
+          Close
+        </button>
+        <button (click)="openEditFromView()" class="bg-gradient-to-r from-amber-500 to-orange-600 
+                       text-white px-5 py-2.5 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition font-semibold
+                       flex items-center gap-1.5 text-sm md:text-base">
+          <i class="ri-edit-line"></i>
+          <span>Edit</span>
+        </button>
+        <button (click)="deleteEntryFromView()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl shadow-lg
+                       transition font-semibold flex items-center gap-1.5 text-sm md:text-base">
+          <i class="ri-delete-bin-line"></i>
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT ENTRY MODAL -->
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
+                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+
+      <!-- Close button -->
+      <button (click)="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
+                     p-1.5 rounded-full hover:bg-gray-100 transition">
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 
+                    flex items-center justify-center">
+          <i class="ri-edit-line text-2xl text-amber-600"></i>
+        </div>
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Edit Shop Log</h2>
+          <p class="text-xs md:text-sm text-gray-500">Update transaction details and photos</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Date -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Date <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <input type="date" [(ngModel)]="editFormData.date" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm md:text-base
+                            focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                            outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Payment Status Checkbox -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Payment Status
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-gray-50 border border-gray-200 rounded-xl select-none hover:bg-gray-100/50 transition">
+              <input type="checkbox" [(ngModel)]="editFormData.isPaid" class="w-5 h-5 accent-amber-500 rounded cursor-pointer" />
+              <div>
+                <span class="text-sm font-bold" [ngClass]="editFormData.isPaid ? 'text-emerald-600' : 'text-rose-600'">
+                  {{ editFormData.isPaid ? 'Paid' : 'Pending' }}
+                </span>
+                <p class="text-[10px] text-gray-400">
+                  {{ editFormData.isPaid ? 'Fully settled' : 'Outstanding credit' }}
+                </p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Description / Reason <span class="text-red-500">*</span>
+          </label>
+          <textarea [(ngModel)]="editFormData.reason" placeholder="Enter reason" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                           bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                           focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                           outline-none resize-none transition"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Amount (₹) <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="ri-money-rupee-circle-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            <input type="number" [(ngModel)]="editFormData.price" placeholder="0" min="0" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                          rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                          focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                          outline-none transition" />
+          </div>
+        </div>
+
+        <!-- Current Images Section -->
+        <div *ngIf="existingImages.length > 0">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <div class="flex items-center justify-between">
+              <span>Current Attached Images</span>
+              <span class="text-xs text-gray-400 font-normal">
+                {{ existingImages.length }} of 4
+              </span>
+            </div>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div *ngFor="let img of existingImages; let i = index" class="relative group rounded-xl overflow-hidden border border-amber-100 shadow-sm">
+              <img [src]="img" class="w-full h-24 object-cover" />
+              <button (click)="removeExistingImage(i)" class="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white 
+                             w-6 h-6 rounded-full flex items-center justify-center shadow transition active:scale-95">
+                <i class="ri-close-line text-sm"></i>
+              </button>
+              <div class="absolute bottom-1 left-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
+                {{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New Images Section -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <div class="flex items-center justify-between">
+              <span>Add New Images</span>
+              <span class="text-xs font-semibold" [class.text-red-500]="getRemainingSlots() === 0" [class.text-emerald-600]="getRemainingSlots() > 0">
+                {{ getRemainingSlots() > 0 ? 'Can add ' + getRemainingSlots() + ' more' : 'Maximum reached (4)' }}
+              </span>
+            </div>
+          </label>
+
+          <div *ngIf="getRemainingSlots() > 0" class="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center 
+                      hover:border-amber-400 hover:bg-amber-50/20 transition cursor-pointer"
+            (click)="triggerEditFileInput()">
+            <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-2"></i>
+            <p class="text-sm text-gray-600 mb-1 font-semibold">Click to upload new receipts/photos</p>
+            <p class="text-xs text-gray-400">Max {{ getRemainingSlots() }} more image(s)</p>
+          </div>
+
+          <div *ngIf="getRemainingSlots() === 0"
+            class="border-2 border-dashed border-orange-200 rounded-xl p-5 text-center bg-orange-50/40">
+            <i class="ri-image-fill text-4xl text-orange-400 mb-2"></i>
+            <p class="text-sm text-orange-700 font-semibold mb-1">Maximum images reached (4/4)</p>
+            <p class="text-xs text-gray-500">Remove existing images above to upload new ones</p>
+          </div>
+
+          <input id="editFileInput" type="file" (change)="onEditFileSelect($event)" accept="image/*" multiple
+            class="hidden" />
+
+          <!-- New Previews -->
+          <div *ngIf="editPreviewImages.length > 0" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+            <div *ngFor="let img of editPreviewImages; let i = index" class="relative group rounded-xl overflow-hidden border border-emerald-100 shadow-sm">
+              <img [src]="img" class="w-full h-24 object-cover" />
+              <button (click)="removeEditImage(i)" class="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white 
+                             w-6 h-6 rounded-full flex items-center justify-center shadow transition active:scale-95">
+                <i class="ri-close-line text-sm"></i>
+              </button>
+              <div class="absolute bottom-1 left-1.5 bg-emerald-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
+                New
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+        <button (click)="closeEditModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-semibold transition text-sm md:text-base">
+          Cancel
+        </button>
+        <button (click)="updateEntry()" [disabled]="!editFormData.reason.trim() || editFormData.price <= 0" class="bg-gradient-to-r from-amber-500 to-orange-600 
+                       text-white px-6 py-2.5 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition
+                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center gap-1.5 text-sm md:text-base">
+          <i class="ri-save-line"></i>
+          <span>Update Record</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE PREVIEW MODAL -->
+  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[3000] p-4"
+    (click)="closeImagePreview()">
+
+    <div class="relative max-w-5xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center"
+      (click)="$event.stopPropagation()">
+
+      <!-- Close button -->
+      <button (click)="closeImagePreview()" class="absolute top-3 right-3 bg-white/10 hover:bg-white/20 
+                     text-white p-2.5 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+
+      <!-- Indicator -->
+      <div class="absolute top-3 left-1/2 -translate-x-1/2 bg-white/10 
+                  backdrop-blur-sm px-4 py-1.5 rounded-lg z-10 shadow">
+        <p class="text-white font-semibold text-xs md:text-sm">
+          {{ currentImageIndex + 1 }} / {{ viewImages.length }}
+        </p>
+      </div>
+
+      <!-- Arrow Buttons -->
+      <button *ngIf="currentImageIndex > 0" (click)="previousImage(); $event.stopPropagation()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 
+                     text-white p-3 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-arrow-left-s-line text-2xl"></i>
+      </button>
+
+      <button *ngIf="currentImageIndex < viewImages.length - 1" (click)="nextImage(); $event.stopPropagation()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 
+                     text-white p-3 rounded-full backdrop-blur-sm transition z-10 shadow-lg">
+        <i class="ri-arrow-right-s-line text-2xl"></i>
+      </button>
+
+      <!-- Image container -->
+      <div class="flex items-center justify-center w-full h-full p-4 md:p-12">
+        <img [src]="previewImageUrl" alt="Preview" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+      </div>
+    </div>
+  </div>
+
+  <!-- FIXED FOOTER -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-amber-600 to-orange-600 
+                 text-white py-3 text-center shadow-lg z-45">
+    <p class="text-xs md:text-sm">
+      Developed by
+      <a href="https://suyashpatil.in" target="_blank"
+        class="font-semibold text-yellow-200 hover:text-white transition">
+        SuyashPatil
+      </a>
+    </p>
+  </footer>
+
+  <!-- Click outside to close menu backdrop -->
+  <div *ngIf="showMenu" (click)="closeMenu()" class="fixed inset-0 z-40"></div>
+
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div *ngIf="showDeleteEntryConfirm" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[3000] px-4 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-red-100 animate-scale-in">
+    <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border border-red-100">
+      <i class="ri-delete-bin-line text-3xl text-red-600"></i>
+    </div>
+
+    <h3 class="text-xl font-bold text-gray-800 text-center mb-1">
+      Delete Log?
+    </h3>
+    <p class="text-gray-500 text-center text-sm mb-2">
+      Are you sure you want to delete this record?
+    </p>
+    <p class="text-gray-400 text-center text-xs mb-6 bg-gray-50 py-1.5 rounded-lg">
+      This operation cannot be undone.
+    </p>
+
+    <div class="flex gap-3">
+      <button (click)="cancelDeleteEntry()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+                     hover:bg-gray-50 font-semibold transition text-sm">
+        Cancel
+      </button>
+
+      <button (click)="confirmDeleteEntry()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white 
+                     hover:bg-red-700 font-semibold transition text-sm flex items-center justify-center gap-1.5">
+        <i class="ri-delete-bin-line"></i>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>

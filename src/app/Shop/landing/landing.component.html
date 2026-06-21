@@ -1,0 +1,76 @@
+<div class="landing-page">
+    <header class="app-header">
+        <h1 class="logo">Tejas<span>SWEETS</span></h1>
+        <div class="header-actions">
+            <!-- User Dropdown -->
+            <div class="user-profile-dropdown dropdown">
+                <button class="profile-trigger" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="avatar-wrapper">
+                        <img src="../../assets/img/avatars/1.png" alt="User Avatar" class="avatar-img">
+                        <span class="status-indicator" [class.online]="isLoggedIn"></span>
+                    </div>
+                    <span class="user-name-label">{{ isLoggedIn ? user?.name || user?.username : 'Guest User' }}</span>
+                    <i class="ri-arrow-down-s-line trigger-icon"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
+                    <li class="dropdown-header text-center py-4">
+                        <div class="avatar-wrapper-lg mb-3 mx-auto">
+                            <img src="../../assets/img/avatars/1.png" alt="User Avatar" class="avatar-img-large">
+                            <span class="status-indicator" [class.online]="isLoggedIn"></span>
+                        </div>
+                        <div class="user-info-container">
+                            <h6 class="mb-0 user-full-name">{{ isLoggedIn ? user?.name || user?.username : 'Guest User' }}</h6>
+                            <small class="text-muted">{{ isLoggedIn ? user?.role || 'Administrator' : 'Guest' }}</small>
+                        </div>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider mx-3">
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0)">
+                            <i class="ri-user-3-line me-2 fs-5"></i>
+                            <span>My Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0)">
+                            <i class="ri-settings-4-line me-2 fs-5"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center py-2" href="javascript:void(0)">
+                            <i class="ri-history-line me-2 fs-5"></i>
+                            <span>Order History</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider mx-3">
+                    </li>
+                    <li class="px-3 py-2">
+                        <button *ngIf="isLoggedIn"
+                            class="btn btn-logout w-100 d-flex align-items-center justify-content-center"
+                            (click)="logout()">
+                            <i class="ri-logout-box-r-line me-2"></i>
+                            <span>Logout</span>
+                        </button>
+                        <button *ngIf="!isLoggedIn"
+                            class="btn btn-login w-100 d-flex align-items-center justify-content-center"
+                            (click)="login()">
+                            <i class="ri-login-box-line me-2"></i>
+                            <span>Login</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="content-area">
+        <router-outlet></router-outlet>
+    </main>
+
+    <app-shopfooter></app-shopfooter>
+</div>

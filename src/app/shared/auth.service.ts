@@ -271,6 +271,147 @@ clearFarmUserDetailsCookie(): void {
 }
 
 
+// ===== Tejas SWEETS Shop Auth Methods =====
+
+  private readonly shopSessionExpiredMessage = 'the user loged in other device';
+
+  isShopLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const hasSession = typeof window !== 'undefined' && sessionStorage.getItem('shopCredentials') !== null;
+    const shopUser = this.getShopCredentialsFromCookie();
+    const hasToken = !!this.getShopToken();
+    return (hasSession || (!!shopUser && typeof shopUser === 'object')) && hasToken;
+  }
+
+  getShopToken(): string | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    try {
+      return localStorage.getItem('shop_token');
+    } catch {
+      return null;
+    }
+  }
+
+  setShopCredentialsCookie(value: any, days: number = 7): void {
+    try {
+      const json = JSON.stringify(value);
+      const encoded = encodeURIComponent(json);
+      const expires = new Date();
+      expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `shopCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+      
+      // Also save to sessionStorage for tab session persistence
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('shopCredentials', json);
+      }
+    } catch (e) {
+      console.error('Failed to set shop credentials', e);
+    }
+  }
+
+  getShopCredentialsFromCookie(): any | null {
+    try {
+      // Try to get from sessionStorage first
+      if (typeof window !== 'undefined') {
+        const sessionUser = sessionStorage.getItem('shopCredentials');
+        if (sessionUser) {
+          return JSON.parse(sessionUser);
+        }
+      }
+
+      // Fallback to cookie
+      const cookies = document.cookie ? document.cookie.split('; ') : [];
+      for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'shopCredentials' && value) {
+          const decoded = decodeURIComponent(value);
+          return JSON.parse(decoded);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to read shop credentials', e);
+    }
+    return null;
+  }
+
+  validateShopSession(showExpiredToast: boolean = false) {
+    const token = this.getShopToken();
+    if (!token) {
+      return of(null);
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get(`${this.api.baseurl}LoginShop/validate`, { headers }).pipe(
+      tap((response: any) => {
+        // Shop session validated successfully
+      }),
+      catchError((err) => {
+        const message = err?.status === 401 || err?.status === 403
+          ? this.shopSessionExpiredMessage
+          : 'Shop session could not be validated. Please login again.';
+        this.handleShopSessionExpired(message, showExpiredToast);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  handleShopSessionExpired(message: string = this.shopSessionExpiredMessage, showToast: boolean = true): void {
+    this.clearShopSession(showToast, true, message, 'Session Expired');
+  }
+
+  private clearShopSession(
+    showToast: boolean,
+    navigateToLogin: boolean,
+    message: string = 'Logged out from Tejas SWEETS',
+    title: string = 'Logout'
+  ): void {
+    document.cookie = 'shopCredentials=; path=/; max-age=0';
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('shop_token');
+      localStorage.removeItem('shop_user');
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('shopCredentials');
+      }
+    }
+
+    if (showToast) {
+      try {
+        if (title === 'Session Expired') {
+          this.toaster.warning(message, title);
+        } else {
+          this.toaster.success(message, title);
+        }
+      } catch (e) {
+        console.warn('toaster unavailable', e);
+      }
+    }
+
+    if (navigateToLogin) {
+      this.router.navigate(['/shop/login']);
+    }
+  }
+
+  shopLogout(): void {
+    const token = this.getShopToken();
+    if (!token) {
+      this.clearShopSession(true, true);
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.post(`${this.api.baseurl}LoginShop/logout`, {}, { headers }).subscribe({
+      next: () => this.clearShopSession(true, true),
+      error: () => this.clearShopSession(true, true)
+    });
+  }
+
+
 
 // ===== Smart Parking Auth Methods =====
 
