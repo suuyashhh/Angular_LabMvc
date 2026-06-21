@@ -126,7 +126,7 @@
   </main>
 
   <!-- ADD ENTRY MODAL -->
-  <div *ngIf="showModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] px-4 backdrop-blur-sm">
+  <div *ngIf="showModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
                 relative border border-amber-100 max-h-[90vh] overflow-y-auto">
 
@@ -189,7 +189,7 @@
           <label class="block text-sm font-semibold text-gray-700 mb-1.5">
             Description / Reason <span class="text-red-500">*</span>
           </label>
-          <textarea [(ngModel)]="formData.reason" placeholder="What is this transaction for? (e.g., Sold 10kg Kaju Katli, Paid milk delivery vendor)" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+          <textarea [(ngModel)]="formData.reason" placeholder="Description" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
                            bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
                            focus:ring-2 focus:ring-amber-500 focus:border-transparent 
                            outline-none resize-none transition"></textarea>
@@ -258,7 +258,7 @@
   </div>
 
   <!-- VIEW ENTRY MODAL -->
-  <div *ngIf="showViewModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] px-4 backdrop-blur-sm">
+  <div *ngIf="showViewModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
                 relative border border-amber-100 max-h-[90vh] overflow-y-auto">
 
@@ -363,7 +363,7 @@
   </div>
 
   <!-- EDIT ENTRY MODAL -->
-  <div *ngIf="showEditModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] px-4 backdrop-blur-sm">
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
                 relative border border-amber-100 max-h-[90vh] overflow-y-auto">
 
@@ -533,7 +533,7 @@
   </div>
 
   <!-- IMAGE PREVIEW MODAL -->
-  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[70] p-4"
+  <div *ngIf="showImagePreview" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[3000] p-4"
     (click)="closeImagePreview()">
 
     <div class="relative max-w-5xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center"
@@ -568,14 +568,6 @@
       <div class="flex items-center justify-center w-full h-full p-4 md:p-12">
         <img [src]="previewImageUrl" alt="Preview" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
       </div>
-
-      <!-- Tip info -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/10 
-                  backdrop-blur-sm px-4 py-1.5 rounded-lg shadow">
-        <p class="text-white text-xs">
-          Click outside or press anywhere to close
-        </p>
-      </div>
     </div>
   </div>
 
@@ -597,7 +589,7 @@
 </div>
 
 <!-- DELETE CONFIRMATION MODAL -->
-<div *ngIf="showDeleteEntryConfirm" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[70] px-4 backdrop-blur-sm">
+<div *ngIf="showDeleteEntryConfirm" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[3000] px-4 backdrop-blur-sm">
   <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-red-100 animate-scale-in">
     <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 border border-red-100">
       <i class="ri-delete-bin-line text-3xl text-red-600"></i>
