@@ -1,1 +1,80 @@
-<p>login-shop works!</p>
+<div class="login-wrapper">
+  <!-- Decorative background elements for premium feel -->
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+  <div class="bg-shape shape-3"></div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="brand-logo">
+          <span class="material-icons-outlined brand-icon">cookie</span>
+        </div>
+        <h2 class="brand-name">Tejas<span>SWEETS</span></h2>
+        <p class="brand-tagline">Login to access your Sweet Shop portal</p>
+      </div>
+
+      <!-- Card Body (Form) -->
+      <form class="login-form" (ngSubmit)="login()" #loginForm="ngForm">
+        <!-- Username Field -->
+        <div class="input-group">
+          <label for="username">Username / Phone</label>
+          <div class="input-wrapper" [class.focused]="usernameInput.dirty && usernameInput.valid">
+            <span class="material-icons-outlined field-icon">person</span>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              [(ngModel)]="loginObj.username" 
+              placeholder="Enter your username or phone" 
+              required 
+              #usernameInput="ngModel">
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="input-group">
+          <div class="password-label-wrapper">
+            <label for="password">Password</label>
+            <a href="javascript:void(0)" class="forgot-link">Forgot Password?</a>
+          </div>
+          <div class="input-wrapper" [class.focused]="passwordInput.dirty && passwordInput.valid">
+            <span class="material-icons-outlined field-icon">lock</span>
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password" 
+              name="password" 
+              [(ngModel)]="loginObj.password" 
+              placeholder="Enter your password" 
+              required 
+              #passwordInput="ngModel">
+            <span 
+              class="material-icons-outlined visibility-toggle" 
+              (click)="togglePasswordVisibility()">
+              {{ showPassword ? 'visibility_off' : 'visibility' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="remember-me-wrapper">
+          <label class="checkbox-container">
+            <input type="checkbox" name="rememberMe" checked>
+            <span class="checkbox-checkmark"></span>
+            Keep me signed in
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          [disabled]="isLoading || !loginForm.form.valid">
+          <span class="btn-text" *ngIf="!isLoading">Sign In</span>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

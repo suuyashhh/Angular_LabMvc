@@ -15,24 +15,27 @@ import { ShopfooterComponent } from "../../shared/shopfooter/shopfooter.componen
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
-export class ShopLandingComponent implements OnInit, OnDestroy {
- 
+export class ShopLandingComponent implements OnInit {
+  public auth = inject(AuthService);
   private router = inject(Router);
+
+  get user() {
+    return this.auth.getShopCredentialsFromCookie();
+  }
+
+  get isLoggedIn() {
+    return this.auth.isShopLoggedIn();
+  }
+
   ngOnInit() {
   }
 
-  ngOnDestroy() {
-  
-  }
-
   logout() {
+    this.auth.shopLogout();
   }
 
   login() {
-  }
-
-  private validateParkingSession() {
-   
+    this.router.navigate(['/shop/login']);
   }
 }
 

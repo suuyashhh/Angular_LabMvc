@@ -271,6 +271,58 @@ clearFarmUserDetailsCookie(): void {
 }
 
 
+// ===== Tejas SWEETS Shop Auth Methods =====
+
+isShopLoggedIn(): boolean {
+  if (!isPlatformBrowser(this.platformId)) return false;
+  const shopUser = this.getShopCredentialsFromCookie();
+  return !!shopUser && typeof shopUser === 'object';
+}
+
+setShopCredentialsCookie(value: any, days: number = 7): void {
+  try {
+    const json = JSON.stringify(value);
+    const encoded = encodeURIComponent(json);
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `shopCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+  } catch (e) {
+    console.error('Failed to set shop cookie', e);
+  }
+}
+
+getShopCredentialsFromCookie(): any | null {
+  try {
+    const cookies = document.cookie ? document.cookie.split('; ') : [];
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=');
+      if (name === 'shopCredentials' && value) {
+        const decoded = decodeURIComponent(value);
+        return JSON.parse(decoded);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to read shop cookie', e);
+  }
+  return null;
+}
+
+shopLogout(): void {
+  try {
+    document.cookie = 'shopCredentials=; path=/; max-age=0';
+    try {
+      this.toaster.success('Logged out from Tejas SWEETS', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+    this.router.navigate(['/shop/login']);
+  } catch (err) {
+    console.error('shopLogout error', err);
+    this.router.navigate(['/shop/login']);
+  }
+}
+
+
 
 // ===== Smart Parking Auth Methods =====
 
