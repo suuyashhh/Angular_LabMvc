@@ -39,7 +39,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       return throwError(() => err);
     }
 
-    if (err.status === 401 || err.status === 403 || err.status === 0) {
+    const isShopRequest = req.url.includes('LoginShop') || req.url.includes('Shop');
+
+    if (!isShopRequest && (err.status === 401 || err.status === 403 || err.status === 0)) {
       authService.logout();
       router.navigate(['/']);
     }

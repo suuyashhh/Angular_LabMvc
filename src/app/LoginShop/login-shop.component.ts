@@ -53,38 +53,38 @@ export class LoginShopComponent implements OnInit {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const url = `${this.api.baseurl}LoginShop/Login`;
 
-    this.http.post(url, this.loginObj, { headers })
+    const payload = {
+      CONTACT: this.loginObj.username,
+      PASS: this.loginObj.password
+    };
+
+    this.http.post(url, payload, { headers })
       .pipe(finalize(() => {
         this.isLoading = false;
         this.loader.hide();
       }))
       .subscribe({
         next: (res: any) => {
-          if (res) {
-            this.auth.setShopCredentialsCookie(res, 365);
+          if (res && (res.useR_ID || res.USER_ID || res.userId)) {
+            const userObj = {
+              userId: res.useR_ID || res.USER_ID || res.userId,
+              name: res.useR_NAME || res.USER_NAME || res.userName,
+              username: res.useR_NAME || res.USER_NAME || res.userName,
+              role: 'Administrator'
+            };
+            this.auth.setShopCredentialsCookie(userObj, 365);
             this.toastr.success('Welcome back!', 'Login Successful');
             this.router.navigate(['/shop/dashboard']);
           } else {
             this.toastr.error('Invalid credentials. Please try again.', 'Login Failed');
+            this.router.navigate(["shop"]);
           }
         },
         error: (err: any) => {
-          console.warn('Backend login failed, using demo fallback:', err);
-          
-          // Demo fallback to ensure the UI works beautifully even if the backend endpoint is not yet created
-          if (this.loginObj.username && this.loginObj.password) {
-            const demoUser = {
-              username: this.loginObj.username,
-              name: 'Tejas Sweets Admin',
-              role: 'Administrator',
-              token: 'demo-shop-token-12345'
-            };
-            this.auth.setShopCredentialsCookie(demoUser, 365);
-            this.toastr.success('Logged in as Administrator (Demo Mode)', 'Login Successful');
-            this.router.navigate(['/shop/dashboard']);
-          } else {
-            this.toastr.error('Connection error or invalid credentials', 'Login Failed');
-          }
+          console.error('Backend login failed:', err);
+          const errorMsg = err?.error?.message || err?.error || 'Connection error or invalid credentials';
+          this.toastr.error(errorMsg, 'Login Failed');
+          this.router.navigate(["shop"]);
         }
       });
   }

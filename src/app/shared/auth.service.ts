@@ -275,8 +275,9 @@ clearFarmUserDetailsCookie(): void {
 
 isShopLoggedIn(): boolean {
   if (!isPlatformBrowser(this.platformId)) return false;
+  const hasSession = typeof window !== 'undefined' && sessionStorage.getItem('shopCredentials') !== null;
   const shopUser = this.getShopCredentialsFromCookie();
-  return !!shopUser && typeof shopUser === 'object';
+  return hasSession || (!!shopUser && typeof shopUser === 'object');
 }
 
 setShopCredentialsCookie(value: any, days: number = 7): void {
@@ -286,13 +287,27 @@ setShopCredentialsCookie(value: any, days: number = 7): void {
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     document.cookie = `shopCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+    
+    // Also save to sessionStorage for tab session persistence
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('shopCredentials', json);
+    }
   } catch (e) {
-    console.error('Failed to set shop cookie', e);
+    console.error('Failed to set shop credentials', e);
   }
 }
 
 getShopCredentialsFromCookie(): any | null {
   try {
+    // Try to get from sessionStorage first
+    if (typeof window !== 'undefined') {
+      const sessionUser = sessionStorage.getItem('shopCredentials');
+      if (sessionUser) {
+        return JSON.parse(sessionUser);
+      }
+    }
+
+    // Fallback to cookie
     const cookies = document.cookie ? document.cookie.split('; ') : [];
     for (const cookie of cookies) {
       const [name, value] = cookie.split('=');
@@ -302,7 +317,7 @@ getShopCredentialsFromCookie(): any | null {
       }
     }
   } catch (e) {
-    console.error('Failed to read shop cookie', e);
+    console.error('Failed to read shop credentials', e);
   }
   return null;
 }
@@ -310,6 +325,9 @@ getShopCredentialsFromCookie(): any | null {
 shopLogout(): void {
   try {
     document.cookie = 'shopCredentials=; path=/; max-age=0';
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('shopCredentials');
+    }
     try {
       this.toaster.success('Logged out from Tejas SWEETS', 'Logout');
     } catch (e) {
