@@ -15,9 +15,13 @@ import { ShopfooterComponent } from "../../shared/shopfooter/shopfooter.componen
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
-export class ShopLandingComponent implements OnInit {
+export class ShopLandingComponent implements OnInit, OnDestroy {
   public auth = inject(AuthService);
   private router = inject(Router);
+
+  private readonly onWindowFocus = () => this.validateShopSession();
+  private routeSub: Subscription | null = null;
+  private sessionCheckSub: Subscription | null = null;
 
   get user() {
     return this.auth.getShopCredentialsFromCookie();
@@ -28,6 +32,27 @@ export class ShopLandingComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.startSessionPolling();
+
+    this.routeSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => this.validateShopSession());
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', this.onWindowFocus);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+    if (this.sessionCheckSub) {
+      this.sessionCheckSub.unsubscribe();
+    }
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', this.onWindowFocus);
+    }
   }
 
   logout() {
@@ -36,6 +61,29 @@ export class ShopLandingComponent implements OnInit {
 
   login() {
     this.router.navigate(['/shop/login']);
+  }
+
+  private validateShopSession() {
+    if (!this.auth.isShopLoggedIn()) {
+      return;
+    }
+
+    this.auth.validateShopSession(true).subscribe({
+      next: () => {},
+      error: () => {}
+    });
+  }
+
+  private startSessionPolling() {
+    this.sessionCheckSub = interval(3000).pipe(
+      startWith(0),
+      filter(() => this.auth.isShopLoggedIn()),
+      exhaustMap(() =>
+        this.auth.validateShopSession(true).pipe(
+          catchError(() => EMPTY)
+        )
+      )
+    ).subscribe();
   }
 }
 

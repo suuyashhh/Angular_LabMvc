@@ -65,13 +65,20 @@ export class LoginShopComponent implements OnInit {
       }))
       .subscribe({
         next: (res: any) => {
-          if (res && (res.useR_ID || res.USER_ID || res.userId)) {
+          const rawUser = res?.userDetails || res?.user || res;
+          if (rawUser && (rawUser.useR_ID || rawUser.USER_ID || rawUser.userId)) {
             const userObj = {
-              userId: res.useR_ID || res.USER_ID || res.userId,
-              name: res.useR_NAME || res.USER_NAME || res.userName,
-              username: res.useR_NAME || res.USER_NAME || res.userName,
+              userId: rawUser.useR_ID || rawUser.USER_ID || rawUser.userId,
+              name: rawUser.useR_NAME || rawUser.USER_NAME || rawUser.userName,
+              username: rawUser.useR_NAME || rawUser.USER_NAME || rawUser.userName,
               role: 'Administrator'
             };
+
+            if (res?.token) {
+              localStorage.setItem('shop_token', res.token);
+              localStorage.setItem('shop_user', JSON.stringify(userObj));
+            }
+
             this.auth.setShopCredentialsCookie(userObj, 365);
             this.toastr.success('Welcome back!', 'Login Successful');
             this.router.navigate(['/shop/dashboard']);
