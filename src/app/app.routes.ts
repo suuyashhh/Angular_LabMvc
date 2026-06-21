@@ -46,15 +46,14 @@ export const routes: Routes = [
     loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES)
   },
   {
-    path: 'Parking',
+    path: 'parking',
     canActivate: [parkingAuthGuard],
     loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.SmartParkingLandingComponent),
     loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
   },
   {
-    path: 'parking',
-    canActivate: [parkingAuthGuard],
-    loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.SmartParkingLandingComponent),
-    loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
+    path: 'shop',
+    loadComponent: () => import('./Shop/landing/landing.component').then(m => m.ShopLandingComponent),
+    loadChildren: () => import('./Shop/shop.routes').then(m => m.SHOP_ROUTES)
   }
 ];

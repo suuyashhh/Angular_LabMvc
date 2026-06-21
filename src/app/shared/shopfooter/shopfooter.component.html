@@ -1,0 +1,10 @@
+<footer class="bottom-nav">
+  <div class="nav-item" *ngFor="let item of navItems" 
+       [class.active]="item.active" 
+       [routerLink]="item.link || null">
+    <div class="icon-container">
+      <span class="material-icons-outlined icon">{{ item.icon }}</span>
+    </div>
+    <span class="label">{{ item.label }}</span>
+  </div>
+</footer>
