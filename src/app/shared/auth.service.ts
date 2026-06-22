@@ -292,7 +292,7 @@ clearFarmUserDetailsCookie(): void {
     }
   }
 
-  setShopCredentialsCookie(value: any, days: number = 7): void {
+  setShopCredentialsCookie(value: any, days: number = 30): void {
     try {
       const json = JSON.stringify(value);
       const encoded = encodeURIComponent(json);

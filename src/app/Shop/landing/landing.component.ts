@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { SmartParkingSidebarComponent } from '../../shared/SmartParkingsidebar/sidebar.component';
 import { SmartParkingFooterComponent } from '../../shared/SmartParkingfooter/footer.component';
 import { SidebarService } from '../../shared/sidebar.service';
@@ -11,7 +11,7 @@ import { ShopfooterComponent } from "../../shared/shopfooter/shopfooter.componen
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, ShopfooterComponent],
+  imports: [RouterOutlet, CommonModule, ShopfooterComponent, RouterLink],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css'
 })
