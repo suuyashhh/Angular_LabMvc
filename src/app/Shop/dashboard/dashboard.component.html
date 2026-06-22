@@ -5,17 +5,30 @@
     <div class="max-w-4xl mx-auto">
 
       <!-- FINANCIAL SUMMARY WIDGETS -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <!-- Balance Card -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <!-- Paid Amount Card -->
         <div class="bg-white rounded-xl p-4 border border-amber-100 shadow-sm flex items-center justify-between">
           <div>
-            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Net Balance</p>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Paid Amount</p>
             <h3 class="text-xl md:text-2xl font-bold mt-1 text-emerald-600">
-              ₹{{ netBalance | number:'1.2-2' }}
+              ₹{{ totalPaid | number:'1.2-2' }}
             </h3>
           </div>
           <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-50 text-emerald-600">
-            <i class="ri-wallet-3-line text-xl"></i>
+            <i class="ri-checkbox-circle-line text-xl"></i>
+          </div>
+        </div>
+
+        <!-- Unpaid Amount Card -->
+        <div class="bg-white rounded-xl p-4 border border-rose-100 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Unpaid Amount</p>
+            <h3 class="text-xl md:text-2xl font-bold mt-1 text-rose-600">
+              ₹{{ totalPending | number:'1.2-2' }}
+            </h3>
+          </div>
+          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-rose-50 text-rose-600">
+            <i class="ri-time-line text-xl"></i>
           </div>
         </div>
       </div>

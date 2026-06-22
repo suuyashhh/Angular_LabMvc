@@ -14,7 +14,11 @@ export const SHOP_ROUTES : Routes = [
     {
         path:'history',
         loadComponent: () => import('./history/history.component').then(m => m.HistoryComponent)
-    },    
+    },  
+    {
+        path:'shop-users',
+        loadComponent: () => import('./shop-users/shop-users.component').then(m => m.ShopUsersComponent)
+    },   
     {
         path:'**',
         redirectTo:'dashboard'
