@@ -131,8 +131,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.loader.show();
     
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${y}-${m}-${d}`;
+    
     this.api.get('ShopEntry/GetAllTypesEntrys', { 
-      userId: this.userId
+      userId: this.userId,
+      fromDate: todayStr,
+      toDate: todayStr
     }).subscribe({
       next: (res: any) => {
         this.entries = Array.isArray(res) ? res : [];

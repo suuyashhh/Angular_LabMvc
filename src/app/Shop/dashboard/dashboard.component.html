@@ -61,7 +61,7 @@
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-base md:text-lg font-semibold text-gray-800 flex items-center gap-2">
             <i class="ri-history-line text-amber-500"></i>
-            <span>Shop Log History</span>
+            <span>Today's Shop Logs</span>
           </h3>
           <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
             Showing {{ filteredEntries.length }} entries
@@ -72,7 +72,7 @@
         <div *ngIf="groupedEntries.length === 0" class="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
           <div class="text-6xl mb-4">🏪</div>
           <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-2">No Records Found</h4>
-          <p class="text-sm text-gray-500 mb-6">Create your first entry to see history</p>
+          <p class="text-sm text-gray-500 mb-6">Create your first entry for today</p>
           <button (click)="openAddModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 
                        text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 
                        transition font-semibold shadow">
