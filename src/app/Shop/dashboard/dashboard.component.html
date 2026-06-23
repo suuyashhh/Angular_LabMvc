@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+<div class="min-h-screen bg-white">
 
   <!-- MAIN CONTENT -->
-  <main class="pt-24 md:pt-28 pb-20 px-4 md:px-6">
+  <main class="pt-6 md:pt-8 pb-20 px-4 md:px-6">
     <div class="max-w-4xl mx-auto">
 
       <!-- FINANCIAL SUMMARY WIDGETS -->
@@ -61,7 +61,7 @@
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-base md:text-lg font-semibold text-gray-800 flex items-center gap-2">
             <i class="ri-history-line text-amber-500"></i>
-            <span>Shop Log History</span>
+            <span>Today's Shop Logs</span>
           </h3>
           <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
             Showing {{ filteredEntries.length }} entries
@@ -72,7 +72,7 @@
         <div *ngIf="groupedEntries.length === 0" class="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
           <div class="text-6xl mb-4">🏪</div>
           <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-2">No Records Found</h4>
-          <p class="text-sm text-gray-500 mb-6">Create your first entry to see history</p>
+          <p class="text-sm text-gray-500 mb-6">Create your first entry for today</p>
           <button (click)="openAddModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 
                        text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 
                        transition font-semibold shadow">
@@ -84,10 +84,12 @@
         <div *ngFor="let group of groupedEntries; let isLast = last" class="mb-6" [class.mb-0]="isLast">
 
           <!-- Date Header -->
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-            <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
-            <span class="text-xs text-gray-400">({{ group.count }})</span>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+              <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
+              <span class="text-xs text-gray-400">({{ group.count }})</span>
+            </div>
           </div>
 
           <!-- Cards list -->
@@ -116,7 +118,7 @@
                         <i class="ri-image-line"></i> Photos
                       </span>
                     </div>
-                    <h5 class="font-medium text-gray-800 mt-1 truncate text-sm md:text-base">
+                    <h5 class="font-medium text-gray-800 mt-1 text-sm md:text-base whitespace-normal break-words">
                       {{ entry.reason }}
                     </h5>
                   </div>

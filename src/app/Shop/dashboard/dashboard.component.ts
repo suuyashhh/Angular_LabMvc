@@ -44,7 +44,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Entries data
   entries: ShopEntry[] = [];
   filteredEntries: ShopEntry[] = [];
-  groupedEntries: { date: string; count: number; entries: ShopEntry[] }[] = [];
+  groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number }[] = [];
   
   // Selected entry for view/edit
   selectedEntry: ShopEntry | null = null;
@@ -131,8 +131,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.loader.show();
     
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${y}-${m}-${d}`;
+    
     this.api.get('ShopEntry/GetAllTypesEntrys', { 
-      userId: this.userId
+      userId: this.userId,
+      fromDate: todayStr,
+      toDate: todayStr
     }).subscribe({
       next: (res: any) => {
         this.entries = Array.isArray(res) ? res : [];
@@ -160,11 +168,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
       grouped.get(dateKey)!.push(entry);
     });
 
-    this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => ({
-      date,
-      count: entries.length,
-      entries
-    }));
+    this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => {
+      let paidSum = 0;
+      let unpaidSum = 0;
+      entries.forEach(e => {
+        if (e.iS_PAID) {
+          paidSum += e.price;
+        } else {
+          unpaidSum += e.price;
+        }
+      });
+      return {
+        date,
+        count: entries.length,
+        entries,
+        totalPaid: paidSum,
+        totalUnpaid: unpaidSum
+      };
+    });
   }
 
   calculateTotals() {
