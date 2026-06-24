@@ -71,7 +71,8 @@ export class LoginShopComponent implements OnInit {
               userId: rawUser.useR_ID || rawUser.USER_ID || rawUser.userId,
               name: rawUser.useR_NAME || rawUser.USER_NAME || rawUser.userName,
               username: rawUser.useR_NAME || rawUser.USER_NAME || rawUser.userName,
-              role: 'Administrator'
+              role: 'Administrator',
+              user_img: rawUser.useR_IMG || rawUser.USER_IMG || rawUser.userImg || rawUser.user_img
             };
 
             if (res?.token) {
