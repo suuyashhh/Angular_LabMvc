@@ -1,12 +1,12 @@
 <div class="landing-page">
     <header class="app-header">
-        <h1 class="logo">Tejas<span>SWEETS</span></h1>
+        <h1 class="logo">Tejas<span>SnackCenter</span></h1>
         <div class="header-actions">
             <!-- User Dropdown -->
             <div class="user-profile-dropdown dropdown">
                 <button class="profile-trigger" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="avatar-wrapper">
-                        <img src="../../assets/img/avatars/1.png" alt="User Avatar" class="avatar-img">
+                        <img [src]="isLoggedIn && user?.user_img ? user.user_img : '../../assets/img/avatars/1.png'" alt="User Avatar" class="avatar-img">
                         <span class="status-indicator" [class.online]="isLoggedIn"></span>
                     </div>
                     <span class="user-name-label">{{ isLoggedIn ? user?.name || user?.username : 'Guest User' }}</span>
@@ -16,7 +16,7 @@
                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
                     <li class="dropdown-header text-center py-4">
                         <div class="avatar-wrapper-lg mb-3 mx-auto">
-                            <img src="../../assets/img/avatars/1.png" alt="User Avatar" class="avatar-img-large">
+                            <img [src]="isLoggedIn && user?.user_img ? user.user_img : '../../assets/img/avatars/1.png'" alt="User Avatar" class="avatar-img-large">
                             <span class="status-indicator" [class.online]="isLoggedIn"></span>
                         </div>
                         <div class="user-info-container">
@@ -47,7 +47,7 @@
                     </li>
                     <li>
                         <a class="dropdown-item d-flex align-items-center py-2" routerLink="/shop/shop-users">
-                            <i class="ri-history-line me-2 fs-5"></i>
+                            <i class="ri-group-line me-2 fs-5"></i>
                             <span>Shop Users</span>
                         </a>
                     </li>
