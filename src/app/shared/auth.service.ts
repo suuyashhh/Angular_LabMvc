@@ -349,10 +349,9 @@ clearFarmUserDetailsCookie(): void {
         // Shop session validated successfully
       }),
       catchError((err) => {
-        const message = err?.status === 401 || err?.status === 403
-          ? this.shopSessionExpiredMessage
-          : 'Shop session could not be validated. Please login again.';
-        this.handleShopSessionExpired(message, showExpiredToast);
+        if (err?.status === 401 || err?.status === 403) {
+          this.handleShopSessionExpired(this.shopSessionExpiredMessage, showExpiredToast);
+        }
         return throwError(() => err);
       })
     );
@@ -512,13 +511,10 @@ clearFarmUserDetailsCookie(): void {
         }
       }),
       catchError((err) => {
-        // Clear stale browser session data for any failed validation request.
-        // This prevents repeated validate loops when the backend rejects the token
-        // or the browser blocks the 401 response because of missing CORS headers.
-        const message = err?.status === 401 || err?.status === 403
-          ? this.parkingSessionExpiredMessage
-          : 'Parking session could not be validated. Please login again.';
-        this.clearParkingSession(showExpiredToast, true, message, 'Session Expired');
+        if (err?.status === 401 || err?.status === 403) {
+          const message = this.parkingSessionExpiredMessage;
+          this.clearParkingSession(showExpiredToast, true, message, 'Session Expired');
+        }
         return throwError(() => err);
       })
     );
