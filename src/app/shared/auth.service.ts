@@ -123,6 +123,7 @@ export class AuthService {
   private clearLocalSession(): void {
     localStorage.clear();
     document.cookie = 'authToken=; path=/; max-age=0';
+    document.cookie = 'shopCredentials=; path=/; max-age=0';
     this.router.navigate(['/lab']);
   }
 
@@ -277,10 +278,9 @@ clearFarmUserDetailsCookie(): void {
 
   isShopLoggedIn(): boolean {
     if (!isPlatformBrowser(this.platformId)) return false;
-    const hasSession = typeof window !== 'undefined' && sessionStorage.getItem('shopCredentials') !== null;
     const shopUser = this.getShopCredentialsFromCookie();
     const hasToken = !!this.getShopToken();
-    return (hasSession || (!!shopUser && typeof shopUser === 'object')) && hasToken;
+    return (!!shopUser && typeof shopUser === 'object') && hasToken;
   }
 
   getShopToken(): string | null {
@@ -294,16 +294,13 @@ clearFarmUserDetailsCookie(): void {
 
   setShopCredentialsCookie(value: any, days: number = 30): void {
     try {
-      const json = JSON.stringify(value);
+      // Exclude user_img from the cookie to keep it under the 4KB browser limit
+      const { user_img, ...cookieValue } = value;
+      const json = JSON.stringify(cookieValue);
       const encoded = encodeURIComponent(json);
       const expires = new Date();
       expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
       document.cookie = `shopCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
-      
-      // Also save to sessionStorage for tab session persistence
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('shopCredentials', json);
-      }
     } catch (e) {
       console.error('Failed to set shop credentials', e);
     }
@@ -311,21 +308,28 @@ clearFarmUserDetailsCookie(): void {
 
   getShopCredentialsFromCookie(): any | null {
     try {
-      // Try to get from sessionStorage first
-      if (typeof window !== 'undefined') {
-        const sessionUser = sessionStorage.getItem('shopCredentials');
-        if (sessionUser) {
-          return JSON.parse(sessionUser);
-        }
-      }
-
-      // Fallback to cookie
       const cookies = document.cookie ? document.cookie.split('; ') : [];
       for (const cookie of cookies) {
         const [name, value] = cookie.split('=');
         if (name === 'shopCredentials' && value) {
           const decoded = decodeURIComponent(value);
-          return JSON.parse(decoded);
+          const userObj = JSON.parse(decoded);
+
+          // Restore user_img from localStorage if available in browser
+          if (isPlatformBrowser(this.platformId)) {
+            try {
+              const localUserStr = localStorage.getItem('shop_user');
+              if (localUserStr) {
+                const localUser = JSON.parse(localUserStr);
+                if (localUser && localUser.user_img) {
+                  userObj.user_img = localUser.user_img;
+                }
+              }
+            } catch (err) {
+              console.warn('Failed to merge user_img from localStorage', err);
+            }
+          }
+          return userObj;
         }
       }
     } catch (e) {
@@ -369,8 +373,7 @@ clearFarmUserDetailsCookie(): void {
   ): void {
     document.cookie = 'shopCredentials=; path=/; max-age=0';
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('shop_token');
-      localStorage.removeItem('shop_user');
+      localStorage.clear();
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('shopCredentials');
       }
