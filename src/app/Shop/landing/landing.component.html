@@ -79,4 +79,21 @@
     </main>
 
     <app-shopfooter></app-shopfooter>
+
+    <!-- Device Conflict Modal -->
+    <div class="conflict-modal-overlay" *ngIf="auth.shopConflict$ | async">
+        <div class="conflict-modal-card">
+            <div class="modal-header-icon">
+                <i class="ri-error-warning-line"></i>
+            </div>
+            <h3 class="modal-title">Session Conflict</h3>
+            <p class="modal-message">
+                your user id is opened in other device.. for get continue work please logout and sing in again
+            </p>
+            <button class="btn btn-primary btn-modal-action" (click)="closeConflictModalAndRedirect()">
+                <i class="ri-login-box-line me-2"></i>
+                <span>Logout and Sign In</span>
+            </button>
+        </div>
+    </div>
 </div>

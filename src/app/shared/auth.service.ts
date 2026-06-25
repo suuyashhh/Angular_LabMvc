@@ -338,6 +338,13 @@ clearFarmUserDetailsCookie(): void {
     return null;
   }
 
+  private shopConflictSubject = new BehaviorSubject<boolean>(false);
+  public shopConflict$ = this.shopConflictSubject.asObservable();
+
+  clearShopConflictFlag(): void {
+    this.shopConflictSubject.next(false);
+  }
+
   validateShopSession(showExpiredToast: boolean = false) {
     const token = this.getShopToken();
     if (!token) {
@@ -353,7 +360,7 @@ clearFarmUserDetailsCookie(): void {
         // Shop session validated successfully
       }),
       catchError((err) => {
-        if (err?.status === 401 || err?.status === 403) {
+        if (err?.status === 401 || err?.status === 403 || err?.status === 0) {
           this.handleShopSessionExpired(this.shopSessionExpiredMessage, showExpiredToast);
         }
         return throwError(() => err);
@@ -362,7 +369,9 @@ clearFarmUserDetailsCookie(): void {
   }
 
   handleShopSessionExpired(message: string = this.shopSessionExpiredMessage, showToast: boolean = true): void {
-    this.clearShopSession(showToast, true, message, 'Session Expired');
+    console.log('handleShopSessionExpired called with message:', message);
+    this.shopConflictSubject.next(true);
+    this.clearShopSession(showToast, false, message, 'Session Expired');
   }
 
   private clearShopSession(
