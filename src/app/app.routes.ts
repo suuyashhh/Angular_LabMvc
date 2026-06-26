@@ -10,7 +10,7 @@ import { shopAuthGuard } from './shared/shop-auth.guard';
 
 export const routes: Routes = [
 
-  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+  { path: '', redirectTo: 'shop', pathMatch: 'full' },
   { path: 'lab', component: LoginComponent },
 
   { path: 'login', component: LoginComponent },
