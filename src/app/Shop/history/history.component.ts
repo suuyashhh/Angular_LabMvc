@@ -47,7 +47,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   // Entries data
   entries: ShopEntry[] = [];
   filteredEntries: ShopEntry[] = [];
-  groupedEntries: { date: string; count: number; entries: ShopEntry[] }[] = [];
+  groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number }[] = [];
   
   // Selected entry for view/edit
   selectedEntry: ShopEntry | null = null;
@@ -170,11 +170,24 @@ export class HistoryComponent implements OnInit, OnDestroy {
       grouped.get(dateKey)!.push(entry);
     });
 
-    this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => ({
-      date,
-      count: entries.length,
-      entries
-    }));
+    this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => {
+      let paidSum = 0;
+      let unpaidSum = 0;
+      entries.forEach(e => {
+        if (e.iS_PAID) {
+          paidSum += e.price;
+        } else {
+          unpaidSum += e.price;
+        }
+      });
+      return {
+        date,
+        count: entries.length,
+        entries,
+        totalPaid: paidSum,
+        totalUnpaid: unpaidSum
+      };
+    });
   }
 
   calculateTotals() {

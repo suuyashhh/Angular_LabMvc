@@ -1,4 +1,5 @@
 import { Routes } from "@angular/router";
+import { shopAuthGuard } from "../shared/shop-auth.guard";
 
 export const SHOP_ROUTES : Routes = [
     {

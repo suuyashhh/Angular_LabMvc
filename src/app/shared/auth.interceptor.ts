@@ -46,8 +46,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
+      console.log('authInterceptor caught error:', {
+        url: req.url,
+        isShopRequest,
+        isShopLoginRequest,
+        status: err.status,
+        error: err
+      });
+
       if (isShopRequest && !isShopLoginRequest) {
-        if (err.status === 401 || err.status === 403) {
+        if (err.status === 401 || err.status === 403 || err.status === 0) {
+          console.log('Detected 401/403/0 shop session expiration. Calling handleShopSessionExpired.');
           authService.handleShopSessionExpired(
             'the user loged in other device',
             true

@@ -12,6 +12,7 @@ interface ShopUser {
   useR_NAME: string;
   pass: string;
   contact: string;
+  useR_IMG?: string;
 }
 
 @Component({
@@ -39,14 +40,16 @@ export class ShopUsersComponent implements OnInit {
   formData = {
     username: '',
     password: '',
-    contact: ''
+    contact: '',
+    user_img: ''
   };
 
   editFormData = {
     userId: 0,
     username: '',
     password: '',
-    contact: ''
+    contact: '',
+    user_img: ''
   };
 
   showPassword = false;
@@ -95,7 +98,8 @@ export class ShopUsersComponent implements OnInit {
       useR_ID: user.useR_ID ?? user.useR_Id ?? user.useR_id ?? user.USER_ID ?? user.userId ?? 0,
       useR_NAME: user.useR_NAME ?? user.useR_Name ?? user.useR_name ?? user.USER_NAME ?? user.userName ?? '',
       pass: user.pass ?? user.PASS ?? user.Password ?? user.password ?? '',
-      contact: user.contact ?? user.CONTACT ?? ''
+      contact: user.contact ?? user.CONTACT ?? '',
+      useR_IMG: user.useR_IMG ?? user.useR_Img ?? user.useR_img ?? user.USER_IMG ?? user.userImg ?? user.user_img ?? ''
     };
   }
 
@@ -117,7 +121,8 @@ export class ShopUsersComponent implements OnInit {
     this.formData = {
       username: '',
       password: '',
-      contact: ''
+      contact: '',
+      user_img: ''
     };
     this.showPassword = false;
   }
@@ -144,7 +149,8 @@ export class ShopUsersComponent implements OnInit {
     const payload = {
       USER_NAME: this.formData.username.trim(),
       PASS: this.formData.password.trim(),
-      CONTACT: this.formData.contact.trim()
+      CONTACT: this.formData.contact.trim(),
+      USER_IMG: this.formData.user_img
     };
 
     this.api.post('ShopUser/Insert', payload).subscribe({
@@ -173,7 +179,8 @@ export class ShopUsersComponent implements OnInit {
       userId: user.useR_ID,
       username: user.useR_NAME,
       password: user.pass,
-      contact: user.contact
+      contact: user.contact,
+      user_img: user.useR_IMG || ''
     };
     this.showEditPassword = false;
     this.showEditModal = true;
@@ -203,7 +210,8 @@ export class ShopUsersComponent implements OnInit {
       USER_ID: this.editFormData.userId,
       USER_NAME: this.editFormData.username.trim(),
       PASS: this.editFormData.password.trim(),
-      CONTACT: this.editFormData.contact.trim()
+      CONTACT: this.editFormData.contact.trim(),
+      USER_IMG: this.editFormData.user_img
     };
 
     this.api.put('ShopUser/Update', payload).subscribe({
@@ -238,7 +246,7 @@ export class ShopUsersComponent implements OnInit {
 
   confirmDelete() {
     if (!this.selectedUser) return;
-
+ 
     this.loader.show();
     this.api.delete('ShopUser/Delete', { userId: this.selectedUser.useR_ID }).subscribe({
       next: (res: any) => {
@@ -257,5 +265,32 @@ export class ShopUsersComponent implements OnInit {
         this.loader.hide();
       }
     });
+  }
+
+  onFileSelected(event: any, isEdit: boolean) {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        this.toastr.warning('Image size should not exceed 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        if (isEdit) {
+          this.editFormData.user_img = e.target.result;
+        } else {
+          this.formData.user_img = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(isEdit: boolean) {
+    if (isEdit) {
+      this.editFormData.user_img = '';
+    } else {
+      this.formData.user_img = '';
+    }
   }
 }

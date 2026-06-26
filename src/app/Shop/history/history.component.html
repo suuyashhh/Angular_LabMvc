@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+<div class="min-h-screen bg-white">
 
   <!-- MAIN CONTENT -->
-  <main class="pt-24 md:pt-28 pb-20 px-4 md:px-6">
+ <main class="pt-6 md:pt-8 pb-20 px-4 md:px-6">
     <div class="max-w-4xl mx-auto">
 
       <!-- FINANCIAL SUMMARY WIDGETS -->
@@ -97,10 +97,16 @@
         <div *ngFor="let group of groupedEntries; let isLast = last" class="mb-6" [class.mb-0]="isLast">
 
           <!-- Date Header -->
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-            <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
-            <span class="text-xs text-gray-400">({{ group.count }})</span>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+              <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
+              <span class="text-xs text-gray-400">({{ group.count }})</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs md:text-sm font-bold">
+              <span class="text-emerald-600">Paid: ₹{{ group.totalPaid | number:'1.2-2' }}</span>
+              <span class="text-rose-600">Unpaid: ₹{{ group.totalUnpaid | number:'1.2-2' }}</span>
+            </div>
           </div>
 
           <!-- Cards list -->
@@ -129,7 +135,7 @@
                         <i class="ri-image-line"></i> Photos
                       </span>
                     </div>
-                    <h5 class="font-medium text-gray-800 mt-1 truncate text-sm md:text-base">
+                    <h5 class="font-medium text-gray-800 mt-1 text-sm md:text-base whitespace-normal break-words">
                       {{ entry.reason }}
                     </h5>
                   </div>

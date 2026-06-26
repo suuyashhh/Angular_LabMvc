@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 10% 20%, rgba(255, 153, 0, 0.08) 0%, rgba(255, 94, 0, 0.04) 90%), #fdfbfa;
+    background: #ffffff;
     font-family: 'Poppins', 'Outfit', sans-serif;
     overflow: hidden;
     box-sizing: border-box;
@@ -15,6 +15,7 @@
 
 /* Background floating shapes (Blobs) */
 .bg-shape {
+    display: none;
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);

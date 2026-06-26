@@ -34,6 +34,11 @@ export class ShopLandingComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.startSessionPolling();
 
+    // Debug shopConflict$ state
+    this.auth.shopConflict$.subscribe(val => {
+      console.log('ShopLandingComponent shopConflict$ value:', val);
+    });
+
     this.routeSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => this.validateShopSession());
@@ -60,6 +65,11 @@ export class ShopLandingComponent implements OnInit, OnDestroy {
   }
 
   login() {
+    this.router.navigate(['/shop/login']);
+  }
+
+  closeConflictModalAndRedirect() {
+    this.auth.clearShopConflictFlag();
     this.router.navigate(['/shop/login']);
   }
 
