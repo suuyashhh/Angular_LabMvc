@@ -46,6 +46,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   entries: ShopEntry[] = [];
   filteredEntries: ShopEntry[] = [];
   groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number }[] = [];
+  expenseTypes: any[] = [];
 
   // Selected entry for view/edit
   selectedEntry: ShopEntry | null = null;
@@ -108,6 +109,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadShopUserData();
     this.loadEntries();
+    this.loadExpenseTypes();
+  }
+
+  loadExpenseTypes() {
+    this.api.get('ShopExpenseType/GetAll').subscribe({
+      next: (res: any) => {
+        this.expenseTypes = Array.isArray(res) ? res : [];
+      },
+      error: (err) => {
+        console.error('Error loading expense types for dropdown:', err);
+      }
+    });
+  }
+
+  onExpenseTypeSelect(event: any, isEdit: boolean) {
+    const value = event.target.value;
+    if (value) {
+      if (isEdit) {
+        this.editFormData.reason = value;
+      } else {
+        this.formData.reason = value;
+      }
+    }
   }
 
   ngOnDestroy() {

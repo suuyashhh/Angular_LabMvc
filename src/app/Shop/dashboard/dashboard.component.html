@@ -225,6 +225,21 @@
 
         <!-- Description -->
         <div>
+          <!-- Expense Type helper dropdown -->
+          <div *ngIf="formData.entryType === 2" class="mb-3">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Quick-Select Expense Type (Optional helper)
+            </label>
+            <div class="relative">
+              <i class="ri-price-tag-3-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <select (change)="onExpenseTypeSelect($event, false)" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition">
+                <option value="">--Choose for fill description--</option>
+                <option *ngFor="let t of expenseTypes" [value]="t.name">{{ t.name }}</option>
+              </select>
+            </div>
+          </div>
+
           <label class="block text-sm font-semibold text-gray-700 mb-1.5">
             Description / Reason <span class="text-red-500">*</span>
           </label>
@@ -471,6 +486,21 @@
 
         <!-- Description -->
         <div>
+          <!-- Expense Type helper dropdown -->
+          <div *ngIf="editFormData.entryType === 2" class="mb-3">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Quick-Select Expense Type (Optional helper)
+            </label>
+            <div class="relative">
+              <i class="ri-price-tag-3-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <select (change)="onExpenseTypeSelect($event, true)" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition">
+                <option value="">-- Choose an expense type to fill description --</option>
+                <option *ngFor="let t of expenseTypes" [value]="t.name">{{ t.name }}</option>
+              </select>
+            </div>
+          </div>
+
           <label class="block text-sm font-semibold text-gray-700 mb-1.5">
             Description / Reason <span class="text-red-500">*</span>
           </label>
