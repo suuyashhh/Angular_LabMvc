@@ -21,6 +21,10 @@ export const SHOP_ROUTES : Routes = [
         loadComponent: () => import('./shop-users/shop-users.component').then(m => m.ShopUsersComponent)
     },   
     {
+        path:'ex-entrytype',
+        loadComponent: () => import('./ex-entrytype/ex-entrytype.component').then(m => m.ExEntrytypeComponent)
+    },
+    {
         path:'**',
         redirectTo:'dashboard'
     }
