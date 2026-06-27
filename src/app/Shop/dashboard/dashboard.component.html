@@ -5,30 +5,46 @@
     <div class="max-w-4xl mx-auto">
 
       <!-- FINANCIAL SUMMARY WIDGETS -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <!-- Paid Amount Card -->
-        <div class="bg-white rounded-xl p-4 border border-amber-100 shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Paid Amount</p>
-            <h3 class="text-xl md:text-2xl font-bold mt-1 text-emerald-600">
-              ₹{{ totalPaid | number:'1.2-2' }}
-            </h3>
+      <div class="bg-white rounded-xl md:rounded-2xl border border-gray-200 shadow-sm p-6 mb-6 max-w-md mx-auto">
+        <div class="space-y-4">
+          <!-- Profit Row -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <i class="ri-add-line text-lg font-bold"></i>
+              </div>
+              <span class="text-sm font-semibold text-gray-600">Profit</span>
+            </div>
+            <span class="text-base md:text-lg font-bold text-emerald-600">₹{{ totalProfit | number:'1.0-0' }}</span>
           </div>
-          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-50 text-emerald-600">
-            <i class="ri-checkbox-circle-line text-xl"></i>
-          </div>
-        </div>
 
-        <!-- Unpaid Amount Card -->
-        <div class="bg-white rounded-xl p-4 border border-rose-100 shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Unpaid Amount</p>
-            <h3 class="text-xl md:text-2xl font-bold mt-1 text-rose-600">
-              ₹{{ totalPending | number:'1.2-2' }}
-            </h3>
+          <!-- Expense Row -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-600">
+                <i class="ri-subtract-line text-lg font-bold"></i>
+              </div>
+              <span class="text-sm font-semibold text-gray-600">Expense</span>
+            </div>
+            <span class="text-base md:text-lg font-bold text-rose-600">₹{{ totalExpense | number:'1.0-0' }}</span>
           </div>
-          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-rose-50 text-rose-600">
-            <i class="ri-time-line text-xl"></i>
+
+          <!-- Divider -->
+          <div class="border-t border-dashed border-gray-200 my-2"></div>
+
+          <!-- Net Total Row -->
+          <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="netTotal >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
+                <i class="ri-wallet-3-line text-lg"></i>
+              </div>
+              <span class="text-sm font-bold text-gray-800">Net Total</span>
+            </div>
+            <span class="text-lg md:text-xl font-extrabold"
+                  [ngClass]="netTotal >= 0 ? 'text-emerald-600' : 'text-rose-600'">
+              ₹{{ netTotal | number:'1.0-0' }}
+            </span>
           </div>
         </div>
       </div>
@@ -36,15 +52,23 @@
       <!-- ACTION BAR -->
       <div class="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 mb-6 border border-gray-200">
         <div class="flex flex-col sm:flex-row gap-3">
-          <button (click)="openAddModal()" class="bg-gradient-to-r from-amber-500 to-orange-600 
+          <button (click)="openAddModal(2)" class="bg-gradient-to-r from-amber-500 to-orange-600 
                        text-white px-5 py-2.5 rounded-lg md:rounded-xl 
                        hover:from-amber-600 hover:to-orange-700 transition-all duration-200
                        flex items-center justify-center gap-2 font-semibold text-sm md:text-base
                        shadow-sm hover:shadow-md">
-            <i class="ri-add-line text-lg md:text-xl"></i>
-            <span>Add Entry</span>
+            <i class="ri-subtract-line text-lg md:text-xl"></i>
+            <span>Add Expense</span>
           </button>
 
+          <button (click)="openAddModal(1)" class="bg-gradient-to-r from-emerald-500 to-teal-600 
+                       text-white px-5 py-2.5 rounded-lg md:rounded-xl 
+                       hover:from-emerald-600 hover:to-teal-700 transition-all duration-200
+                       flex items-center justify-center gap-2 font-semibold text-sm md:text-base
+                       shadow-sm hover:shadow-md">
+            <i class="ri-add-line text-lg md:text-xl"></i>
+            <span>Add Profit</span>
+          </button>
         </div>
       </div>
 
@@ -81,7 +105,7 @@
               <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
               <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
               <span class="text-xs text-gray-400">({{ group.count }})</span>
-            </div>
+            </div>          
           </div>
 
           <!-- Cards list -->
@@ -95,14 +119,18 @@
                 <div class="flex items-start gap-3 flex-1 min-w-0">
                   <!-- Payment Status Icon -->
                   <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border"
-                       [ngClass]="entry.iS_PAID ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'">
-                    <i [class]="entry.iS_PAID ? 'ri-checkbox-circle-line text-xl' : 'ri-time-line text-xl'"></i>
+                       [ngClass]="entry.entryType === 1 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : (entry.iS_PAID ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600')">
+                    <i [class]="entry.entryType === 1 ? 'ri-arrow-up-circle-line text-xl' : (entry.iS_PAID ? 'ri-checkbox-circle-line text-xl' : 'ri-time-line text-xl')"></i>
                   </div>
 
                   <!-- Text Details -->
                   <div class="flex-1 min-w-0 pt-0.5">
                     <div class="flex items-center gap-2 flex-wrap">
                       <span class="text-xs font-bold px-2 py-0.5 rounded-full"
+                            [ngClass]="entry.entryType === 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
+                        {{ entry.entryType === 1 ? 'Profit' : 'Expense' }}
+                      </span>
+                      <span *ngIf="entry.entryType !== 1" class="text-xs font-bold px-2 py-0.5 rounded-full"
                             [ngClass]="entry.iS_PAID ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'">
                         {{ entry.iS_PAID ? 'Paid' : 'Pending' }}
                       </span>
@@ -119,8 +147,8 @@
                 <!-- Right Price -->
                 <div class="flex-shrink-0 text-right">
                   <span class="text-base md:text-lg font-bold" 
-                        [ngClass]="entry.iS_PAID ? 'text-emerald-600' : 'text-red-600'">
-                    ₹{{ entry.price | number:'1.2-2' }}
+                        [ngClass]="entry.entryType === 1 ? 'text-emerald-600' : 'text-red-600'">
+                    ₹{{ entry.price | number:'1.0-0' }}
                   </span>
                   <p class="text-[10px] text-gray-400 mt-1">Click to view</p>
                 </div>
@@ -144,20 +172,24 @@
       </button>
 
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 
-                    flex items-center justify-center">
-          <i class="ri-add-box-line text-2xl text-amber-600"></i>
+        <div class="w-12 h-12 rounded-full flex items-center justify-center"
+             [ngClass]="formData.entryType === 1 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'">
+          <i [class]="formData.entryType === 1 ? 'ri-coins-line text-2xl' : 'ri-subtract-line text-2xl'"></i>
         </div>
         <div>
-          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Add New Shop Log</h2>
-          <p class="text-xs md:text-sm text-gray-500">Record a new transaction for Tejas SWEETS</p>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+            {{ formData.entryType === 1 ? 'Add New Profit' : 'Add New Expense' }}
+          </h2>
+          <p class="text-xs md:text-sm text-gray-500">
+            {{ formData.entryType === 1 ? 'Record new income for Tejas SWEETS' : 'Record a new transaction for Tejas SWEETS' }}
+          </p>
         </div>
       </div>
 
       <!-- Form -->
       <div class="space-y-4">
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4" [ngClass]="formData.entryType === 1 ? 'sm:grid-cols-1' : 'sm:grid-cols-2'">
           <!-- Date -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -173,7 +205,7 @@
           </div>
 
           <!-- Payment Status Checkbox -->
-          <div>
+          <div *ngIf="formData.entryType !== 1">
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
               Payment Status
             </label>
@@ -297,16 +329,23 @@
             </p>
           </div>
           <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Type</p>
+            <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.entryType === 1 ? 'text-emerald-700' : 'text-amber-700'">
+              <i [class]="selectedEntry?.entryType === 1 ? 'ri-arrow-up-circle-line text-base' : 'ri-arrow-down-circle-line text-base'"></i>
+              <span>{{ selectedEntry?.entryType === 1 ? 'Profit' : 'Expense' }}</span>
+            </p>
+          </div>
+          <div *ngIf="selectedEntry?.entryType !== 1">
             <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Payment Status</p>
             <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.iS_PAID ? 'text-emerald-700' : 'text-rose-700'">
               <i [class]="selectedEntry?.iS_PAID ? 'ri-checkbox-circle-line text-base' : 'ri-time-line text-base'"></i>
               <span>{{ selectedEntry?.iS_PAID ? 'Paid' : 'Pending' }}</span>
             </p>
           </div>
-          <div class="sm:col-span-2">
+          <div [ngClass]="selectedEntry?.entryType === 1 ? 'sm:col-span-1' : 'sm:col-span-2'">
             <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Amount</p>
-            <p class="font-extrabold mt-1 text-base md:text-lg" [ngClass]="selectedEntry?.iS_PAID ? 'text-emerald-600' : 'text-red-600'">
-              ₹{{ selectedEntry?.price | number:'1.2-2' }}
+            <p class="font-extrabold mt-1 text-base md:text-lg" [ngClass]="selectedEntry?.entryType === 1 ? 'text-emerald-600' : 'text-red-600'">
+              ₹{{ selectedEntry?.price | number:'1.0-0' }}
             </p>
           </div>
         </div>
@@ -381,12 +420,14 @@
       </button>
 
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 
-                    flex items-center justify-center">
-          <i class="ri-edit-line text-2xl text-amber-600"></i>
+        <div class="w-12 h-12 rounded-full flex items-center justify-center"
+             [ngClass]="editFormData.entryType === 1 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'">
+          <i [class]="editFormData.entryType === 1 ? 'ri-coins-line text-2xl' : 'ri-edit-line text-2xl'"></i>
         </div>
         <div>
-          <h2 class="text-xl md:text-2xl font-bold text-gray-800">Edit Shop Log</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+            {{ editFormData.entryType === 1 ? 'Edit Profit Log' : 'Edit Expense Log' }}
+          </h2>
           <p class="text-xs md:text-sm text-gray-500">Update transaction details and photos</p>
         </div>
       </div>
@@ -394,7 +435,7 @@
       <!-- Form -->
       <div class="space-y-4">
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4" [ngClass]="editFormData.entryType === 1 ? 'sm:grid-cols-1' : 'sm:grid-cols-2'">
           <!-- Date -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -410,7 +451,7 @@
           </div>
 
           <!-- Payment Status Checkbox -->
-          <div>
+          <div *ngIf="editFormData.entryType !== 1">
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
               Payment Status
             </label>

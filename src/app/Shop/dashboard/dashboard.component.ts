@@ -19,6 +19,7 @@ interface ShopEntry {
   imagE3?: string;
   imagE4?: string;
   date: string;
+  entryType?: number;
 }
 
 @Component({
@@ -40,50 +41,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showEditModal = false;
   searchQuery = '';
   showDeleteEntryConfirm = false;
-  
+
   // Entries data
   entries: ShopEntry[] = [];
   filteredEntries: ShopEntry[] = [];
   groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number }[] = [];
-  
+
   // Selected entry for view/edit
   selectedEntry: ShopEntry | null = null;
   viewImages: string[] = [];
-  
+
   // Form data for adding
   formData = {
     isPaid: true,
     reason: '',
     price: 0,
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    entryType: 2
   };
-  
+
   // Form data for editing
   editFormData = {
     isPaid: true,
     reason: '',
     price: 0,
-    date: ''
+    date: '',
+    entryType: 2
   };
-  
+
   // Add modal files
   selectedFiles: File[] = [];
   previewImages: string[] = [];
-  
+
   // Edit modal files
   selectedEditFiles: File[] = [];
   editPreviewImages: string[] = [];
   existingImages: string[] = [];
-  
+
   // Image preview
   showImagePreview = false;
   previewImageUrl: string = '';
   currentImageIndex = 0;
-  
+
   netBalance = 0;
   totalPaid = 0;
   totalPending = 0;
-  
+  totalProfit = 0;
+  totalExpense = 0;
+  netTotal = 0;
+
   private isBrowser: boolean;
 
   constructor(
@@ -130,14 +136,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     this.loader.show();
-    
+
     const today = new Date();
     const y = today.getFullYear();
     const m = String(today.getMonth() + 1).padStart(2, '0');
     const d = String(today.getDate()).padStart(2, '0');
     const todayStr = `${y}-${m}-${d}`;
-    
-    this.api.get('ShopEntry/GetAllTypesEntrys', { 
+
+    this.api.get('ShopEntry/GetAllTypesEntrys', {
       userId: this.userId,
       fromDate: todayStr,
       toDate: todayStr
@@ -159,7 +165,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   groupEntriesByDate() {
     const grouped = new Map<string, ShopEntry[]>();
-    
+
     this.filteredEntries.forEach(entry => {
       const dateKey = this.formatDate(entry.date);
       if (!grouped.has(dateKey)) {
@@ -171,11 +177,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => {
       let paidSum = 0;
       let unpaidSum = 0;
+      let profitSum = 0;
+      let expenseSum = 0;
       entries.forEach(e => {
         if (e.iS_PAID) {
           paidSum += e.price;
         } else {
           unpaidSum += e.price;
+        }
+
+        if (e.entryType === 1) {
+          profitSum += e.price;
+        } else {
+          expenseSum += e.price;
         }
       });
       return {
@@ -183,7 +197,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         count: entries.length,
         entries,
         totalPaid: paidSum,
-        totalUnpaid: unpaidSum
+        totalUnpaid: unpaidSum,
+        totalProfit: profitSum,
+        totalExpense: expenseSum
       };
     });
   }
@@ -192,17 +208,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.netBalance = 0;
     this.totalPaid = 0;
     this.totalPending = 0;
-    
+    this.totalProfit = 0;
+    this.totalExpense = 0;
+    this.netTotal = 0;
+
     this.filteredEntries.forEach(entry => {
       if (entry.iS_PAID) {
         this.totalPaid += entry.price;
       } else {
         this.totalPending += entry.price;
       }
+
+      if (entry.entryType === 1) {
+        this.totalProfit += entry.price;
+      } else {
+        this.totalExpense += entry.price;
+      }
     });
-    
+
     // Net Balance is the sum of Paid amount
     this.netBalance = this.totalPaid;
+    this.netTotal = this.totalProfit - this.totalExpense;
   }
 
   formatDate(dateString: string): string {
@@ -219,7 +245,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.filteredEntries = [...this.entries];
     } else {
       const query = this.searchQuery.toLowerCase();
-      this.filteredEntries = this.entries.filter(entry => 
+      this.filteredEntries = this.entries.filter(entry =>
         entry.reason.toLowerCase().includes(query) ||
         (entry.iS_PAID ? 'paid' : 'pending').includes(query)
       );
@@ -229,9 +255,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   // ============= ADD MODAL =============
-  openAddModal() {
+  openAddModal(type: number = 2) {
     this.showModal = true;
-    this.resetForm();
+    this.resetForm(type);
+    if (type === 1) {
+      this.formData.isPaid = true;
+    }
   }
 
   closeModal() {
@@ -239,16 +268,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.resetForm();
   }
 
-  resetForm() {
+  resetForm(type: number = 2) {
     this.formData = {
       isPaid: true,
       reason: '',
       price: 0,
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      entryType: type
     };
     this.selectedFiles = [];
     this.previewImages = [];
-    
+
     if (this.isBrowser) {
       const fileInput = document.querySelector('#fileInput') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
@@ -257,7 +287,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async onFileSelect(event: any) {
     const files = Array.from(event.target.files) as File[];
-    
+
     if (this.selectedFiles.length + files.length > 4) {
       this.toastr.warning('Maximum 4 images allowed');
       return;
@@ -277,12 +307,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // Compress image to 50KB target size
         const compressedFile = await this.imageCompression.compressImage(file, 50);
-        
+
         const compressedSizeKB = this.imageCompression.getFileSizeKB(compressedFile);
         console.log(`Compressed size of ${file.name}: ${compressedSizeKB.toFixed(2)} KB`);
 
         this.selectedFiles.push(compressedFile);
-        
+
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.previewImages.push(e.target.result);
@@ -294,7 +324,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           'Image Compressed',
           { timeOut: 3000 }
         );
-        
+
       } catch (error) {
         console.error('Compression error:', error);
         this.toastr.error(`Failed to compress ${file.name}`);
@@ -320,21 +350,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     try {
       this.loader.show();
-      
+
       let imagePaths = ['', '', '', ''];
-      
+
       // Upload files
       for (let i = 0; i < this.selectedFiles.length; i++) {
         const formData = new FormData();
         formData.append('file', this.selectedFiles[i]);
-        
+
         const uploadResult: any = await this.api.upload('ShopFileUpload/Upload', formData).toPromise();
-        
+
         if (uploadResult && uploadResult.success) {
           imagePaths[i] = uploadResult.filePath;
         }
       }
-      
+
       // Save entry
       const payload = {
         iS_PAID: this.formData.isPaid,
@@ -345,11 +375,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         image2: imagePaths[1],
         image3: imagePaths[2],
         image4: imagePaths[3],
-        date: this.formData.date
+        date: this.formData.date,
+        entryType: this.formData.entryType
       };
-      
+
       const result: any = await this.api.post('ShopEntry/Insert', payload).toPromise();
-      
+
       if (result.success) {
         this.toastr.success('Entry added successfully');
         this.closeModal();
@@ -358,7 +389,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.toastr.error(result.message || 'Failed to add entry');
         this.loader.hide();
       }
-      
+
     } catch (error: any) {
       console.error('Save error:', error);
       this.toastr.error(error?.error?.message || error?.message || 'Error saving entry');
@@ -387,29 +418,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private loadViewImages() {
     if (!this.selectedEntry) return;
-    
+
     const img1 = this.selectedEntry.imagE1 || '';
     const img2 = this.selectedEntry.imagE2 || '';
     const img3 = this.selectedEntry.imagE3 || '';
     const img4 = this.selectedEntry.imagE4 || '';
-    
+
     this.viewImages = [img1, img2, img3, img4].filter(img => img && img.trim() !== '');
   }
 
   openEditFromView() {
     if (!this.selectedEntry) return;
-    
+
     this.editFormData = {
       isPaid: this.selectedEntry.iS_PAID,
       reason: this.selectedEntry.reason,
       price: this.selectedEntry.price,
-      date: this.selectedEntry.date.split('T')[0]
+      date: this.selectedEntry.date.split('T')[0],
+      entryType: this.selectedEntry.entryType || 2
     };
-    
+
     this.existingImages = [...this.viewImages];
     this.selectedEditFiles = [];
     this.editPreviewImages = [];
-    
+
     this.showViewModal = false;
     this.showEditModal = true;
   }
@@ -425,7 +457,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   confirmDeleteEntry() {
     if (!this.selectedEntry) return;
-    
+
     this.showDeleteEntryConfirm = false;
     this.loader.show();
 
@@ -461,7 +493,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.selectedEditFiles = [];
     this.editPreviewImages = [];
     this.existingImages = [];
-    
+
     if (this.isBrowser) {
       const fileInput = document.getElementById('editFileInput') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
@@ -470,7 +502,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async onEditFileSelect(event: any) {
     const files = Array.from(event.target.files) as File[];
-    
+
     const totalImages = this.existingImages.length + this.selectedEditFiles.length + files.length;
     if (totalImages > 4) {
       this.toastr.warning('Maximum 4 images allowed in total');
@@ -487,13 +519,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       try {
         const originalSizeKB = this.imageCompression.getFileSizeKB(file);
-        
+
         // Compress image to 50KB target size
         const compressedFile = await this.imageCompression.compressImage(file, 50);
         const compressedSizeKB = this.imageCompression.getFileSizeKB(compressedFile);
 
         this.selectedEditFiles.push(compressedFile);
-        
+
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.editPreviewImages.push(e.target.result);
@@ -505,7 +537,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           'Image Compressed',
           { timeOut: 3000 }
         );
-        
+
       } catch (error) {
         console.error('Compression error:', error);
         this.toastr.error(`Failed to compress ${file.name}`);
@@ -542,9 +574,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     try {
       this.loader.show();
-      
+
       let imagePaths = ['', '', '', ''];
-      
+
       // Preserve existing images relative paths
       for (let i = 0; i < this.existingImages.length; i++) {
         const img = this.existingImages[i];
@@ -557,21 +589,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
+
       // Upload new images starting after existing images
       let currentIndex = this.existingImages.length;
       for (let i = 0; i < this.selectedEditFiles.length && currentIndex < 4; i++) {
         const formData = new FormData();
         formData.append('file', this.selectedEditFiles[i]);
-        
+
         const uploadResult: any = await this.api.upload('ShopFileUpload/Upload', formData).toPromise();
-        
+
         if (uploadResult && uploadResult.success) {
           imagePaths[currentIndex] = uploadResult.filePath;
           currentIndex++;
         }
       }
-      
+
       // Update entry
       const payload = {
         shoP_ENTRY_ID: this.selectedEntry.shoP_ENTRY_ID,
@@ -583,11 +615,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         image2: imagePaths[1],
         image3: imagePaths[2],
         image4: imagePaths[3],
-        date: this.editFormData.date
+        date: this.editFormData.date,
+        entryType: this.editFormData.entryType
       };
-      
+
       const result: any = await this.api.put('ShopEntry/Update', payload).toPromise();
-      
+
       if (result.success) {
         this.toastr.success('Entry updated successfully');
         this.closeEditModal();
@@ -597,7 +630,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.toastr.error(result.message || 'Failed to update entry');
         this.loader.hide();
       }
-      
+
     } catch (error: any) {
       console.error('Update error:', error);
       this.toastr.error(error?.error?.message || error?.message || 'Error updating entry');

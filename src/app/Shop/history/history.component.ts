@@ -19,6 +19,7 @@ interface ShopEntry {
   imagE3?: string;
   imagE4?: string;
   date: string;
+  entryType?: number;
 }
 
 @Component({
@@ -47,7 +48,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   // Entries data
   entries: ShopEntry[] = [];
   filteredEntries: ShopEntry[] = [];
-  groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number }[] = [];
+  groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number; totalProfit: number; totalExpense: number; }[] = [];
   
   // Selected entry for view/edit
   selectedEntry: ShopEntry | null = null;
@@ -58,7 +59,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     isPaid: true,
     reason: '',
     price: 0,
-    date: ''
+    date: '',
+    entryType: 2
   };
   
   // Edit modal files
@@ -74,6 +76,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
   netBalance = 0;
   totalPaid = 0;
   totalPending = 0;
+  totalProfit = 0;
+  totalExpense = 0;
+  netTotal = 0;
   
   private isBrowser: boolean;
 
@@ -173,11 +178,19 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => {
       let paidSum = 0;
       let unpaidSum = 0;
+      let profitSum = 0;
+      let expenseSum = 0;
       entries.forEach(e => {
         if (e.iS_PAID) {
           paidSum += e.price;
         } else {
           unpaidSum += e.price;
+        }
+
+        if (e.entryType === 1) {
+          profitSum += e.price;
+        } else {
+          expenseSum += e.price;
         }
       });
       return {
@@ -185,7 +198,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
         count: entries.length,
         entries,
         totalPaid: paidSum,
-        totalUnpaid: unpaidSum
+        totalUnpaid: unpaidSum,
+        totalProfit: profitSum,
+        totalExpense: expenseSum
       };
     });
   }
@@ -194,6 +209,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.netBalance = 0;
     this.totalPaid = 0;
     this.totalPending = 0;
+    this.totalProfit = 0;
+    this.totalExpense = 0;
+    this.netTotal = 0;
     
     this.filteredEntries.forEach(entry => {
       if (entry.iS_PAID) {
@@ -201,10 +219,17 @@ export class HistoryComponent implements OnInit, OnDestroy {
       } else {
         this.totalPending += entry.price;
       }
+
+      if (entry.entryType === 1) {
+        this.totalProfit += entry.price;
+      } else {
+        this.totalExpense += entry.price;
+      }
     });
     
     // Net Balance is the sum of Paid amount
     this.netBalance = this.totalPaid;
+    this.netTotal = this.totalProfit - this.totalExpense;
   }
 
   formatDate(dateString: string): string {
@@ -221,10 +246,12 @@ export class HistoryComponent implements OnInit, OnDestroy {
       this.filteredEntries = [...this.entries];
     } else {
       const query = this.searchQuery.toLowerCase();
-      this.filteredEntries = this.entries.filter(entry => 
-        entry.reason.toLowerCase().includes(query) ||
-        (entry.iS_PAID ? 'paid' : 'pending').includes(query)
-      );
+      this.filteredEntries = this.entries.filter(entry => {
+        const formattedDate = this.formatDate(entry.date).toLowerCase();
+        return entry.reason.toLowerCase().includes(query) ||
+          (entry.iS_PAID ? 'paid' : 'pending').includes(query) ||
+          formattedDate.includes(query);
+      });
     }
     this.groupEntriesByDate();
     this.calculateTotals();
@@ -267,7 +294,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
       isPaid: this.selectedEntry.iS_PAID,
       reason: this.selectedEntry.reason,
       price: this.selectedEntry.price,
-      date: this.selectedEntry.date.split('T')[0]
+      date: this.selectedEntry.date.split('T')[0],
+      entryType: this.selectedEntry.entryType || 2
     };
     
     this.existingImages = [...this.viewImages];
@@ -447,7 +475,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
         image2: imagePaths[1],
         image3: imagePaths[2],
         image4: imagePaths[3],
-        date: this.editFormData.date
+        date: this.editFormData.date,
+        entryType: this.editFormData.entryType
       };
       
       const result: any = await this.api.put('ShopEntry/Update', payload).toPromise();
