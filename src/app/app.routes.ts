@@ -61,5 +61,10 @@ export const routes: Routes = [
     canActivate: [shopAuthGuard],
     loadComponent: () => import('./Shop/landing/landing.component').then(m => m.ShopLandingComponent),
     loadChildren: () => import('./Shop/shop.routes').then(m => m.SHOP_ROUTES)
+  },
+   {
+    path: 'market',
+    loadComponent: () => import('./Market/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./Market/Market.routes').then(m => m.MARKET_ROUTES)
   }
 ];
