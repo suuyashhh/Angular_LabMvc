@@ -35,6 +35,7 @@ export class PurchaseEntryComponent implements OnInit {
   isUploading = false;
   paidAmount = 0;
   notes = '';
+  showMarathiInTable = false;
 
   constructor(
     public apiService: ApiService,
@@ -83,16 +84,33 @@ export class PurchaseEntryComponent implements OnInit {
         this.notes = data.notes || '';
         
         // Populate items
-        this.itemsList = data.items.map((item: any) => ({
-          vegetableId: item.vegetableId,
-          vegetableName: item.vegetableName,
-          quantity: item.quantity,
-          pricePerKg: item.pricePerKg,
-          total: item.total
-        }));
+        this.itemsList = data.items.map((item: any) => {
+          const parts = (item.vegetableName || '').split(' - ');
+          const engName = parts[0]?.trim() || '';
+          const marName = parts[1]?.trim() || '';
+
+          return {
+            vegetableId: item.vegetableId,
+            engVegetableName: engName,
+            marVegetableName: marName,
+            vegetableName: this.showMarathiInTable && marName ? marName : engName,
+            quantity: item.quantity,
+            pricePerKg: item.pricePerKg,
+            total: item.total
+          };
+        });
       },
       error: (err) => alert('Failed to load purchase details for edit.')
     });
+  }
+
+  onLanguageToggleChange() {
+    this.itemsList = this.itemsList.map(item => ({
+      ...item,
+      vegetableName: this.showMarathiInTable && item.marVegetableName 
+        ? item.marVegetableName 
+        : item.engVegetableName
+    }));
   }
 
   // Hotel Custom Dropdown helpers
@@ -128,7 +146,11 @@ export class PurchaseEntryComponent implements OnInit {
     // Add Row
     this.itemsList.push({
       vegetableId: veg.id,
-      vegetableName: veg.vegetableName,
+      engVegetableName: veg.engVegetableName,
+      marVegetableName: veg.marVegetableName,
+      vegetableName: this.showMarathiInTable && veg.marVegetableName
+        ? veg.marVegetableName
+        : veg.engVegetableName,
       quantity: 1,
       pricePerKg: 0,
       total: 0
@@ -142,7 +164,9 @@ export class PurchaseEntryComponent implements OnInit {
 
   get filteredVegetables() {
     return this.vegetablesList.filter(v =>
-      !this.vegSearchQuery || v.vegetableName?.toLowerCase().includes(this.vegSearchQuery.toLowerCase())
+      !this.vegSearchQuery || 
+      v.engVegetableName?.toLowerCase().includes(this.vegSearchQuery.toLowerCase()) ||
+      v.marVegetableName?.toLowerCase().includes(this.vegSearchQuery.toLowerCase())
     );
   }
 

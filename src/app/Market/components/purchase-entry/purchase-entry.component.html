@@ -80,7 +80,25 @@
             <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 0.5px;">ITEMS</span>
             <h4 class="fw-bold mb-0">Vegetables</h4>
           </div>
-          <span class="small text-muted">{{ itemsList.length }} rows</span>
+          
+          <div class="d-flex align-items-center gap-3">
+            <!-- Language Switch Toggle -->
+            <div class="d-flex align-items-center gap-2 bg-light px-3 py-1.5 rounded-pill border">
+              <span class="small fw-semibold" [class.text-primary-green]="!showMarathiInTable" [class.text-muted]="showMarathiInTable" style="font-size: 11px;">English</span>
+              <div class="form-check form-switch mb-0 d-flex align-items-center">
+                <input 
+                  class="form-check-input custom-switch-green cursor-pointer" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="languageSwitch" 
+                  [(ngModel)]="showMarathiInTable"
+                  (change)="onLanguageToggleChange()"
+                  style="width: 2.2em; height: 1.1em; cursor: pointer;">
+              </div>
+              <span class="small fw-semibold" [class.text-primary-green]="showMarathiInTable" [class.text-muted]="!showMarathiInTable" style="font-size: 11px;">मराठी</span>
+            </div>
+            <span class="small text-muted">{{ itemsList.length }} rows</span>
+          </div>
         </div>
 
         <!-- Items Table -->
@@ -164,7 +182,7 @@
                 *ngFor="let veg of filteredVegetables"
                 [class.disabled]="isVegAdded(veg.id)"
                 (click)="!isVegAdded(veg.id) && selectVegetable(veg, $event)">
-                <span class="fw-bold" [class.text-muted]="isVegAdded(veg.id)">{{ veg.vegetableName }}</span>
+                <span class="fw-bold" [class.text-muted]="isVegAdded(veg.id)">{{ veg.engVegetableName }}{{ veg.marVegetableName ? ' - ' + veg.marVegetableName : '' }}</span>
                 <span class="badge bg-light text-muted small fs-8" *ngIf="isVegAdded(veg.id)">already added</span>
               </div>
               <div class="text-muted text-center py-2 small" *ngIf="filteredVegetables.length === 0">

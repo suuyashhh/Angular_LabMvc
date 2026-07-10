@@ -30,7 +30,7 @@
           <div class="veg-icon-box">
             <i class="bi bi-egg-fried"></i>
           </div>
-          <span class="fw-bold fs-5 text-truncate" style="max-width: 180px;">{{ veg.vegetableName }}</span>
+          <span class="fw-bold fs-5 text-truncate" style="max-width: 250px;">{{ veg.engVegetableName }}{{ veg.marVegetableName ? ' - ' + veg.marVegetableName : '' }}</span>
         </div>
         <div class="d-flex gap-1">
           <button (click)="openEditDrawer(veg)" class="btn btn-sm btn-action-icon" title="Edit">
@@ -62,18 +62,29 @@
     <div class="drawer-body">
       <form #vegForm="ngForm">
         <div class="mb-3">
-          <label for="vegetableName" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Vegetable Name *</label>
+          <label for="engVegetableName" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">English Vegetable Name *</label>
           <input 
             type="text" 
-            id="vegetableName" 
-            name="vegetableName" 
+            id="engVegetableName" 
+            name="engVegetableName" 
             class="form-control" 
-            [(ngModel)]="formData.vegetableName" 
-            placeholder="e.g. Tomato, Potato, Onion"
+            [(ngModel)]="formData.engVegetableName" 
+            placeholder="e.g. Carrot"
             required
-            #nameModel="ngModel"
-            [class.is-invalid]="nameModel.touched && nameModel.invalid">
-          <div class="invalid-feedback">Vegetable name is required.</div>
+            #engModel="ngModel"
+            [class.is-invalid]="engModel.touched && engModel.invalid">
+          <div class="invalid-feedback">English vegetable name is required.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="marVegetableName" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Marathi Vegetable Name</label>
+          <input 
+            type="text" 
+            id="marVegetableName" 
+            name="marVegetableName" 
+            class="form-control" 
+            [(ngModel)]="formData.marVegetableName" 
+            placeholder="e.g. गाजर">
         </div>
       </form>
     </div>

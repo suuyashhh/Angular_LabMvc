@@ -96,3 +96,16 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Custom Switch Styling */
+.custom-switch-green:checked {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+.custom-switch-green:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(43, 92, 46, 0.25) !important;
+}
+.text-primary-green {
+  color: var(--primary-color) !important;
+}
