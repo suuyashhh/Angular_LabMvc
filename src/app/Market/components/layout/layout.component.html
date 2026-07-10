@@ -1,0 +1,117 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.mobile-open]="isSidebarOpen">
+    <div class="sidebar-brand d-flex align-items-center gap-3">
+      <div class="brand-logo-small">
+        <i class="bi bi-egg-fried text-white"></i>
+      </div>
+      <div>
+        <h4 class="mb-0 fw-bold brand-name">VegBook</h4>
+        <span class="brand-tag">PURCHASE LEDGER</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/market/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="bi bi-grid-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      
+      <a routerLink="/market/hotels" routerLinkActive="active" class="nav-item">
+        <i class="bi bi-building"></i>
+        <span>Hotels</span>
+      </a>
+
+      <a routerLink="/market/vegetables" routerLinkActive="active" class="nav-item">
+        <i class="bi bi-egg-fried"></i>
+        <span>Vegetables</span>
+      </a>
+
+      <div class="px-3 my-4">
+        <button routerLink="/market/purchase/add" class="btn btn-accent-orange w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+          <i class="bi bi-plus-lg"></i>
+          <span>Add Entry</span>
+        </button>
+      </div>
+      
+      <button (click)="openBackupModal()" class="nav-item mt-auto border-0 bg-transparent text-start w-100">
+        <i class="bi bi-arrow-down-up"></i>
+        <span>Backup Data</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="small text-muted">V1.0 - ONLINE READY</span>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay for mobile -->
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+  <!-- Main Content Panel -->
+  <div class="main-panel">
+    <header class="main-header d-flex justify-content-between align-items-center px-4 no-print">
+      <button class="btn d-lg-none p-0 border-0" (click)="toggleSidebar()">
+        <i class="bi bi-list fs-3"></i>
+      </button>
+
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <span class="user-name d-none d-md-inline">Welcome, <strong>{{ authService.currentUserValue?.username }}</strong></span>
+        <button (click)="onLogout()" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Body -->
+    <main class="content-body p-4">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Backup Modal Overlay -->
+  <div class="modal fade show" [class.d-block]="showBackupModal" tabindex="-1" style="background: rgba(0,0,0,0.5);" *ngIf="showBackupModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold">Data Management</h5>
+          <button type="button" class="btn-close" (click)="closeBackupModal()"></button>
+        </div>
+        
+        <div class="modal-body p-4">
+          <p class="text-muted small">Export system entries into a JSON file, or restore from a previous backup file.</p>
+          
+          <div *ngIf="notification" class="alert alert-info text-center py-2 fs-7 small mb-3">
+            {{ notification }}
+          </div>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <button (click)="exportData()" class="btn btn-light-custom w-100 py-3 d-flex flex-column align-items-center justify-content-center gap-2" [disabled]="backupLoading">
+                <i class="bi bi-download fs-4 text-success"></i>
+                <span class="fw-bold">Export JSON</span>
+              </button>
+            </div>
+            <div class="col-6">
+              <label class="btn btn-light-custom w-100 py-3 d-flex flex-column align-items-center justify-content-center gap-2 cursor-pointer mb-0" [class.disabled]="backupLoading">
+                <i class="bi bi-upload fs-4 text-warning"></i>
+                <span class="fw-bold">Import JSON</span>
+                <input type="file" (change)="importData($event)" class="d-none" accept=".json" [disabled]="backupLoading">
+              </label>
+            </div>
+          </div>
+
+          <div *ngIf="backupLoading" class="text-center mt-3">
+            <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+            <span class="ms-2 small text-muted">Processing...</span>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn btn-light-custom w-100" (click)="closeBackupModal()" [disabled]="backupLoading">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

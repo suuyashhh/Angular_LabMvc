@@ -1,0 +1,286 @@
+<div class="purchase-entry-container pb-5">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+    <div class="d-flex align-items-center gap-3">
+      <button routerLink="/market/dashboard" class="btn btn-light-custom btn-icon-only">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <div>
+        <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 1px;">
+          {{ editMode ? 'EDIT ENTRY' : 'NEW ENTRY' }}
+        </span>
+        <h1 class="fw-bold mb-0">Purchase Bill</h1>
+      </div>
+    </div>
+    <button (click)="saveEntry()" class="btn btn-primary-green px-4 py-2.5 d-flex align-items-center gap-2" [disabled]="isSaving">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>
+      <span>Save Entry</span>
+    </button>
+  </div>
+
+  <!-- Main Form -->
+  <div class="row g-4">
+    <!-- Hotel & Date Selection Card -->
+    <div class="col-12">
+      <div class="entry-card p-4">
+        <div class="row g-3">
+          <!-- Searchable Hotel Dropdown -->
+          <div class="col-md-8 position-relative">
+            <label class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Hotel *</label>
+            <div class="dropdown-trigger-box" (click)="toggleHotelDropdown($event)">
+              <span *ngIf="selectedHotel">{{ selectedHotel.hotelName }}</span>
+              <span class="text-muted" *ngIf="!selectedHotel">Search hotel by name...</span>
+              <i class="bi bi-chevron-down ms-auto text-muted"></i>
+            </div>
+
+            <!-- Custom Dropdown Menu -->
+            <div class="custom-dropdown-menu p-3 shadow-lg" *ngIf="showHotelDropdown">
+              <input 
+                type="text" 
+                class="form-control mb-2" 
+                placeholder="Search hotel by name..." 
+                [(ngModel)]="hotelSearchQuery"
+                (click)="$event.stopPropagation()"
+                #hotelSearchInput>
+              
+              <div class="dropdown-options-list">
+                <div 
+                  class="dropdown-option-item p-2" 
+                  *ngFor="let hotel of filteredHotels"
+                  (click)="selectHotel(hotel, $event)">
+                  <div class="fw-bold">{{ hotel.hotelName }}</div>
+                  <div class="text-muted small fs-7">{{ hotel.address || 'No Address' }} · {{ hotel.contactNumber || 'No Phone' }}</div>
+                </div>
+                <div class="text-muted text-center py-2 small" *ngIf="filteredHotels.length === 0">
+                  No hotels found.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date Picker -->
+          <div class="col-md-4">
+            <label for="date" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Date *</label>
+            <input 
+              type="date" 
+              id="date" 
+              class="form-control" 
+              [(ngModel)]="entryDate"
+              (keydown.enter)="onEnter($event)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vegetables Entry Table Card -->
+    <div class="col-12">
+      <div class="entry-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 0.5px;">ITEMS</span>
+            <h4 class="fw-bold mb-0">Vegetables</h4>
+          </div>
+          <span class="small text-muted">{{ itemsList.length }} rows</span>
+        </div>
+
+        <!-- Items Table -->
+        <div class="table-responsive mb-4" *ngIf="itemsList.length > 0">
+          <table class="table align-middle">
+            <thead>
+              <tr class="text-muted uppercase small" style="font-size: 11px; letter-spacing: 0.5px;">
+                <th style="width: 45%;">Vegetable</th>
+                <th style="width: 15%;">Qty (KG)</th>
+                <th style="width: 15%;">Price / KG</th>
+                <th style="width: 15%;">Total</th>
+                <th style="width: 10%;" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of itemsList; let idx = index">
+                <td class="fw-bold">{{ item.vegetableName }}</td>
+                <td>
+                  <input 
+                    type="number" 
+                    class="form-control py-1 px-2 text-center" 
+                    [(ngModel)]="item.quantity" 
+                    (ngModelChange)="calculateRowTotal(item)"
+                    (keydown.enter)="onEnter($event)"
+                    min="0.01">
+                </td>
+                <td>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0">₹</span>
+                    <input 
+                      type="number" 
+                      class="form-control py-1 px-2 border-start-0 ps-0" 
+                      [(ngModel)]="item.pricePerKg" 
+                      (ngModelChange)="calculateRowTotal(item)"
+                      (keydown.enter)="onEnter($event)"
+                      min="0">
+                  </div>
+                </td>
+                <td class="fw-bold">₹{{ item.total | number:'1.2-2' }}</td>
+                <td class="text-end">
+                  <button (click)="removeItem(idx)" class="btn btn-sm btn-outline-danger border-0">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <!-- Grand Total Row -->
+              <tr class="table-light">
+                <td colspan="3" class="text-end fw-bold">Grand Total</td>
+                <td colspan="2" class="fw-extrabold text-success fs-5">₹{{ grandTotal | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty Items State -->
+        <div class="text-center py-4 border border-dashed rounded-3 mb-4" *ngIf="itemsList.length === 0">
+          <span class="text-muted small">No vegetable items added to bill yet. Select a vegetable below to add.</span>
+        </div>
+
+        <!-- Vegetable searchable select dropdown -->
+        <div class="position-relative">
+          <label class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Add Vegetable</label>
+          <div class="dropdown-trigger-box" (click)="toggleVegetableDropdown($event)">
+            <span class="text-muted">Type to search vegetables...</span>
+            <i class="bi bi-chevron-down ms-auto text-muted"></i>
+          </div>
+
+          <!-- Custom Vegetable Dropdown Menu -->
+          <div class="custom-dropdown-menu p-3 shadow-lg" *ngIf="showVegetableDropdown">
+            <input 
+              type="text" 
+              class="form-control mb-2" 
+              placeholder="Type to search vegetables..." 
+              [(ngModel)]="vegSearchQuery"
+              (click)="$event.stopPropagation()"
+              #vegSearchInput>
+            
+            <div class="dropdown-options-list">
+              <div 
+                class="dropdown-option-item p-2 d-flex justify-content-between align-items-center" 
+                *ngFor="let veg of filteredVegetables"
+                [class.disabled]="isVegAdded(veg.id)"
+                (click)="!isVegAdded(veg.id) && selectVegetable(veg, $event)">
+                <span class="fw-bold" [class.text-muted]="isVegAdded(veg.id)">{{ veg.vegetableName }}</span>
+                <span class="badge bg-light text-muted small fs-8" *ngIf="isVegAdded(veg.id)">already added</span>
+              </div>
+              <div class="text-muted text-center py-2 small" *ngIf="filteredVegetables.length === 0">
+                No vegetables found.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Card -->
+    <div class="col-12">
+      <div class="entry-card p-4">
+        <h4 class="fw-bold mb-3">Payment</h4>
+
+        <div class="row g-4">
+          <!-- Payment Method Radios -->
+          <div class="col-md-6">
+            <label class="form-label text-uppercase fw-semibold mb-2" style="font-size: 11px;">Payment Method</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="payment-radio-card" [class.active]="paymentMethod === 'Cash'">
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="Cash" 
+                    [(ngModel)]="paymentMethod"
+                    (change)="onPaymentMethodChange()">
+                  <div class="fw-bold">Cash</div>
+                  <span class="small text-muted">Physical cash payment</span>
+                </label>
+              </div>
+              <div class="col-6">
+                <label class="payment-radio-card" [class.active]="paymentMethod === 'Online'">
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="Online" 
+                    [(ngModel)]="paymentMethod"
+                    (change)="onPaymentMethodChange()">
+                  <div class="fw-bold">Online</div>
+                  <span class="small text-muted">UPI, bank transfer, etc.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Screenshot Upload -->
+          <div class="col-md-6" *ngIf="paymentMethod === 'Online'">
+            <label class="form-label text-uppercase fw-semibold mb-2" style="font-size: 11px;">Payment Screenshot (optional)</label>
+            <div class="d-flex align-items-center gap-3">
+              <!-- Dotted Dnd Box -->
+              <label class="screenshot-upload-box" *ngIf="!uploadedImageUrl">
+                <i class="bi bi-upload mb-1 fs-4"></i>
+                <span class="small fw-semibold">Upload Image</span>
+                <input type="file" (change)="onImageUpload($event)" class="d-none" accept="image/*">
+              </label>
+              
+              <!-- Preview -->
+              <div class="uploaded-image-preview-container position-relative" *ngIf="uploadedImageUrl">
+                <img [src]="getImageUrl(uploadedImageUrl)" class="img-fluid rounded-3 border">
+                <button (click)="removeImage()" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                  <i class="bi bi-x small"></i>
+                </button>
+              </div>
+
+              <div class="small text-muted" *ngIf="!uploadedImageUrl">
+                Attach the UPI/bank screenshot for record. Max 3 MB.
+              </div>
+              <div class="small text-muted" *ngIf="isUploading">
+                <div class="spinner-border spinner-border-sm text-success me-1" role="status"></div>
+                Uploading...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Totals Section -->
+        <div class="row g-3 align-items-center border-top pt-4 mt-4">
+          <div class="col-md-4 text-center text-md-start">
+            <span class="text-uppercase text-muted fw-bold small" style="font-size: 10px;">Grand Total</span>
+            <h3 class="fw-extrabold text-success mb-0">₹{{ grandTotal | number:'1.2-2' }}</h3>
+          </div>
+
+          <div class="col-md-4">
+            <label for="paidAmount" class="form-label text-uppercase fw-semibold mb-1" style="font-size: 11px;">Paid Amount</label>
+            <input 
+              type="number" 
+              id="paidAmount" 
+              class="form-control" 
+              [(ngModel)]="paidAmount" 
+              placeholder="0.00"
+              (keydown.enter)="onEnter($event)"
+              min="0">
+          </div>
+
+          <div class="col-md-4 text-center text-md-end">
+            <span class="text-uppercase text-muted fw-bold small" style="font-size: 10px;">Remaining</span>
+            <h3 class="fw-extrabold text-danger mb-0">₹{{ remainingAmount | number:'1.2-2' }}</h3>
+          </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <label for="notes" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Notes (optional)</label>
+            <textarea 
+              id="notes" 
+              class="form-control" 
+              rows="3" 
+              placeholder="Write notes about this purchase..." 
+              [(ngModel)]="notes"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

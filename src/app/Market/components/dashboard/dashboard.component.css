@@ -1,0 +1,43 @@
+.filters-panel {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+}
+.stat-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0;
+}
+.btn-icon {
+  background: #f7f8f5;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+}
+.btn-icon:hover {
+  background: #eef1ec;
+  border-color: #d1d5cb;
+}
+.col-custom {
+  flex: 0 0 auto;
+}
+@media (min-width: 992px) {
+  .col-lg-2\.4 {
+    width: 20%;
+  }
+}
