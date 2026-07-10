@@ -20,8 +20,6 @@ export class DashboardComponent implements OnInit {
   searchHotel = '';
   searchDate = '';
   filterPayment = 'All';
-  minAmount?: number;
-  maxAmount?: number;
 
   constructor(private apiService: ApiService, private router: Router) {
     const today = new Date();
@@ -91,10 +89,7 @@ export class DashboardComponent implements OnInit {
       
       const matchesPayment = this.filterPayment === 'All' || e.paymentMethod === this.filterPayment;
       
-      const matchesMin = this.minAmount === undefined || this.minAmount === null || e.grandTotal >= this.minAmount;
-      const matchesMax = this.maxAmount === undefined || this.maxAmount === null || e.grandTotal <= this.maxAmount;
-      
-      return matchesHotel && matchesDate && matchesPayment && matchesMin && matchesMax;
+      return matchesHotel && matchesDate && matchesPayment;
     });
   }
 }

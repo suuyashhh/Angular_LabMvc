@@ -128,3 +128,9 @@
     transform: translateX(0);
   }
 }
+
+@media (max-width: 576px) {
+  .content-body {
+    padding: 1rem 8px !important;
+  }
+}
