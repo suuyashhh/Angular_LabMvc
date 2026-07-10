@@ -80,18 +80,36 @@
             <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 0.5px;">ITEMS</span>
             <h4 class="fw-bold mb-0">Vegetables</h4>
           </div>
-          <span class="small text-muted">{{ itemsList.length }} rows</span>
+          
+          <div class="d-flex align-items-center gap-3">
+            <!-- Language Switch Toggle -->
+            <div class="d-flex align-items-center gap-2 bg-light px-3 py-1.5 rounded-pill border">
+              <span class="small fw-semibold" [class.text-primary-green]="!showMarathiInTable" [class.text-muted]="showMarathiInTable" style="font-size: 11px;">English</span>
+              <div class="form-check form-switch mb-0 d-flex align-items-center">
+                <input 
+                  class="form-check-input custom-switch-green cursor-pointer" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="languageSwitch" 
+                  [(ngModel)]="showMarathiInTable"
+                  (change)="onLanguageToggleChange()"
+                  style="width: 2.2em; height: 1.1em; cursor: pointer;">
+              </div>
+              <span class="small fw-semibold" [class.text-primary-green]="showMarathiInTable" [class.text-muted]="!showMarathiInTable" style="font-size: 11px;">मराठी</span>
+            </div>
+            <span class="small text-muted">{{ itemsList.length }} rows</span>
+          </div>
         </div>
 
         <!-- Items Table -->
         <div class="table-responsive mb-4" *ngIf="itemsList.length > 0">
-          <table class="table align-middle">
+          <table class="table align-middle purchase-items-table">
             <thead>
               <tr class="text-muted uppercase small" style="font-size: 11px; letter-spacing: 0.5px;">
-                <th style="width: 45%;">Vegetable</th>
-                <th style="width: 15%;">Qty (KG)</th>
-                <th style="width: 15%;">Price / KG</th>
-                <th style="width: 15%;">Total</th>
+                <th style="width: 25%;">Vegetable</th>
+                <th style="width: 20%;" class="text-center">Qty (KG)</th>
+                <th style="width: 25%;" class="text-center">Price / KG</th>
+                <th style="width: 20%;" class="text-center">Total</th>
                 <th style="width: 10%;" class="text-end">Actions</th>
               </tr>
             </thead>
@@ -99,27 +117,35 @@
               <tr *ngFor="let item of itemsList; let idx = index">
                 <td class="fw-bold">{{ item.vegetableName }}</td>
                 <td>
-                  <input 
-                    type="number" 
-                    class="form-control py-1 px-2 text-center" 
-                    [(ngModel)]="item.quantity" 
-                    (ngModelChange)="calculateRowTotal(item)"
-                    (keydown.enter)="onEnter($event)"
-                    min="0.01">
+                  <div class="table-input-container">
+                    <input 
+                      #qtyInput
+                      type="number" 
+                      class="form-control text-center table-input" 
+                      [(ngModel)]="item.quantity" 
+                      (ngModelChange)="calculateRowTotal(item)"
+                      (keydown.enter)="onEnter($event)"
+                      (focus)="qtyInput.select()"
+                      (click)="qtyInput.select()"
+                      min="0.01">
+                  </div>
                 </td>
                 <td>
-                  <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light border-end-0">₹</span>
+                  <div class="input-group flex-nowrap table-input-group">
+                    <span class="input-group-text">₹</span>
                     <input 
+                      #priceInput
                       type="number" 
-                      class="form-control py-1 px-2 border-start-0 ps-0" 
+                      class="form-control text-center ps-0" 
                       [(ngModel)]="item.pricePerKg" 
                       (ngModelChange)="calculateRowTotal(item)"
                       (keydown.enter)="onEnter($event)"
+                      (focus)="priceInput.select()"
+                      (click)="priceInput.select()"
                       min="0">
                   </div>
                 </td>
-                <td class="fw-bold">₹{{ item.total | number:'1.2-2' }}</td>
+                <td class="fw-bold text-center">₹{{ item.total | number:'1.2-2' }}</td>
                 <td class="text-end">
                   <button (click)="removeItem(idx)" class="btn btn-sm btn-outline-danger border-0">
                     <i class="bi bi-trash"></i>
@@ -164,7 +190,7 @@
                 *ngFor="let veg of filteredVegetables"
                 [class.disabled]="isVegAdded(veg.id)"
                 (click)="!isVegAdded(veg.id) && selectVegetable(veg, $event)">
-                <span class="fw-bold" [class.text-muted]="isVegAdded(veg.id)">{{ veg.vegetableName }}</span>
+                <span class="fw-bold" [class.text-muted]="isVegAdded(veg.id)">{{ veg.engVegetableName }}{{ veg.marVegetableName ? ' - ' + veg.marVegetableName : '' }}</span>
                 <span class="badge bg-light text-muted small fs-8" *ngIf="isVegAdded(veg.id)">already added</span>
               </div>
               <div class="text-muted text-center py-2 small" *ngIf="filteredVegetables.length === 0">
@@ -253,12 +279,15 @@
           <div class="col-md-4">
             <label for="paidAmount" class="form-label text-uppercase fw-semibold mb-1" style="font-size: 11px;">Paid Amount</label>
             <input 
+              #paidAmountInput
               type="number" 
               id="paidAmount" 
               class="form-control" 
               [(ngModel)]="paidAmount" 
               placeholder="0.00"
               (keydown.enter)="onEnter($event)"
+              (focus)="paidAmountInput.select()"
+              (click)="paidAmountInput.select()"
               min="0">
           </div>
 

@@ -12,34 +12,30 @@ import { ApiService } from '../../services/api.service';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  stats: any = null;
   entries: any[] = [];
   todayStr = '';
 
   // Filter bindings
   searchHotel = '';
-  searchDate = '';
+  fromDate = '';
+  toDate = '';
   filterPayment = 'All';
 
   constructor(private apiService: ApiService, private router: Router) {
     const today = new Date();
     this.todayStr = today.toISOString().split('T')[0];
+    this.fromDate = this.todayStr;
+    this.toDate = this.todayStr;
   }
 
   ngOnInit() {
-    this.loadStats();
     this.loadEntries();
   }
 
-  loadStats() {
-    this.apiService.getStats().subscribe({
-      next: (data) => this.stats = data,
-      error: (err) => console.error(err)
-    });
-  }
+
 
   loadEntries() {
-    this.apiService.getPurchases().subscribe({
+    this.apiService.getPurchases(this.fromDate, this.toDate).subscribe({
       next: (data) => this.entries = data,
       error: (err) => console.error(err)
     });
@@ -50,7 +46,6 @@ export class DashboardComponent implements OnInit {
       this.apiService.deletePurchase(id).subscribe({
         next: () => {
           this.loadEntries();
-          this.loadStats();
         },
         error: (err) => alert(err.error?.message || 'Failed to delete purchase entry')
       });
@@ -80,16 +75,8 @@ export class DashboardComponent implements OnInit {
   get filteredEntries() {
     return this.entries.filter(e => {
       const matchesHotel = !this.searchHotel || e.hotelName?.toLowerCase().includes(this.searchHotel.toLowerCase());
-      
-      let matchesDate = true;
-      if (this.searchDate) {
-        const entryDate = new Date(e.date).toISOString().split('T')[0];
-        matchesDate = entryDate === this.searchDate;
-      }
-      
       const matchesPayment = this.filterPayment === 'All' || e.paymentMethod === this.filterPayment;
-      
-      return matchesHotel && matchesDate && matchesPayment;
+      return matchesHotel && matchesPayment;
     });
   }
 }

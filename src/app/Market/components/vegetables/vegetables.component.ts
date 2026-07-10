@@ -20,7 +20,8 @@ export class VegetablesComponent implements OnInit {
 
   formData: any = {
     id: 0,
-    vegetableName: ''
+    engVegetableName: '',
+    marVegetableName: ''
   };
 
   constructor(private apiService: ApiService) {}
@@ -38,7 +39,9 @@ export class VegetablesComponent implements OnInit {
 
   get filteredVegetables() {
     return this.vegetables.filter(v => 
-      !this.searchQuery || v.vegetableName?.toLowerCase().includes(this.searchQuery.toLowerCase())
+      !this.searchQuery || 
+      v.engVegetableName?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+      v.marVegetableName?.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
 
@@ -46,7 +49,8 @@ export class VegetablesComponent implements OnInit {
     this.editMode = false;
     this.formData = {
       id: 0,
-      vegetableName: ''
+      engVegetableName: '',
+      marVegetableName: ''
     };
     this.isDrawerOpen = true;
   }
@@ -62,7 +66,7 @@ export class VegetablesComponent implements OnInit {
   }
 
   saveVegetable() {
-    if (!this.formData.vegetableName) return;
+    if (!this.formData.engVegetableName) return;
 
     this.isSaving = true;
     if (this.editMode) {
