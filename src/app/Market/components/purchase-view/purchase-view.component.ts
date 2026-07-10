@@ -1,0 +1,296 @@
+import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ApiService } from '../../services/api.service';
+
+@Component({
+  selector: 'app-purchase-view',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <!-- Interactive View Mode -->
+    <div class="view-container pb-5" *ngIf="!isPrintMode && purchase">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <div class="d-flex align-items-center gap-3">
+          <button routerLink="/market/dashboard" class="btn btn-light-custom btn-icon-only">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <div>
+            <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 1px;">ENTRY DETAILS</span>
+            <h1 class="fw-bold mb-0">Purchase Bill #{{ purchase.id }}</h1>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button (click)="printBill()" class="btn btn-light-custom d-flex align-items-center gap-2">
+            <i class="bi bi-printer"></i>
+            <span>Print</span>
+          </button>
+          <button (click)="shareBill()" class="btn btn-primary-green d-flex align-items-center gap-2">
+            <i class="bi bi-share"></i>
+            <span>Share Bill</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Detail Cards Grid -->
+      <div class="row g-4">
+        <!-- Left Column: Hotel & Items details -->
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+            <div class="card-body p-4">
+              <h5 class="fw-bold border-bottom pb-3 mb-3">Hotel Details</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                  <div class="text-muted small text-uppercase fw-semibold mb-1">Hotel Name</div>
+                  <h4 class="fw-bold text-success">{{ purchase.hotelName }}</h4>
+                </div>
+                <div class="col-md-6">
+                  <div class="text-muted small text-uppercase fw-semibold mb-1">Contact & Address</div>
+                  <div class="fw-semibold"><i class="bi bi-telephone me-2 text-muted"></i>{{ purchase.contactNumber || 'No phone number' }}</div>
+                  <div class="text-muted small mt-1"><i class="bi bi-geo-alt me-2"></i>{{ purchase.address || 'No address provided' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+            <div class="card-body p-4">
+              <h5 class="fw-bold border-bottom pb-3 mb-3">Vegetable Purchases</h5>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr class="text-muted small text-uppercase" style="font-size: 11px;">
+                      <th>Vegetable</th>
+                      <th class="text-center">Quantity (KG)</th>
+                      <th class="text-center">Price / KG</th>
+                      <th class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of purchase.items">
+                      <td class="fw-bold text-dark">{{ item.vegetableName }}</td>
+                      <td class="text-center fw-medium">{{ item.quantity }} KG</td>
+                      <td class="text-center">₹{{ item.pricePerKg | number:'1.2-2' }}</td>
+                      <td class="text-end fw-bold">₹{{ item.total | number:'1.2-2' }}</td>
+                    </tr>
+                    <tr class="table-light">
+                      <td colspan="3" class="text-end fw-bold">Grand Total</td>
+                      <td class="text-end fw-extrabold text-success fs-5">₹{{ purchase.grandTotal | number:'1.2-2' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Payment & Screenshot -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+            <div class="card-body p-4">
+              <h5 class="fw-bold border-bottom pb-3 mb-3">Payment Summary</h5>
+              
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Payment Method</span>
+                <span [class]="purchase.paymentMethod === 'Online' ? 'badge-online' : 'badge-cash'">{{ purchase.paymentMethod }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Grand Total</span>
+                <span class="fw-bold">₹{{ purchase.grandTotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Paid Amount</span>
+                <span class="fw-bold text-success">₹{{ purchase.paidAmount | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                <span class="fw-bold">Remaining Due</span>
+                <span class="fw-bold text-danger">₹{{ (purchase.grandTotal - purchase.paidAmount) | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- Notes -->
+              <div class="mt-4 pt-3 border-top" *ngIf="purchase.notes">
+                <span class="text-muted small text-uppercase fw-semibold d-block mb-1">Notes</span>
+                <p class="small text-secondary mb-0 bg-light p-2.5 rounded-3">{{ purchase.notes }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screenshot preview if Online -->
+          <div class="card border-0 shadow-sm" style="border-radius: 16px;" *ngIf="purchase.paymentMethod === 'Online' && purchase.paymentImage">
+            <div class="card-body p-4">
+              <h5 class="fw-bold border-bottom pb-3 mb-3">Payment Screenshot</h5>
+              <div class="text-center">
+                <img 
+                  [src]="getImageUrl(purchase.paymentImage)" 
+                  class="img-fluid rounded-3 border cursor-pointer w-100" 
+                  style="max-height: 250px; object-fit: contain;"
+                  (click)="zoomScreenshot = true">
+                <span class="text-muted small d-block mt-2"><i class="bi bi-zoom-in me-1"></i>Click to zoom screenshot</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot Zoom Modal -->
+      <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.85);" *ngIf="zoomScreenshot" (click)="zoomScreenshot = false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content border-0 bg-transparent text-center">
+            <img [src]="getImageUrl(purchase.paymentImage)" class="img-fluid rounded-3 mx-auto" style="max-height: 90vh;">
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" (click)="zoomScreenshot = false"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print Only Mode -->
+    <div class="print-bill-page p-5 bg-white" *ngIf="isPrintMode && purchase" style="min-height: 100vh;">
+      <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+        <div>
+          <h2 class="fw-extrabold text-success mb-1">VegBook</h2>
+          <span class="text-muted text-uppercase small font-monospace">Purchase Bill Invoice</span>
+        </div>
+        <div class="text-end">
+          <h5 class="mb-1 fw-bold">Invoice #{{ purchase.id }}</h5>
+          <span class="text-muted">{{ purchase.date | date:'dd MMMM yyyy, h:mm a' }}</span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <div class="col-6">
+          <span class="text-uppercase text-muted fw-bold small d-block mb-1">Billed To</span>
+          <h4 class="fw-bold mb-1">{{ purchase.hotelName }}</h4>
+          <div class="text-secondary small">{{ purchase.address }}</div>
+          <div class="text-secondary small">Ph: {{ purchase.contactNumber }}</div>
+        </div>
+        <div class="col-6 text-end">
+          <span class="text-uppercase text-muted fw-bold small d-block mb-1">Supplier</span>
+          <h4 class="fw-bold mb-1">VegBook Purchase Ledger</h4>
+          <div class="text-secondary small">V1.0 System Generated Receipt</div>
+        </div>
+      </div>
+
+      <table class="table table-bordered mb-4">
+        <thead>
+          <tr class="table-light text-uppercase small">
+            <th>Vegetable Item</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-center">Price / KG</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of purchase.items">
+            <td class="fw-bold">{{ item.vegetableName }}</td>
+            <td class="text-center">{{ item.quantity }} KG</td>
+            <td class="text-center">₹{{ item.pricePerKg | number:'1.2-2' }}</td>
+            <td class="text-end fw-bold">₹{{ item.total | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="text-end fw-bold">Grand Total</td>
+            <td class="text-end fw-bold text-success fs-5">₹{{ purchase.grandTotal | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="row align-items-start mt-5 pt-3 border-top">
+        <div class="col-6">
+          <h5 class="fw-bold mb-2">Payment Details</h5>
+          <div class="small">Method: <strong>{{ purchase.paymentMethod }}</strong></div>
+          <div class="small">Paid Amount: <strong>₹{{ purchase.paidAmount | number:'1.2-2' }}</strong></div>
+          <div class="small">Remaining Balance: <strong class="text-danger">₹{{ (purchase.grandTotal - purchase.paidAmount) | number:'1.2-2' }}</strong></div>
+        </div>
+        <div class="col-6 text-end">
+          <div class="pt-5 border-top d-inline-block text-center" style="width: 180px;">
+            <span class="small text-muted">Authorized Signature</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .btn-icon-only {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .cursor-pointer {
+      cursor: pointer;
+    }
+  `]
+})
+export class PurchaseViewComponent implements OnInit, AfterViewChecked {
+  purchase: any = null;
+  isPrintMode = false;
+  zoomScreenshot = false;
+  printTriggered = false;
+
+  constructor(
+    public apiService: ApiService,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    this.route.url.subscribe(url => {
+      this.isPrintMode = url.some(segment => segment.path === 'print');
+    });
+
+    this.route.params.subscribe(params => {
+      const id = +params['id'];
+      this.loadPurchase(id);
+    });
+  }
+
+  ngAfterViewChecked() {
+    if (this.isPrintMode && this.purchase && !this.printTriggered) {
+      this.printTriggered = true;
+      setTimeout(() => {
+        window.print();
+      }, 1000);
+    }
+  }
+
+  loadPurchase(id: number) {
+    this.apiService.getPurchase(id).subscribe({
+      next: (data) => this.purchase = data,
+      error: (err) => alert('Failed to load purchase details.')
+    });
+  }
+
+  printBill() {
+    window.open(`/market/purchase/print/${this.purchase.id}`, '_blank');
+  }
+
+  shareBill() {
+    const dateStr = new Date(this.purchase.date).toLocaleDateString('en-IN');
+    const text = `*VegBook Purchase Bill*\n\n*Date:* ${dateStr}\n*Hotel:* ${this.purchase.hotelName}\n*Total:* ₹${this.purchase.grandTotal}\n*Paid:* ₹${this.purchase.paidAmount}\n*Due:* ₹${(this.purchase.grandTotal - this.purchase.paidAmount).toFixed(2)}\n\nView details: ${window.location.origin}/market/purchase/view/${this.purchase.id}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Purchase Bill',
+        text: text,
+        url: `${window.location.origin}/market/purchase/view/${this.purchase.id}`
+      }).catch(err => console.log(err));
+    } else {
+      const cleanNumber = this.purchase.contactNumber ? this.purchase.contactNumber.replace(/[^0-9]/g, '') : '';
+      const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+  }
+
+  getImageUrl(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    try {
+      const url = new URL(this.apiService.getHostUrl());
+      return url.origin + path;
+    } catch {
+      return 'https://backend.suyashpatil.in' + path;
+    }
+  }
+}
