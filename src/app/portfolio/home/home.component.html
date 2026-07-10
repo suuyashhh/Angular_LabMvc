@@ -1,52 +1,624 @@
-<div id="suyash-page">
-    <!-- Video Background -->
-    <div id="suyash-video-container">
-        <video #backgroundVideo autoplay muted loop playsinline preload="auto" id="suyash-background-video">
-            <source src="../../../assets/videos/bg.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div id="suyash-overlay"></div>
+<div class="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 md:pt-32 md:pb-16 select-none">
+  <div class="w-full max-w-4xl text-center space-y-8">
+
+    <!-- Profile Image -->
+    <div class="relative w-32 h-32 md:w-36 md:h-36 mx-auto scroll-reveal reveal-scale-up">
+      <!-- Dashed Border Outer Container -->
+      <div
+        class="w-full h-full rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-1.5 flex items-center justify-center transition-all duration-300 hover:border-zinc-400 dark:hover:border-zinc-650">
+        <!-- Inner Profile Image -->
+        <img src="assets/images/suyashPro.jpg" alt="Suyash Patil"
+          class="w-full h-full rounded-full object-cover shadow-lg border border-zinc-200 dark:border-zinc-800">
+      </div>
+      <!-- Green Active Status Badge -->
+      <span
+        class="absolute bottom-2.5 right-2.5 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-950 shadow-md"></span>
     </div>
 
-    <!-- Main Content -->
-    <main id="suyash-container">
-        <div id="suyash-profile-section" aria-labelledby="suyash-profile-heading" style="margin-top:50px">
-            <div id="suyash-profile-image" style="width: 100px; height: 100px; border-width: 2px;">
-                <img src="../../../assets/images/suyashPro.jpg" alt="Suyash Patil" loading="lazy">
-            </div>
-            <h1 id="suyash-profile-heading" class="suyash-name" style="font-size: 1.6rem;">Suyash Patil</h1>
-            <p class="suyash-title" style="font-size: 0.9rem;">.Net Developer <span class="suyash-emoji">💻</span></p>
-            <div id="suyash-social-icons" style="gap: 12px;">
-                <a href="https://github.com/suuyashhh" target="_blank" aria-label="GitHub Profile" rel="noopener">
-                    <i class="fab fa-github" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank" aria-label="LinkedIn Profile" rel="noopener">
-                    <i class="fab fa-linkedin" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="https://wa.me/918180821173" aria-label="WhatsApp" target="_blank" rel="noopener">
-                    <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i>
-                </a>
-            </div>
+    <!-- Greeting with Waving Hand Capsule -->
+    <div class="flex items-center justify-center space-x-3.5 scroll-reveal reveal-fade-up delay-100">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-sans">
+        Hi, I'm Suyash
+      </h1>
+      <!-- Waving Hand Pill -->
+      <div
+        class="px-3.5 py-1.5 border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 rounded-full shadow-sm flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-default">
+        <span class="text-2xl animate-wave">👋</span>
+      </div>
+    </div>
+
+    <!-- Description Lines -->
+    <div
+      class="space-y-5 text-zinc-600 dark:text-zinc-400 font-medium text-sm md:text-[1.05rem] leading-relaxed max-w-lg mx-auto scroll-reveal reveal-fade-up delay-200">
+
+      <!-- Line 1: I make coding related videos and build, ship, code... -->
+      <div class="flex flex-wrap items-center justify-center gap-y-2.5">
+        <span>I make coding related videos and</span>
+        <div class="flex flex-wrap gap-1.5 ml-1">
+          <span
+            class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">build</span>
+          <span
+            class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">ship</span>
+          <span
+            class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">code</span>
+          <span
+            class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">gym</span>
+          <span
+            class="px-3 py-1 text-xs md:text-sm font-semibold border border-dashed border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 rounded-full shadow-sm hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 cursor-default">repeat</span>
+        </div>
+      </div>
+
+      <!-- Line 2: I build interactive Software -->
+      <div class="flex flex-wrap items-center justify-center gap-y-2.5">
+        <span>I build interactive Software and full-stack web applications.</span>
+      </div>
+    </div>
+
+    <!-- Social Links -->
+    <div class="flex items-center justify-center gap-5 pt-6">
+      <a href="https://twitter.com" target="_blank" rel="noopener"
+        class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer scroll-reveal reveal-scale-up delay-300"
+        title="X (Twitter)">
+        <svg
+          class="w-4 h-4 fill-current text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
+          viewBox="0 0 24 24">
+          <path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
+          </path>
+        </svg>
+      </a>
+      <a href="https://github.com/suuyashhh" target="_blank" rel="noopener"
+        class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer scroll-reveal reveal-scale-up delay-350"
+        title="GitHub">
+        <i class="fab fa-github text-base"></i>
+      </a>
+      <a href="https://youtube.com" target="_blank" rel="noopener"
+        class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer scroll-reveal reveal-scale-up delay-400"
+        title="YouTube">
+        <i class="fab fa-youtube text-base text-red-500"></i>
+      </a>
+      <a href="mailto:suyashpatil@gmail.com"
+        class="w-11 h-11 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-950 dark:hover:text-zinc-50 hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer scroll-reveal reveal-scale-up delay-450"
+        title="Email">
+        <i class="fas fa-envelope text-base text-blue-500"></i>
+      </a>
+    </div>
+    <!-- GitHub Contributions Section -->
+    <div
+      class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left scroll-reveal reveal-fade-up">
+      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-4 text-center">
+        GitHub Contributions
+      </h1>
+
+      <!-- Card Container -->
+      <div id="contrib-card-container"
+        class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl p-4 md:p-6 shadow-sm overflow-hidden">
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-10 space-y-3">
+          <div class="w-7 h-7 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400">Fetching GitHub calendar...</p>
         </div>
 
-        <nav id="suyash-menu-section" aria-label="Portfolio Navigation">
-            <!-- Using routerLink with explicit paths -->
-            <a routerLink="/portfolio/about" class="suyash-menu-item" data-text="About">
-                <span>About</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/projects" class="suyash-menu-item" data-text="All Projects Application">
-                <span>All Projects Applications</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/resume" class="suyash-menu-item" data-text="Resume">
-                <span>Resume</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-            <a routerLink="/portfolio/contact" class="suyash-menu-item" data-text="Contact">
-                <span>Contact</span>
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        </nav>
-    </main>
+        <!-- Error State -->
+        <div *ngIf="hasError" class="flex flex-col items-center justify-center py-10 text-center space-y-2">
+          <i class="fas fa-triangle-exclamation text-red-500 text-xl animate-pulse"></i>
+          <p class="text-xs text-zinc-600 dark:text-zinc-400">Could not load contribution data.</p>
+        </div>
+
+        <!-- Graph content -->
+        <div *ngIf="!isLoading && !hasError" class="gh-contrib-wrap">
+
+          <!-- Total count row -->
+          <div class="flex items-center gap-2 mb-3 text-zinc-700 dark:text-zinc-300">
+            <svg class="w-4 h-4 fill-current flex-shrink-0" viewBox="0 0 24 24">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            <span class="text-xs font-semibold">{{ totalContributions | number }} contributions in the last year</span>
+          </div>
+
+          <!-- Grid wrapper: day-labels + scrollable grid -->
+          <div class="gh-grid-outer">
+
+            <!-- Day-of-week labels (Mon, Wed, Fri) -->
+            <div class="gh-day-labels">
+              <span></span><!-- Sun -->
+              <span>Mon</span>
+              <span></span><!-- Tue -->
+              <span>Wed</span>
+              <span></span><!-- Thu -->
+              <span>Fri</span>
+              <span></span><!-- Sat -->
+            </div>
+
+            <!-- Scrollable columns area -->
+            <div class="gh-grid-scroll scrollbar-none" id="contrib-grid-viewport" (scroll)="hideTooltip()">
+              <div class="gh-grid-inner">
+
+                <!-- Month labels row -->
+                <div class="gh-month-row">
+                  <div *ngFor="let week of weeks; let wIdx = index" class="gh-month-cell">
+                    <span *ngIf="getMonthLabel(wIdx)" class="gh-month-label">{{ getMonthLabel(wIdx) }}</span>
+                  </div>
+                </div>
+
+                <!-- Week columns -->
+                <div class="gh-week-row">
+                  <div *ngFor="let week of weeks; let wIdx = index" class="gh-week-col">
+                    <span *ngFor="let day of week" class="gh-cell" [class.gh-l0]="day.level === 0"
+                      [class.gh-l1]="day.level === 1" [class.gh-l2]="day.level === 2" [class.gh-l3]="day.level === 3"
+                      [class.gh-l4]="day.level === 4" (mouseenter)="showTooltip(day, $event)"
+                      (mouseleave)="hideTooltip()" (click)="showContribToast(day)">
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom row: Learn link (left) + Legend (right) -->
+          <div class="gh-bottom-bar">
+            <a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/managing-contribution-settings-on-your-profile/why-are-my-contributions-not-showing-up-on-my-profile"
+              target="_blank" rel="noopener" class="gh-learn-link">Learn how we count contributions</a>
+
+            <div class="gh-legend">
+              <span class="gh-legend-label">Less</span>
+              <span class="gh-cell gh-l0"></span>
+              <span class="gh-cell gh-l1"></span>
+              <span class="gh-cell gh-l2"></span>
+              <span class="gh-cell gh-l3"></span>
+              <span class="gh-cell gh-l4"></span>
+              <span class="gh-legend-label">More</span>
+            </div>
+          </div>
+
+          <!-- Tooltip (GitHub-style dark pill) -->
+          <div *ngIf="hoveredDay" [style.top.px]="tooltipY" [style.left.px]="tooltipX" class="gh-tooltip">
+            <span class="font-semibold">{{ hoveredDay.count }} {{ hoveredDay.count === 1 ? 'contribution' :
+              'contributions' }}</span>
+            &nbsp;on {{ hoveredDay.date | date:'MMMM d' }}<span class="gh-tooltip-ordinal">{{
+              getOrdinal(hoveredDay.date) }}</span>.
+            <!-- Arrow -->
+            <div class="gh-tooltip-arrow"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Tech Stack Section -->
+    <div
+      class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
+      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+        Tech Stack
+      </h1>
+
+      <!-- Grid Container matching screenshot style -->
+      <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+
+        <!-- Angular -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-angularjs-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">Angular</span>
+        </div>
+
+        <!-- JavaScript -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-javascript-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">JavaScript</span>
+        </div>
+
+        <!-- TypeScript -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-typescript-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">TypeScript</span>
+        </div>
+
+        <!-- jQuery -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-jquery-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">jQuery</span>
+        </div>
+
+        <!-- AJAX -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-xml-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">AJAX</span>
+        </div>
+
+        <!-- C# -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-csharp-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">C#</span>
+        </div>
+
+        <!-- ASP.NET Core -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-dotnetcore-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">.NET Core</span>
+        </div>
+
+        <!-- ASP.NET MVC -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-dot-net-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">ASP.NET MVC</span>
+        </div>
+
+
+        <!-- SQL Server -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-microsoftsqlserver-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">SQL Server</span>
+        </div>
+
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+
+          <i class="devicon-tailwindcss-original colored text-4xl"></i>
+
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">
+            Tailwind CSS
+          </span>
+        </div>
+
+        <!-- Bootstrap -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-bootstrap-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">Bootstrap</span>
+        </div>
+
+
+      </div>
+    </div>
+
+    <div
+      class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
+      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+        Tools & Platforms
+      </h1>
+
+      <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+
+        <!-- VS Code -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-vscode-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">VS Code</span>
+        </div>
+
+        <!-- Visual Studio -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-visualstudio-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">Visual Studio</span>
+        </div>
+
+        <!-- Git -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-git-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">Git</span>
+        </div>
+
+        <!-- GitHub -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-github-original text-4xl dark:text-white"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">GitHub</span>
+        </div>
+
+        <!-- GitLab -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-gitlab-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">GitLab</span>
+        </div>
+
+        <!-- Android Studio -->
+        <div
+          class="w-[100px] h-[100px] flex flex-col items-center justify-center border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl hover:scale-105 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="devicon-androidstudio-plain colored text-4xl"></i>
+          <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mt-2">Android Studio</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Work Experience Section -->
+    <div
+      class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
+      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+        Work Experience
+      </h1>
+
+      <!-- Experience Cards Container -->
+      <div class="space-y-6 text-left max-w-xl mx-auto">
+        <!-- ThreeStar Card -->
+        <div
+          class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 scroll-reveal reveal-fade-left delay-100">
+
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div class="flex items-center gap-3 sm:gap-4">
+
+              <div
+                class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center bg-white shadow-sm shrink-0">
+                <img src="assets/images/ThreeStar.png" alt="ThreeStar" class="w-full h-full rounded-full object-cover">
+              </div>
+
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-tight">
+                  Threestar Infotech Pvt. Ltd
+                </h3>
+
+                <p class="text-xs sm:text-sm font-medium text-zinc-650 dark:text-zinc-400 mt-1">
+                  Software Developer
+                </p>
+              </div>
+
+            </div>
+
+            <div
+              class="flex items-center gap-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 sm:self-start sm:mt-1.5">
+
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10m-13 9h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v11a2 2 0 002 2z" />
+              </svg>
+
+              <span>Oct 2025 – Current</span>
+            </div>
+          </div>
+
+          <div class="mt-5 border-t border-zinc-100 dark:border-zinc-800 pt-4">
+            <p class="text-xs sm:text-sm leading-6 sm:leading-7 text-zinc-600 dark:text-zinc-300">
+              Working on Core Banking Software Development and related banking application modules using
+              <span class="font-semibold text-zinc-850 dark:text-zinc-100">
+                .NET Core
+              </span>,
+              <span class="font-semibold text-zinc-850 dark:text-zinc-100">
+                Angular
+              </span>.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- CodEzy Card -->
+        <div
+          class="relative border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 scroll-reveal reveal-fade-right delay-200">
+
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div class="flex items-center gap-3 sm:gap-4">
+              <div
+                class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center bg-white shadow-sm shrink-0">
+                <img src="assets/images/CodEzy.png" alt="CodEzy" class="w-full h-full rounded-full object-cover">
+              </div>
+
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-tight">
+                  CodEzy Infosolutions Pvt. Ltd.
+                </h3>
+                <p class="text-xs sm:text-sm font-medium text-zinc-650 dark:text-zinc-400 mt-1">
+                  Junior Software Developer
+                </p>
+              </div>
+            </div>
+            <div
+              class="flex items-center gap-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 sm:self-start sm:mt-1.5">
+
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10m-13 9h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v11a2 2 0 002 2z" />
+              </svg>
+              <span>Oct 2024 – Sep 2025</span>
+            </div>
+          </div>
+
+          <div class="mt-5 border-t border-zinc-100 dark:border-zinc-800 pt-4">
+            <p class="text-xs sm:text-sm leading-6 sm:leading-7 text-zinc-600 dark:text-zinc-300">
+              A software development firm specialising in enterprise solutions using
+              <span class="font-semibold text-zinc-850 dark:text-zinc-100">
+                .NET MVC
+              </span>,
+              <span class="font-semibold text-zinc-850 dark:text-zinc-100">
+                Angular
+              </span>,
+              and
+              <span class="font-semibold text-zinc-850 dark:text-zinc-100">
+                Cloud Technologies
+              </span>.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Featured Projects Section -->
+    <div
+      class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
+      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+        Featured Projects
+      </h1>
+
+      <!-- Projects Grid Container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl md:max-w-none mx-auto">
+
+        <!-- Loop over the first 2 projects -->
+        <div *ngFor="let project of projects; let idx = index"
+          class="bg-white border border-dashed border-zinc-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md hover:border-zinc-300 transition-all duration-300 flex flex-col group scroll-reveal reveal-scale-up"
+          [style.transition-delay.ms]="150 * (idx + 1)">
+
+          <!-- Image Carousel Area (Vertical Card Top) -->
+          <div
+            class="relative h-48 sm:h-56 overflow-hidden cursor-pointer bg-zinc-50 border-b border-dashed border-zinc-150"
+            (click)="openImagePreview(project)">
+
+            <img *ngFor="let image of project.images; let i = index" [src]="image" [alt]="project.title"
+              [class.opacity-100]="currentImageIndex[project.id] === i"
+              [class.opacity-0]="currentImageIndex[project.id] !== i"
+              class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300">
+
+            <!-- Carousel Controls -->
+            <button *ngIf="project.images.length > 1" (click)="prevImage(project.id); $event.stopPropagation()"
+              class="absolute top-1/2 left-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
+              aria-label="Previous image">
+              <i class="fas fa-chevron-left text-xs"></i>
+            </button>
+
+            <button *ngIf="project.images.length > 1" (click)="nextImage(project.id); $event.stopPropagation()"
+              class="absolute top-1/2 right-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
+              aria-label="Next image">
+              <i class="fas fa-chevron-right text-xs"></i>
+            </button>
+
+            <!-- Click to preview indicator -->
+            <div
+              class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-zinc-950/75 backdrop-blur-sm text-white px-3.5 py-1.5 rounded-full text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1.5 shadow-md z-10">
+              <i class="fas fa-magnifying-glass-plus text-[10px]"></i> Zoom Project
+            </div>
+          </div>
+
+          <!-- Details Area -->
+          <div class="p-5 flex-grow flex flex-col justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-zinc-900 group-hover:text-zinc-950 transition-colors leading-snug mb-2">
+                {{ project.title }}
+              </h3>
+              <p class="text-xs sm:text-sm text-zinc-500 font-medium leading-relaxed mb-4 line-clamp-2">
+                {{ project.description }}
+              </p>
+            </div>
+
+            <div>
+              <!-- Tech tags -->
+              <div class="flex flex-wrap gap-1.5 mb-4">
+                <span *ngFor="let tech of project.tech"
+                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold bg-zinc-50 border border-dashed border-zinc-200 text-zinc-650 rounded-full shadow-sm">
+                  {{ tech }}
+                </span>
+              </div>
+
+              <!-- Links -->
+              <div class="grid grid-cols-2 gap-2 mt-auto">
+                <a [href]="project.links.code" target="_blank" rel="noopener"
+                  class="py-2 bg-zinc-50 border border-dashed border-zinc-200 text-center text-zinc-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                  <i class="fas fa-code text-[11px] sm:text-xs"></i> <span>Code</span>
+                </a>
+                <a [href]="project.links.demo" target="_blank" rel="noopener"
+                  class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                  <i class="fas fa-arrow-up-right-from-square text-[10px] sm:text-[11px]"></i> <span>Demo</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- More Projects Button -->
+      <div class="mt-8 flex justify-center">
+        <a [routerLink]="['/portfolio/projects']"
+          class="inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 border border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 px-6 py-3 rounded-2xl font-bold shadow-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 cursor-pointer text-sm">
+          <span>More Projects</span>
+          <i class="fas fa-chevron-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+
+
+    <footer class="w-full mt-1 border-t border-dashed border-zinc-200 dark:border-zinc-800 pt-1 pb-1 text-center">
+      <div id="suyash-social-icons" class="flex items-center justify-center gap-3 mb-1">
+
+        <a href="https://github.com/suuyashhh" target="_blank"
+          class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="fab fa-github text-base text-zinc-800 dark:text-zinc-100"></i>
+        </a>
+
+        <!-- LinkedIn -->
+        <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank"
+          class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="fab fa-linkedin text-base text-[#0077B5]"></i>
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/suyashpatil_.03" target="_blank"
+          class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="fab fa-instagram text-base text-[#E4405F]"></i>
+        </a>
+
+        <!-- WhatsApp -->
+        <a href="https://wa.me/918180821173" target="_blank"
+          class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+          <i class="fab fa-whatsapp text-base text-[#25D366]"></i>
+        </a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ================= IMAGE PREVIEW MODAL ================= -->
+  <div *ngIf="showImagePreview"
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-md p-4 sm:p-6"
+    (click)="closeImagePreview()">
+
+    <div class="relative w-full max-w-4xl h-full max-h-[85vh] flex flex-col justify-between"
+      (click)="$event.stopPropagation()">
+
+      <!-- Header Bar -->
+      <div class="flex items-center justify-between pb-3 border-b border-dashed border-zinc-800">
+        <h3 class="text-white font-bold text-base sm:text-lg truncate max-w-[80%]">
+          {{ previewProjectTitle }}
+        </h3>
+        <button (click)="closeImagePreview()"
+          class="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <i class="fas fa-times text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Main Image View area -->
+      <div class="relative flex-1 flex items-center justify-center py-4 min-h-0">
+        <img [src]="previewImage" [alt]="previewProjectTitle"
+          class="max-w-full max-h-full object-contain rounded-2xl border-2 border-dashed border-zinc-800 shadow-2xl">
+
+        <!-- Navigation Arrows -->
+        <button *ngIf="getCurrentProjectImages().length > 1" (click)="prevImageInPreview()"
+          class="absolute left-3 w-10 h-10 rounded-full bg-zinc-900/90 border border-zinc-850 text-white flex items-center justify-center hover:bg-zinc-850 active:scale-95 transition-transform shadow-lg z-10 cursor-pointer">
+          <i class="fas fa-chevron-left text-sm"></i>
+        </button>
+        <button *ngIf="getCurrentProjectImages().length > 1" (click)="nextImageInPreview()"
+          class="absolute right-3 w-10 h-10 rounded-full bg-zinc-900/90 border border-zinc-850 text-white flex items-center justify-center hover:bg-zinc-850 active:scale-95 transition-transform shadow-lg z-10 cursor-pointer">
+          <i class="fas fa-chevron-right text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Bottom Counter & Action -->
+      <div class="flex items-center justify-between pt-3 border-t border-dashed border-zinc-800">
+        <span
+          class="text-zinc-400 font-semibold text-xs bg-zinc-900 px-3 py-1.5 border border-zinc-850 rounded-full select-none">
+          {{ currentImageIndex[currentPreviewProjectId] + 1 }} / {{ getCurrentProjectImages().length }}
+        </span>
+        <button (click)="closeImagePreview()"
+          class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2 rounded-full text-xs font-semibold hover:bg-red-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5">
+          <i class="fas fa-times text-[10px]"></i> Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

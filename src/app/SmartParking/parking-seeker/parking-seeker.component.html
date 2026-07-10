@@ -1,0 +1,204 @@
+<div class="pk-wrap">
+
+  <!-- ===== Page Header ===== -->
+  <div class="pk-page-header">
+    <div class="pk-title-row">
+      <div>
+        <div class="pk-eyebrow">
+          <div class="pk-eyebrow-dot"></div>
+          Live Availability
+        </div>
+        <h1 class="pk-title">Find <span>Parking</span> Near You</h1>
+      </div>
+      <div class="pk-stats">
+        <div class="pk-stat">
+          <div class="pk-stat-val">{{parkingList.length}}</div>
+          <div class="pk-stat-lbl">Spots</div>
+        </div>
+        <div class="pk-stat">
+          <div class="pk-stat-val">₹20</div>
+          <div class="pk-stat-lbl">Starting</div>
+        </div>
+        <div class="pk-stat">
+          <div class="pk-stat-val">Nearby</div>
+          <div class="pk-stat-lbl">Active</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="pk-search-row">
+      <div class="pk-search-wrap">
+        <span class="material-icons-outlined pk-search-icon">search</span>
+        <input type="text" placeholder="Search by address or area…" class="pk-search-input" />
+      </div>
+      <button class="pk-btn-locate" (click)="getCurrentLocation()" [disabled]="isLoading">
+        <span class="material-icons-outlined" style="font-size:17px;">my_location</span>
+        {{ isLoading ? 'Locating...' : 'Refresh Location' }}
+      </button>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="pk-filters">
+      <button class="pk-chip" [class.active]="activeFilter === 'all'" (click)="applyFilter('all')">All Vehicles</button>
+      <button class="pk-chip" [class.active]="activeFilter === '2-wheeler'" (click)="applyFilter('2-wheeler')">
+        <span class="material-icons-outlined">moped</span>2-Wheeler
+      </button>
+      <button class="pk-chip" [class.active]="activeFilter === '4-wheeler'" (click)="applyFilter('4-wheeler')">
+        <span class="material-icons-outlined">directions_car</span>4-Wheeler
+      </button>
+      <button class="pk-chip" [class.active]="activeFilter === 'distance'" (click)="applyFilter('distance')">
+        <span class="material-icons-outlined">near_me</span>&lt; 1 km
+      </button>
+      <button class="pk-chip" [class.active]="activeFilter === 'budget'" (click)="applyFilter('budget')">
+        <span class="material-icons-outlined">savings</span>Budget
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Body ===== -->
+  <div class="pk-body">
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="pk-loading">
+      <div class="pk-spinner"></div>
+      <p>Finding nearest spots for you…</p>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && parkingList.length === 0" class="pk-empty">
+      <div class="pk-empty-icon">
+        <span class="material-icons-outlined">search_off</span>
+      </div>
+      <h3>No spots found</h3>
+      <p>Try a different search or remove filters to see all spots.</p>
+    </div>
+
+    <!-- Grid -->
+    <div *ngIf="!isLoading && parkingList.length > 0" class="pk-section-label">Available Spots</div>
+    <div *ngIf="!isLoading && parkingList.length > 0" class="pk-grid">
+      
+      <div class="pk-card pk-fade" *ngFor="let spot of parkingList" (click)="openDetailModal(spot)">
+        <div class="pk-card-img-wrap">
+          <img *ngIf="spot.img1" [src]="getSpotImage(spot.img1)" alt="Parking" loading="lazy"/>
+          <div *ngIf="!spot.img1" class="pk-no-img">
+            <span class="material-icons-outlined" style="font-size:36px;">image</span>
+            <span style="font-size:12px;">No image</span>
+          </div>
+          <div class="pk-price-tag">₹{{spot.price}}/hr</div>
+          <div class="pk-dist-tag" *ngIf="spot.distance !== null">
+            <span class="material-icons-outlined">location_on</span>
+            {{formatDistance(spot.distance)}}
+          </div>
+          <div class="pk-vehicle-badge">
+             <span class="material-icons-outlined">{{spot.vehicalType === '2' || spot.VehicalType === '2' ? 'moped' : 'directions_car'}}</span>
+          </div>
+        </div>
+        <div class="pk-card-body">
+          <div class="pk-address">{{spot.fullAddress}}</div>
+          <div class="pk-card-actions">
+            <a [href]="'tel:' + spot.contact" (click)="$event.stopPropagation()" class="pk-btn-call">
+              <span class="material-icons-outlined">call</span>Call
+            </a>
+            <button (click)="$event.stopPropagation(); showDirection(spot)" class="pk-btn-book">
+              <span class="material-icons-outlined">near_me</span>Direction
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== Detail Modal ===== -->
+  <div class="pk-modal-overlay" *ngIf="isDetailModalOpen" (click)="closeDetailModal()">
+    <div class="pk-modal" (click)="$event.stopPropagation()">
+      
+      <!-- Premium Modal Header with Image -->
+      <div class="pk-modal-visual">
+         <!-- Slider -->
+         <div class="pk-modal-slider">
+           <div class="pk-img-gallery" [style.transform]="'translateX(' + (-currentImageIndex * 100) + '%)'">
+              <div class="pk-gallery-item" *ngFor="let img of spotImages">
+                <img [src]="img" alt="Spot view">
+              </div>
+              <div class="pk-gallery-item no-img" *ngIf="spotImages.length === 0">
+                <span class="material-icons-outlined">image_not_supported</span>
+                <p>No Images Provided</p>
+              </div>
+           </div>
+           
+           <button class="pk-nav-btn prev" (click)="prevImage()" *ngIf="spotImages.length > 1">
+              <span class="material-icons-outlined">arrow_back_ios_new</span>
+           </button>
+           <button class="pk-nav-btn next" (click)="nextImage()" *ngIf="spotImages.length > 1">
+              <span class="material-icons-outlined">arrow_forward_ios</span>
+           </button>
+
+           <div class="pk-gallery-dots" *ngIf="spotImages.length > 1">
+              <span *ngFor="let dot of spotImages; let i = index" 
+                    [class.active]="i === currentImageIndex"
+                    (click)="currentImageIndex = i"></span>
+           </div>
+
+           <button class="pk-modal-close-overlay" (click)="closeDetailModal()">
+              <span class="material-icons-outlined">close</span>
+           </button>
+         </div>
+      </div>
+
+      <div class="pk-modal-content">
+        <div class="pk-modal-header-info">
+          <div class="pk-modal-badge-row">
+            <div class="pk-type-tag">
+              <span class="material-icons-outlined">{{selectedSpot?.vehicalType === '2' || selectedSpot?.VehicalType === '2' ? 'moped' : 'directions_car'}}</span>
+              {{selectedSpot?.vehicalType === '2' || selectedSpot?.VehicalType === '2' ? '2-Wheeler' : '4-Wheeler'}}
+            </div>
+            <div class="pk-dist-tag-modal" *ngIf="selectedSpot?.distance !== null">
+              <span class="material-icons-outlined">near_me</span>
+              {{formatDistance(selectedSpot?.distance)}}
+            </div>
+          </div>
+          <h2 class="pk-modal-address">{{selectedSpot?.fullAddress}}</h2>
+        </div>
+
+        <div class="pk-info-grid">
+          <div class="pk-info-item">
+            <div class="pk-info-icon"><span class="material-icons-outlined">currency_rupee</span></div>
+            <div class="pk-info-text">
+              <label>Hourly Rate</label>
+              <strong>₹{{selectedSpot?.price}} <small>/hr</small></strong>
+            </div>
+          </div>
+          <div class="pk-info-item">
+            <div class="pk-info-icon"><span class="material-icons-outlined">contact_phone</span></div>
+            <div class="pk-info-text">
+              <label>Contact Provider</label>
+              <strong>{{selectedSpot?.contact}}</strong>
+            </div>
+          </div>
+          <div class="pk-info-item">
+            <div class="pk-info-icon"><span class="material-icons-outlined">verified</span></div>
+            <div class="pk-info-text">
+              <label>Availability</label>
+              <strong style="color:var(--green)">Open Now</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="pk-modal-actions">
+          <a [href]="'tel:' + selectedSpot?.contact" class="pk-btn-call-large">
+            <span class="material-icons-outlined">call</span>
+            Call Provider
+          </a>
+          <button class="pk-btn-reserve" (click)="showDirection(selectedSpot)">
+            <span class="material-icons-outlined">near_me</span>
+            Get Directions
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

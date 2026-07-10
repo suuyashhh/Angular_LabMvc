@@ -1,66 +1,83 @@
-<main class="relative z-10 max-w-6xl mx-auto px-6 py-20">
-    <!-- Particle background -->
-    <div id="particles-js" class="fixed inset-0 -z-10"></div>
-    
-    <div class="w-full max-w-md mx-auto" style="margin-top: 50px;">
-        <div class="bg-slate-800/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50">
-            <!-- Title -->
-            <h1 class="text-3xl font-bold text-center mb-6 pb-2 border-b-2 border-accent inline-block text-gradient">
-                Contact Me</h1>
+<main class="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-16 max-w-5xl min-h-screen flex flex-col items-center">
 
-            <!-- Contact Form -->
-            <form class="space-y-4">
-                <!-- Name Field -->
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Name</label>
-                    <input type="text" id="name" name="name"
-                        class="w-full px-3 py-2 bg-slate-900/80 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all"
-                        placeholder="Your name">
-                </div>
+  <!-- Header Section -->
+  <div class="text-center space-y-3 mb-8 w-full scroll-reveal reveal-fade-up">
+    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 font-sans">
+      Contact
+    </h1>
+  </div>
 
-                <!-- Email Field -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" name="email"
-                        class="w-full px-3 py-2 bg-slate-900/80 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all"
-                        placeholder="your@email.com">
-                </div>
+  <!-- Contact Form Card -->
+  <div class="w-full max-w-md bg-white border border-dashed border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-sm scroll-reveal reveal-scale-up delay-100">
+    <form class="space-y-5">
+      
+      <!-- Name Field -->
+      <div class="space-y-1.5">
+        <label for="name" class="block text-xs sm:text-sm font-bold text-zinc-700">Name</label>
+        <input type="text" id="name" name="name"
+               class="w-full px-4 py-3 bg-zinc-50 border border-dashed border-zinc-200 rounded-2xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 transition-all text-sm font-medium"
+               placeholder="Your name">
+      </div>
 
-                <!-- Message Field -->
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-300 mb-1">Message</label>
-                    <textarea id="message" name="message" rows="4"
-                        class="w-full px-3 py-2 bg-slate-900/80 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all resize-none"
-                        placeholder="Your message here..."></textarea>
-                </div>
+      <!-- Email Field -->
+      <div class="space-y-1.5">
+        <label for="email" class="block text-xs sm:text-sm font-bold text-zinc-700">Email Address</label>
+        <input type="email" id="email" name="email"
+               class="w-full px-4 py-3 bg-zinc-50 border border-dashed border-zinc-200 rounded-2xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 transition-all text-sm font-medium"
+               placeholder="name@example.com">
+      </div>
 
-                <!-- Submit Button -->
-                <button type="submit"
-                    class="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-slate-800 mt-2">
-                    Send Message
-                </button>
-            </form>
-        </div>
-    </div>
-     <section style="margin-top: 50px;">
-        <footer class="relative border-t border-white/10">
-        <div class="max-w-6xl mx-auto text-center" style="margin-top: 50px;">
-            <div class="flex justify-center space-x-6 mb-4">
-                <a href="https://www.linkedin.com/in/suyash-patil-877398282/" class="text-light hover:text-accent transition-colors text-xl">
-                    <i class="fab fa-linkedin"></i>
-                </a>
-                <a href="https://github.com/suuyashhh" class="text-light hover:text-accent transition-colors text-xl">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="#" class="text-light hover:text-accent transition-colors text-xl">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="mailto:suyashpatil2113@gmail.com" class="text-light hover:text-accent transition-colors text-xl">
-                    <i class="fas fa-envelope"></i>
-                </a>
-            </div>
-            <p class="text-light/70">© 2025 Suyash Patil.</p>
-        </div>
-    </footer>
-    </section>
+      <!-- Message Field -->
+      <div class="space-y-1.5">
+        <label for="message" class="block text-xs sm:text-sm font-bold text-zinc-700">Message</label>
+        <textarea id="message" name="message" rows="4"
+                  class="w-full px-4 py-3 bg-zinc-50 border border-dashed border-zinc-200 rounded-2xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-950/10 focus:border-zinc-950 transition-all text-sm font-medium resize-none"
+                  placeholder="How can I help you?"></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit"
+              class="w-full bg-zinc-950 hover:bg-zinc-900 text-white font-bold py-3.5 px-4 rounded-2xl transition-all shadow-md active:scale-[0.98] cursor-pointer text-sm">
+        Send Message
+      </button>
+    </form>
+  </div>
+
+  <footer class="w-full mt-1 border-t border-dashed border-zinc-200 dark:border-zinc-800 pt-1 pb-1 text-center">
+
+  <!-- Social Icons -->
+  <div id="suyash-social-icons" class="flex items-center justify-center gap-3 mb-1">
+
+    <!-- GitHub -->
+    <a href="https://github.com/suuyashhh"
+      target="_blank"
+      class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+      <i class="fab fa-github text-base text-zinc-800 dark:text-zinc-100"></i>
+    </a>
+
+    <!-- LinkedIn -->
+    <a href="https://www.linkedin.com/in/suyash-patil-877398282/"
+      target="_blank"
+      class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+      <i class="fab fa-linkedin text-base text-[#0077B5]"></i>
+    </a>
+
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/suyashpatil_.03"
+      target="_blank"
+      class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+      <i class="fab fa-instagram text-base text-[#E4405F]"></i>
+    </a>
+
+    <!-- WhatsApp -->
+    <a href="https://wa.me/918180821173"
+      target="_blank"
+      class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
+      <i class="fab fa-whatsapp text-base text-[#25D366]"></i>
+    </a>
+
+  </div>
+
+</footer>
+
 </main>

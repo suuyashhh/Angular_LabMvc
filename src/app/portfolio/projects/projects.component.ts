@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -26,10 +26,12 @@ interface Project {
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent implements OnInit {
+export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
   activeTab: 'webApps' | 'websites' = 'webApps';
   currentImageIndex: { [key: string]: number } = {};
   
+  private observer: IntersectionObserver | null = null;
+
   // Image preview modal
   showImagePreview = false;
   previewImage = '';
@@ -51,7 +53,7 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/lab',
-        android: '../../../assets/APK\'S/Lab.apk'
+        android: '/assets/apks/Lab.apk'
       },
       category: 'webApp'
     },
@@ -69,8 +71,8 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/dairyfarm',
-        android: '../../../assets/APK\'S/DairyFarm.apk',
-        desktop: '../../../assets/DeskTopAPK\'S/Dairy Farm.lnk'
+        android: '/assets/apks/DairyFarm.apk',
+        desktop: '/assets/desktop-files/Dairy-Farm.lnk'
       },
       category: 'webApp'
     },
@@ -88,7 +90,7 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://dairyfarm.revolutionit.in/Fabrication_Admin',
-        android: '../../../assets/APK\'S/Fabrication.apk'
+        android: '/assets/apks/Fabrication.apk'
       },
       category: 'webApp'
     },
@@ -106,10 +108,28 @@ export class ProjectsComponent implements OnInit {
       links: {
         code: 'https://github.com/suuyashhh',
         demo: 'https://suyashpatil.in/farm',
-        android: '../../../assets/APK\'S/Fabrication.apk'
+        android: '/assets/apks/Fabrication.apk'
       },
       category: 'webApp'
     },
+    {
+      id: 'SmartParking',
+      title: 'SmartParking - App',
+      description: 'SmartParking is a Smart City based parking management application developed for a college project',
+      images: [
+        '../../../assets/img/SmartParking/SP1.png',
+        '../../../assets/img/SmartParking/SP4.png',
+        '../../../assets/img/SmartParking/SP2.png',
+        '../../../assets/img/SmartParking/SP3.png'
+      ],
+      tech: ['Angular', 'SQL', '.Net Core', 'Android Studio'],
+      links: {
+        code: 'https://github.com/suuyashhh',
+        demo: 'https://suyashpatil.in/parking/dashboard',
+        android: '/assets/apks/SmartParking.apk'
+      },
+      category: 'webApp'
+    },    
     {
       id: 'portfolio',
       title: 'Lab Website',
@@ -169,9 +189,44 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  ngAfterViewInit() {
+    this.initScrollReveal();
+  }
+
+  initScrollReveal() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        } else {
+          entry.target.classList.remove('reveal-visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    const targets = document.querySelectorAll('.scroll-reveal');
+    targets.forEach(target => this.observer!.observe(target));
+  }
+
   // Switch between tabs
   switchTab(tab: 'webApps' | 'websites'): void {
     this.activeTab = tab;
+    setTimeout(() => {
+      this.initScrollReveal();
+    }, 50);
   }
 
   // Navigate to next image in carousel

@@ -1,0 +1,369 @@
+/* Reset & Styling scope */
+.login-wrapper {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    font-family: 'Poppins', 'Outfit', sans-serif;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+/* Background floating shapes (Blobs) */
+.bg-shape {
+    display: none;
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.6;
+    animation: floatAnimation 12s infinite alternate ease-in-out;
+}
+
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 153, 0, 0.2);
+    top: -50px;
+    left: -50px;
+}
+
+.shape-2 {
+    width: 350px;
+    height: 350px;
+    background: rgba(255, 94, 0, 0.15);
+    bottom: -100px;
+    right: -50px;
+    animation-delay: -3s;
+}
+
+.shape-3 {
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 215, 0, 0.2);
+    top: 50%;
+    left: 80%;
+    transform: translateY(-50%);
+    animation-delay: -6s;
+}
+
+@keyframes floatAnimation {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        transform: translate(30px, 20px) scale(1.15);
+    }
+}
+
+/* Login Container & Card */
+.login-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 440px;
+    animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 153, 0, 0.15);
+    border-radius: 28px;
+    padding: 2.75rem 2.25rem;
+    box-shadow: 0 20px 40px rgba(255, 153, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Card Header */
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(255, 153, 0, 0.1) 0%, rgba(255, 94, 0, 0.1) 100%);
+    border-radius: 18px;
+    margin-bottom: 1rem;
+    color: #ff9900;
+}
+
+.brand-icon {
+    font-size: 32px;
+}
+
+.brand-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #3a2212;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+}
+
+.brand-name span {
+    color: #ff9900;
+}
+
+.brand-tagline {
+    font-size: 0.82rem;
+    color: #8c7f76;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Form Styles */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5c4e43;
+    letter-spacing: 0.2px;
+}
+
+.password-label-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-link {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #ff9900;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+    color: #e07b00;
+    text-decoration: underline;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1.5px solid #ebdcd0;
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+    border-color: #ff9900;
+    box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.12);
+}
+
+.input-wrapper.focused {
+    border-color: #ff9900;
+}
+
+.field-icon {
+    position: absolute;
+    left: 14px;
+    color: #b0a196;
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 13px 14px 13px 44px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #3a2212;
+    font-family: inherit;
+}
+
+.input-wrapper input::placeholder {
+    color: #c0b2a7;
+    font-weight: 400;
+}
+
+.visibility-toggle {
+    position: absolute;
+    right: 14px;
+    color: #b0a196;
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.visibility-toggle:hover {
+    color: #ff9900;
+}
+
+/* Remember Me Checkbox */
+.remember-me-wrapper {
+    margin: 4px 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6e6053;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 18px;
+    width: 18px;
+    background-color: #fff;
+    border: 1.5px solid #ebdcd0;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+.checkbox-container:hover input ~ .checkbox-checkmark {
+    border-color: #ff9900;
+}
+
+.checkbox-container input:checked ~ .checkbox-checkmark {
+    background-color: #ff9900;
+    border-color: #ff9900;
+}
+
+.checkbox-checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkbox-checkmark::after {
+    display: block;
+}
+
+.checkbox-container .checkbox-checkmark::after {
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff9900 0%, #ff7300 100%);
+    border: none;
+    outline: none;
+    color: #ffffff;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-family: inherit;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 153, 0, 0.35);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    background: #e5dec9;
+    background: #e2dbd5;
+    color: #a3958c;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading Spinner */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 12px;
+    }
+    
+    .login-card {
+        padding: 2.25rem 1.5rem;
+        border-radius: 20px;
+    }
+    
+    .brand-name {
+        font-size: 1.45rem;
+    }
+}
