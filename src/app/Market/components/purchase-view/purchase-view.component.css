@@ -1,0 +1,12 @@
+.btn-icon-only {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
