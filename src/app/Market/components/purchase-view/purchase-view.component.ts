@@ -56,17 +56,12 @@ export class PurchaseViewComponent implements OnInit, AfterViewChecked {
     const dateStr = new Date(this.purchase.date).toLocaleDateString('en-IN');
     const text = `*VegBook Purchase Bill*\n\n*Date:* ${dateStr}\n*Hotel:* ${this.purchase.hotelName}\n*Total:* ₹${this.purchase.grandTotal}\n*Paid:* ₹${this.purchase.paidAmount}\n*Due:* ₹${(this.purchase.grandTotal - this.purchase.paidAmount).toFixed(2)}\n\nView details: ${window.location.origin}/market/purchase/view/${this.purchase.id}`;
     
-    if (navigator.share) {
-      navigator.share({
-        title: 'Purchase Bill',
-        text: text,
-        url: `${window.location.origin}/market/purchase/view/${this.purchase.id}`
-      }).catch(err => console.log(err));
-    } else {
-      const cleanNumber = this.purchase.contactNumber ? this.purchase.contactNumber.replace(/[^0-9]/g, '') : '';
-      const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
-      window.open(whatsappUrl, '_blank');
+    let cleanNumber = this.purchase.contactNumber ? this.purchase.contactNumber.replace(/[^0-9]/g, '') : '';
+    if (cleanNumber.length === 10) {
+      cleanNumber = '91' + cleanNumber;
     }
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank');
   }
 
   getImageUrl(path: string): string {
