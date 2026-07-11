@@ -82,6 +82,7 @@ export class PurchaseEntryComponent implements OnInit {
         this.uploadedImageUrl = data.paymentImage;
         this.paidAmount = data.paidAmount;
         this.notes = data.notes || '';
+        this.showMarathiInTable = data.showMarathi || false;
         
         // Populate items
         this.itemsList = data.items.map((item: any) => {
@@ -263,6 +264,7 @@ export class PurchaseEntryComponent implements OnInit {
       paymentImage: this.uploadedImageUrl,
       grandTotal: this.grandTotal,
       notes: this.notes,
+      showMarathi: this.showMarathiInTable,
       items: this.itemsList.map(item => ({
         vegetableId: item.vegetableId,
         quantity: item.quantity,
