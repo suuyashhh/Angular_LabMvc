@@ -12,23 +12,36 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/market/dashboard" routerLinkActive="active" class="nav-item">
+      <a routerLink="/market/dashboard" routerLinkActive="active" class="nav-item" (click)="isSidebarOpen = false">
         <i class="bi bi-grid-fill"></i>
         <span>Dashboard</span>
       </a>
       
-      <a routerLink="/market/hotels" routerLinkActive="active" class="nav-item">
-        <i class="bi bi-building"></i>
-        <span>Hotels</span>
-      </a>
+      <!-- Masters Dropdown -->
+      <div class="nav-dropdown" [class.open]="isMastersDropdownOpen">
+        <a href="#" (click)="toggleMastersDropdown($event)" class="nav-item d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-folder-fill"></i>
+            <span>Masters</span>
+          </div>
+          <i class="bi bi-chevron-down arrow-icon" [style.transform]="isMastersDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'" style="transition: transform 0.2s;"></i>
+        </a>
+        
+        <div class="dropdown-container" *ngIf="isMastersDropdownOpen">
+          <a routerLink="/market/hotels" routerLinkActive="active" class="nav-item sub-item" (click)="isSidebarOpen = false">
+            <i class="bi bi-building"></i>
+            <span>Hotels</span>
+          </a>
 
-      <a routerLink="/market/vegetables" routerLinkActive="active" class="nav-item">
-        <i class="bi bi-egg-fried"></i>
-        <span>Vegetables</span>
-      </a>
+          <a routerLink="/market/vegetables" routerLinkActive="active" class="nav-item sub-item" (click)="isSidebarOpen = false">
+            <i class="bi bi-egg-fried"></i>
+            <span>Vegetables</span>
+          </a>
+        </div>
+      </div>
 
       <div class="px-3 my-4">
-        <button routerLink="/market/purchase/add" class="btn btn-accent-orange w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+        <button routerLink="/market/purchase/add" class="btn btn-accent-orange w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-sm" (click)="isSidebarOpen = false">
           <i class="bi bi-plus-lg"></i>
           <span>Add Entry</span>
         </button>
@@ -64,6 +77,27 @@
     <main class="content-body p-4">
       <router-outlet></router-outlet>
     </main>
+
+    <!-- Mobile Bottom Navigation Footer -->
+    <footer class="mobile-footer d-sm-none no-print">
+      <div class="mobile-nav-container">
+        <a routerLink="/market/dashboard" routerLinkActive="active" class="mobile-nav-item">
+          <div class="icon-wrapper">
+            <i class="bi bi-grid-fill"></i>
+          </div>
+          <span class="mobile-nav-label">Dashboard</span>
+          <span class="active-indicator-dot"></span>
+        </a>
+        
+        <button (click)="toggleSidebar()" class="mobile-nav-item" [class.active]="isSidebarOpen">
+          <div class="icon-wrapper">
+            <i class="bi bi-list"></i>
+          </div>
+          <span class="mobile-nav-label">Menu</span>
+          <span class="active-indicator-dot"></span>
+        </button>
+      </div>
+    </footer>
   </div>
 
 </div>

@@ -12,14 +12,27 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LayoutComponent {
   isSidebarOpen = false;
+  isMastersDropdownOpen = false;
 
   constructor(
     public authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    // Keep the dropdown open if the active route is under hotels or vegetables
+    this.router.events.subscribe(() => {
+      if (this.router.url.includes('/market/hotels') || this.router.url.includes('/market/vegetables')) {
+        this.isMastersDropdownOpen = true;
+      }
+    });
+  }
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  toggleMastersDropdown(event: Event) {
+    event.preventDefault();
+    this.isMastersDropdownOpen = !this.isMastersDropdownOpen;
   }
 
   onLogout() {
