@@ -28,6 +28,7 @@
     "bootstrap": "^5.3.5",
     "crypto-js": "^4.2.0",
     "express": "^4.18.2",
+    "jspdf": "^4.2.1",
     "motion": "^12.40.0",
     "ngx-pagination": "^6.0.3",
     "ngx-toastr": "^19.0.0",

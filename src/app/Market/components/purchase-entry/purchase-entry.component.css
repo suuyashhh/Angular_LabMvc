@@ -96,3 +96,76 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Custom Switch Styling */
+.custom-switch-green:checked {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+.custom-switch-green:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(43, 92, 46, 0.25) !important;
+}
+.text-primary-green {
+  color: var(--primary-color) !important;
+}
+
+/* Custom Table Layout and Sizing */
+.purchase-items-table {
+  min-width: 650px;
+}
+
+.table-input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-input {
+  max-width: 100px;
+  height: 38px;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.table-input:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(43, 92, 46, 0.15) !important;
+  outline: none;
+}
+
+/* Custom Input Group Sizing and Border Handling */
+.table-input-group {
+  max-width: 120px;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease-in-out;
+  background-color: #ffffff;
+}
+
+.table-input-group:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(43, 92, 46, 0.15);
+}
+
+.table-input-group .input-group-text {
+  background-color: #f8f9fa;
+  border: none;
+  font-size: 14px;
+  color: #495057;
+  padding-left: 10px;
+  padding-right: 8px;
+}
+
+.table-input-group .form-control {
+  border: none;
+  font-weight: 500;
+  height: 36px;
+  outline: none;
+  box-shadow: none !important;
+}
+
