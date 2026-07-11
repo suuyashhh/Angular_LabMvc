@@ -105,6 +105,12 @@ export class ApiService {
     return this.http.post<any>(`${this.baseUrl}/purchase/upload`, formData, { headers: this.getHeaders() });
   }
 
+  uploadPurchasePdf(id: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.baseUrl}/purchase/${id}/pdf`, formData, { headers: this.getHeaders() });
+  }
+
   // Dashboard Stats
   getStats(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/dashboard/stats`, { headers: this.getHeaders() });
