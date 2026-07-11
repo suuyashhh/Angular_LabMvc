@@ -57,6 +57,125 @@ export class DashboardComponent implements OnInit {
     window.open(`/market/purchase/print/${id}`, '_blank');
   }
 
+  openInvoicePdf(entry: any) {
+    this.apiService.getPurchase(entry.id).subscribe({
+      next: (fullPurchase) => {
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        // Styling
+        const primaryColor = [43, 92, 46];
+        const textColor = [30, 37, 28];
+        const lightGrey = [245, 247, 243];
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(22);
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text('VegBook', 15, 20);
+
+        doc.setFontSize(10);
+        doc.setFont('Helvetica', 'normal');
+        doc.setTextColor(120, 120, 120);
+        doc.text('PURCHASE LEDGER BILL', 15, 25);
+
+        doc.setFontSize(10);
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.setFont('Helvetica', 'bold');
+        doc.text(`Invoice #: ${fullPurchase.id}`, 140, 20);
+        doc.setFont('Helvetica', 'normal');
+        doc.text(`Date: ${new Date(fullPurchase.date).toLocaleDateString('en-IN')}`, 140, 25);
+
+        doc.setDrawColor(220, 220, 220);
+        doc.line(15, 30, 195, 30);
+
+        // Hotel Info
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('BILLED TO:', 15, 40);
+        doc.setFont('Helvetica', 'normal');
+        doc.text(fullPurchase.hotelName || 'N/A', 15, 45);
+        let currentY = 50;
+        if (fullPurchase.contactNumber) {
+          doc.text(`Contact: ${fullPurchase.contactNumber}`, 15, currentY);
+          currentY += 5;
+        }
+        if (fullPurchase.address) {
+          doc.text(`Address: ${fullPurchase.address}`, 15, currentY);
+          currentY += 5;
+        }
+
+        // Table headers
+        let y = Math.max(currentY + 5, 65);
+        doc.setFillColor(lightGrey[0], lightGrey[1], lightGrey[2]);
+        doc.rect(15, y, 180, 8, 'F');
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('Vegetable Item', 18, y + 5.5);
+        doc.text('Quantity', 95, y + 5.5, { align: 'right' });
+        doc.text('Price / KG', 145, y + 5.5, { align: 'right' });
+        doc.text('Total', 190, y + 5.5, { align: 'right' });
+
+        y += 8;
+
+        // Table items
+        doc.setFont('Helvetica', 'normal');
+        const items = fullPurchase.items || [];
+        items.forEach((item: any) => {
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+          const cleanedName = (item.vegetableName || 'Item').replace(/[^\x00-\x7F]/g, "").trim().replace(/\s+-\s*$/, "") || item.vegetableName;
+          doc.text(cleanedName, 18, y + 5.5);
+          doc.text(`${item.quantity} KG`, 95, y + 5.5, { align: 'right' });
+          doc.text(`Rs ${item.pricePerKg.toFixed(2)}`, 145, y + 5.5, { align: 'right' });
+          doc.text(`Rs ${item.total.toFixed(2)}`, 190, y + 5.5, { align: 'right' });
+          y += 8;
+        });
+
+        doc.line(15, y, 195, y);
+        y += 6;
+
+        // Totals
+        doc.setFont('Helvetica', 'bold');
+        doc.text('Grand Total:', 130, y + 2);
+        doc.text(`Rs ${(fullPurchase.grandTotal || 0).toFixed(2)}`, 190, y + 2, { align: 'right' });
+
+        doc.text('Paid Amount:', 130, y + 8);
+        doc.text(`Rs ${(fullPurchase.paidAmount || 0).toFixed(2)}`, 190, y + 8, { align: 'right' });
+
+        const remaining = (fullPurchase.grandTotal || 0) - (fullPurchase.paidAmount || 0);
+        doc.setTextColor(200, 50, 50);
+        doc.text('Remaining Due:', 130, y + 14);
+        doc.text(`Rs ${remaining.toFixed(2)}`, 190, y + 14, { align: 'right' });
+
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text(`Payment Method: ${fullPurchase.paymentMethod || 'N/A'}`, 15, y + 2);
+        if (fullPurchase.notes) {
+          doc.text(`Notes: ${fullPurchase.notes}`, 15, y + 8);
+        }
+
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Generated automatically by VegBook Ledger System', 15, 285);
+
+        const pdfBlob = doc.output('blob');
+        const fileURL = URL.createObjectURL(pdfBlob);
+        window.open(fileURL, '_blank');
+      },
+      error: (loadErr) => {
+        console.error('Failed to load purchase details:', loadErr);
+        alert('Failed to load purchase details to generate invoice PDF.');
+      }
+    });
+  }
+
   shareEntry(entry: any) {
     // 1. Fetch full purchase details first to get all vegetable items
     this.apiService.getPurchase(entry.id).subscribe({
@@ -181,8 +300,13 @@ export class DashboardComponent implements OnInit {
             }
             const pdfUrl = `${cleanHost}${res.url}`;
 
-            // 4. Construct WhatsApp Message
-            const text = `*VegBook Purchase Bill*\n\n*Date:* ${new Date(fullPurchase.date).toLocaleDateString('en-IN')}\n*Hotel:* ${fullPurchase.hotelName}\n*Total:* ₹${fullPurchase.grandTotal}\n*Paid:* ₹${fullPurchase.paidAmount}\n*Due:* ₹${remaining.toFixed(2)}\n\n*Download PDF Invoice:* ${pdfUrl}`;
+            // 4. Construct WhatsApp Message with custom user-requested template
+            const formattedDate = new Date(fullPurchase.date).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            });
+            const text = `VegBook Purchase Bill \n\n Date: ${formattedDate}\n Hotel: ${fullPurchase.hotelName}\n Total : ₹${(fullPurchase.grandTotal || 0).toFixed(2)}\n Paid  : ₹${(fullPurchase.paidAmount || 0).toFixed(2)}\n Due   : ₹${remaining.toFixed(2)}\n\n Invoice PDF: \n${pdfUrl}`;
             
             let cleanNumber = fullPurchase.contactNumber ? fullPurchase.contactNumber.replace(/[^0-9]/g, '') : '';
             if (cleanNumber.length === 10) {
@@ -190,43 +314,24 @@ export class DashboardComponent implements OnInit {
             }
             const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
             
-            // 5. Direct user to WhatsApp chat or use Web Share API if supported
-            const shareData = {
-              files: [pdfFile],
-              title: `VegBook Purchase Bill - ${fullPurchase.hotelName}`,
-              text: text
-            };
-
-            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-              navigator.share(shareData)
-                .then(() => console.log('Shared PDF invoice successfully.'))
-                .catch((err) => {
-                  console.warn('Web share failed, falling back to WhatsApp link:', err);
-                  window.open(whatsappUrl, '_blank');
-                });
-            } else {
-              window.open(whatsappUrl, '_blank');
-            }
+            // 5. Direct user to WhatsApp chat directly
+            window.open(whatsappUrl, '_blank');
           },
           error: (uploadErr) => {
             console.error('Failed to upload PDF:', uploadErr);
             alert('Failed to upload PDF invoice. Sharing standard text instead.');
-            const text = `*VegBook Purchase Bill*\n\n*Date:* ${new Date(fullPurchase.date).toLocaleDateString('en-IN')}\n*Hotel:* ${fullPurchase.hotelName}\n*Total:* ₹${fullPurchase.grandTotal}\n*Paid:* ₹${fullPurchase.paidAmount}\n*Due:* ₹${remaining.toFixed(2)}`;
+            const formattedDate = new Date(fullPurchase.date).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            });
+            const text = `VegBook Purchase Bill \n\n Date: ${formattedDate}\n Hotel: ${fullPurchase.hotelName}\n Total : ₹${(fullPurchase.grandTotal || 0).toFixed(2)}\n Paid  : ₹${(fullPurchase.paidAmount || 0).toFixed(2)}\n Due   : ₹${remaining.toFixed(2)}`;
             let cleanNumber = fullPurchase.contactNumber ? fullPurchase.contactNumber.replace(/[^0-9]/g, '') : '';
             if (cleanNumber.length === 10) {
               cleanNumber = '91' + cleanNumber;
             }
             const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
-            
-            const shareTextData = {
-              title: `VegBook Purchase Bill - ${fullPurchase.hotelName}`,
-              text: text
-            };
-            if (navigator.share && navigator.canShare && navigator.canShare(shareTextData)) {
-              navigator.share(shareTextData).catch(() => window.open(whatsappUrl, '_blank'));
-            } else {
-              window.open(whatsappUrl, '_blank');
-            }
+            window.open(whatsappUrl, '_blank');
           }
         });
       },
