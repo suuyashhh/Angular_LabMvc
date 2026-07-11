@@ -175,9 +175,13 @@ export class PurchaseViewComponent implements OnInit, AfterViewChecked {
         }
         const pdfUrl = `${cleanHost}${res.url}`;
 
-        // 3. Construct WhatsApp Message
-        const dateStr = new Date(this.purchase.date).toLocaleDateString('en-IN');
-        const text = `*VegBook Purchase Bill*\n\n*Date:* ${dateStr}\n*Hotel:* ${this.purchase.hotelName}\n*Total:* ₹${this.purchase.grandTotal}\n*Paid:* ₹${this.purchase.paidAmount}\n*Due:* ₹${remaining.toFixed(2)}\n\n*Download PDF Invoice:* ${pdfUrl}`;
+        // 3. Construct WhatsApp Message with custom user-requested template
+        const formattedDate = new Date(this.purchase.date).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+        const text = `VegBook Purchase Bill \n\n Date: ${formattedDate}\n Hotel: ${this.purchase.hotelName}\n Total : ₹${(this.purchase.grandTotal || 0).toFixed(2)}\n Paid  : ₹${(this.purchase.paidAmount || 0).toFixed(2)}\n Due   : ₹${remaining.toFixed(2)}\n\n Invoice PDF: \n${pdfUrl}`;
         
         let cleanNumber = this.purchase.contactNumber ? this.purchase.contactNumber.replace(/[^0-9]/g, '') : '';
         if (cleanNumber.length === 10) {
@@ -185,44 +189,24 @@ export class PurchaseViewComponent implements OnInit, AfterViewChecked {
         }
         const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
         
-        // 4. Direct user to WhatsApp chat or use Web Share API if supported
-        const shareData = {
-          files: [pdfFile],
-          title: `VegBook Purchase Bill - ${this.purchase.hotelName}`,
-          text: text
-        };
-
-        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-          navigator.share(shareData)
-            .then(() => console.log('Shared PDF invoice successfully.'))
-            .catch((err) => {
-              console.warn('Web share failed, falling back to WhatsApp link:', err);
-              window.open(whatsappUrl, '_blank');
-            });
-        } else {
-          window.open(whatsappUrl, '_blank');
-        }
+        // 4. Direct user to WhatsApp chat directly
+        window.open(whatsappUrl, '_blank');
       },
       error: (uploadErr) => {
         console.error('Failed to upload PDF:', uploadErr);
         alert('Failed to upload PDF invoice. Sharing standard text instead.');
-        const dateStr = new Date(this.purchase.date).toLocaleDateString('en-IN');
-        const text = `*VegBook Purchase Bill*\n\n*Date:* ${dateStr}\n*Hotel:* ${this.purchase.hotelName}\n*Total:* ₹${this.purchase.grandTotal}\n*Paid:* ₹${this.purchase.paidAmount}\n*Due:* ₹${remaining.toFixed(2)}`;
+        const formattedDate = new Date(this.purchase.date).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+        const text = `VegBook Purchase Bill \n\n Date: ${formattedDate}\n Hotel: ${this.purchase.hotelName}\n Total : ₹${(this.purchase.grandTotal || 0).toFixed(2)}\n Paid  : ₹${(this.purchase.paidAmount || 0).toFixed(2)}\n Due   : ₹${remaining.toFixed(2)}`;
         let cleanNumber = this.purchase.contactNumber ? this.purchase.contactNumber.replace(/[^0-9]/g, '') : '';
         if (cleanNumber.length === 10) {
           cleanNumber = '91' + cleanNumber;
         }
         const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
-        
-        const shareTextData = {
-          title: `VegBook Purchase Bill - ${this.purchase.hotelName}`,
-          text: text
-        };
-        if (navigator.share && navigator.canShare && navigator.canShare(shareTextData)) {
-          navigator.share(shareTextData).catch(() => window.open(whatsappUrl, '_blank'));
-        } else {
-          window.open(whatsappUrl, '_blank');
-        }
+        window.open(whatsappUrl, '_blank');
       }
     });
   }
