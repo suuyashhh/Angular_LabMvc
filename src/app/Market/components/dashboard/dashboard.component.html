@@ -1,10 +1,9 @@
 <div class="dashboard-container">
   <!-- Page Header -->
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+  <div class="page-header flex-column flex-md-row align-items-start align-items-md-center gap-3">
     <div>
-      <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 1px;">LEDGER · {{ todayStr }}</span>
-      <h1 class="fw-bold mb-0">Dashboard</h1>
-      <p class="text-muted mb-0">Track vegetable purchases across all hotels.</p>
+      <span class="page-header-subtitle">OVERVIEW</span>
+      <h1 class="page-header-title">Dashboard</h1>
     </div>
     <button routerLink="/market/purchase/add" class="btn btn-primary-green d-flex align-items-center gap-2 shadow-sm">
       <i class="bi bi-plus-lg"></i>
@@ -12,87 +11,41 @@
     </button>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="row g-3 mb-4" *ngIf="stats">
-    <div class="col-6 col-md-4 col-lg-2.4 col-custom">
-      <div class="stat-card">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="stat-title">Total Hotels</span>
-          <i class="bi bi-building text-muted"></i>
-        </div>
-        <h2 class="stat-value">{{ stats.totalHotels }}</h2>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-2.4 col-custom">
-      <div class="stat-card">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="stat-title">Vegetables</span>
-          <i class="bi bi-egg-fried text-muted"></i>
-        </div>
-        <h2 class="stat-value">{{ stats.totalVegetables }}</h2>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-2.4 col-custom">
-      <div class="stat-card">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="stat-title">Purchase Entries</span>
-          <i class="bi bi-file-earmark-text text-muted"></i>
-        </div>
-        <h2 class="stat-value">{{ stats.totalPurchaseEntries }}</h2>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-6 col-lg-2.4 col-custom">
-      <div class="stat-card">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="stat-title">Today's Total</span>
-          <i class="bi bi-calendar-event text-danger"></i>
-        </div>
-        <h2 class="stat-value text-success">₹{{ stats.todayPurchaseTotal | number:'1.2-2' }}</h2>
-      </div>
-    </div>
-
-    <div class="col-12 col-md-6 col-lg-2.4 col-custom">
-      <div class="stat-card">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="stat-title">Overall Total</span>
-          <i class="bi bi-wallet2 text-success"></i>
-        </div>
-        <h2 class="stat-value text-success">₹{{ stats.overallPurchaseTotal | number:'1.2-2' }}</h2>
-      </div>
-    </div>
-  </div>
-
   <!-- Filters Panel -->
   <div class="filters-panel p-4 mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <span class="text-uppercase fw-semibold text-muted small" style="letter-spacing: 0.5px;"><i class="bi bi-filter me-2"></i>Filters</span>
-      <span class="small text-muted">{{ filteredEntries.length }} entries</span>
+      <div class="d-flex flex-wrap align-items-center gap-2 gap-md-3 small">
+        <span class="text-success fw-medium">Paid: ₹{{ totalPaidAmount | number:'1.2-2' }}</span>
+        <span class="text-muted">|</span>
+        <span class="text-danger fw-medium">Pending: ₹{{ totalPendingAmount | number:'1.2-2' }}</span>
+        <span class="text-muted">|</span>
+        <span class="text-muted">{{ filteredEntries.length }} entries</span>
+      </div>
     </div>
-    <div class="row g-3">
-      <div class="col-md-3">
+    <div class="row g-2 g-md-3">
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">Search Hotel</label>
         <div class="input-group">
           <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-          <input type="text" class="form-control border-start-0 ps-0" placeholder="Search hotel..." [(ngModel)]="searchHotel">
+          <input type="text" class="form-control border-start-0 ps-0" placeholder="Search hotel..."
+            [(ngModel)]="searchHotel">
         </div>
       </div>
-      <div class="col-md-2">
-        <input type="date" class="form-control" [(ngModel)]="searchDate">
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">From Date</label>
+        <input type="date" class="form-control" [(ngModel)]="fromDate" (change)="loadEntries()">
       </div>
-      <div class="col-md-2">
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">To Date</label>
+        <input type="date" class="form-control" [(ngModel)]="toDate" (change)="loadEntries()">
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">Payment Method</label>
         <select class="form-select" [(ngModel)]="filterPayment">
           <option value="All">All payments</option>
           <option value="Cash">Cash</option>
           <option value="Online">Online</option>
         </select>
-      </div>
-      <div class="col-md-2.5 col-sm-6 flex-grow-1">
-        <input type="number" class="form-control" placeholder="Min amount" [(ngModel)]="minAmount">
-      </div>
-      <div class="col-md-2.5 col-sm-6 flex-grow-1">
-        <input type="number" class="form-control" placeholder="Max amount" [(ngModel)]="maxAmount">
       </div>
     </div>
   </div>
@@ -141,6 +94,9 @@
                 <button (click)="printEntry(entry.id)" class="btn btn-sm btn-icon" title="Print">
                   <i class="bi bi-printer text-dark"></i>
                 </button>
+                <button (click)="openInvoicePdf(entry)" class="btn btn-sm btn-icon" title="Invoice PDF">
+                  <i class="bi bi-file-earmark-pdf text-danger"></i>
+                </button>
                 <button (click)="shareEntry(entry)" class="btn btn-sm btn-icon" title="Share">
                   <i class="bi bi-share text-success"></i>
                 </button>
@@ -158,6 +114,25 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div class="confirm-modal-backdrop" [class.show]="isDeleteModalOpen" (click)="closeDeleteModal()">
+    <div class="confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-header">
+        <div class="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5 class="confirm-modal-title">Delete Entry</h5>
+      </div>
+      <div class="confirm-modal-body">
+        Are you sure you want to delete this purchase entry? This action cannot be undone.
+      </div>
+      <div class="confirm-modal-footer">
+        <button type="button" class="btn btn-light-custom py-2 px-3" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-accent-orange py-2 px-3" (click)="confirmDeleteAction()">Delete</button>
+      </div>
     </div>
   </div>
 </div>

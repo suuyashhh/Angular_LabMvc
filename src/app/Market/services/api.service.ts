@@ -75,8 +75,12 @@ export class ApiService {
   }
 
   // Purchases CRUD
-  getPurchases(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/purchase`, { headers: this.getHeaders() });
+  getPurchases(fromDate?: string, toDate?: string): Observable<any[]> {
+    let url = `${this.baseUrl}/purchase`;
+    const queryParams: any = {};
+    if (fromDate) queryParams.fromDate = fromDate;
+    if (toDate) queryParams.toDate = toDate;
+    return this.http.get<any[]>(url, { headers: this.getHeaders(), params: queryParams });
   }
 
   getPurchase(id: number): Observable<any> {
@@ -101,17 +105,14 @@ export class ApiService {
     return this.http.post<any>(`${this.baseUrl}/purchase/upload`, formData, { headers: this.getHeaders() });
   }
 
+  uploadPurchasePdf(id: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.baseUrl}/purchase/${id}/pdf`, formData, { headers: this.getHeaders() });
+  }
+
   // Dashboard Stats
   getStats(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/dashboard/stats`, { headers: this.getHeaders() });
-  }
-
-  // Backup & Restore
-  exportBackup(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/backup/export`, { headers: this.getHeaders() });
-  }
-
-  importBackup(data: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/backup/import`, data, { headers: this.getHeaders() });
   }
 }

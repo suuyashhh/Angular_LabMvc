@@ -18,6 +18,10 @@ export class HotelsComponent implements OnInit {
   isDrawerOpen = false;
   editMode = false;
   isSaving = false;
+
+  // Confirmation Modal states
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
   
   formData: any = {
     id: 0,
@@ -98,11 +102,27 @@ export class HotelsComponent implements OnInit {
   }
 
   confirmDelete(id: number) {
-    if (confirm('Are you sure you want to delete this hotel? All associated purchases will be deleted.')) {
-      this.apiService.deleteHotel(id).subscribe({
-        next: () => this.loadHotels(),
-        error: (err) => alert(err.error?.message || 'Failed to delete hotel')
+    this.deleteItemId = id;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
+      this.apiService.deleteHotel(this.deleteItemId).subscribe({
+        next: () => {
+          this.loadHotels();
+          this.closeDeleteModal();
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Failed to delete hotel');
+          this.closeDeleteModal();
+        }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 }

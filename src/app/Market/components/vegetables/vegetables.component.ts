@@ -18,9 +18,14 @@ export class VegetablesComponent implements OnInit {
   editMode = false;
   isSaving = false;
 
+  // Confirmation Modal states
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
+
   formData: any = {
     id: 0,
-    vegetableName: ''
+    engVegetableName: '',
+    marVegetableName: ''
   };
 
   constructor(private apiService: ApiService) {}
@@ -38,7 +43,9 @@ export class VegetablesComponent implements OnInit {
 
   get filteredVegetables() {
     return this.vegetables.filter(v => 
-      !this.searchQuery || v.vegetableName?.toLowerCase().includes(this.searchQuery.toLowerCase())
+      !this.searchQuery || 
+      v.engVegetableName?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+      v.marVegetableName?.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
 
@@ -46,7 +53,8 @@ export class VegetablesComponent implements OnInit {
     this.editMode = false;
     this.formData = {
       id: 0,
-      vegetableName: ''
+      engVegetableName: '',
+      marVegetableName: ''
     };
     this.isDrawerOpen = true;
   }
@@ -62,7 +70,7 @@ export class VegetablesComponent implements OnInit {
   }
 
   saveVegetable() {
-    if (!this.formData.vegetableName) return;
+    if (!this.formData.engVegetableName) return;
 
     this.isSaving = true;
     if (this.editMode) {
@@ -93,11 +101,27 @@ export class VegetablesComponent implements OnInit {
   }
 
   confirmDelete(id: number) {
-    if (confirm('Are you sure you want to delete this vegetable?')) {
-      this.apiService.deleteVegetable(id).subscribe({
-        next: () => this.loadVegetables(),
-        error: (err) => alert(err.error?.message || 'Failed to delete vegetable')
+    this.deleteItemId = id;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
+      this.apiService.deleteVegetable(this.deleteItemId).subscribe({
+        next: () => {
+          this.loadVegetables();
+          this.closeDeleteModal();
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Failed to delete vegetable');
+          this.closeDeleteModal();
+        }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 }

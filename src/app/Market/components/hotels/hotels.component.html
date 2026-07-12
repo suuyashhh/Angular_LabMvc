@@ -1,10 +1,9 @@
 <div class="hotels-container">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="page-header">
     <div>
-      <span class="text-uppercase text-muted fw-semibold small" style="letter-spacing: 1px;">MASTER</span>
-      <h1 class="fw-bold mb-0">Hotels</h1>
-      <p class="text-muted mb-0">Add and manage hotels you supply to.</p>
+      <span class="page-header-subtitle">MASTER</span>
+      <h1 class="page-header-title">Hotels</h1>
     </div>
     <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center gap-2 shadow-sm">
       <i class="bi bi-plus-lg"></i>
@@ -120,4 +119,24 @@
       </button>
     </div>
   </div>
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div class="confirm-modal-backdrop" [class.show]="isDeleteModalOpen" (click)="closeDeleteModal()">
+    <div class="confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-header">
+        <div class="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5 class="confirm-modal-title">Delete Hotel</h5>
+      </div>
+      <div class="confirm-modal-body">
+        Are you sure you want to delete this hotel? All associated purchases will be deleted. This action cannot be undone.
+      </div>
+      <div class="confirm-modal-footer">
+        <button type="button" class="btn btn-light-custom py-2 px-3" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-accent-orange py-2 px-3" (click)="confirmDeleteAction()">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>
+
