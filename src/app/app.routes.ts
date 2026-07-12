@@ -66,5 +66,10 @@ export const routes: Routes = [
     path: 'market',
     loadComponent: () => import('./Market/landing/landing.component').then(m => m.LandingComponent),
     loadChildren: () => import('./Market/Market.routes').then(m => m.MARKET_ROUTES)
+  },
+   {
+    path: 'fab',
+    loadComponent: () => import('./Fab/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./Fab/Fab.routes').then(m => m.FAB_ROUTES)
   }
 ];
