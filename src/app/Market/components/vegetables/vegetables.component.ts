@@ -18,6 +18,10 @@ export class VegetablesComponent implements OnInit {
   editMode = false;
   isSaving = false;
 
+  // Confirmation Modal states
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
+
   formData: any = {
     id: 0,
     engVegetableName: '',
@@ -97,11 +101,27 @@ export class VegetablesComponent implements OnInit {
   }
 
   confirmDelete(id: number) {
-    if (confirm('Are you sure you want to delete this vegetable?')) {
-      this.apiService.deleteVegetable(id).subscribe({
-        next: () => this.loadVegetables(),
-        error: (err) => alert(err.error?.message || 'Failed to delete vegetable')
+    this.deleteItemId = id;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
+      this.apiService.deleteVegetable(this.deleteItemId).subscribe({
+        next: () => {
+          this.loadVegetables();
+          this.closeDeleteModal();
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Failed to delete vegetable');
+          this.closeDeleteModal();
+        }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 }
