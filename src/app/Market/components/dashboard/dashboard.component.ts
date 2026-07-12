@@ -22,10 +22,19 @@ export class DashboardComponent implements OnInit {
   toDate = '';
   filterPayment = 'All';
 
+  // Confirmation Modal states
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
+
   constructor(private apiService: ApiService, private router: Router) {
     const today = new Date();
     this.todayStr = today.toISOString().split('T')[0];
-    this.fromDate = this.todayStr;
+    
+    // First day of the current month
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    this.fromDate = `${yyyy}-${mm}-01`;
+    
     this.toDate = this.todayStr;
   }
 
@@ -43,14 +52,28 @@ export class DashboardComponent implements OnInit {
   }
 
   confirmDelete(id: number) {
-    if (confirm('Are you sure you want to delete this purchase entry?')) {
-      this.apiService.deletePurchase(id).subscribe({
+    this.deleteItemId = id;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
+      this.apiService.deletePurchase(this.deleteItemId).subscribe({
         next: () => {
           this.loadEntries();
+          this.closeDeleteModal();
         },
-        error: (err) => alert(err.error?.message || 'Failed to delete purchase entry')
+        error: (err) => {
+          alert(err.error?.message || 'Failed to delete purchase entry');
+          this.closeDeleteModal();
+        }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 
   printEntry(id: number) {
@@ -352,5 +375,17 @@ export class DashboardComponent implements OnInit {
       const matchesPayment = this.filterPayment === 'All' || e.paymentMethod === this.filterPayment;
       return matchesHotel && matchesPayment;
     });
+  }
+
+  get totalGrandAmount(): number {
+    return this.filteredEntries.reduce((sum, entry) => sum + (entry.grandTotal || 0), 0);
+  }
+
+  get totalPaidAmount(): number {
+    return this.filteredEntries.reduce((sum, entry) => sum + (entry.paidAmount || 0), 0);
+  }
+
+  get totalPendingAmount(): number {
+    return this.filteredEntries.reduce((sum, entry) => sum + ((entry.grandTotal || 0) - (entry.paidAmount || 0)), 0);
   }
 }

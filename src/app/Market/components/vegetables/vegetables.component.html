@@ -100,4 +100,24 @@
       </button>
     </div>
   </div>
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div class="confirm-modal-backdrop" [class.show]="isDeleteModalOpen" (click)="closeDeleteModal()">
+    <div class="confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-header">
+        <div class="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5 class="confirm-modal-title">Delete Vegetable</h5>
+      </div>
+      <div class="confirm-modal-body">
+        Are you sure you want to delete this vegetable? This action cannot be undone.
+      </div>
+      <div class="confirm-modal-footer">
+        <button type="button" class="btn btn-light-custom py-2 px-3" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-accent-orange py-2 px-3" (click)="confirmDeleteAction()">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>
+
