@@ -1,0 +1,113 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Billing & Sales Revenues</h2>
+  </div>
+
+  <div class="content-grid">
+    <!-- Form Card -->
+    <div class="glass-card form-card">
+      <div class="card-header">
+        <h3>{{ isEditMode ? 'Modify Bill Details' : 'Record New Invoice/Bill' }}</h3>
+      </div>
+      <form (ngSubmit)="onSubmit()" #profitForm="ngForm" class="cyber-form">
+        <div class="form-group">
+          <label for="name">Bill Name / Client Details</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="profitObj.pro_name"
+            placeholder="e.g. Iron Gate Order, Tata Steel Bill"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="price">Bill Amount (₹)</label>
+          <input
+            type="number"
+            id="price"
+            name="price"
+            [(ngModel)]="profitObj.pro_price"
+            placeholder="e.g. 25000"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="date">Billing Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            [(ngModel)]="profitObj.date"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="!profitForm.valid">
+            {{ isEditMode ? 'Update Bill' : 'Log Bill' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="glass-card table-card">
+      <div class="card-header border-flex">
+        <h3>Sales Revenues Log</h3>
+        
+        <div class="search-filters">
+          <div class="date-selector">
+            <label for="from">From:</label>
+            <input type="date" id="from" [(ngModel)]="searchFrom" class="form-control sm" />
+          </div>
+          <div class="date-selector">
+            <label for="to">To:</label>
+            <input type="date" id="to" [(ngModel)]="searchTo" class="form-control sm" />
+          </div>
+          <button (click)="fetchProfits()" class="btn-submit sm-btn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Bill / Client Details</th>
+              <th>Received Amount</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of profits">
+              <td>{{ p.date | date:'dd-MMM-yyyy' }}</td>
+              <td><strong>{{ p.pro_name }}</strong></td>
+              <td class="profit-cell">₹{{ p.pro_price | number }}</td>
+              <td class="action-cell">
+                <button (click)="editProfit(p)" class="btn-icon btn-edit" title="Edit Record">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button (click)="deleteProfit(p.pro_id)" class="btn-icon btn-delete" title="Delete Record">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="profits.length === 0">
+              <td colspan="4" class="no-data">No sales billing records found for this date range.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

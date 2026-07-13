@@ -1,0 +1,306 @@
+.webforms-inner-container {
+  min-height: 100vh;
+  background-color: #f4f6f9;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  color: #333;
+  padding: 30px;
+}
+
+.webforms-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+.header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.webforms-page-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0;
+}
+
+.webforms-btn-back {
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.webforms-btn-back:hover {
+  background-color: #5a6268;
+}
+
+.webforms-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .webforms-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.webforms-inner-card {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  padding: 25px;
+}
+
+.webforms-card-header {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.webforms-card-header.border-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.webforms-card-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #495057;
+  margin: 0;
+}
+
+.webforms-date-badge {
+  background-color: #e8f4fd;
+  color: #0056b3;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #b8daff;
+}
+
+.webforms-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.webforms-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.webforms-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.webforms-form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #495057;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.webforms-form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.webforms-btn-primary {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.webforms-btn-primary:hover:not(:disabled) {
+  background-color: #0069d9;
+}
+
+.webforms-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.webforms-btn-success {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.webforms-btn-success:hover {
+  background-color: #218838;
+}
+
+/* Paysheet details box */
+.webforms-details-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.webforms-details-box p {
+  margin: 0 0 2px;
+  font-size: 11px;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.webforms-details-box strong {
+  font-size: 14px;
+  color: #212529;
+}
+
+/* Classic clean table styling */
+.webforms-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.webforms-table th {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 12px;
+  text-transform: uppercase;
+}
+
+.webforms-table td {
+  border: 1px solid #dee2e6;
+  color: #333;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.webforms-deduction-row td {
+  background-color: #fff8f8;
+}
+
+.webforms-grand-total-row td {
+  background-color: #e2f0d9;
+  font-size: 15px;
+  color: #2e5b1b;
+}
+
+.webforms-grand-total-row strong {
+  font-size: 16px;
+}
+
+.mt-3 { margin-top: 15px; }
+.mt-4 { margin-top: 20px; }
+.mr-2 { margin-right: 8px; }
+
+/* Attendance Legend & Date Strip Styles */
+.webforms-attendance-strip-section {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+.webforms-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #495057;
+  margin-top: 0;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.attendance-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6c757d;
+}
+.attendance-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.attendance-legend .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-full { background-color: #2e7d32; }
+.dot-half { background-color: #f9a825; }
+.dot-off { background-color: #c62828; }
+
+.date-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.date-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 45px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.date-pill.full-day { background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%); }
+.date-pill.half-day { background: linear-gradient(135deg, #f9a825 0%, #fbc02d 100%); color: #1a1a1a; }
+.date-pill.off-day { background: linear-gradient(135deg, #c62828 0%, #d32f2f 100%); }
+.mb-4 { margin-bottom: 20px; }

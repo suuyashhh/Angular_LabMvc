@@ -206,6 +206,61 @@ clearDairyCredentialsCookie(): void {
   document.cookie = 'dairyCredentials=; path=/; max-age=0';
 }
 
+/** Fabrication Credentials */
+isFabLoggedIn(): boolean {
+  if (!isPlatformBrowser(this.platformId)) return false;
+  const fab = this.getFabCredentialsFromCookie();
+  return !!fab && typeof fab === 'object';
+}
+
+setFabCredentialsCookie(value: any, days: number = 7): void {
+  try {
+    const json = JSON.stringify(value);
+    const encoded = encodeURIComponent(json);
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `fabCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+  } catch (e) {
+    console.error('Failed to set fab cookie', e);
+  }
+}
+
+getFabCredentialsFromCookie(): any | null {
+  try {
+    const cookies = document.cookie ? document.cookie.split('; ') : [];
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=');
+      if (name === 'fabCredentials' && value) {
+        const decoded = decodeURIComponent(value);
+        return JSON.parse(decoded);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to read fab cookie', e);
+  }
+  return null;
+}
+
+fabLogout(): void {
+  try {
+    this.clearFabCredentialsCookie();
+    try {
+      this.toaster.success('Logged out from Fabrication Portal', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+    this.router.navigate(['/fab/login']);
+  } catch (err) {
+    console.error('fabLogout error', err);
+    this.router.navigate(['/fab/login']);
+  }
+}
+
+clearFabCredentialsCookie(): void {
+  document.cookie = 'fabCredentials=; path=/; max-age=0';
+}
+
+
 
 
 

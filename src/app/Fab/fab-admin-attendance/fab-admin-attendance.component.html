@@ -1,0 +1,150 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Daily Attendance Management</h2>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-nav">
+    <button (click)="activeTab = 'registry'; fetchDataForDate()" [class.active]="activeTab === 'registry'" class="tab-btn">
+      <i class="fas fa-calendar-plus mr-2"></i>Daily Registry
+    </button>
+    <button (click)="activeTab = 'history'; fetchHistory()" [class.active]="activeTab === 'history'" class="tab-btn">
+      <i class="fas fa-history mr-2"></i>Attendance Log
+    </button>
+  </div>
+  
+  <div class="tab-content">
+    <!-- REGISTRY TAB -->
+    <div *ngIf="activeTab === 'registry'" class="registry-pane">
+      <div class="control-bar glass-card">
+        <div class="date-selector">
+          <label for="regDate">Select Date:</label>
+          <input
+            type="date"
+            id="regDate"
+            [(ngModel)]="selectedDate"
+            (change)="fetchDataForDate()"
+            class="form-control"
+          />
+        </div>
+        <div class="action-buttons">
+          <button (click)="autoMarkOffDays()" class="btn-secondary">
+            <i class="fas fa-magic mr-2"></i>Auto Mark Off Days
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card table-card mt-6">
+        <div class="card-header">
+          <h3>
+            Attendance for {{ selectedDate | date:'dd-MMM-yyyy' }}
+            <span class="status-badge" [ngClass]="isSavedAttendance ? 'saved' : 'pending'">
+              {{ isSavedAttendance ? 'Saved' : 'Not Marked Yet' }}
+            </span>
+          </h3>
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Helper ID</th>
+                <th>Helper Name</th>
+                <th>Status Choice</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of attendanceList">
+                <td>#{{ item.user_id }}</td>
+                <td><strong>{{ item.user_name }}</strong></td>
+                <td>
+                  <div class="radio-group">
+                    <label class="radio-container full-day">
+                      <input type="radio" [name]="'status_' + item.user_id" value="Full Day" [(ngModel)]="item.user_day">
+                      <span class="custom-radio"></span> Full Day
+                    </label>
+                    <label class="radio-container half-day">
+                      <input type="radio" [name]="'status_' + item.user_id" value="Half Day" [(ngModel)]="item.user_day">
+                      <span class="custom-radio"></span> Half Day
+                    </label>
+                    <label class="radio-container off-day">
+                      <input type="radio" [name]="'status_' + item.user_id" value="Off Day" [(ngModel)]="item.user_day">
+                      <span class="custom-radio"></span> Off Day
+                    </label>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="attendanceList.length === 0">
+                <td colspan="3" class="no-data">No helpers found to mark attendance.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="form-actions mt-6" *ngIf="attendanceList.length > 0">
+          <button (click)="saveAttendance()" class="btn-submit">
+            <i class="fas fa-save mr-2"></i>Save Attendance
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div *ngIf="activeTab === 'history'" class="history-pane">
+      <div class="control-bar glass-card">
+        <div class="range-inputs">
+          <div class="date-selector">
+            <label for="from">From:</label>
+            <input type="date" id="from" [(ngModel)]="historyFrom" class="form-control" />
+          </div>
+          <div class="date-selector">
+            <label for="to">To:</label>
+            <input type="date" id="to" [(ngModel)]="historyTo" class="form-control" />
+          </div>
+          <button (click)="fetchHistory()" class="btn-submit search-btn">
+            <i class="fas fa-search mr-2"></i>Search Logs
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card table-card mt-6">
+        <div class="card-header">
+          <h3>Attendance logs from {{ historyFrom | date:'dd-MMM-yyyy' }} to {{ historyTo | date:'dd-MMM-yyyy' }}</h3>
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Helper Name</th>
+                <th>Duty Status</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of historyRecords">
+                <td>{{ record.date | date:'dd-MMM-yyyy' }}</td>
+                <td><strong>{{ record.user_name }}</strong></td>
+                <td>
+                  <span class="attendance-badge" [ngClass]="record.user_day.toLowerCase().replace(' ', '-')">
+                    {{ record.user_day }}
+                  </span>
+                </td>
+                <td class="action-cell">
+                  <button (click)="deleteAttendanceRecord(record.h_id)" class="btn-icon btn-delete" title="Delete Log">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="historyRecords.length === 0">
+                <td colspan="4" class="no-data">No attendance records found for this period. Click Search Logs.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

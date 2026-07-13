@@ -1,0 +1,47 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Monthly Financial Summary</h2>
+  </div>
+
+  <div class="summary-wrapper glass-card">
+    <div class="card-header border-flex">
+      <h3>Monthly Profit & Expense Sheet</h3>
+      <button (click)="fetchMonthlySummary()" class="btn-refresh" title="Reload Records">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Month & Year</th>
+            <th>Total billing (Revenue)</th>
+            <th>Total Expense (Ops + Salary + Advance)</th>
+            <th>Net Profit / Loss</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of records">
+            <td>
+              <span class="month-indicator"><i class="fas fa-calendar-alt mr-2 text-blue-500"></i></span>
+              <strong>{{ r.monthName }} {{ r.yearValue }}</strong>
+            </td>
+            <td class="revenue-val">₹{{ r.totalBill | number:'1.2-2' }}</td>
+            <td class="expense-val">₹{{ r.totalExpense | number:'1.2-2' }}</td>
+            <td [ngClass]="r.profit >= 0 ? 'profit-val' : 'loss-val'">
+              <span class="trend-icon">
+                <i [ngClass]="r.profit >= 0 ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+              </span>
+              ₹{{ r.profit | number:'1.2-2' }}
+            </td>
+          </tr>
+          <tr *ngIf="records.length === 0">
+            <td colspan="4" class="no-data">No monthly financial records available.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

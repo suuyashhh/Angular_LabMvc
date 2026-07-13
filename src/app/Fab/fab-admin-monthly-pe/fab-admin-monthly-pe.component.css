@@ -1,0 +1,158 @@
+.page-container {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 0%, rgb(18, 30, 54) 0%, rgb(9, 15, 26) 100%);
+  color: #f8fafc;
+  font-family: 'Outfit', sans-serif;
+  padding: 40px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.btn-back {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateX(-2px);
+}
+
+.page-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 35px;
+}
+
+.card-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 12px;
+}
+
+.card-header.border-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #f1f5f9;
+}
+
+.btn-refresh {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-refresh:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* Premium Table Styling */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.premium-table th {
+  padding: 16px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.premium-table td {
+  padding: 16px 20px;
+  font-size: 15px;
+  color: #cbd5e1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.premium-table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.month-indicator {
+  display: inline-block;
+}
+
+.revenue-val {
+  color: #34d399 !important;
+  font-weight: 600;
+}
+
+.expense-val {
+  color: #f87171 !important;
+  font-weight: 600;
+}
+
+.profit-val {
+  color: #10b981 !important;
+  font-weight: 700;
+}
+
+.loss-val {
+  color: #ef4444 !important;
+  font-weight: 700;
+}
+
+.trend-icon {
+  margin-right: 6px;
+  font-size: 11px;
+}
+
+.no-data {
+  text-align: center;
+  color: #64748b;
+  padding: 40px !important;
+}
+
+.mr-2 { margin-right: 8px; }

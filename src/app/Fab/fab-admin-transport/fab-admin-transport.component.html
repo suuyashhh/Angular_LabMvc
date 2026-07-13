@@ -1,0 +1,113 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Driver Transport Logistics</h2>
+  </div>
+
+  <div class="content-grid">
+    <!-- Form Card -->
+    <div class="glass-card form-card">
+      <div class="card-header">
+        <h3>{{ isEditMode ? 'Modify Transport Trip Log' : 'Record New Transport Trip' }}</h3>
+      </div>
+      <form (ngSubmit)="onSubmit()" #tripForm="ngForm" class="cyber-form">
+        <div class="form-group">
+          <label for="name">Route details / Location / Driver Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="tripObj.exp_name"
+            placeholder="e.g. Pune to Mumbai (Tata Ace - Driver Ram)"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="price">Trip Freight Cost / Driver Fee (₹)</label>
+          <input
+            type="number"
+            id="price"
+            name="price"
+            [(ngModel)]="tripObj.exp_price"
+            placeholder="e.g. 4500"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="date">Trip Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            [(ngModel)]="tripObj.date"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="!tripForm.valid">
+            {{ isEditMode ? 'Update Log' : 'Log Trip' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="glass-card table-card">
+      <div class="card-header border-flex">
+        <h3>Transportation Logs</h3>
+        
+        <div class="search-filters">
+          <div class="date-selector">
+            <label for="from">From:</label>
+            <input type="date" id="from" [(ngModel)]="searchFrom" class="form-control sm" />
+          </div>
+          <div class="date-selector">
+            <label for="to">To:</label>
+            <input type="date" id="to" [(ngModel)]="searchTo" class="form-control sm" />
+          </div>
+          <button (click)="fetchTrips()" class="btn-submit sm-btn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Location & Route Details</th>
+              <th>Trip Freight Cost</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of trips">
+              <td>{{ t.date | date:'dd-MMM-yyyy' }}</td>
+              <td><strong>{{ t.exp_name }}</strong></td>
+              <td class="price-cell">₹{{ t.exp_price | number }}</td>
+              <td class="action-cell">
+                <button (click)="editTrip(t)" class="btn-icon btn-edit" title="Edit Record">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button (click)="deleteTrip(t.exp_id)" class="btn-icon btn-delete" title="Delete Record">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="trips.length === 0">
+              <td colspan="4" class="no-data">No transport logs found for this date range.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

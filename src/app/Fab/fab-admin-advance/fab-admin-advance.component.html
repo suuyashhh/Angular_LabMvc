@@ -1,0 +1,107 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Helper Advance Payments</h2>
+  </div>
+
+  <div class="content-grid">
+    <!-- Form Card -->
+    <div class="glass-card form-card">
+      <div class="card-header">
+        <h3>{{ isEditMode ? 'Modify Advance Log' : 'Issue Helper Advance' }}</h3>
+      </div>
+      <form (ngSubmit)="onSubmit()" #advanceForm="ngForm" class="cyber-form">
+        <div class="form-group">
+          <label for="helper">Select Helper</label>
+          <select id="helper" name="helper" [(ngModel)]="advanceObj.user_id" class="form-control" required>
+            <option [ngValue]="null" disabled selected>-- Select a Helper --</option>
+            <option *ngFor="let h of helpers" [value]="h.user_id">{{ h.user_name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="amount">Advance Amount (₹)</label>
+          <input
+            type="number"
+            id="amount"
+            name="amount"
+            [(ngModel)]="advanceObj.user_advance"
+            placeholder="e.g. 1000"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="date">Disbursal Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            [(ngModel)]="advanceObj.date"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="desc">Remarks / Description</label>
+          <input
+            type="text"
+            id="desc"
+            name="desc"
+            [(ngModel)]="advanceObj.exp_name"
+            placeholder="e.g. Advance Payment, Loan, etc."
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="!advanceForm.valid">
+            {{ isEditMode ? 'Update Record' : 'Log Advance' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="glass-card table-card">
+      <div class="card-header">
+        <h3>Advance Payments Log</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Helper Name</th>
+              <th>Advance Amount</th>
+              <th>Remarks</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let adv of advances">
+              <td>{{ adv.date | date:'dd-MMM-yyyy' }}</td>
+              <td><strong>{{ adv.user_name }}</strong></td>
+              <td>₹{{ adv.user_advance | number }}</td>
+              <td><span class="remarks-tag">{{ adv.exp_name }}</span></td>
+              <td class="action-cell">
+                <button (click)="editAdvance(adv)" class="btn-icon btn-edit" title="Edit Record">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button (click)="deleteAdvance(adv.exp_id)" class="btn-icon btn-delete" title="Delete Record">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="advances.length === 0">
+              <td colspan="5" class="no-data">No advance payments recorded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

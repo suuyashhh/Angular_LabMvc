@@ -1,0 +1,51 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Custom Period Analysis</h2>
+  </div>
+
+  <div class="control-bar glass-card">
+    <div class="range-inputs">
+      <div class="date-selector">
+        <label for="from">Start Date:</label>
+        <input type="date" id="from" [(ngModel)]="fromDate" class="form-control" />
+      </div>
+      <div class="date-selector">
+        <label for="to">End Date:</label>
+        <input type="date" id="to" [(ngModel)]="toDate" class="form-control" />
+      </div>
+      <button (click)="fetchSummary()" class="btn-submit search-btn">
+        <i class="fas fa-calculator mr-2"></i>Evaluate Period
+      </button>
+    </div>
+  </div>
+
+  <!-- Cards View -->
+  <div *ngIf="summary" class="metrics-grid mt-6">
+    <div class="metric-card glass-card revenue">
+      <div class="card-icon"><i class="fas fa-arrow-trend-up"></i></div>
+      <div class="card-data">
+        <p>Total Revenue (Billing)</p>
+        <h3>₹{{ summary.totalBill | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+
+    <div class="metric-card glass-card expenses">
+      <div class="card-icon"><i class="fas fa-arrow-trend-down"></i></div>
+      <div class="card-data">
+        <p>Total Expenses</p>
+        <h3>₹{{ summary.totalExpense | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+
+    <div class="metric-card glass-card profit" [ngClass]="summary.profit >= 0 ? 'surplus' : 'deficit'">
+      <div class="card-icon">
+        <i [ngClass]="summary.profit >= 0 ? 'fas fa-hand-holding-dollar' : 'fas fa-triangle-exclamation'"></i>
+      </div>
+      <div class="card-data">
+        <p>Net Balance</p>
+        <h3>₹{{ summary.profit | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+  </div>
+</div>

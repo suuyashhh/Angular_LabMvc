@@ -1,0 +1,116 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Helper Master Configuration</h2>
+  </div>
+
+  <div class="content-grid">
+    <!-- Form Card -->
+    <div class="glass-card form-card">
+      <div class="card-header">
+        <h3>{{ isEditMode ? 'Edit Helper Details' : 'Register New Helper' }}</h3>
+      </div>
+      <form (ngSubmit)="onSubmit()" #helperForm="ngForm" class="cyber-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="helperObj.user_name"
+            placeholder="John Doe"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contact">Contact Number</label>
+          <input
+            type="text"
+            id="contact"
+            name="contact"
+            [(ngModel)]="helperObj.user_contact"
+            placeholder="9876543210"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="pass">Login Password</label>
+          <input
+            type="password"
+            id="pass"
+            name="pass"
+            [(ngModel)]="helperObj.user_pass"
+            placeholder="••••••••"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="salary">Baseline Daily Salary (₹)</label>
+          <input
+            type="number"
+            id="salary"
+            name="salary"
+            [(ngModel)]="helperObj.user_salary"
+            placeholder="e.g. 500"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="!helperForm.valid">
+            {{ isEditMode ? 'Update Helper' : 'Register Helper' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="glass-card table-card">
+      <div class="card-header">
+        <h3>Registered Helpers</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Password</th>
+              <th>Daily Salary</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of helpers">
+              <td>#{{ h.user_id }}</td>
+              <td><strong>{{ h.user_name }}</strong></td>
+              <td>{{ h.user_contact }}</td>
+              <td><code>{{ h.user_pass }}</code></td>
+              <td>₹{{ h.user_salary | number }}</td>
+              <td class="action-cell">
+                <button (click)="editHelper(h)" class="btn-icon btn-edit" title="Edit Helper">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button (click)="deleteHelper(h.user_id)" class="btn-icon btn-delete" title="Delete Helper">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="helpers.length === 0">
+              <td colspan="6" class="no-data">No helpers registered yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+<div class="page-container">
+  <div class="page-header">
+    <a routerLink="/fab/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <h2>Mark Daily Attendance</h2>
+  </div>
+
+  <div class="content-grid">
+    <!-- Today's Punch Card -->
+    <div class="glass-card punch-card">
+      <div class="card-header">
+        <h3><i class="fas fa-clock mr-2 text-blue-500"></i>Punch Register</h3>
+      </div>
+      
+      <div *ngIf="!alreadyMarked" class="punch-form">
+        <p class="punch-info">Select your duty status for today, <strong>{{ todayDateStr | date:'dd-MMM-yyyy' }}</strong>:</p>
+        <div class="form-group">
+          <label for="status">Duty Status</label>
+          <select id="status" [(ngModel)]="selectedStatus" class="form-control">
+            <option value="Full Day">Full Day (Standard Shift)</option>
+            <option value="Half Day">Half Day (Half Shift)</option>
+            <option value="Off Day">Off Day / Absent</option>
+          </select>
+        </div>
+        <button (click)="submitAttendance()" class="btn-submit btn-block">
+          <i class="fas fa-fingerprint mr-2"></i>Submit Attendance
+        </button>
+      </div>
+
+      <div *ngIf="alreadyMarked" class="punch-success">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <h4>Attendance Already Recorded!</h4>
+        <p>You have submitted attendance for today:</p>
+        <div class="status-pill" [ngClass]="(todayRecord?.user_day || 'Off Day').toLowerCase().replace(' ', '-')">
+          {{ todayRecord?.user_day || 'Off Day' }}
+        </div>
+        <span class="timestamp">Date: {{ todayDateStr | date:'dd-MMM-yyyy' }}</span>
+      </div>
+    </div>
+
+    <!-- Monthly Summary Card -->
+    <div class="glass-card calendar-card">
+      <div class="card-header border-flex">
+        <h3><i class="fas fa-calendar-alt mr-2 text-emerald-500"></i>Attendance Calendar</h3>
+        
+        <div class="calendar-filters">
+          <select [(ngModel)]="selectedMonth" (change)="fetchMonthlyLogs()" class="form-control sm">
+            <option *ngFor="let m of monthsList" [value]="m.value">{{ m.name }}</option>
+          </select>
+          <select [(ngModel)]="selectedYear" (change)="fetchMonthlyLogs()" class="form-control sm">
+            <option *ngFor="let y of yearsList" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Day of Week</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of attendanceLogs">
+              <td>{{ log.date | date:'dd-MMM-yyyy' }}</td>
+              <td>{{ log.date | date:'EEEE' }}</td>
+              <td>
+                <span class="attendance-badge" [ngClass]="log.user_day.toLowerCase().replace(' ', '-')">
+                  {{ log.user_day }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="attendanceLogs.length === 0">
+              <td colspan="3" class="no-data">No attendance records found for the selected month.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
