@@ -67,6 +67,16 @@ export const FAB_ROUTES : Routes = [
         loadComponent: () => import('./fab-admin-salary-history/fab-admin-salary-history.component').then(m => m.FabAdminSalaryHistoryComponent)
     },
     {
+        path: 'history',
+        canActivate: [fabAuthGuard],
+        loadComponent: () => import('./fab-admin-history-all/fab-admin-history-all.component').then(m => m.FabAdminHistoryAllComponent)
+    },
+    {
+        path: 'helper-history',
+        canActivate: [fabAuthGuard],
+        loadComponent: () => import('./fab-admin-helper-history/fab-admin-helper-history.component').then(m => m.FabAdminHelperHistoryComponent)
+    },
+    {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

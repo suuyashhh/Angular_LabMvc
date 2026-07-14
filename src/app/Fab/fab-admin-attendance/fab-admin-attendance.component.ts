@@ -66,7 +66,7 @@ export class FabAdminAttendanceComponent implements OnInit {
                 h_id: null,
                 user_id: h.user_id,
                 user_name: h.user_name,
-                user_day: 'Full Day', // default for marking new
+                user_day: 'Off Day', // default for marking new
                 exists: false
               }));
             }

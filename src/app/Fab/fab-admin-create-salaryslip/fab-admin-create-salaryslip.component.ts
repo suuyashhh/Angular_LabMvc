@@ -62,12 +62,14 @@ export class FabAdminCreateSalaryslipComponent implements OnInit {
       next: (attList) => {
         this.dateWiseAttendance = (attList || []).map(item => {
           let cssClass = 'off-day';
-          const day = item.user_day || '';
-          if (day.trim().toLowerCase() === 'full day') cssClass = 'full-day';
-          else if (day.trim().toLowerCase() === 'half day') cssClass = 'half-day';
-          else if (day.trim().toLowerCase() === 'off day') cssClass = 'off-day';
+          const day = (item.user_day || item.User_day || '').toString().trim().toLowerCase();
+          if (day === 'full day') cssClass = 'full-day';
+          else if (day === 'half day') cssClass = 'half-day';
+          else if (day === 'off day') cssClass = 'off-day';
           return {
             ...item,
+            date: item.date || item.Date,
+            user_day: item.user_day || item.User_day,
             cssClass
           };
         });

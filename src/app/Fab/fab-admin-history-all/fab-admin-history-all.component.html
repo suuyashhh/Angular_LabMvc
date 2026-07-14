@@ -1,0 +1,86 @@
+<div class="page-container bg-slate-50 min-h-screen">
+  <!-- Page Header -->
+  <div class="flex items-center gap-4 bg-white p-4 border-b border-slate-200 sticky top-0 z-40">
+    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center shadow-inner flex-shrink-0">
+      <img src="assets/img/Fabrication/SalaryHistory.png" alt="History Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+    </div>
+    <div class="min-w-0">
+      <h1 class="text-xl sm:text-2xl font-semibold text-slate-800 truncate">History</h1>
+      <p class="text-xs sm:text-sm text-slate-500 -mt-0.5 truncate">Track all business revenues, workshop expenses, transport entries, and payslips</p>
+    </div>
+  </div>
+
+  <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+    <!-- Search Bar -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+      <div class="relative w-full">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+          <i class="fas fa-search text-base"></i>
+        </span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="filterAndGroupHistory()"
+          placeholder="Search by description, record type, names, or values..."
+          class="block w-full pl-10 pr-4 py-2.5 text-sm sm:text-base text-slate-900 placeholder-slate-400 bg-slate-50/50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        />
+      </div>
+    </div>
+
+    <!-- History Groups -->
+    <div class="space-y-8">
+      <div *ngFor="let group of filteredGroups" class="space-y-4">
+        <!-- Month Group Header -->
+        <div class="flex items-center gap-3 py-2 border-b border-slate-200/80">
+          <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-700 uppercase tracking-wide">{{ group.key }}</h3>
+          <span class="text-xs sm:text-sm text-slate-400">({{ group.value.length }} records)</span>
+        </div>
+
+        <!-- Group Items -->
+        <div class="space-y-3">
+          <div
+            *ngFor="let item of group.value"
+            class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-row items-center justify-between gap-4"
+          >
+            <!-- Left content: Icon and Text info -->
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
+                <img [src]="getItemImage(item.record_type)" [alt]="item.record_type" class="w-8 h-8 object-contain" />
+              </div>
+              <div class="min-w-0">
+                <h5 class="text-sm sm:text-base font-semibold text-slate-800 truncate">{{ item.record_name }}</h5>
+                <div class="flex flex-wrap items-center gap-2 mt-1">
+                  <span class="text-xs text-slate-400">{{ item.record_date | date:'dd-MMM-yyyy' }}</span>
+                  <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border {{ getBadgeClass(item.record_type) }}">
+                    {{ getRecordTypeLabel(item.record_type) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right content: Price -->
+            <div class="flex-shrink-0 text-right">
+              <h4
+                class="text-base sm:text-lg font-bold tracking-tight"
+                [ngClass]="item.record_type === 'FabProfit' ? 'text-emerald-600' : 'text-rose-600'"
+              >
+                {{ item.record_type === 'FabProfit' ? '+' : '-' }} ₹{{ item.price | number:'1.0-0' }}
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Data Fallback -->
+      <div *ngIf="filteredGroups.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+          <i class="fas fa-history text-2xl"></i>
+        </div>
+        <h3 class="text-base sm:text-lg font-semibold text-slate-700">No History Logs Found</h3>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 px-4">There are no records matching your query or date filters.</p>
+      </div>
+    </div>
+  </div>
+</div>

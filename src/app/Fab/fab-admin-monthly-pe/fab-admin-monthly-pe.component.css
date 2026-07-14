@@ -1,16 +1,9 @@
 .page-container {
   min-height: 100vh;
-  background: radial-gradient(circle at 50% 0%, rgb(18, 30, 54) 0%, rgb(9, 15, 26) 100%);
-  color: #f8fafc;
+  background-color: #f8fafc;
+  color: #1e293b;
   font-family: 'Outfit', sans-serif;
-  padding: 40px;
-}
-
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 30px;
+  padding: 0;
 }
 
 .btn-back {
