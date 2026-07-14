@@ -1,0 +1,109 @@
+.webforms-page-container {
+  min-height: 100vh;
+  background-color: #f4f6f9;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  color: #333;
+}
+
+/* WebForms top bar matching the dark slate header bar */
+.webforms-top-bar {
+  background-color: #343a40;
+  color: #fff;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.btn-logout-webforms {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-logout-webforms:hover {
+  background-color: #0056b3;
+}
+
+/* WebForms Main Content */
+.webforms-main-content {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Grid layout with 4 columns matching the screenshot */
+.webforms-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+/* Card design matching legacy WebForms cards */
+.webforms-card {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 140px;
+}
+
+.webforms-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.06);
+  border-color: #007bff;
+}
+
+.webforms-card img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  text-align: center;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 992px) {
+  .webforms-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .webforms-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .webforms-grid {
+    grid-template-columns: 1fr;
+  }
+}
