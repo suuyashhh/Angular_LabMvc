@@ -1,0 +1,156 @@
+<div class="webforms-inner-container">
+  <!-- Page Header -->
+  <div class="flex items-center gap-4 bg-white p-4 border-b border-slate-200 sticky top-0 z-40 no-print">
+    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center shadow-inner flex-shrink-0">
+      <img src="assets/img/Fabrication/SalaryHistory.png" alt="Salary History Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+    </div>
+    <div class="min-w-0">
+      <h1 class="text-xl sm:text-2xl font-semibold text-slate-800 truncate">{{ isAdmin ? 'Salary Slips Register' : 'My Salary Slips' }}</h1>
+      <p class="text-xs sm:text-sm text-slate-500 -mt-0.5 truncate">Track salary disbursement records</p>
+    </div>
+  </div>
+
+  <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+    <!-- Search Filters (Admin Only) -->
+    <div *ngIf="isAdmin" class="webforms-inner-card no-print mb-4">
+      <div class="webforms-search-bar">
+        <div class="webforms-form-group">
+          <label for="from">From Date:</label>
+          <input type="date" id="from" [(ngModel)]="searchFrom" class="webforms-form-control" />
+        </div>
+        <div class="webforms-form-group">
+          <label for="to">To Date:</label>
+          <input type="date" id="to" [(ngModel)]="searchTo" class="webforms-form-control" />
+        </div>
+        <button (click)="fetchSalarySlips()" class="webforms-btn-search">
+          <i class="fas fa-search mr-2"></i> Search History
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="webforms-inner-card no-print">
+      <div class="webforms-card-header">
+        <h3>Payslips History Archive</h3>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="webforms-table">
+          <thead>
+            <tr>
+              <th>Disbursal Date</th>
+              <th>Helper Name</th>
+              <th>Payroll Period</th>
+              <th style="text-align: right;">Net Salary Paid</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let slip of slips">
+              <td>{{ slip.slip_day | date:'dd-MMM-yyyy' }}</td>
+              <td><strong>{{ slip.user_name }}</strong></td>
+              <td>{{ slip.from_date | date:'dd-MMM' }} to {{ slip.tO_date | date:'dd-MMM-yyyy' }}</td>
+              <td style="text-align: right; font-weight: 700; color: #28a745;">₹{{ slip.grand_total | number:'1.2-2' }}</td>
+              <td style="text-align: center;">
+                <button (click)="openSlipDetails(slip)" class="webforms-action-btn" title="View Payslip details">
+                  <i class="fas fa-file-invoice"></i> View
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="slips.length === 0">
+              <td colspan="5" style="text-align: center; color: #6c757d; padding: 20px;">No salary slips found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop & Window -->
+  <div *ngIf="showModal && selectedSlip" class="modal-backdrop-custom">
+    <div class="modal-window-custom">
+      <div class="modal-header-custom no-print">
+        <h3>Salary Slip Detail</h3>
+        <div class="modal-actions-custom">
+          <button (click)="printPayslip()" class="btn-print-custom" title="Print Slip">
+            <i class="fas fa-print mr-2"></i>Print
+          </button>
+          <button (click)="closeModal()" class="btn-close-custom" title="Close Details">&times;</button>
+        </div>
+      </div>
+
+      <!-- PRINTABLE SLIP CONTENT -->
+      <div class="printable-slip">
+        <div class="slip-title">
+          <h2>FABRICATION WORKSHOP</h2>
+          <p>Helper Wage & Attendance Statement</p>
+        </div>
+
+        <div class="slip-meta">
+          <div class="meta-col">
+            <p><span>Helper Name:</span> <strong>{{ selectedSlip.user_name }}</strong></p>
+            <p><span>Helper ID:</span> #{{ selectedSlip.user_id }}</p>
+          </div>
+          <div class="meta-col text-right">
+            <p><span>Pay Period:</span> {{ selectedSlip.from_date | date:'dd-MMM-yyyy' }} to {{ selectedSlip.tO_date | date:'dd-MMM-yyyy' }}</p>
+            <p><span>Issue Date:</span> {{ selectedSlip.slip_day | date:'dd-MMM-yyyy' }}</p>
+          </div>
+        </div>
+
+        <table class="slip-table">
+          <thead>
+            <tr>
+              <th>Item Description</th>
+              <th style="text-align: center;">Count / Rate</th>
+              <th style="text-align: right;">Earnings</th>
+              <th style="text-align: right;">Deductions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Full Days Attendance</td>
+              <td style="text-align: center;">{{ selectedSlip.full_day }} days &#64; ₹{{ selectedSlip.full_salary | number }}</td>
+              <td style="text-align: right;">₹{{ selectedSlip.full_day_Total | number:'1.2-2' }}</td>
+              <td style="text-align: right;">-</td>
+            </tr>
+            <tr>
+              <td>Half Days Attendance</td>
+              <td style="text-align: center;">{{ selectedSlip.half_day }} days &#64; ₹{{ selectedSlip.half_salary | number }}</td>
+              <td style="text-align: right;">₹{{ selectedSlip.half_day_total | number:'1.2-2' }}</td>
+              <td style="text-align: right;">-</td>
+            </tr>
+            <tr>
+              <td>Off Days Attendance</td>
+              <td style="text-align: center;">{{ selectedSlip.off_day }} days</td>
+              <td style="text-align: right;">-</td>
+              <td style="text-align: right;">-</td>
+            </tr>
+            <tr class="deduction-row">
+              <td>Less: Disbursed Advance Balance</td>
+              <td style="text-align: center;">-</td>
+              <td style="text-align: right;">-</td>
+              <td style="text-align: right; color: #dc3545;">- ₹{{ selectedSlip.advance_total | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="2"><strong>Net Payable Amount</strong></td>
+              <td colspan="2" style="text-align: right; color: #28a745;">
+                <strong>₹{{ selectedSlip.grand_total | number:'1.2-2' }}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="slip-signatures">
+          <div class="sig-box">
+            <div class="sig-line"></div>
+            <p>Helper Signature</p>
+          </div>
+          <div class="sig-box">
+            <div class="sig-line"></div>
+            <p>Authorized Administrator</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

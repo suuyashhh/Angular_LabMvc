@@ -1,0 +1,121 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="flex items-center gap-4 bg-white p-4 border-b border-slate-200 sticky top-0 z-40">
+    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center shadow-inner flex-shrink-0">
+      <img src="assets/img/Fabrication/Expanse.png" alt="Expense Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+    </div>
+    <div class="min-w-0">
+      <h1 class="text-xl sm:text-2xl font-semibold text-slate-800 truncate">General Workshop Expenses</h1>
+      <p class="text-xs sm:text-sm text-slate-500 -mt-0.5 truncate">Track operation and material expenses</p>
+    </div>
+  </div>
+
+  <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+    <div class="content-grid">
+      <!-- Form Card -->
+      <div class="glass-card form-card">
+        <div class="card-header">
+          <h3>{{ isEditMode ? 'Modify Expense Log' : 'Record New Expense' }}</h3>
+        </div>
+        <form (ngSubmit)="onSubmit()" #expenseForm="ngForm" class="cyber-form">
+          <div class="form-group">
+            <label for="date">Expense Date</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              [(ngModel)]="expenseObj.date"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="name">Expense Head / Description</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="expenseObj.exp_name"
+              placeholder="e.g. Welding Rods, Utility Bill"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="amount">Amount Incurred (₹)</label>
+            <input
+              type="number"
+              id="amount"
+              name="amount"
+              [(ngModel)]="expenseObj.exp_price"
+              placeholder="e.g. 1500"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-submit" [disabled]="!expenseForm.valid">
+              {{ isEditMode ? 'Update Record' : 'Record Expense' }}
+            </button>
+            <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Table Card -->
+      <div class="glass-card table-card">
+        <div class="card-header border-flex">
+          <h3>Expense Log Register</h3>
+          
+          <div class="search-filters">
+            <div class="date-selector">
+              <label for="from">From:</label>
+              <input type="date" id="from" [(ngModel)]="searchFrom" class="form-control sm" />
+            </div>
+            <div class="date-selector">
+              <label for="to">To:</label>
+              <input type="date" id="to" [(ngModel)]="searchTo" class="form-control sm" />
+            </div>
+            <button (click)="fetchExpenses()" class="btn-submit sm-btn">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Expense Head / Title</th>
+                <th style="text-align: right;">Amount</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let exp of expenses">
+                <td>{{ exp.date | date:'dd-MMM-yyyy' }}</td>
+                <td><strong>{{ exp.exp_name }}</strong></td>
+                <td style="text-align: right; font-weight: 600; color: #f87171;">₹{{ exp.exp_price | number }}</td>
+                <td class="action-cell">
+                  <button (click)="editExpense(exp)" class="btn-icon btn-edit" title="Edit Record">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button (click)="deleteExpense(exp.exp_id)" class="btn-icon btn-delete" title="Delete Record">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="expenses.length === 0">
+                <td colspan="4" class="no-data">No expense records found for this date range.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
