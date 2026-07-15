@@ -409,3 +409,56 @@
 
 .mb-4 { margin-bottom: 20px; }
 .mr-2 { margin-right: 8px; }
+
+/* Responsive Design / Mobile Styles */
+@media (max-width: 576px) {
+  /* page header mobile layout */
+  .flex.items-center.justify-between.bg-white.p-4.border-b {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+
+  .flex.items-center.justify-between.bg-white.p-4.border-b > .flex.items-center.gap-4 {
+    align-items: center !important;
+  }
+
+  /* webforms historical search bar layout */
+  .webforms-search-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  
+  .webforms-form-group {
+    width: 100% !important;
+  }
+  
+  .webforms-form-control {
+    width: 100% !important;
+  }
+
+  /* modal and slip styling on mobile */
+  .modal-window-custom {
+    width: 95% !important;
+    margin: 10px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  .printable-slip {
+    padding: 20px !important;
+  }
+
+  .slip-meta {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .slip-signatures {
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+    margin-top: 30px !important;
+  }
+}

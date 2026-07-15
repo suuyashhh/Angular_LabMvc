@@ -93,17 +93,57 @@
 @media (max-width: 992px) {
   .webforms-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .webforms-card {
+    padding: 16px 10px;
+    min-height: 110px;
+  }
+  .webforms-card img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-size: 12px;
   }
 }
 
 @media (max-width: 768px) {
   .webforms-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .webforms-card {
+    padding: 12px 6px;
+    min-height: 90px;
+  }
+  .webforms-card img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-size: 11px;
   }
 }
 
 @media (max-width: 480px) {
   .webforms-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .webforms-card {
+    padding: 8px 4px;
+    min-height: 75px;
+  }
+  .webforms-card img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 6px;
+  }
+  .card-title {
+    font-size: 9px;
+    line-height: 1.1;
   }
 }

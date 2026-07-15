@@ -27,6 +27,9 @@ export class FabAdminProfitComponent implements OnInit {
     date: new Date().toISOString().substring(0, 10)
   };
   isEditMode = false;
+  isDrawerOpen = false;
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -39,11 +42,33 @@ export class FabAdminProfitComponent implements OnInit {
     this.fetchProfits();
   }
 
+  openAddDrawer() {
+    this.isEditMode = false;
+    this.resetForm();
+    this.isDrawerOpen = true;
+  }
+
+  openEditDrawer(record: any) {
+    this.isEditMode = true;
+    this.profitObj = {
+      pro_id: record.pro_id,
+      pro_name: record.pro_name,
+      pro_price: record.pro_price,
+      date: record.date ? record.date.split('T')[0] : ''
+    };
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
+  }
+
   fetchProfits() {
     this.loader.show();
     this.http.get<any[]>(`${this.api.baseurl}Fab/Profits/Range?fromDate=${this.searchFrom}&toDate=${this.searchTo}`).subscribe({
       next: (res) => {
-        this.profits = res || [];
+        const data = res || [];
+        this.profits = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         this.loader.hide();
       },
       error: (err) => {
@@ -67,6 +92,7 @@ export class FabAdminProfitComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Billing record updated successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchProfits();
           } else {
             this.toastr.error('Failed to update billing record', 'Error');
@@ -85,6 +111,7 @@ export class FabAdminProfitComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Billing record logged successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchProfits();
           } else {
             this.toastr.error('Failed to record bill', 'Error');
@@ -101,20 +128,20 @@ export class FabAdminProfitComponent implements OnInit {
   }
 
   editProfit(record: any) {
-    this.isEditMode = true;
-    this.profitObj = {
-      pro_id: record.pro_id,
-      pro_name: record.pro_name,
-      pro_price: record.pro_price,
-      date: new Date(record.date).toISOString().substring(0, 10)
-    };
+    this.openEditDrawer(record);
   }
 
   deleteProfit(profitId: number) {
-    if (confirm('Are you sure you want to delete this billing profit log?')) {
+    this.deleteItemId = profitId;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
       this.loader.show();
-      this.http.delete(`${this.api.baseurl}Fab/Profit/${profitId}`).subscribe({
+      this.http.delete(`${this.api.baseurl}Fab/Profit/${this.deleteItemId}`).subscribe({
         next: (res: any) => {
+          this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Billing record deleted', 'Success');
             this.fetchProfits();
@@ -124,12 +151,18 @@ export class FabAdminProfitComponent implements OnInit {
           }
         },
         error: (err) => {
+          this.closeDeleteModal();
           console.error(err);
           this.toastr.error('Server error deleting record', 'Error');
           this.loader.hide();
         }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 
   resetForm() {

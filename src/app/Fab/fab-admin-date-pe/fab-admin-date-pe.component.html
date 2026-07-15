@@ -15,15 +15,12 @@
       <div class="range-inputs">
         <div class="date-selector">
           <label for="from">Start Date:</label>
-          <input type="date" id="from" [(ngModel)]="fromDate" class="form-control" />
+          <input type="date" id="from" [(ngModel)]="fromDate" (ngModelChange)="fetchSummary()" class="form-control" />
         </div>
         <div class="date-selector">
           <label for="to">End Date:</label>
-          <input type="date" id="to" [(ngModel)]="toDate" class="form-control" />
+          <input type="date" id="to" [(ngModel)]="toDate" (ngModelChange)="fetchSummary()" class="form-control" />
         </div>
-        <button (click)="fetchSummary()" class="btn-submit search-btn">
-          <i class="fas fa-calculator mr-2"></i>Evaluate Period
-        </button>
       </div>
     </div>
 

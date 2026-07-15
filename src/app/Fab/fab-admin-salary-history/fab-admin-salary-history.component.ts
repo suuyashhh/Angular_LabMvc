@@ -49,7 +49,8 @@ export class FabAdminSalaryHistoryComponent implements OnInit {
       // Load all slips or filter by range
       this.http.get<any[]>(`${this.api.baseurl}Fab/SalarySlips/Range?fromDate=${this.searchFrom}&toDate=${this.searchTo}`).subscribe({
         next: (res) => {
-          this.slips = res || [];
+          const data = res || [];
+          this.slips = data.sort((a, b) => new Date(b.slip_day).getTime() - new Date(a.slip_day).getTime());
           this.loader.hide();
         },
         error: (err) => {
@@ -62,7 +63,8 @@ export class FabAdminSalaryHistoryComponent implements OnInit {
       // Helper: Load personal history only
       this.http.get<any[]>(`${this.api.baseurl}Fab/Helper/${this.user.user_id}/SalarySlips`).subscribe({
         next: (res) => {
-          this.slips = res || [];
+          const data = res || [];
+          this.slips = data.sort((a, b) => new Date(b.slip_day).getTime() - new Date(a.slip_day).getTime());
           this.loader.hide();
         },
         error: (err) => {
