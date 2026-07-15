@@ -51,52 +51,54 @@
           </div>
         </div>
 
-        <table class="webforms-table">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th style="text-align: center;">Days</th>
-              <th style="text-align: right;">Salary Rate (₹)</th>
-              <th style="text-align: right;">Total Salary (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Full Day</td>
-              <td style="text-align: center;">{{ calculatedSlip.full_day }}</td>
-              <td style="text-align: right;">
-                <input type="number" [(ngModel)]="calculatedSlip.full_salary" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
-              </td>
-              <td style="text-align: right; color: #28a745; font-weight: 600;">₹{{ calculatedSlip.full_day_Total | number:'1.2-2' }}</td>
-            </tr>
-            <tr>
-              <td>Half Day</td>
-              <td style="text-align: center;">{{ calculatedSlip.half_day }}</td>
-              <td style="text-align: right;">
-                <input type="number" [(ngModel)]="calculatedSlip.half_salary" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
-              </td>
-              <td style="text-align: right; color: #28a745; font-weight: 600;">₹{{ calculatedSlip.half_day_total | number:'1.2-2' }}</td>
-            </tr>
-            <tr>
-              <td>Off Day</td>
-              <td style="text-align: center;">{{ calculatedSlip.off_day }}</td>
-              <td style="text-align: right;">0</td>
-              <td style="text-align: right; color: #6c757d;">0</td>
-            </tr>
-            <tr class="webforms-deduction-row">
-              <td>Advance</td>
-              <td style="text-align: center;">-</td>
-              <td style="text-align: right;">
-                <input type="number" [(ngModel)]="calculatedSlip.advance_total" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
-              </td>
-              <td style="text-align: right; color: #dc3545; font-weight: 600;">- ₹{{ calculatedSlip.advance_total | number:'1.2-2' }}</td>
-            </tr>
-            <tr class="webforms-grand-total-row">
-              <td colspan="3"><strong>Net Salary</strong></td>
-              <td style="text-align: right;"><strong>₹{{ calculatedSlip.grand_total | number:'1.2-2' }}</strong></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="webforms-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th style="text-align: center;">Days</th>
+                <th style="text-align: right;">Salary Rate (₹)</th>
+                <th style="text-align: right;">Total Salary (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Full Day</td>
+                <td style="text-align: center;">{{ calculatedSlip.full_day }}</td>
+                <td style="text-align: right;">
+                  <input type="number" [(ngModel)]="calculatedSlip.full_salary" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
+                </td>
+                <td style="text-align: right; color: #28a745; font-weight: 600;">₹{{ calculatedSlip.full_day_Total | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td>Half Day</td>
+                <td style="text-align: center;">{{ calculatedSlip.half_day }}</td>
+                <td style="text-align: right;">
+                  <input type="number" [(ngModel)]="calculatedSlip.half_salary" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
+                </td>
+                <td style="text-align: right; color: #28a745; font-weight: 600;">₹{{ calculatedSlip.half_day_total | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td>Off Day</td>
+                <td style="text-align: center;">{{ calculatedSlip.off_day }}</td>
+                <td style="text-align: right;">0</td>
+                <td style="text-align: right; color: #6c757d;">0</td>
+              </tr>
+              <tr class="webforms-deduction-row">
+                <td>Advance</td>
+                <td style="text-align: center;">-</td>
+                <td style="text-align: right;">
+                  <input type="number" [(ngModel)]="calculatedSlip.advance_total" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
+                </td>
+                <td style="text-align: right; color: #dc3545; font-weight: 600;">- ₹{{ calculatedSlip.advance_total | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="webforms-grand-total-row">
+                <td colspan="3"><strong>Net Salary</strong></td>
+                <td style="text-align: right;"><strong>₹{{ calculatedSlip.grand_total | number:'1.2-2' }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <div class="mt-4">
           <button (click)="saveSalarySlip()" class="webforms-btn-success">
