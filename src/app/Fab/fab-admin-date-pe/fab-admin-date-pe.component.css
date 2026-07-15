@@ -185,3 +185,46 @@
 
 .mt-6 { margin-top: 24px; }
 .mr-2 { margin-right: 8px; }
+
+/* Responsive Design / Mobile Styles */
+@media (max-width: 576px) {
+  /* page header mobile layout */
+  .flex.items-center.gap-4.bg-white.p-4.border-b {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+
+  .flex.items-center.gap-4.bg-white.p-4.border-b > .flex.items-center.gap-4 {
+    align-items: center !important;
+  }
+
+  /* control bar and input selectors */
+  .control-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  
+  .range-inputs {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  
+  .date-selector label {
+    margin-bottom: 2px !important;
+  }
+  
+  .date-selector input, .date-selector {
+    width: 100% !important;
+  }
+
+  /* metrics grid layouts */
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}

@@ -117,15 +117,12 @@
         <div class="range-filters">
           <div class="filter-group">
             <label for="from">From:</label>
-            <input type="date" id="from" [(ngModel)]="historyFrom" class="form-control sm" />
+            <input type="date" id="from" [(ngModel)]="historyFrom" (ngModelChange)="fetchHistory()" class="form-control sm" />
           </div>
           <div class="filter-group">
             <label for="to">To:</label>
-            <input type="date" id="to" [(ngModel)]="historyTo" class="form-control sm" />
+            <input type="date" id="to" [(ngModel)]="historyTo" (ngModelChange)="fetchHistory()" class="form-control sm" />
           </div>
-          <button (click)="fetchHistory()" class="btn-search-history">
-            <i class="fas fa-search"></i>
-          </button>
         </div>
       </div>
 
@@ -154,7 +151,7 @@
                 </td>
               </tr>
               <tr *ngIf="historyRecords.length === 0">
-                <td colspan="3" class="no-data">No attendance records found for this period. Click Search Logs.</td>
+                <td colspan="3" class="no-data">No attendance records found for this period.</td>
               </tr>
             </tbody>
           </table>

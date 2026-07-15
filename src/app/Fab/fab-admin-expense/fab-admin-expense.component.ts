@@ -29,6 +29,9 @@ export class FabAdminExpenseComponent implements OnInit {
     date: new Date().toISOString().substring(0, 10)
   };
   isEditMode = false;
+  isDrawerOpen = false;
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -41,11 +44,35 @@ export class FabAdminExpenseComponent implements OnInit {
     this.fetchExpenses();
   }
 
+  openAddDrawer() {
+    this.isEditMode = false;
+    this.resetForm();
+    this.isDrawerOpen = true;
+  }
+
+  openEditDrawer(record: any) {
+    this.isEditMode = true;
+    this.expenseObj = {
+      exp_id: record.exp_id,
+      user_id: null,
+      exp_name: record.exp_name,
+      exp_price: record.exp_price,
+      user_advance: 0,
+      date: record.date ? record.date.split('T')[0] : ''
+    };
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
+  }
+
   fetchExpenses() {
     this.loader.show();
     this.http.get<any[]>(`${this.api.baseurl}Fab/Expenses/Range?fromDate=${this.searchFrom}&toDate=${this.searchTo}&onlyGeneral=true`).subscribe({
       next: (res) => {
-        this.expenses = res || [];
+        const data = res || [];
+        this.expenses = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         this.loader.hide();
       },
       error: (err) => {
@@ -69,6 +96,7 @@ export class FabAdminExpenseComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Expense updated successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchExpenses();
           } else {
             this.toastr.error('Failed to update expense', 'Error');
@@ -87,6 +115,7 @@ export class FabAdminExpenseComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Expense recorded successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchExpenses();
           } else {
             this.toastr.error('Failed to record expense', 'Error');
@@ -103,22 +132,20 @@ export class FabAdminExpenseComponent implements OnInit {
   }
 
   editExpense(record: any) {
-    this.isEditMode = true;
-    this.expenseObj = {
-      exp_id: record.exp_id,
-      user_id: null,
-      exp_name: record.exp_name,
-      exp_price: record.exp_price,
-      user_advance: 0,
-      date: new Date(record.date).toISOString().substring(0, 10)
-    };
+    this.openEditDrawer(record);
   }
 
   deleteExpense(expId: number) {
-    if (confirm('Are you sure you want to delete this expense record?')) {
+    this.deleteItemId = expId;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
       this.loader.show();
-      this.http.delete(`${this.api.baseurl}Fab/Expense/${expId}`).subscribe({
+      this.http.delete(`${this.api.baseurl}Fab/Expense/${this.deleteItemId}`).subscribe({
         next: (res: any) => {
+          this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Expense deleted successfully', 'Success');
             this.fetchExpenses();
@@ -128,12 +155,18 @@ export class FabAdminExpenseComponent implements OnInit {
           }
         },
         error: (err) => {
+          this.closeDeleteModal();
           console.error(err);
           this.toastr.error('Server error deleting expense record', 'Error');
           this.loader.hide();
         }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 
   resetForm() {

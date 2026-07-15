@@ -304,3 +304,53 @@
 .date-pill.half-day { background-color: #f9a825; color: #fff; }
 .date-pill.off-day { background-color: #c62828; color: #fff; }
 .mb-4 { margin-bottom: 20px; }
+
+/* Responsive Design / Mobile Styles */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  /* page header mobile layout */
+  .flex.items-center.justify-between.bg-white.p-4.border-b {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+
+  .flex.items-center.justify-between.bg-white.p-4.border-b > .flex.items-center.gap-4 {
+    align-items: center !important;
+  }
+
+  .flex.items-center.justify-between.bg-white.p-4.border-b > button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* results card header mobile */
+  .webforms-card-header.border-flex {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  /* details box mobile layout */
+  .webforms-details-box {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* side drawer full width on mobile */
+  .side-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    right: -100% !important;
+  }
+  .side-drawer.show {
+    right: 0 !important;
+  }
+}
