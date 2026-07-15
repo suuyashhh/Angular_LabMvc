@@ -319,3 +319,57 @@
 }
 
 .mt-6 { margin-top: 24px; }
+
+/* Responsive Design / Mobile Styles */
+@media (max-width: 576px) {
+  /* page header mobile layout */
+  .flex.items-center.justify-between.bg-white.p-4.border-b {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+
+  .flex.items-center.justify-between.bg-white.p-4.border-b > .flex.items-center.gap-4 {
+    align-items: center !important;
+  }
+
+  .flex.items-center.justify-between.bg-white.p-4.border-b > button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* control bar and input selectors */
+  .control-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  
+  .date-selector-wrapper, .range-filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  
+  .date-selector-wrapper label, .filter-group label {
+    margin-bottom: 2px !important;
+  }
+  
+  .date-selector-wrapper input, .filter-group input, .filter-group {
+    width: 100% !important;
+  }
+  
+  /* radio status groups */
+  .attendance-radio-group {
+    gap: 8px !important;
+  }
+  
+  .custom-radio {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+}

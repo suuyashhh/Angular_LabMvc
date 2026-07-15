@@ -23,6 +23,9 @@ export class FabUsersComponent implements OnInit {
     user_salary: null
   };
   isEditMode = false;
+  isDrawerOpen = false;
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -33,6 +36,32 @@ export class FabUsersComponent implements OnInit {
 
   ngOnInit() {
     this.fetchHelpers();
+  }
+
+  openAddDrawer() {
+    this.editMode(false);
+    this.resetForm();
+    this.isDrawerOpen = true;
+  }
+
+  openEditDrawer(helper: any) {
+    this.editMode(true);
+    this.helperObj = {
+      user_id: helper.user_id,
+      user_name: helper.user_name,
+      user_contact: helper.user_contact,
+      user_pass: helper.user_pass,
+      user_salary: helper.user_salary
+    };
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
+  }
+
+  editMode(mode: boolean) {
+    this.isEditMode = mode;
   }
 
   fetchHelpers() {
@@ -63,6 +92,7 @@ export class FabUsersComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Helper details updated successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchHelpers();
           } else {
             this.toastr.error('Failed to update helper details', 'Error');
@@ -81,6 +111,7 @@ export class FabUsersComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Helper registered successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchHelpers();
           } else {
             this.toastr.error('Failed to register helper', 'Error');
@@ -101,21 +132,20 @@ export class FabUsersComponent implements OnInit {
   }
 
   editHelper(helper: any) {
-    this.isEditMode = true;
-    this.helperObj = {
-      user_id: helper.user_id,
-      user_name: helper.user_name,
-      user_contact: helper.user_contact,
-      user_pass: helper.user_pass,
-      user_salary: helper.user_salary
-    };
+    this.openEditDrawer(helper);
   }
 
   deleteHelper(userId: number) {
-    if (confirm('Are you sure you want to delete this helper? All associated records will remain but their user profile will be removed.')) {
+    this.deleteItemId = userId;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
       this.loader.show();
-      this.http.delete(`${this.api.baseurl}Fab/Helper/${userId}`).subscribe({
+      this.http.delete(`${this.api.baseurl}Fab/Helper/${this.deleteItemId}`).subscribe({
         next: (res: any) => {
+          this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Helper deleted successfully', 'Success');
             this.fetchHelpers();
@@ -125,12 +155,18 @@ export class FabUsersComponent implements OnInit {
           }
         },
         error: (err) => {
+          this.closeDeleteModal();
           console.error(err);
           this.toastr.error('Server error occurred', 'Error');
           this.loader.hide();
         }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 
   resetForm() {

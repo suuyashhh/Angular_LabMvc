@@ -151,7 +151,8 @@ export class FabAdminAttendanceComponent implements OnInit {
     this.loader.show();
     this.http.get<any[]>(`${this.api.baseurl}Fab/Attendance/Range?fromDate=${this.historyFrom}&toDate=${this.historyTo}`).subscribe({
       next: (res) => {
-        this.historyRecords = res || [];
+        const data = res || [];
+        this.historyRecords = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         this.loader.hide();
       },
       error: (err) => {

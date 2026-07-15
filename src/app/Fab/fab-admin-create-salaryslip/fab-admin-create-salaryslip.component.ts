@@ -24,6 +24,7 @@ export class FabAdminCreateSalaryslipComponent implements OnInit {
   summary: any = null;
   calculatedSlip: any = null;
   hasCalculated = false;
+  isDrawerOpen = false;
 
   constructor(
     private http: HttpClient,
@@ -35,6 +36,14 @@ export class FabAdminCreateSalaryslipComponent implements OnInit {
 
   ngOnInit() {
     this.fetchHelpers();
+  }
+
+  openCalculatorDrawer() {
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
   }
 
   fetchHelpers() {
@@ -55,6 +64,7 @@ export class FabAdminCreateSalaryslipComponent implements OnInit {
       return;
     }
 
+    this.isDrawerOpen = false;
     this.loader.show();
     
     // 1. Fetch helper date-wise attendance

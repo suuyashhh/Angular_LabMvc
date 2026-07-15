@@ -26,6 +26,9 @@ export class FabAdminAdvanceComponent implements OnInit {
     date: new Date().toISOString().substring(0, 10)
   };
   isEditMode = false;
+  isDrawerOpen = false;
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -37,6 +40,29 @@ export class FabAdminAdvanceComponent implements OnInit {
   ngOnInit() {
     this.fetchHelpers();
     this.fetchAdvances();
+  }
+
+  openAddDrawer() {
+    this.isEditMode = false;
+    this.resetForm();
+    this.isDrawerOpen = true;
+  }
+
+  openEditDrawer(record: any) {
+    this.isEditMode = true;
+    this.advanceObj = {
+      exp_id: record.exp_id,
+      user_id: record.user_id,
+      exp_name: record.exp_name || 'Advance Payment',
+      exp_price: 0,
+      user_advance: record.user_advance,
+      date: record.date ? record.date.split('T')[0] : ''
+    };
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
   }
 
   fetchHelpers() {
@@ -55,7 +81,8 @@ export class FabAdminAdvanceComponent implements OnInit {
     this.loader.show();
     this.http.get<any[]>(`${this.api.baseurl}Fab/Advances`).subscribe({
       next: (res) => {
-        this.advances = res || [];
+        const data = res || [];
+        this.advances = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         this.loader.hide();
       },
       error: (err) => {
@@ -79,6 +106,7 @@ export class FabAdminAdvanceComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Advance payment record updated!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchAdvances();
           } else {
             this.toastr.error('Failed to update advance record', 'Error');
@@ -97,6 +125,7 @@ export class FabAdminAdvanceComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Advance payment logged successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchAdvances();
           } else {
             this.toastr.error('Failed to log advance payment', 'Error');
@@ -113,22 +142,20 @@ export class FabAdminAdvanceComponent implements OnInit {
   }
 
   editAdvance(record: any) {
-    this.isEditMode = true;
-    this.advanceObj = {
-      exp_id: record.exp_id,
-      user_id: record.user_id,
-      exp_name: record.exp_name || 'Advance Payment',
-      exp_price: 0,
-      user_advance: record.user_advance,
-      date: new Date(record.date).toISOString().substring(0, 10)
-    };
+    this.openEditDrawer(record);
   }
 
   deleteAdvance(expId: number) {
-    if (confirm('Are you sure you want to delete this advance payment log?')) {
+    this.deleteItemId = expId;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
       this.loader.show();
-      this.http.delete(`${this.api.baseurl}Fab/Expense/${expId}`).subscribe({
+      this.http.delete(`${this.api.baseurl}Fab/Expense/${this.deleteItemId}`).subscribe({
         next: (res: any) => {
+          this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Advance record deleted', 'Success');
             this.fetchAdvances();
@@ -138,12 +165,18 @@ export class FabAdminAdvanceComponent implements OnInit {
           }
         },
         error: (err) => {
+          this.closeDeleteModal();
           console.error(err);
           this.toastr.error('Server error deleting advance record', 'Error');
           this.loader.hide();
         }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 
   resetForm() {

@@ -29,6 +29,9 @@ export class FabAdminTransportComponent implements OnInit {
     date: new Date().toISOString().substring(0, 10)
   };
   isEditMode = false;
+  isDrawerOpen = false;
+  isDeleteModalOpen = false;
+  deleteItemId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -41,11 +44,35 @@ export class FabAdminTransportComponent implements OnInit {
     this.fetchTrips();
   }
 
+  openAddDrawer() {
+    this.isEditMode = false;
+    this.resetForm();
+    this.isDrawerOpen = true;
+  }
+
+  openEditDrawer(record: any) {
+    this.isEditMode = true;
+    this.tripObj = {
+      exp_id: record.exp_id,
+      user_id: 20203,
+      exp_name: record.exp_name,
+      exp_price: record.exp_price,
+      user_advance: 0,
+      date: record.date ? record.date.split('T')[0] : ''
+    };
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
+  }
+
   fetchTrips() {
     this.loader.show();
     this.http.get<any[]>(`${this.api.baseurl}Fab/Transport/History?fromDate=${this.searchFrom}&toDate=${this.searchTo}`).subscribe({
       next: (res) => {
-        this.trips = res || [];
+        const data = res || [];
+        this.trips = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         this.loader.hide();
       },
       error: (err) => {
@@ -69,6 +96,7 @@ export class FabAdminTransportComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Transportation record updated!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchTrips();
           } else {
             this.toastr.error('Failed to update record', 'Error');
@@ -87,6 +115,7 @@ export class FabAdminTransportComponent implements OnInit {
           if (res.success) {
             this.toastr.success('Transportation trip logged successfully!', 'Success');
             this.resetForm();
+            this.closeDrawer();
             this.fetchTrips();
           } else {
             this.toastr.error('Failed to record trip', 'Error');
@@ -103,22 +132,20 @@ export class FabAdminTransportComponent implements OnInit {
   }
 
   editTrip(record: any) {
-    this.isEditMode = true;
-    this.tripObj = {
-      exp_id: record.exp_id,
-      user_id: 20203,
-      exp_name: record.exp_name,
-      exp_price: record.exp_price,
-      user_advance: 0,
-      date: new Date(record.date).toISOString().substring(0, 10)
-    };
+    this.openEditDrawer(record);
   }
 
   deleteTrip(expId: number) {
-    if (confirm('Are you sure you want to delete this transport trip log?')) {
+    this.deleteItemId = expId;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDeleteAction() {
+    if (this.deleteItemId !== null) {
       this.loader.show();
-      this.http.delete(`${this.api.baseurl}Fab/Expense/${expId}`).subscribe({
+      this.http.delete(`${this.api.baseurl}Fab/Expense/${this.deleteItemId}`).subscribe({
         next: (res: any) => {
+          this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Transport record deleted', 'Success');
             this.fetchTrips();
@@ -128,12 +155,18 @@ export class FabAdminTransportComponent implements OnInit {
           }
         },
         error: (err) => {
+          this.closeDeleteModal();
           console.error(err);
           this.toastr.error('Server error deleting transport record', 'Error');
           this.loader.hide();
         }
       });
     }
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.deleteItemId = null;
   }
 
   resetForm() {

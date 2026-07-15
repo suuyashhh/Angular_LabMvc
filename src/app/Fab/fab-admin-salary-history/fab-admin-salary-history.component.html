@@ -16,15 +16,12 @@
       <div class="webforms-search-bar">
         <div class="webforms-form-group">
           <label for="from">From Date:</label>
-          <input type="date" id="from" [(ngModel)]="searchFrom" class="webforms-form-control" />
+          <input type="date" id="from" [(ngModel)]="searchFrom" (ngModelChange)="fetchSalarySlips()" class="webforms-form-control" />
         </div>
         <div class="webforms-form-group">
           <label for="to">To Date:</label>
-          <input type="date" id="to" [(ngModel)]="searchTo" class="webforms-form-control" />
+          <input type="date" id="to" [(ngModel)]="searchTo" (ngModelChange)="fetchSalarySlips()" class="webforms-form-control" />
         </div>
-        <button (click)="fetchSalarySlips()" class="webforms-btn-search">
-          <i class="fas fa-search mr-2"></i> Search History
-        </button>
       </div>
     </div>
 
