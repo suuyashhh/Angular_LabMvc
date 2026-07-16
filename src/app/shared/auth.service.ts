@@ -644,4 +644,39 @@ clearFarmUserDetailsCookie(): void {
     }
   }
 
+  // ===== Notes Module Auth Methods =====
+
+  isNotesLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    return !!localStorage.getItem('notes_user');
+  }
+
+  getNotesUser(): any | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    const userStr = localStorage.getItem('notes_user');
+    try {
+      return userStr ? JSON.parse(userStr) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  setNotesUser(user: any): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('notes_user', JSON.stringify(user));
+    }
+  }
+
+  notesLogout(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('notes_user');
+    }
+    try {
+      this.toaster.success('Logged out from Notes', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+    this.router.navigate(['/notes/login']);
+  }
+
 }
