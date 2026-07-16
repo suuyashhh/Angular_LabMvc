@@ -1,0 +1,14 @@
+/* Custom scrollbar style for note view */
+.max-h-\[85vh\] ::-webkit-scrollbar {
+  width: 8px;
+}
+.max-h-\[85vh\] ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+.max-h-\[85vh\] ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+.max-h-\[85vh\] ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
