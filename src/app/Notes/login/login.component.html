@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Decorative background blobs -->
+  <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-10 animate-blob"></div>
+  <div class="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+  <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
+
+  <div class="sm:mx-auto sm:w-full sm:max-w-md z-10">
+    <div class="flex justify-center">
+      <div class="h-12 w-12 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+        <span class="text-white text-2xl font-bold font-serif">N</span>
+      </div>
+    </div>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-white tracking-tight">Sign in to Notes</h2>
+    <p class="mt-2 text-center text-sm text-slate-400">
+      Don't have an account?
+      <a routerLink="/notes/register" class="font-medium text-purple-400 hover:text-purple-300 transition-colors duration-200">
+        Register here
+      </a>
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
+    <div class="bg-slate-900/60 backdrop-blur-xl py-8 px-4 shadow-2xl border border-slate-800 sm:rounded-2xl sm:px-10">
+      <form class="space-y-6" (ngSubmit)="login()">
+        <div>
+          <label for="number" class="block text-sm font-medium text-slate-300">Mobile Number</label>
+          <div class="mt-1">
+            <input id="number" name="number" type="text" required
+              [(ngModel)]="loginObj.number"
+              class="appearance-none block w-full px-3 py-2 border border-slate-800 rounded-lg bg-slate-950/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              placeholder="9876543210">
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+          <div class="mt-1">
+            <input id="password" name="password" type="password" required
+              [(ngModel)]="loginObj.password"
+              class="appearance-none block w-full px-3 py-2 border border-slate-800 rounded-lg bg-slate-950/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <div>
+          <button type="submit" [disabled]="isLoading"
+            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 active:scale-95 transition-all duration-150 disabled:opacity-50">
+            <span *ngIf="!isLoading">Sign In</span>
+            <span *ngIf="isLoading" class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Signing in...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
