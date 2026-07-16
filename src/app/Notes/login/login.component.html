@@ -1,50 +1,59 @@
-<div class="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-  <!-- Decorative background blobs -->
-  <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-10 animate-blob"></div>
-  <div class="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
-  <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
+<div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+  <!-- Decorative background circles -->
+  <div class="absolute -top-10 -left-10 w-96 h-96 bg-purple-100 rounded-full filter blur-3xl opacity-60"></div>
+  <div class="absolute -bottom-10 -right-10 w-96 h-96 bg-blue-100 rounded-full filter blur-3xl opacity-60"></div>
 
-  <div class="sm:mx-auto sm:w-full sm:max-w-md z-10">
-    <div class="flex justify-center">
-      <div class="h-12 w-12 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
-        <span class="text-white text-2xl font-bold font-serif">N</span>
-      </div>
+  <div class="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center">
+    <div class="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center shadow-lg shadow-purple-500/20 mb-4">
+      <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
+      </svg>
     </div>
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-white tracking-tight">Sign in to Notes</h2>
-    <p class="mt-2 text-center text-sm text-slate-400">
-      Don't have an account?
-      <a routerLink="/notes/register" class="font-medium text-purple-400 hover:text-purple-300 transition-colors duration-200">
-        Register here
+    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Sign in to Notes</h2>
+    <p class="mt-2 text-sm text-slate-600">
+      Or
+      <a routerLink="/notes/register" class="font-semibold text-purple-600 hover:text-purple-755 transition-colors duration-200">
+        create a new account
       </a>
     </p>
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
-    <div class="bg-slate-900/60 backdrop-blur-xl py-8 px-4 shadow-2xl border border-slate-800 sm:rounded-2xl sm:px-10">
-      <form class="space-y-6" (ngSubmit)="login()">
+    <div class="bg-white/80 backdrop-blur-md py-8 px-6 shadow-xl border border-slate-200/80 rounded-2xl sm:px-10">
+      <form class="space-y-5" (ngSubmit)="login()">
         <div>
-          <label for="number" class="block text-sm font-medium text-slate-300">Mobile Number</label>
-          <div class="mt-1">
+          <label for="number" class="block text-sm font-semibold text-slate-700">Mobile Number</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+              </svg>
+            </div>
             <input id="number" name="number" type="text" required
               [(ngModel)]="loginObj.number"
-              class="appearance-none block w-full px-3 py-2 border border-slate-800 rounded-lg bg-slate-950/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent focus:bg-white transition-all duration-200 text-sm"
               placeholder="9876543210">
           </div>
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
-          <div class="mt-1">
+          <label for="password" class="block text-sm font-semibold text-slate-700">Password</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
             <input id="password" name="password" type="password" required
               [(ngModel)]="loginObj.password"
-              class="appearance-none block w-full px-3 py-2 border border-slate-800 rounded-lg bg-slate-950/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent focus:bg-white transition-all duration-200 text-sm"
               placeholder="••••••••">
           </div>
         </div>
 
-        <div>
+        <div class="pt-2">
           <button type="submit" [disabled]="isLoading"
-            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 active:scale-95 transition-all duration-150 disabled:opacity-50">
+            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-550 hover:to-indigo-550 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 active:scale-98 transition-all duration-150 disabled:opacity-50">
             <span *ngIf="!isLoading">Sign In</span>
             <span *ngIf="isLoading" class="flex items-center">
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
