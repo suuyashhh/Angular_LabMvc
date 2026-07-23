@@ -28,17 +28,14 @@ export class ExEntrytypeComponent implements OnInit {
   // Selected item for edit/delete
   selectedType: ShopExpenseType | null = null;
 
-  // Modals state
-  showAddModal = false;
-  showEditModal = false;
-  showDeleteConfirm = false;
+  // Drawer and Modal State
+  isDrawerOpen = false;
+  editMode = false;
+  isDeleteModalOpen = false;
+  isSaving = false;
 
-  // Forms
+  // Form Data
   formData = {
-    name: ''
-  };
-
-  editFormData = {
     exId: 0,
     name: ''
   };
@@ -98,106 +95,104 @@ export class ExEntrytypeComponent implements OnInit {
     }
   }
 
-  // Add Modal Actions
-  openAddModal() {
-    this.showAddModal = true;
+  // Drawer Actions
+  openAddDrawer() {
+    this.editMode = false;
     this.formData = {
+      exId: 0,
       name: ''
     };
+    this.isDrawerOpen = true;
   }
 
-  closeAddModal() {
-    this.showAddModal = false;
+  openEditDrawer(item: ShopExpenseType) {
+    this.editMode = true;
+    this.selectedType = item;
+    this.formData = {
+      exId: item.eX_ID,
+      name: item.name
+    };
+    this.isDrawerOpen = true;
   }
 
-  saveType() {
+  closeDrawer() {
+    this.isDrawerOpen = false;
+    this.selectedType = null;
+    this.formData = { exId: 0, name: '' };
+  }
+
+  saveExpenseType() {
     if (!this.formData.name.trim()) {
       this.toastr.error('Please enter a name');
       return;
     }
 
-    this.loader.show();
-    const payload = {
-      NAME: this.formData.name.trim()
-    };
+    this.isSaving = true;
 
-    this.api.post('ShopExpenseType/Insert', payload).subscribe({
-      next: (res: any) => {
-        if (res && res.success) {
-          this.toastr.success('Expense type added successfully');
-          this.closeAddModal();
-          this.loadExpenseTypes();
-        } else {
-          this.toastr.error(res?.message || 'Failed to add expense type');
-          this.loader.hide();
+    if (this.editMode) {
+      // Update
+      const payload = {
+        EX_ID: this.formData.exId,
+        NAME: this.formData.name.trim()
+      };
+
+      this.api.put('ShopExpenseType/Update', payload).subscribe({
+        next: (res: any) => {
+          this.isSaving = false;
+          if (res && res.success) {
+            this.toastr.success('Expense type updated successfully');
+            this.closeDrawer();
+            this.loadExpenseTypes();
+          } else {
+            this.toastr.error(res?.message || 'Failed to update expense type');
+          }
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Update error:', err);
+          this.toastr.error('Error updating expense type');
         }
-      },
-      error: (err) => {
-        console.error('Insert error:', err);
-        this.toastr.error('Error adding expense type');
-        this.loader.hide();
-      }
-    });
-  }
+      });
+    } else {
+      // Insert
+      const payload = {
+        NAME: this.formData.name.trim()
+      };
 
-  // Edit Modal Actions
-  openEditModal(item: ShopExpenseType) {
-    this.selectedType = item;
-    this.editFormData = {
-      exId: item.eX_ID,
-      name: item.name
-    };
-    this.showEditModal = true;
-  }
-
-  closeEditModal() {
-    this.showEditModal = false;
-    this.selectedType = null;
-  }
-
-  updateType() {
-    if (!this.editFormData.name.trim()) {
-      this.toastr.error('Please enter a name');
-      return;
+      this.api.post('ShopExpenseType/Insert', payload).subscribe({
+        next: (res: any) => {
+          this.isSaving = false;
+          if (res && res.success) {
+            this.toastr.success('Expense type added successfully');
+            this.closeDrawer();
+            this.loadExpenseTypes();
+          } else {
+            this.toastr.error(res?.message || 'Failed to add expense type');
+          }
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Insert error:', err);
+          this.toastr.error('Error adding expense type');
+        }
+      });
     }
-
-    this.loader.show();
-    const payload = {
-      EX_ID: this.editFormData.exId,
-      NAME: this.editFormData.name.trim()
-    };
-
-    this.api.put('ShopExpenseType/Update', payload).subscribe({
-      next: (res: any) => {
-        if (res && res.success) {
-          this.toastr.success('Expense type updated successfully');
-          this.closeEditModal();
-          this.loadExpenseTypes();
-        } else {
-          this.toastr.error(res?.message || 'Failed to update expense type');
-          this.loader.hide();
-        }
-      },
-      error: (err) => {
-        console.error('Update error:', err);
-        this.toastr.error('Error updating expense type');
-        this.loader.hide();
-      }
-    });
   }
 
   // Delete Actions
-  openDeleteConfirm(item: ShopExpenseType) {
-    this.selectedType = item;
-    this.showDeleteConfirm = true;
+  confirmDelete(id: number) {
+    this.selectedType = this.expenseTypes.find(t => t.eX_ID === id) || null;
+    if (this.selectedType) {
+      this.isDeleteModalOpen = true;
+    }
   }
 
-  closeDeleteConfirm() {
-    this.showDeleteConfirm = false;
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
     this.selectedType = null;
   }
 
-  confirmDelete() {
+  confirmDeleteAction() {
     if (!this.selectedType) return;
 
     this.loader.show();
@@ -205,7 +200,7 @@ export class ExEntrytypeComponent implements OnInit {
       next: (res: any) => {
         if (res && res.success) {
           this.toastr.success('Expense type deleted successfully');
-          this.closeDeleteConfirm();
+          this.closeDeleteModal();
           this.loadExpenseTypes();
         } else {
           this.toastr.error(res?.message || 'Failed to delete expense type');

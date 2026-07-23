@@ -57,10 +57,10 @@
           <div class="w-full">
             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">From Date</label>
             <div class="relative">
-              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 text-sm"></i>
+              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-[#2b5c2e] text-sm"></i>
               <input type="date" [(ngModel)]="fromDate" (change)="loadEntries()"
                 class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50/50 text-gray-700 text-xs md:text-sm
-                       focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white outline-none transition duration-150" />
+                       focus:ring-2 focus:ring-[#2b5c2e] focus:border-[#2b5c2e] focus:bg-white outline-none transition duration-150" />
             </div>
           </div>
           
@@ -68,10 +68,10 @@
           <div class="w-full">
             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">To Date</label>
             <div class="relative">
-              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 text-sm"></i>
+              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-[#2b5c2e] text-sm"></i>
               <input type="date" [(ngModel)]="toDate" (change)="loadEntries()"
                 class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50/50 text-gray-700 text-xs md:text-sm
-                       focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white outline-none transition duration-150" />
+                       focus:ring-2 focus:ring-[#2b5c2e] focus:border-[#2b5c2e] focus:bg-white outline-none transition duration-150" />
             </div>
           </div>
 
@@ -83,7 +83,7 @@
               <input type="text" [(ngModel)]="searchQuery" (input)="searchEntries()"
                 placeholder="Search by description or status..." 
                 class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-800 placeholder-gray-400 text-xs md:text-sm
-                       focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition duration-200" />
+                       focus:ring-2 focus:ring-[#2b5c2e] focus:border-[#2b5c2e] outline-none transition duration-200" />
             </div>
           </div>
           
@@ -94,10 +94,10 @@
       <div>
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-base md:text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <i class="ri-history-line text-amber-500"></i>
+            <i class="ri-history-line text-[#2b5c2e]"></i>
             <span>Shop History</span>
           </h3>
-          <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+          <span class="text-xs bg-[#e8f5e9] text-[#2b5c2e] px-2 py-1 rounded-full font-medium">
             Showing {{ filteredEntries.length }} entries
           </span>
         </div>
@@ -115,7 +115,7 @@
           <!-- Date Header -->
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
-              <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#f6f7f3]0"></div>
               <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
               <span class="text-xs text-gray-400">({{ group.count }})</span>
             </div>
@@ -127,8 +127,8 @@
 
           <!-- Cards list -->
           <div class="space-y-3">
-            <div *ngFor="let entry of group.entries" (click)="viewEntry(entry)" class="bg-white hover:bg-amber-50/20 rounded-xl p-4 
-                        border border-gray-200 hover:border-amber-300
+            <div *ngFor="let entry of group.entries" (click)="viewEntry(entry)" class="bg-white hover:bg-[#f6f7f3]/50 rounded-xl p-4 
+                        border border-gray-200 hover:border-[#2b5c2e]
                         transition-all duration-200 cursor-pointer shadow-sm group">
 
               <div class="flex items-start justify-between gap-4">
@@ -144,7 +144,7 @@
                   <div class="flex-1 min-w-0 pt-0.5">
                      <div class="flex items-center gap-2 flex-wrap">
                       <span class="text-xs font-bold px-2 py-0.5 rounded-full"
-                            [ngClass]="entry.entryType === 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
+                            [ngClass]="entry.entryType === 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-[#e8f5e9] text-[#2b5c2e]'">
                         {{ entry.entryType === 1 ? 'Profit' : 'Expense' }}
                       </span>
                       <span *ngIf="entry.entryType !== 1" class="text-xs font-bold px-2 py-0.5 rounded-full"
@@ -180,7 +180,7 @@
   <!-- VIEW ENTRY MODAL -->
   <div *ngIf="showViewModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
-                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+                relative border border-[#e5e8e1] max-h-[90vh] overflow-y-auto">
 
       <!-- Close button -->
       <button (click)="closeViewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
@@ -189,9 +189,9 @@
       </button>
 
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 
+        <div class="w-12 h-12 rounded-full bg-[#2b5c2e] 
                     flex items-center justify-center">
-          <i class="ri-information-line text-2xl text-amber-600"></i>
+          <i class="ri-information-line text-2xl text-[#2b5c2e]"></i>
         </div>
         <div>
           <h2 class="text-xl md:text-2xl font-bold text-gray-800">Transaction Details</h2>
@@ -202,7 +202,7 @@
       <!-- Content -->
       <div class="space-y-4">
         <!-- Details grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-amber-50/30 p-4 rounded-xl border border-amber-100/50">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#f6f7f3]/50 p-4 rounded-xl border border-[#e5e8e1]">
           <div>
             <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Date</p>
             <p class="font-medium text-gray-800 mt-1">
@@ -211,7 +211,7 @@
           </div>
           <div>
             <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Type</p>
-            <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.entryType === 1 ? 'text-emerald-700' : 'text-amber-700'">
+            <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.entryType === 1 ? 'text-emerald-700' : 'text-[#2b5c2e]'">
               <i [class]="selectedEntry?.entryType === 1 ? 'ri-arrow-up-circle-line text-base' : 'ri-arrow-down-circle-line text-base'"></i>
               <span>{{ selectedEntry?.entryType === 1 ? 'Profit' : 'Expense' }}</span>
             </p>
@@ -245,13 +245,13 @@
             Attached Receipts/Photos ({{ viewImages.length }})
           </label>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div *ngFor="let img of viewImages; let i = index" class="relative group rounded-xl overflow-hidden border border-amber-100 shadow-sm cursor-pointer"
+            <div *ngFor="let img of viewImages; let i = index" class="relative group rounded-xl overflow-hidden border border-[#e5e8e1] shadow-sm cursor-pointer"
                  (click)="openImagePreview(img, i)">
               <img [src]="img" class="w-full h-24 object-cover hover:scale-105 transition duration-300" />
               <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-300">
                 <i class="ri-eye-line text-white text-xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
               </div>
-              <div class="absolute top-1.5 left-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
+              <div class="absolute top-1.5 left-1.5 bg-[#f6f7f3]0 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
                 {{ i + 1 }}
               </div>
             </div>
@@ -261,7 +261,7 @@
         <!-- No Images State -->
         <div *ngIf="viewImages.length === 0">
           <label class="block text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2">Attached Images</label>
-          <div class="text-center py-6 bg-amber-50/20 rounded-xl border border-amber-100/50">
+          <div class="text-center py-6 bg-[#f6f7f3]/50 rounded-xl border border-[#e5e8e1]">
             <div class="text-3xl mb-1">🖼️</div>
             <p class="text-xs text-gray-500">No receipts or photos attached to this log</p>
           </div>
@@ -274,8 +274,8 @@
                        hover:bg-gray-50 font-semibold transition text-sm md:text-base">
           Close
         </button>
-        <button (click)="openEditFromView()" class="bg-gradient-to-r from-amber-500 to-orange-600 
-                       text-white px-5 py-2.5 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition font-semibold
+        <button (click)="openEditFromView()" class="bg-[#2b5c2e] 
+                       text-white px-5 py-2.5 rounded-xl shadow-lg hover:bg-[#1e4220] transition font-semibold
                        flex items-center gap-1.5 text-sm md:text-base">
           <i class="ri-edit-line"></i>
           <span>Edit</span>
@@ -292,7 +292,7 @@
   <!-- EDIT ENTRY MODAL -->
   <div *ngIf="showEditModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
-                relative border border-amber-100 max-h-[90vh] overflow-y-auto">
+                relative border border-[#e5e8e1] max-h-[90vh] overflow-y-auto">
 
       <!-- Close button -->
       <button (click)="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
@@ -302,7 +302,7 @@
 
       <div class="flex items-center gap-3 mb-6">
         <div class="w-12 h-12 rounded-full flex items-center justify-center"
-             [ngClass]="editFormData.entryType === 1 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'">
+             [ngClass]="editFormData.entryType === 1 ? 'bg-emerald-100 text-emerald-600' : 'bg-[#e8f5e9] text-[#2b5c2e]'">
           <i [class]="editFormData.entryType === 1 ? 'ri-coins-line text-2xl' : 'ri-edit-line text-2xl'"></i>
         </div>
         <div>
@@ -326,7 +326,7 @@
               <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
               <input type="date" [(ngModel)]="editFormData.date" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
                             rounded-xl bg-white text-gray-800 text-sm md:text-base
-                            focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                            focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent 
                             outline-none transition" />
             </div>
           </div>
@@ -337,7 +337,7 @@
               Payment Status
             </label>
             <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-gray-50 border border-gray-200 rounded-xl select-none hover:bg-gray-100/50 transition">
-              <input type="checkbox" [(ngModel)]="editFormData.isPaid" class="w-5 h-5 accent-amber-500 rounded cursor-pointer" />
+              <input type="checkbox" [(ngModel)]="editFormData.isPaid" class="w-5 h-5 accent-[#2b5c2e] rounded cursor-pointer" />
               <div>
                 <span class="text-sm font-bold" [ngClass]="editFormData.isPaid ? 'text-emerald-600' : 'text-rose-600'">
                   {{ editFormData.isPaid ? 'Paid' : 'Pending' }}
@@ -357,7 +357,7 @@
           </label>
           <textarea [(ngModel)]="editFormData.reason" placeholder="Enter reason" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
                            bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
-                           focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                           focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent 
                            outline-none resize-none transition"></textarea>
         </div>
 
@@ -370,7 +370,7 @@
             <i class="ri-money-rupee-circle-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
             <input type="number" [(ngModel)]="editFormData.price" placeholder="0" min="0" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
                           rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
-                          focus:ring-2 focus:ring-amber-500 focus:border-transparent 
+                          focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent 
                           outline-none transition" />
           </div>
         </div>
@@ -386,13 +386,13 @@
             </div>
           </label>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div *ngFor="let img of existingImages; let i = index" class="relative group rounded-xl overflow-hidden border border-amber-100 shadow-sm">
+            <div *ngFor="let img of existingImages; let i = index" class="relative group rounded-xl overflow-hidden border border-[#e5e8e1] shadow-sm">
               <img [src]="img" class="w-full h-24 object-cover" />
               <button (click)="removeExistingImage(i)" class="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white 
                              w-6 h-6 rounded-full flex items-center justify-center shadow transition active:scale-95">
                 <i class="ri-close-line text-sm"></i>
               </button>
-              <div class="absolute bottom-1 left-1.5 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
+              <div class="absolute bottom-1 left-1.5 bg-[#f6f7f3]0 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow">
                 {{ i + 1 }}
               </div>
             </div>
@@ -411,7 +411,7 @@
           </label>
 
           <div *ngIf="getRemainingSlots() > 0" class="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center 
-                      hover:border-amber-400 hover:bg-amber-50/20 transition cursor-pointer"
+                      hover:border-[#2b5c2e] hover:bg-[#f6f7f3]/50 transition cursor-pointer"
             (click)="triggerEditFileInput()">
             <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-2"></i>
             <p class="text-sm text-gray-600 mb-1 font-semibold">Click to upload new receipts/photos</p>
@@ -419,9 +419,9 @@
           </div>
 
           <div *ngIf="getRemainingSlots() === 0"
-            class="border-2 border-dashed border-orange-200 rounded-xl p-5 text-center bg-orange-50/40">
-            <i class="ri-image-fill text-4xl text-orange-400 mb-2"></i>
-            <p class="text-sm text-orange-700 font-semibold mb-1">Maximum images reached (4/4)</p>
+            class="border-2 border-dashed border-[#e5e8e1] rounded-xl p-5 text-center bg-[#f6f7f3]">
+            <i class="ri-image-fill text-4xl text-[#9ba097] mb-2"></i>
+            <p class="text-sm text-[#686e63] font-semibold mb-1">Maximum images reached (4/4)</p>
             <p class="text-xs text-gray-500">Remove existing images above to upload new ones</p>
           </div>
 
@@ -451,8 +451,8 @@
                        hover:bg-gray-50 font-semibold transition text-sm md:text-base">
           Cancel
         </button>
-        <button (click)="updateEntry()" [disabled]="!editFormData.reason.trim() || editFormData.price <= 0" class="bg-gradient-to-r from-amber-500 to-orange-600 
-                       text-white px-6 py-2.5 rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-700 transition
+        <button (click)="updateEntry()" [disabled]="!editFormData.reason.trim() || editFormData.price <= 0" class="bg-[#2b5c2e] 
+                       text-white px-6 py-2.5 rounded-xl shadow-lg hover:bg-[#1e4220] transition
                        disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center gap-1.5 text-sm md:text-base">
           <i class="ri-save-line"></i>
           <span>Update Record</span>
@@ -500,17 +500,7 @@
     </div>
   </div>
 
-  <!-- FIXED FOOTER -->
-  <footer class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-amber-600 to-orange-600 
-                 text-white py-3 text-center shadow-lg z-45">
-    <p class="text-xs md:text-sm">
-      Developed by
-      <a href="https://suyashpatil.in" target="_blank"
-        class="font-semibold text-yellow-200 hover:text-white transition">
-        SuyashPatil
-      </a>
-    </p>
-  </footer>
+
 
   <!-- Click outside to close menu backdrop -->
   <div *ngIf="showMenu" (click)="closeMenu()" class="fixed inset-0 z-40"></div>
