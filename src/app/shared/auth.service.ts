@@ -333,9 +333,8 @@ clearFarmUserDetailsCookie(): void {
 
   isShopLoggedIn(): boolean {
     if (!isPlatformBrowser(this.platformId)) return false;
-    const shopUser = this.getShopCredentialsFromCookie();
-    const hasToken = !!this.getShopToken();
-    return (!!shopUser && typeof shopUser === 'object') && hasToken;
+    const shopUser = localStorage.getItem('shop_user');
+    return !!shopUser;
   }
 
   getShopToken(): string | null {
@@ -401,26 +400,7 @@ clearFarmUserDetailsCookie(): void {
   }
 
   validateShopSession(showExpiredToast: boolean = false) {
-    const token = this.getShopToken();
-    if (!token) {
-      return of(null);
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get(`${this.api.baseurl}LoginShop/validate`, { headers }).pipe(
-      tap((response: any) => {
-        // Shop session validated successfully
-      }),
-      catchError((err) => {
-        if (err?.status === 401 || err?.status === 403 || err?.status === 0) {
-          this.handleShopSessionExpired(this.shopSessionExpiredMessage, showExpiredToast);
-        }
-        return throwError(() => err);
-      })
-    );
+    return of(null);
   }
 
   handleShopSessionExpired(message: string = this.shopSessionExpiredMessage, showToast: boolean = true): void {
@@ -437,7 +417,8 @@ clearFarmUserDetailsCookie(): void {
   ): void {
     document.cookie = 'shopCredentials=; path=/; max-age=0';
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.clear();
+      localStorage.removeItem('shop_user');
+      localStorage.removeItem('shop_token');
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('shopCredentials');
       }
@@ -461,20 +442,7 @@ clearFarmUserDetailsCookie(): void {
   }
 
   shopLogout(): void {
-    const token = this.getShopToken();
-    if (!token) {
-      this.clearShopSession(true, true);
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    this.http.post(`${this.api.baseurl}LoginShop/logout`, {}, { headers }).subscribe({
-      next: () => this.clearShopSession(true, true),
-      error: () => this.clearShopSession(true, true)
-    });
+    this.clearShopSession(true, true);
   }
 
 
