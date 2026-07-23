@@ -75,9 +75,9 @@ export class LoginShopComponent implements OnInit {
               user_img: rawUser.useR_IMG || rawUser.USER_IMG || rawUser.userImg || rawUser.user_img
             };
 
+            localStorage.setItem('shop_user', JSON.stringify(userObj));
             if (res?.token) {
               localStorage.setItem('shop_token', res.token);
-              localStorage.setItem('shop_user', JSON.stringify(userObj));
             }
 
             this.auth.setShopCredentialsCookie(userObj, 365);

@@ -1,0 +1,126 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.mobile-open]="isSidebarOpen">
+    <div class="sidebar-brand d-flex align-items-center gap-3">
+      <div class="brand-logo-small">
+        <i class="bi bi-shop text-white"></i>
+      </div>
+      <div>
+        <h4 class="mb-0 fw-bold brand-name">ShopBook</h4>
+        <span class="brand-tag">EXPENSE LEDGER</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/shop/dashboard" routerLinkActive="active" class="nav-item" (click)="isSidebarOpen = false">
+        <i class="bi bi-grid-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      
+      <!-- Masters Dropdown -->
+      <div class="nav-dropdown" [class.open]="isMastersDropdownOpen">
+        <a href="#" (click)="toggleMastersDropdown($event)" class="nav-item d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-folder-fill"></i>
+            <span>Masters</span>
+          </div>
+          <i class="bi bi-chevron-down arrow-icon" [style.transform]="isMastersDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'" style="transition: transform 0.2s;"></i>
+        </a>
+        
+        <div class="dropdown-container" *ngIf="isMastersDropdownOpen">
+          <a routerLink="/shop/ex-entrytype" routerLinkActive="active" class="nav-item sub-item" (click)="isSidebarOpen = false">
+            <i class="bi bi-tags"></i>
+            <span>Expense Types</span>
+          </a>
+
+          <a routerLink="/shop/shop-users" routerLinkActive="active" class="nav-item sub-item" (click)="isSidebarOpen = false">
+            <i class="bi bi-people"></i>
+            <span>Shop Users</span>
+          </a>
+        </div>
+      </div>
+
+      <a routerLink="/shop/history" routerLinkActive="active" class="nav-item" (click)="isSidebarOpen = false">
+        <i class="bi bi-clock-history"></i>
+        <span>History</span>
+      </a>
+      
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="small text-muted">V1.0 - ONLINE READY</span>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay for mobile -->
+  <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+  <!-- Main Content Panel -->
+  <div class="main-panel">
+    <header class="main-header d-flex justify-content-between align-items-center px-4 no-print">
+      <button class="btn d-lg-none p-0 border-0" (click)="toggleSidebar()">
+        <i class="bi bi-list fs-3"></i>
+      </button>
+
+      <div class="profile-overlay" *ngIf="isProfileDropdownOpen" (click)="isProfileDropdownOpen = false" style="position: fixed; inset: 0; z-index: 100;"></div>
+      
+      <div class="ms-auto position-relative" style="z-index: 101;">
+        <!-- User Profile Dropdown Toggle -->
+        <div class="d-flex align-items-center gap-2 cursor-pointer profile-toggle" (click)="toggleProfileDropdown()" style="cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.2s;">
+          <div class="position-relative">
+            <img [src]="isLoggedIn && user?.user_img ? user.user_img : '../../assets/img/avatars/1.png'" onerror="this.src='https://ui-avatars.com/api/?name=User&background=2b5c2e&color=fff'" alt="Profile" class="rounded-circle profile-img" width="36" height="36" style="object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <span class="position-absolute status-indicator" [class.bg-success]="isLoggedIn" [class.bg-secondary]="!isLoggedIn" style="width: 10px; height: 10px; right: 0px; bottom: 2px; border-radius: 50%; border: 2px solid white;"></span>
+          </div>
+          <span class="fw-semibold text-dark d-none d-sm-inline">{{ isLoggedIn ? user?.name || user?.username || userName : 'Guest User' }}</span>
+          <i class="bi bi-chevron-down text-muted small" [style.transform]="isProfileDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'" style="transition: transform 0.2s;"></i>
+        </div>
+
+        <!-- Dropdown Menu -->
+        <div class="profile-dropdown-menu position-absolute bg-white shadow rounded-3 border" *ngIf="isProfileDropdownOpen" style="top: 110%; right: 0; min-width: 180px; overflow: hidden; animation: fadeIn 0.2s ease;">
+          <div class="dropdown-header px-3 py-2 border-bottom bg-light">
+            <span class="d-block fw-bold text-dark">{{ isLoggedIn ? user?.name || user?.username || userName : 'Guest User' }}</span>
+            <span class="d-block small text-muted">{{ isLoggedIn ? user?.role || 'Shop Administrator' : 'Guest' }}</span>
+          </div>
+          <a href="#" class="dropdown-item px-3 py-2 text-danger d-flex align-items-center gap-2 text-decoration-none hover-bg-light" (click)="onLogout(); $event.preventDefault()" style="transition: background 0.2s;">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Body -->
+    <main class="content-body p-4">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Mobile Bottom Navigation Footer -->
+    <footer class="mobile-footer d-sm-none no-print">
+      <div class="mobile-nav-container">
+        <a routerLink="/shop/dashboard" routerLinkActive="active" class="mobile-nav-item">
+          <div class="icon-wrapper">
+            <i class="bi bi-grid-fill"></i>
+          </div>
+          <span class="mobile-nav-label">Dashboard</span>
+          <span class="active-indicator-dot"></span>
+        </a>
+
+        <a routerLink="/shop/history" routerLinkActive="active" class="mobile-nav-item">
+          <div class="icon-wrapper">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <span class="mobile-nav-label">History</span>
+          <span class="active-indicator-dot"></span>
+        </a>
+        
+        <button (click)="toggleSidebar()" class="mobile-nav-item" [class.active]="isSidebarOpen">
+          <div class="icon-wrapper">
+            <i class="bi bi-list"></i>
+          </div>
+          <span class="mobile-nav-label">Menu</span>
+          <span class="active-indicator-dot"></span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+</div>
