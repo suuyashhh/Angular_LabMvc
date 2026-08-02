@@ -1,5 +1,3 @@
-@import 'quill/dist/quill.core.css';
-@import 'quill/dist/quill.snow.css';
 
 /* Custom scrollbar style for note view */
 .max-h-\[85vh\] ::-webkit-scrollbar {
@@ -14,4 +12,22 @@
 }
 .max-h-\[85vh\] ::-webkit-scrollbar-thumb:hover {
   background: #334155;
+}
+
+/* Custom Powered By for Jodit */
+.jodit-status-bar-link {
+  font-size: 0 !important;
+  color: transparent !important;
+  text-decoration: none !important;
+}
+
+.jodit-status-bar-link::after {
+  content: 'POWERED BY SUYASH';
+  font-size: 11px;
+  color: #3b82f6; /* A nice blue color */
+  font-weight: 500;
+  text-transform: uppercase;
+  pointer-events: none;
+  letter-spacing: 0.5px;
+  display: inline-block;
 }

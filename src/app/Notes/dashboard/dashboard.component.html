@@ -74,7 +74,7 @@
           </button>
         </div>
         <!-- Rich Text Editor -->
-        <quill-editor (onEditorCreated)="onEditorCreated($event)" [modules]="quillModules" placeholder="Write Your Content Here...." class="block w-full" [styles]="{height: '25rem'}"></quill-editor>
+        <jodit-editor [defaultValue]="content" (onChange)="onEditorChange($event)" name="content" [config]="joditConfig" class="block w-full"></jodit-editor>
       </div>
     </div>
 

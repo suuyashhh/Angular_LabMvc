@@ -8,12 +8,7 @@ import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
 import { LoaderService } from '../../services/loader.service';
 import { SafeHtmlPipe } from '../../shared/pipes/safe-html.pipe';
-import { QuillModule } from 'ngx-quill';
-import Quill from 'quill';
-import BlotFormatter from 'quill-blot-formatter';
-
-Quill.register('modules/blotFormatter', BlotFormatter);
-
+import { JoditAngularModule } from 'jodit-angular';
 interface NoteItem {
   id: number;
   userId: number;
@@ -25,7 +20,7 @@ interface NoteItem {
 @Component({
   selector: 'app-notes-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, QuillModule, SafeHtmlPipe],
+  imports: [CommonModule, FormsModule, JoditAngularModule, SafeHtmlPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   encapsulation: ViewEncapsulation.None
@@ -39,26 +34,23 @@ export class DashboardComponent implements OnInit {
   editingNoteId: number | null = null;
   selectedNote: NoteItem | null = null;
   currentUser: any = null;
-  editorInstance: any = null;
-
-  quillModules = {
-    blotFormatter: {},
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ 'header': 1 }, { 'header': 2 }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'direction': 'rtl' }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-      ['clean'],
-      ['link', 'image', 'video']
-    ]
+  joditConfig = {
+    height: 400,
+    uploader: {
+      insertImageAsBase64URI: true
+    },
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: 'insert_as_html',
+    placeholder: 'Write Your Content Here....',
+    controls: {
+      font: {
+        list: {
+          'Roboto,sans-serif': 'Roboto',
+          'Arial,Helvetica,sans-serif': 'Arial',
+        }
+      }
+    }
   };
 
   private http = inject(HttpClient);
@@ -98,21 +90,17 @@ export class DashboardComponent implements OnInit {
     this.loadNotes();
   }
 
-  onEditorCreated(editor: any) {
-    this.editorInstance = editor;
-    if (this.content) {
-      this.editorInstance.root.innerHTML = this.content;
+  onEditorChange(data: any) {
+    if (typeof data === 'string') {
+      this.content = data;
+    } else if (data && data.editor) {
+      this.content = data.editor.value;
+    } else if (data && data.html) {
+      this.content = data.html;
     }
   }
 
   createOrUpdateNote() {
-    if (this.editorInstance) {
-      this.content = this.editorInstance.root.innerHTML;
-      if (this.content === '<p><br></p>') {
-        this.content = ''; // Quill's default empty state
-      }
-    }
-
     const hasText = this.content ? this.content.replace(/<[^>]*>/g, '').trim().length > 0 : false;
     const hasImage = this.content ? this.content.includes('<img') : false;
     
@@ -228,9 +216,6 @@ export class DashboardComponent implements OnInit {
     this.title = '';
     this.content = '';
     this.editingNoteId = null;
-    if (this.editorInstance) {
-      this.editorInstance.root.innerHTML = '';
-    }
   }
 
   logout() {
