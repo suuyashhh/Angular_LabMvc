@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -7,6 +7,12 @@ import { finalize } from 'rxjs/operators';
 import { ApiService } from '../../shared/api.service';
 import { AuthService } from '../../shared/auth.service';
 import { LoaderService } from '../../services/loader.service';
+import { SafeHtmlPipe } from '../../shared/pipes/safe-html.pipe';
+import { QuillModule } from 'ngx-quill';
+import Quill from 'quill';
+import BlotFormatter from 'quill-blot-formatter';
+
+Quill.register('modules/blotFormatter', BlotFormatter);
 
 interface NoteItem {
   id: number;
@@ -19,9 +25,10 @@ interface NoteItem {
 @Component({
   selector: 'app-notes-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, QuillModule, SafeHtmlPipe],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrl: './dashboard.component.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class DashboardComponent implements OnInit {
   activeTab: 'home' | 'paste' = 'home';
@@ -32,6 +39,27 @@ export class DashboardComponent implements OnInit {
   editingNoteId: number | null = null;
   selectedNote: NoteItem | null = null;
   currentUser: any = null;
+  editorInstance: any = null;
+
+  quillModules = {
+    blotFormatter: {},
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'direction': 'rtl' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['clean'],
+      ['link', 'image', 'video']
+    ]
+  };
 
   private http = inject(HttpClient);
   private api = inject(ApiService);
@@ -70,9 +98,35 @@ export class DashboardComponent implements OnInit {
     this.loadNotes();
   }
 
+  onEditorCreated(editor: any) {
+    this.editorInstance = editor;
+    if (this.content) {
+      this.editorInstance.root.innerHTML = this.content;
+    }
+  }
+
   createOrUpdateNote() {
-    if (!this.title.trim() || !this.content.trim()) {
-      this.toastr.warning('Please enter both title and content.', 'Validation');
+    if (this.editorInstance) {
+      this.content = this.editorInstance.root.innerHTML;
+      if (this.content === '<p><br></p>') {
+        this.content = ''; // Quill's default empty state
+      }
+    }
+
+    const hasText = this.content ? this.content.replace(/<[^>]*>/g, '').trim().length > 0 : false;
+    const hasImage = this.content ? this.content.includes('<img') : false;
+    
+    const isTitleEmpty = !this.title || this.title.trim() === '';
+    const isContentEmpty = !hasText && !hasImage;
+
+    if (isTitleEmpty || isContentEmpty) {
+      if (isTitleEmpty && isContentEmpty) {
+         this.toastr.warning('Please enter both title and content.', 'Validation');
+      } else if (isTitleEmpty) {
+         this.toastr.warning('Please enter a title for your paste.', 'Validation');
+      } else {
+         this.toastr.warning('Please enter some content for your paste.', 'Validation');
+      }
       return;
     }
 
@@ -174,6 +228,9 @@ export class DashboardComponent implements OnInit {
     this.title = '';
     this.content = '';
     this.editingNoteId = null;
+    if (this.editorInstance) {
+      this.editorInstance.root.innerHTML = '';
+    }
   }
 
   logout() {

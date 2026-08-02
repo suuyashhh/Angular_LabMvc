@@ -1,3 +1,6 @@
+@import 'quill/dist/quill.core.css';
+@import 'quill/dist/quill.snow.css';
+
 /* Custom scrollbar style for note view */
 .max-h-\[85vh\] ::-webkit-scrollbar {
   width: 8px;
