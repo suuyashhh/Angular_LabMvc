@@ -3,7 +3,13 @@
     <div class="flex justify-between h-16 items-center">
       <!-- Logo & Title -->
       <div class="flex items-center space-x-3">
-        <div class="bg-gradient-to-br from-purple-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-purple-500/20">
+        <button (click)="toggleSidebar()" class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+          <i class="ri-menu-line text-xl"></i>
+        </button>
+        <button (click)="toggleSidebar()" class="hidden lg:block p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" title="Toggle Explorer">
+          <i class="ri-side-bar-line text-xl"></i>
+        </button>
+        <div class="bg-gradient-to-br from-purple-600 to-indigo-600 p-2 rounded-xl shadow-lg shadow-purple-500/20 ml-2">
           <i class="ri-book-3-line text-white text-xl"></i>
         </div>
         <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">Notes Explorer</h1>
@@ -26,10 +32,14 @@
   </div>
 </nav>
 
-<div class="min-h-[calc(100vh-64px)] flex bg-slate-50 text-slate-800" (click)="contextMenuVisible = false">
+<div class="min-h-[calc(100vh-64px)] flex bg-slate-50 text-slate-800 overflow-hidden relative" (click)="contextMenuVisible = false">
   
+  <!-- Mobile Overlay -->
+  <div *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-30 lg:hidden animate-fadeIn"></div>
+
   <!-- Left Sidebar (Explorer) -->
-  <div class="w-80 bg-white border-r border-slate-200 flex flex-col shadow-sm">
+  <div class="absolute lg:relative z-40 bg-white border-r border-slate-200 flex flex-col shadow-xl lg:shadow-sm transition-transform duration-300 ease-in-out h-[calc(100vh-64px)] w-[300px] sm:w-[340px] md:w-[360px]"
+       [ngClass]="isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'">
     <!-- Sidebar Header -->
     <div class="p-4 border-b border-slate-100 flex items-center justify-between">
       <h2 class="font-bold text-slate-700 text-sm tracking-wide uppercase">Explorer</h2>
@@ -73,27 +83,32 @@
 
       <!-- Recursive Tree Template -->
       <ng-template #folderTemplate let-nodes="nodes" let-level="level">
-        <div *ngFor="let node of nodes" class="folder-node">
+        <div *ngFor="let node of nodes" class="folder-node relative" [ngClass]="{'border-l border-slate-200 ml-[11px]': level > 0}">
           <!-- Folder Item -->
-          <div class="group flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-100/80 cursor-pointer transition-colors"
-               [ngStyle]="{'padding-left': (level * 12 + 8) + 'px'}"
+          <div class="group flex items-center justify-between py-1.5 pr-2 rounded-lg hover:bg-slate-100/80 cursor-pointer transition-colors mt-0.5"
+               [ngStyle]="{'padding-left': level === 0 ? '8px' : '20px'}"
                (click)="toggleFolder(node, $event)"
                (contextmenu)="openContextMenu($event, node)">
             
-            <div class="flex items-center space-x-1.5 overflow-hidden">
-              <i class="ri-arrow-right-s-line text-slate-400 transition-transform duration-200" [class.rotate-90]="node.expanded" [class.invisible]="!node.subFolders?.length && !node.pages?.length"></i>
-              <i class="ri-folder-fill text-yellow-500 text-lg"></i>
-              <span class="text-sm text-slate-700 font-medium truncate select-none">{{ node.folderName }}</span>
+            <div class="flex items-center space-x-2 overflow-hidden flex-1 relative">
+              <!-- Guide line connector for children -->
+              <div *ngIf="level > 0" class="absolute left-[-20px] top-1/2 w-[16px] border-t border-slate-200"></div>
+
+              <div class="flex-shrink-0 w-4 flex justify-center">
+                <i class="ri-arrow-right-s-line text-slate-400 transition-transform duration-200" [class.rotate-90]="node.expanded" [class.invisible]="!node.subFolders?.length && !node.pages?.length"></i>
+              </div>
+              <span class="flex-shrink-0 text-lg leading-none">{{ node.expanded ? '📂' : '📁' }}</span>
+              <span class="text-sm text-slate-700 font-medium truncate select-none whitespace-nowrap">{{ node.folderName }}</span>
             </div>
             
             <!-- Quick Add Page Button (Hover) -->
-            <button (click)="$event.stopPropagation(); openAddPageModal(node.folderId)" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-all">
+            <button (click)="$event.stopPropagation(); openAddPageModal(node.folderId)" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-all ml-2 flex-shrink-0">
               <i class="ri-file-add-line"></i>
             </button>
           </div>
 
           <!-- Sub Items (Collapsible) -->
-          <div *ngIf="node.expanded" class="animate-fadeIn">
+          <div *ngIf="node.expanded" class="animate-fadeIn overflow-hidden">
             <!-- Subfolders -->
             <ng-container *ngIf="node.subFolders?.length">
               <ng-container *ngTemplateOutlet="folderTemplate; context: { nodes: node.subFolders, level: level + 1 }"></ng-container>
@@ -101,13 +116,19 @@
             
             <!-- Pages -->
             <div *ngFor="let page of node.pages" 
-                 class="group flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-100/80 cursor-pointer transition-colors"
-                 [class.bg-purple-50]="selectedPage?.pageId === page.pageId"
-                 [ngStyle]="{'padding-left': ((level + 1) * 12 + 28) + 'px'}"
+                 class="group flex items-center justify-between py-1.5 pr-2 rounded-lg cursor-pointer transition-all mt-0.5 border-l border-slate-200 ml-[11px] relative"
+                 [ngClass]="selectedPage?.pageId === page.pageId ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20 border-transparent ml-0 rounded-l-none pl-[31px]' : 'hover:bg-slate-100/80 text-slate-600 pl-[20px]'"
                  (click)="openPage(page.pageId)">
-              <div class="flex items-center space-x-2 overflow-hidden">
-                <i class="ri-file-text-line" [ngClass]="selectedPage?.pageId === page.pageId ? 'text-purple-600' : 'text-blue-500'"></i>
-                <span class="text-sm truncate select-none" [ngClass]="selectedPage?.pageId === page.pageId ? 'text-purple-700 font-semibold' : 'text-slate-600'">{{ page.title }}</span>
+              
+              <!-- Guide line connector for pages -->
+              <div *ngIf="selectedPage?.pageId !== page.pageId" class="absolute left-0 top-1/2 w-[16px] border-t border-slate-200"></div>
+              
+              <!-- Left highlight bar for selected page -->
+              <div *ngIf="selectedPage?.pageId === page.pageId" class="absolute left-0 top-0 bottom-0 w-1 bg-purple-300 rounded-r-md"></div>
+
+              <div class="flex items-center space-x-2 overflow-hidden flex-1 relative z-10">
+                <span class="flex-shrink-0 text-lg leading-none" [class.grayscale]="selectedPage?.pageId === page.pageId" [class.brightness-200]="selectedPage?.pageId === page.pageId">📄</span>
+                <span class="text-sm truncate select-none whitespace-nowrap" [ngClass]="selectedPage?.pageId === page.pageId ? 'font-semibold text-white' : ''">{{ page.title }}</span>
               </div>
             </div>
           </div>
@@ -193,11 +214,11 @@
       </div>
 
       <!-- Page Content Viewer/Editor -->
-      <div class="flex-1 p-8 max-w-[1000px] w-full mx-auto">
-        <div *ngIf="!isEditingPage" class="prose prose-slate prose-purple max-w-none editor-content-viewer" [innerHTML]="selectedPage.content | safeHtml"></div>
+      <div class="flex-1 w-full flex flex-col">
+        <div *ngIf="!isEditingPage" class="flex-1 p-6 sm:p-8 prose prose-slate prose-purple max-w-none editor-content-viewer" [innerHTML]="selectedPage.content | safeHtml"></div>
         
-        <div *ngIf="isEditingPage" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <jodit-editor [defaultValue]="selectedPage.content" (onChange)="onEditorChange($event)" [config]="joditConfig" class="block w-full border-none"></jodit-editor>
+        <div *ngIf="isEditingPage" class="flex-1 bg-white flex flex-col w-full h-full">
+          <jodit-editor [defaultValue]="selectedPage.content" (onChange)="onEditorChange($event)" [config]="joditConfig" class="block w-full flex-1 border-none"></jodit-editor>
         </div>
       </div>
 

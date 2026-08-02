@@ -48,6 +48,8 @@ export class DashboardComponent implements OnInit {
   currentUser: any = null;
   folderTree: NoteFolder[] = [];
   
+  isSidebarOpen: boolean = true;
+  
   // Search
   searchQuery: string = '';
   searchResults: { folders: any[], pages: any[] } = { folders: [], pages: [] };
@@ -248,6 +250,10 @@ export class DashboardComponent implements OnInit {
           this.selectedPage = res;
           this.isEditingPage = false;
           this.buildBreadcrumb(this.folderTree, res.folderId, []);
+          
+          if (window.innerWidth < 1024) { // Close sidebar on mobile/tablet when page opened
+            this.isSidebarOpen = false;
+          }
         },
         error: () => this.toastr.error('Failed to load page.')
       });
@@ -313,6 +319,10 @@ export class DashboardComponent implements OnInit {
   toggleFolder(folder: NoteFolder, event: Event) {
     event.stopPropagation();
     folder.expanded = !folder.expanded;
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
   onSearchChange() {
