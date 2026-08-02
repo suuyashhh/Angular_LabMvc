@@ -9,12 +9,31 @@ import { AuthService } from '../../shared/auth.service';
 import { LoaderService } from '../../services/loader.service';
 import { SafeHtmlPipe } from '../../shared/pipes/safe-html.pipe';
 import { JoditAngularModule } from 'jodit-angular';
-interface NoteItem {
-  id: number;
+
+export interface NoteFolder {
+  folderId: number;
+  userId: number;
+  parentFolderId?: number | null;
+  folderName: string;
+  subFolders: NoteFolder[];
+  pages: NotePageDto[];
+  expanded?: boolean;
+}
+
+export interface NotePageDto {
+  pageId: number;
+  folderId: number;
+  title: string;
+}
+
+export interface NotePage {
+  pageId: number;
+  folderId: number;
   userId: number;
   title: string;
   content: string;
   createdDate: string;
+  updatedDate: string;
 }
 
 @Component({
@@ -26,16 +45,31 @@ interface NoteItem {
   encapsulation: ViewEncapsulation.None
 })
 export class DashboardComponent implements OnInit {
-  activeTab: 'home' | 'paste' = 'home';
-  title = '';
-  content = '';
-  searchQuery = '';
-  notes: NoteItem[] = [];
-  editingNoteId: number | null = null;
-  selectedNote: NoteItem | null = null;
   currentUser: any = null;
+  folderTree: NoteFolder[] = [];
+  
+  // Search
+  searchQuery: string = '';
+  searchResults: { folders: any[], pages: any[] } = { folders: [], pages: [] };
+  isSearching: boolean = false;
+
+  // Selected State
+  selectedPage: NotePage | null = null;
+  isEditingPage: boolean = false;
+  breadcrumb: string[] = [];
+
+  // Modals / Dialogs
+  showAddFolderModal: boolean = false;
+  showAddPageModal: boolean = false;
+  
+  newFolderName: string = '';
+  newPageTitle: string = '';
+  targetFolderIdForAdd: number | null = null; // Can be null if root
+
+  // Editor Config
   joditConfig = {
-    height: 400,
+    height: 600,
+    hidePoweredByJodit: true,
     uploader: {
       insertImageAsBase64URI: true
     },
@@ -53,6 +87,12 @@ export class DashboardComponent implements OnInit {
     }
   };
 
+  // Context Menu
+  contextMenuVisible = false;
+  contextMenuX = 0;
+  contextMenuY = 0;
+  contextMenuFolder: NoteFolder | null = null;
+
   private http = inject(HttpClient);
   private api = inject(ApiService);
   private auth = inject(AuthService);
@@ -61,161 +101,234 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.auth.getNotesUser();
-    this.loadNotes();
-  }
-
-  setTab(tab: 'home' | 'paste') {
-    this.activeTab = tab;
-  }
-
-  loadNotes() {
-    if (!this.currentUser) return;
-    this.loader.show();
-    this.http.get<NoteItem[]>(`${this.api.baseurl}Notes/user/${this.currentUser.id}`, {
-      params: { searchQuery: this.searchQuery }
-    })
-    .pipe(finalize(() => this.loader.hide()))
-    .subscribe({
-      next: (res) => {
-        this.notes = res;
-      },
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Failed to load notes.', 'Error');
-      }
+    this.loadTree();
+    
+    // Close context menu on outside click
+    document.addEventListener('click', () => {
+      this.contextMenuVisible = false;
     });
   }
 
-  onSearchChange() {
-    this.loadNotes();
-  }
-
-  onEditorChange(data: any) {
-    if (typeof data === 'string') {
-      this.content = data;
-    } else if (data && data.editor) {
-      this.content = data.editor.value;
-    } else if (data && data.html) {
-      this.content = data.html;
-    }
-  }
-
-  createOrUpdateNote() {
-    const hasText = this.content ? this.content.replace(/<[^>]*>/g, '').trim().length > 0 : false;
-    const hasImage = this.content ? this.content.includes('<img') : false;
-    
-    const isTitleEmpty = !this.title || this.title.trim() === '';
-    const isContentEmpty = !hasText && !hasImage;
-
-    if (isTitleEmpty || isContentEmpty) {
-      if (isTitleEmpty && isContentEmpty) {
-         this.toastr.warning('Please enter both title and content.', 'Validation');
-      } else if (isTitleEmpty) {
-         this.toastr.warning('Please enter a title for your paste.', 'Validation');
-      } else {
-         this.toastr.warning('Please enter some content for your paste.', 'Validation');
-      }
-      return;
-    }
-
+  loadTree() {
     if (!this.currentUser) return;
-
     this.loader.show();
-
-    if (this.editingNoteId) {
-      // Update Mode
-      const payload = {
-        id: this.editingNoteId,
-        userId: this.currentUser.id,
-        title: this.title,
-        content: this.content
-      };
-
-      this.http.put(`${this.api.baseurl}Notes`, payload)
-        .pipe(finalize(() => this.loader.hide()))
-        .subscribe({
-          next: () => {
-            this.toastr.success('Paste updated successfully!', 'Success');
-            this.clearForm();
-            this.loadNotes();
-            this.setTab('paste');
-          },
-          error: (err) => {
-            console.error(err);
-            this.toastr.error(err?.error?.message || 'Failed to update paste.', 'Error');
-          }
-        });
-    } else {
-      // Create Mode
-      const payload = {
-        userId: this.currentUser.id,
-        title: this.title,
-        content: this.content
-      };
-
-      this.http.post(`${this.api.baseurl}Notes`, payload)
-        .pipe(finalize(() => this.loader.hide()))
-        .subscribe({
-          next: () => {
-            this.toastr.success('Paste created successfully!', 'Success');
-            this.clearForm();
-            this.loadNotes();
-            this.setTab('paste');
-          },
-          error: (err) => {
-            console.error(err);
-            this.toastr.error(err?.error?.message || 'Failed to create paste.', 'Error');
-          }
-        });
-    }
-  }
-
-  editNote(note: NoteItem) {
-    this.title = note.title;
-    this.content = note.content;
-    this.editingNoteId = note.id;
-    this.setTab('home');
-  }
-
-  deleteNote(noteId: number) {
-    if (!this.currentUser) return;
-    if (!confirm('Are you sure you want to delete this paste?')) return;
-
-    this.loader.show();
-    this.http.delete(`${this.api.baseurl}Notes/${noteId}/user/${this.currentUser.id}`)
+    this.http.get<NoteFolder[]>(`${this.api.baseurl}NotesExplorer/tree/${this.currentUser.id}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
-        next: () => {
-          this.toastr.success('Paste deleted successfully.', 'Deleted');
-          this.loadNotes();
+        next: (res) => {
+          this.folderTree = res;
         },
         error: (err) => {
           console.error(err);
-          this.toastr.error('Failed to delete paste.', 'Error');
+          this.toastr.error('Failed to load explorer.', 'Error');
         }
       });
   }
 
-  viewNote(note: NoteItem) {
-    this.selectedNote = note;
+  // --- Folder Actions ---
+  openContextMenu(event: MouseEvent, folder: NoteFolder) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.contextMenuFolder = folder;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+    this.contextMenuVisible = true;
   }
 
-  closeView() {
-    this.selectedNote = null;
+  openAddFolderModal(parentFolderId: number | null) {
+    this.targetFolderIdForAdd = parentFolderId;
+    this.newFolderName = '';
+    this.showAddFolderModal = true;
   }
 
-  copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      this.toastr.success('Copied to clipboard!', 'Copied');
-    }).catch(err => {
-      console.error('Could not copy text: ', err);
-    });
+  createFolder() {
+    if (!this.newFolderName.trim()) {
+      this.toastr.warning('Folder name is required.');
+      return;
+    }
+    const payload = {
+      userId: this.currentUser.id,
+      parentFolderId: this.targetFolderIdForAdd,
+      folderName: this.newFolderName.trim()
+    };
+    
+    this.loader.show();
+    this.http.post(`${this.api.baseurl}NotesExplorer/folders`, payload)
+      .pipe(finalize(() => { this.loader.hide(); this.showAddFolderModal = false; }))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Folder created.');
+          this.loadTree();
+        },
+        error: (err) => this.toastr.error('Failed to create folder.')
+      });
   }
 
-  clearForm() {
-    this.title = '';
-    this.content = '';
-    this.editingNoteId = null;
+  deleteFolder(folder: NoteFolder) {
+    if (folder.subFolders?.length > 0 || folder.pages?.length > 0) {
+      if (!confirm('This folder contains pages and subfolders. Deleting it will permanently remove everything inside. This action cannot be undone. Delete Folder?')) {
+        return;
+      }
+    } else {
+      if (!confirm('Are you sure you want to delete this folder?')) return;
+    }
+
+    this.loader.show();
+    this.http.delete(`${this.api.baseurl}NotesExplorer/folders/${folder.folderId}/user/${this.currentUser.id}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Folder deleted.');
+          if (this.selectedPage && this.breadcrumb.includes(folder.folderName)) {
+            this.selectedPage = null;
+          }
+          this.loadTree();
+        },
+        error: (err) => this.toastr.error(err.error || 'Failed to delete folder.')
+      });
+  }
+
+  renameFolder(folder: NoteFolder) {
+    const newName = prompt('Enter new folder name:', folder.folderName);
+    if (newName && newName.trim() && newName.trim() !== folder.folderName) {
+      this.loader.show();
+      this.http.put(`${this.api.baseurl}NotesExplorer/folders`, {
+        folderId: folder.folderId,
+        userId: this.currentUser.id,
+        folderName: newName.trim()
+      }).pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Folder renamed.');
+          this.loadTree();
+        },
+        error: () => this.toastr.error('Failed to rename folder.')
+      });
+    }
+  }
+
+  // --- Page Actions ---
+  openAddPageModal(folderId: number) {
+    this.targetFolderIdForAdd = folderId;
+    this.newPageTitle = '';
+    this.showAddPageModal = true;
+  }
+
+  createPage() {
+    if (!this.newPageTitle.trim()) {
+      this.toastr.warning('Page title is required.');
+      return;
+    }
+    const payload = {
+      userId: this.currentUser.id,
+      folderId: this.targetFolderIdForAdd,
+      title: this.newPageTitle.trim(),
+      content: ''
+    };
+    
+    this.loader.show();
+    this.http.post<NotePage>(`${this.api.baseurl}NotesExplorer/pages`, payload)
+      .pipe(finalize(() => { this.loader.hide(); this.showAddPageModal = false; }))
+      .subscribe({
+        next: (res) => {
+          this.toastr.success('Page created.');
+          this.loadTree();
+          this.openPage(res.pageId);
+        },
+        error: (err) => this.toastr.error('Failed to create page.')
+      });
+  }
+
+  openPage(pageId: number) {
+    this.loader.show();
+    this.http.get<NotePage>(`${this.api.baseurl}NotesExplorer/pages/${pageId}/user/${this.currentUser.id}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: (res) => {
+          this.selectedPage = res;
+          this.isEditingPage = false;
+          this.buildBreadcrumb(this.folderTree, res.folderId, []);
+        },
+        error: () => this.toastr.error('Failed to load page.')
+      });
+  }
+
+  buildBreadcrumb(nodes: NoteFolder[], targetFolderId: number, currentPath: string[]): boolean {
+    for (let node of nodes) {
+      if (node.folderId === targetFolderId) {
+        this.breadcrumb = [...currentPath, node.folderName];
+        return true;
+      }
+      if (node.subFolders && node.subFolders.length > 0) {
+        if (this.buildBreadcrumb(node.subFolders, targetFolderId, [...currentPath, node.folderName])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  savePage() {
+    if (!this.selectedPage) return;
+    this.loader.show();
+    this.http.put(`${this.api.baseurl}NotesExplorer/pages`, this.selectedPage)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Page saved.');
+          this.isEditingPage = false;
+          this.loadTree(); // refresh titles just in case
+        },
+        error: () => this.toastr.error('Failed to save page.')
+      });
+  }
+
+  deletePage(pageId: number) {
+    if (!confirm('This action cannot be undone. Are you sure you want to permanently delete this page?')) return;
+    
+    this.loader.show();
+    this.http.delete(`${this.api.baseurl}NotesExplorer/pages/${pageId}/user/${this.currentUser.id}`)
+      .pipe(finalize(() => this.loader.hide()))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Page deleted.');
+          this.selectedPage = null;
+          this.loadTree();
+        },
+        error: () => this.toastr.error('Failed to delete page.')
+      });
+  }
+
+  onEditorChange(data: any) {
+    if (!this.selectedPage) return;
+    if (typeof data === 'string') {
+      this.selectedPage.content = data;
+    } else if (data && data.editor) {
+      this.selectedPage.content = data.editor.value;
+    } else if (data && data.html) {
+      this.selectedPage.content = data.html;
+    }
+  }
+
+  toggleFolder(folder: NoteFolder, event: Event) {
+    event.stopPropagation();
+    folder.expanded = !folder.expanded;
+  }
+
+  onSearchChange() {
+    if (!this.searchQuery.trim()) {
+      this.isSearching = false;
+      this.searchResults = { folders: [], pages: [] };
+      return;
+    }
+    
+    this.isSearching = true;
+    this.http.get<any>(`${this.api.baseurl}NotesExplorer/search/${this.currentUser.id}?query=${encodeURIComponent(this.searchQuery)}`)
+      .subscribe({
+        next: (res) => {
+          this.searchResults = res;
+        }
+      });
   }
 
   logout() {
@@ -226,7 +339,7 @@ export class DashboardComponent implements OnInit {
     if (!dateStr) return '';
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     } catch {
       return dateStr;
     }
