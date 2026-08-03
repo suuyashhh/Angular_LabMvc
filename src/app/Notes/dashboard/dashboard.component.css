@@ -1,97 +1,98 @@
 /* Custom scrollbar for Explorer */
 .explorer-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-  .explorer-scroll::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .explorer-scroll::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-  }
-  .explorer-scroll::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
-  
-  /* Custom scrollbar for Page Viewer */
-  .page-scroll::-webkit-scrollbar {
-    width: 8px;
-  }
-  .page-scroll::-webkit-scrollbar-track {
-    background: #f8fafc;
-  }
-  .page-scroll::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-  }
-  .page-scroll::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
-  
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  .animate-fadeIn {
-    animation: fadeIn 0.2s ease-in-out;
-  }
-  
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-slideUp {
-    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  .animate-scaleIn {
-    animation: scaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  /* Editor Viewer Overrides (Tailwind Prose might need some help with rich text) */
-  .editor-content-viewer img {
-    border-radius: 8px;
-    max-width: 100%;
-    height: auto;
-    margin: 1rem 0;
-  }
-  
-  .editor-content-viewer table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-  }
-  
-  .editor-content-viewer th, 
-  .editor-content-viewer td {
-    border: 1px solid #e2e8f0;
-    padding: 0.75rem;
-  }
-  
-  .editor-content-viewer th {
-    background-color: #f8fafc;
-    font-weight: 600;
-  }
-  
-  /* Custom Powered By for Jodit */
-  .jodit-status-bar-link {
-    font-size: 0 !important;
-    color: transparent !important;
-    text-decoration: none !important;
-  }
-  
-  .jodit-status-bar-link::after {
-    content: 'POWERED BY SUYASH';
-    font-size: 11px;
-    color: #3b82f6; /* A nice blue color */
-    font-weight: 500;
-    text-transform: uppercase;
-    pointer-events: none;
-    letter-spacing: 0.5px;
-    display: inline-block;
-  }
+  width: 6px;
+}
+.explorer-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.explorer-scroll::-webkit-scrollbar-thumb {
+  background: #e4e4e7; /* zinc-200 */
+  border-radius: 10px;
+}
+.explorer-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8; /* zinc-300 */
+}
+
+/* Custom scrollbar for Page Viewer */
+.page-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.page-scroll::-webkit-scrollbar-track {
+  background: #ffffff; /* white */
+}
+.page-scroll::-webkit-scrollbar-thumb {
+  background: #e4e4e7; /* zinc-200 */
+  border-radius: 4px;
+}
+.page-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8; /* zinc-300 */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slideUp {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scaleIn {
+  animation: scaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Editor Viewer Overrides */
+.editor-content-viewer img {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+}
+
+.editor-content-viewer table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.editor-content-viewer th, 
+.editor-content-viewer td {
+  border: 1px solid #e4e4e7; /* zinc-200 */
+  padding: 0.75rem;
+}
+
+.editor-content-viewer th {
+  background-color: #f4f4f5; /* zinc-100 */
+  font-weight: 600;
+  color: #18181b; /* zinc-900 */
+}
+
+/* Custom Powered By for Jodit */
+.jodit-status-bar-link {
+  font-size: 0 !important;
+  color: transparent !important;
+  text-decoration: none !important;
+}
+
+.jodit-status-bar-link::after {
+  content: 'POWERED BY SUYASH';
+  font-size: 11px;
+  color: #71717a; /* zinc-500 */
+  font-weight: 600;
+  text-transform: uppercase;
+  pointer-events: none;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
