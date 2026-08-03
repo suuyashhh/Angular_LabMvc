@@ -31,29 +31,21 @@ export class ShopUsersComponent implements OnInit {
   // Selected user for view/edit/delete
   selectedUser: ShopUser | null = null;
 
-  // Modals state
-  showAddModal = false;
-  showEditModal = false;
-  showDeleteConfirm = false;
+  // Drawer and Modal State
+  isDrawerOpen = false;
+  editMode = false;
+  isDeleteModalOpen = false;
+  isSaving = false;
+  showPassword = false;
 
-  // Forms
+  // Form Data
   formData = {
-    username: '',
-    password: '',
-    contact: '',
-    user_img: ''
-  };
-
-  editFormData = {
     userId: 0,
     username: '',
     password: '',
     contact: '',
     user_img: ''
   };
-
-  showPassword = false;
-  showEditPassword = false;
 
   constructor(
     private api: ApiService,
@@ -67,7 +59,6 @@ export class ShopUsersComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Guard check: make sure user is logged in
     if (!this.auth.isShopLoggedIn()) {
       this.toastr.warning('Please login to manage shop users');
       this.router.navigate(['/shop/login']);
@@ -115,20 +106,38 @@ export class ShopUsersComponent implements OnInit {
     }
   }
 
-  // Add Modal Actions
-  openAddModal() {
-    this.showAddModal = true;
+  // Drawer Actions
+  openAddDrawer() {
+    this.editMode = false;
+    this.showPassword = false;
     this.formData = {
+      userId: 0,
       username: '',
       password: '',
       contact: '',
       user_img: ''
     };
-    this.showPassword = false;
+    this.isDrawerOpen = true;
   }
 
-  closeAddModal() {
-    this.showAddModal = false;
+  openEditDrawer(user: ShopUser) {
+    this.editMode = true;
+    this.selectedUser = user;
+    this.showPassword = false;
+    this.formData = {
+      userId: user.useR_ID,
+      username: user.useR_NAME,
+      password: user.pass,
+      contact: user.contact,
+      user_img: user.useR_IMG || ''
+    };
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
+    this.selectedUser = null;
+    this.formData = { userId: 0, username: '', password: '', contact: '', user_img: '' };
   }
 
   saveUser() {
@@ -145,106 +154,76 @@ export class ShopUsersComponent implements OnInit {
       return;
     }
 
-    this.loader.show();
-    const payload = {
-      USER_NAME: this.formData.username.trim(),
-      PASS: this.formData.password.trim(),
-      CONTACT: this.formData.contact.trim(),
-      USER_IMG: this.formData.user_img
-    };
+    this.isSaving = true;
 
-    this.api.post('ShopUser/Insert', payload).subscribe({
-      next: (res: any) => {
-        if (res && res.success) {
-          this.toastr.success('Shop user added successfully');
-          this.closeAddModal();
-          this.loadUsers();
-        } else {
-          this.toastr.error(res?.message || 'Failed to add shop user');
-          this.loader.hide();
+    if (this.editMode) {
+      const payload = {
+        USER_ID: this.formData.userId,
+        USER_NAME: this.formData.username.trim(),
+        PASS: this.formData.password.trim(),
+        CONTACT: this.formData.contact.trim(),
+        USER_IMG: this.formData.user_img
+      };
+
+      this.api.put('ShopUser/Update', payload).subscribe({
+        next: (res: any) => {
+          this.isSaving = false;
+          if (res && res.success) {
+            this.toastr.success('Shop user updated successfully');
+            this.closeDrawer();
+            this.loadUsers();
+          } else {
+            this.toastr.error(res?.message || 'Failed to update shop user');
+          }
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Update error:', err);
+          this.toastr.error('Error updating user');
         }
-      },
-      error: (err) => {
-        console.error('Insert error:', err);
-        this.toastr.error('Error adding user');
-        this.loader.hide();
-      }
-    });
-  }
+      });
+    } else {
+      const payload = {
+        USER_NAME: this.formData.username.trim(),
+        PASS: this.formData.password.trim(),
+        CONTACT: this.formData.contact.trim(),
+        USER_IMG: this.formData.user_img
+      };
 
-  // Edit Modal Actions
-  openEditModal(user: ShopUser) {
-    this.selectedUser = user;
-    this.editFormData = {
-      userId: user.useR_ID,
-      username: user.useR_NAME,
-      password: user.pass,
-      contact: user.contact,
-      user_img: user.useR_IMG || ''
-    };
-    this.showEditPassword = false;
-    this.showEditModal = true;
-  }
-
-  closeEditModal() {
-    this.showEditModal = false;
-    this.selectedUser = null;
-  }
-
-  updateUser() {
-    if (!this.editFormData.username.trim()) {
-      this.toastr.error('Please enter a username');
-      return;
-    }
-    if (!this.editFormData.password.trim()) {
-      this.toastr.error('Please enter a password');
-      return;
-    }
-    if (!this.editFormData.contact.trim()) {
-      this.toastr.error('Please enter a contact number');
-      return;
-    }
-
-    this.loader.show();
-    const payload = {
-      USER_ID: this.editFormData.userId,
-      USER_NAME: this.editFormData.username.trim(),
-      PASS: this.editFormData.password.trim(),
-      CONTACT: this.editFormData.contact.trim(),
-      USER_IMG: this.editFormData.user_img
-    };
-
-    this.api.put('ShopUser/Update', payload).subscribe({
-      next: (res: any) => {
-        if (res && res.success) {
-          this.toastr.success('Shop user updated successfully');
-          this.closeEditModal();
-          this.loadUsers();
-        } else {
-          this.toastr.error(res?.message || 'Failed to update shop user');
-          this.loader.hide();
+      this.api.post('ShopUser/Insert', payload).subscribe({
+        next: (res: any) => {
+          this.isSaving = false;
+          if (res && res.success) {
+            this.toastr.success('Shop user added successfully');
+            this.closeDrawer();
+            this.loadUsers();
+          } else {
+            this.toastr.error(res?.message || 'Failed to add shop user');
+          }
+        },
+        error: (err) => {
+          this.isSaving = false;
+          console.error('Insert error:', err);
+          this.toastr.error('Error adding user');
         }
-      },
-      error: (err) => {
-        console.error('Update error:', err);
-        this.toastr.error('Error updating user');
-        this.loader.hide();
-      }
-    });
+      });
+    }
   }
 
   // Delete Actions
-  openDeleteConfirm(user: ShopUser) {
-    this.selectedUser = user;
-    this.showDeleteConfirm = true;
+  confirmDelete(id: number) {
+    this.selectedUser = this.users.find(u => u.useR_ID === id) || null;
+    if (this.selectedUser) {
+      this.isDeleteModalOpen = true;
+    }
   }
 
-  closeDeleteConfirm() {
-    this.showDeleteConfirm = false;
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
     this.selectedUser = null;
   }
 
-  confirmDelete() {
+  confirmDeleteAction() {
     if (!this.selectedUser) return;
  
     this.loader.show();
@@ -252,7 +231,7 @@ export class ShopUsersComponent implements OnInit {
       next: (res: any) => {
         if (res && res.success) {
           this.toastr.success('Shop user deleted successfully');
-          this.closeDeleteConfirm();
+          this.closeDeleteModal();
           this.loadUsers();
         } else {
           this.toastr.error(res?.message || 'Failed to delete shop user');
@@ -267,7 +246,7 @@ export class ShopUsersComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any, isEdit: boolean) {
+  onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
@@ -276,21 +255,13 @@ export class ShopUsersComponent implements OnInit {
       }
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        if (isEdit) {
-          this.editFormData.user_img = e.target.result;
-        } else {
-          this.formData.user_img = e.target.result;
-        }
+        this.formData.user_img = e.target.result;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  removeImage(isEdit: boolean) {
-    if (isEdit) {
-      this.editFormData.user_img = '';
-    } else {
-      this.formData.user_img = '';
-    }
+  removeImage() {
+    this.formData.user_img = '';
   }
 }

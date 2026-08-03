@@ -1,0 +1,119 @@
+<div class="page-container bg-slate-50 min-h-screen">
+  <!-- Page Header -->
+  <div class="flex items-center gap-4 bg-white p-4 border-b border-slate-200 sticky top-0 z-40">
+    <button *ngIf="selectedHelper" (click)="deselectHelper()" class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors mr-1">
+      <i class="fas fa-arrow-left text-lg"></i>
+    </button>
+
+    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center shadow-inner flex-shrink-0">
+      <img src="assets/img/Fabrication/HelperAttendance.png" alt="History Icon" class="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+    </div>
+
+    <div class="min-w-0">
+      <h1 class="text-xl sm:text-2xl font-semibold text-slate-800 truncate">
+        {{ selectedHelper ? 'Helper History of ' + selectedHelper.user_name : 'Helpers History' }}
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 -mt-0.5 truncate">
+        {{ selectedHelper ? 'Monthly breakdown of advance payment registry' : 'Manage and check logs for helper advance disbursals' }}
+      </p>
+    </div>
+  </div>
+
+  <div class="p-4 sm:p-6 md:p-8 max-w-2xl mx-auto space-y-6">
+    <!-- MASTER VIEW: Helper Names List -->
+    <div *ngIf="!selectedHelper" class="space-y-6">
+      <!-- Search Box & Stats -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-4">
+        <div class="relative w-full">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i class="fas fa-search text-base"></i>
+          </span>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="filterHelpers()"
+            placeholder="Search helpers by name..."
+            class="block w-full pl-10 pr-4 py-2.5 text-sm sm:text-base text-slate-900 placeholder-slate-400 bg-slate-50/50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          />
+        </div>
+
+        <div class="flex items-center justify-between text-xs sm:text-sm text-slate-500 px-1">
+          <span class="font-medium">Total Helpers:</span>
+          <span class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full font-bold">
+            {{ filteredHelpersList.length }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Helper Cards Grid -->
+      <div class="space-y-3">
+        <div
+          *ngFor="let h of filteredHelpersList"
+          (click)="selectHelper(h)"
+          class="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+        >
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white font-bold flex items-center justify-center shadow-sm">
+              {{ (h.user_name ? h.user_name[0] : '') | uppercase }}
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-800 text-sm sm:text-base">{{ h.user_name }}</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Click to view advance logs</p>
+            </div>
+          </div>
+          <div class="text-slate-400 hover:text-slate-600 transition-colors">
+            <i class="fas fa-chevron-right text-sm"></i>
+          </div>
+        </div>
+
+        <!-- No Data Fallback -->
+        <div *ngIf="filteredHelpersList.length === 0" class="text-center py-12 bg-white rounded-xl border border-slate-100 shadow-sm">
+          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
+            <i class="fas fa-users-slash text-lg"></i>
+          </div>
+          <h4 class="font-semibold text-slate-700 text-sm">No Helpers Found</h4>
+          <p class="text-xs text-slate-400 mt-1">Try matching names using another query.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW: Selected Helper History -->
+    <div *ngIf="selectedHelper" class="space-y-6">
+      <div *ngFor="let group of groupedAdvances" class="space-y-4">
+        <!-- Month Year Divider -->
+        <div class="flex items-center gap-3 py-2 border-b border-slate-200/80">
+          <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+          <h3 class="text-sm sm:text-base font-bold text-slate-700 uppercase tracking-wide">{{ group.key }}</h3>
+          <span class="text-xs text-slate-400">({{ group.value.length }} records)</span>
+        </div>
+
+        <!-- Group Items -->
+        <div class="space-y-3">
+          <div
+            *ngFor="let item of group.value"
+            class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm flex items-center justify-between gap-4"
+          >
+            <div>
+              <h5 class="text-sm sm:text-base font-semibold text-slate-800">{{ item.exp_name || 'Helper Advance Disbursal' }}</h5>
+              <p class="text-xs text-slate-400 mt-1">{{ item.date | date:'dd-MMM-yyyy' }}</p>
+            </div>
+            <div class="text-right">
+              <h4 class="text-emerald-600 font-bold text-base sm:text-lg">
+                + ₹{{ item.user_advance | number:'1.0-0' }}
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Data Fallback -->
+      <div *ngIf="groupedAdvances.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+          <i class="fas fa-history text-2xl"></i>
+        </div>
+        <h3 class="text-base sm:text-lg font-semibold text-slate-700">No History Found</h3>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 px-4">There are no logged advance records for {{ selectedHelper.user_name }}.</p>
+      </div>
+    </div>
+  </div>
+</div>

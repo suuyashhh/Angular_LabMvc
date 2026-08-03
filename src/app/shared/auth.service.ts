@@ -206,6 +206,61 @@ clearDairyCredentialsCookie(): void {
   document.cookie = 'dairyCredentials=; path=/; max-age=0';
 }
 
+/** Fabrication Credentials */
+isFabLoggedIn(): boolean {
+  if (!isPlatformBrowser(this.platformId)) return false;
+  const fab = this.getFabCredentialsFromCookie();
+  return !!fab && typeof fab === 'object';
+}
+
+setFabCredentialsCookie(value: any, days: number = 7): void {
+  try {
+    const json = JSON.stringify(value);
+    const encoded = encodeURIComponent(json);
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `fabCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+  } catch (e) {
+    console.error('Failed to set fab cookie', e);
+  }
+}
+
+getFabCredentialsFromCookie(): any | null {
+  try {
+    const cookies = document.cookie ? document.cookie.split('; ') : [];
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=');
+      if (name === 'fabCredentials' && value) {
+        const decoded = decodeURIComponent(value);
+        return JSON.parse(decoded);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to read fab cookie', e);
+  }
+  return null;
+}
+
+fabLogout(): void {
+  try {
+    this.clearFabCredentialsCookie();
+    try {
+      this.toaster.success('Logged out from Fabrication Portal', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+    this.router.navigate(['/fab/login']);
+  } catch (err) {
+    console.error('fabLogout error', err);
+    this.router.navigate(['/fab/login']);
+  }
+}
+
+clearFabCredentialsCookie(): void {
+  document.cookie = 'fabCredentials=; path=/; max-age=0';
+}
+
+
 
 
 
@@ -278,9 +333,8 @@ clearFarmUserDetailsCookie(): void {
 
   isShopLoggedIn(): boolean {
     if (!isPlatformBrowser(this.platformId)) return false;
-    const shopUser = this.getShopCredentialsFromCookie();
-    const hasToken = !!this.getShopToken();
-    return (!!shopUser && typeof shopUser === 'object') && hasToken;
+    const shopUser = localStorage.getItem('shop_user');
+    return !!shopUser;
   }
 
   getShopToken(): string | null {
@@ -346,26 +400,7 @@ clearFarmUserDetailsCookie(): void {
   }
 
   validateShopSession(showExpiredToast: boolean = false) {
-    const token = this.getShopToken();
-    if (!token) {
-      return of(null);
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.get(`${this.api.baseurl}LoginShop/validate`, { headers }).pipe(
-      tap((response: any) => {
-        // Shop session validated successfully
-      }),
-      catchError((err) => {
-        if (err?.status === 401 || err?.status === 403 || err?.status === 0) {
-          this.handleShopSessionExpired(this.shopSessionExpiredMessage, showExpiredToast);
-        }
-        return throwError(() => err);
-      })
-    );
+    return of(null);
   }
 
   handleShopSessionExpired(message: string = this.shopSessionExpiredMessage, showToast: boolean = true): void {
@@ -382,7 +417,8 @@ clearFarmUserDetailsCookie(): void {
   ): void {
     document.cookie = 'shopCredentials=; path=/; max-age=0';
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.clear();
+      localStorage.removeItem('shop_user');
+      localStorage.removeItem('shop_token');
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('shopCredentials');
       }
@@ -406,20 +442,7 @@ clearFarmUserDetailsCookie(): void {
   }
 
   shopLogout(): void {
-    const token = this.getShopToken();
-    if (!token) {
-      this.clearShopSession(true, true);
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    this.http.post(`${this.api.baseurl}LoginShop/logout`, {}, { headers }).subscribe({
-      next: () => this.clearShopSession(true, true),
-      error: () => this.clearShopSession(true, true)
-    });
+    this.clearShopSession(true, true);
   }
 
 
@@ -587,6 +610,41 @@ clearFarmUserDetailsCookie(): void {
     if (navigateToLogin) {
       this.router.navigateByUrl('/parking/dashboard', { replaceUrl: true });
     }
+  }
+
+  // ===== Notes Module Auth Methods =====
+
+  isNotesLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    return !!localStorage.getItem('notes_user');
+  }
+
+  getNotesUser(): any | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    const userStr = localStorage.getItem('notes_user');
+    try {
+      return userStr ? JSON.parse(userStr) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  setNotesUser(user: any): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('notes_user', JSON.stringify(user));
+    }
+  }
+
+  notesLogout(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('notes_user');
+    }
+    try {
+      this.toaster.success('Logged out from Notes', 'Logout');
+    } catch (e) {
+      console.warn('toaster unavailable', e);
+    }
+    this.router.navigate(['/notes/login']);
   }
 
 }

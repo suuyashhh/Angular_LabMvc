@@ -1,0 +1,138 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="page-header flex-column flex-md-row align-items-start align-items-md-center gap-3">
+    <div>
+      <span class="page-header-subtitle">OVERVIEW</span>
+      <h1 class="page-header-title">Dashboard</h1>
+    </div>
+    <button routerLink="/market/purchase/add" class="btn btn-primary-green d-flex align-items-center gap-2 shadow-sm">
+      <i class="bi bi-plus-lg"></i>
+      <span>Add Purchase Entry</span>
+    </button>
+  </div>
+
+  <!-- Filters Panel -->
+  <div class="filters-panel p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex flex-wrap align-items-center gap-2 gap-md-3 small">
+        <span class="text-success fw-medium">Paid: ₹{{ totalPaidAmount | number:'1.2-2' }}</span>
+        <span class="text-muted">|</span>
+        <span class="text-danger fw-medium">Pending: ₹{{ totalPendingAmount | number:'1.2-2' }}</span>
+        <span class="text-muted">|</span>
+        <span class="text-muted">{{ filteredEntries.length }} entries</span>
+      </div>
+    </div>
+    <div class="row g-2 g-md-3">
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">Search Hotel</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" class="form-control border-start-0 ps-0" placeholder="Search hotel..."
+            [(ngModel)]="searchHotel">
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">From Date</label>
+        <input type="date" class="form-control" [(ngModel)]="fromDate" (change)="loadEntries()">
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">To Date</label>
+        <input type="date" class="form-control" [(ngModel)]="toDate" (change)="loadEntries()">
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label text-uppercase fw-semibold text-muted mb-1" style="font-size: 10px;">Payment Method</label>
+        <select class="form-select" [(ngModel)]="filterPayment">
+          <option value="All">All payments</option>
+          <option value="Cash">Cash</option>
+          <option value="Online">Online</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entries Table -->
+  <div class="custom-table-container">
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Hotel</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Paid</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of filteredEntries">
+            <td class="fw-medium text-secondary">{{ entry.date | date:'dd MMM yyyy' }}</td>
+            <td>
+              <div class="fw-bold">{{ entry.hotelName }}</div>
+              <div class="text-muted small" *ngIf="entry.contactNumber">{{ entry.contactNumber }}</div>
+            </td>
+            <td class="fw-bold">₹{{ entry.grandTotal | number:'1.2-2' }}</td>
+            <td>
+              <span [class]="entry.paymentMethod === 'Online' ? 'badge-online' : 'badge-cash'">
+                {{ entry.paymentMethod }}
+              </span>
+            </td>
+            <td>
+              <div class="fw-bold text-success">₹{{ entry.paidAmount | number:'1.2-2' }}</div>
+              <div class="small text-danger" *ngIf="entry.grandTotal - entry.paidAmount > 0">
+                Due ₹{{ (entry.grandTotal - entry.paidAmount) | number:'1.2-2' }}
+              </div>
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-2">
+                <button [routerLink]="['/market/purchase/view', entry.id]" class="btn btn-sm btn-icon" title="View">
+                  <i class="bi bi-eye text-primary"></i>
+                </button>
+                <button [routerLink]="['/market/purchase/edit', entry.id]" class="btn btn-sm btn-icon" title="Edit">
+                  <i class="bi bi-pencil text-secondary"></i>
+                </button>
+                <button (click)="printEntry(entry.id)" class="btn btn-sm btn-icon" title="Print">
+                  <i class="bi bi-printer text-dark"></i>
+                </button>
+                <button (click)="openInvoicePdf(entry)" class="btn btn-sm btn-icon" title="Invoice PDF">
+                  <i class="bi bi-file-earmark-pdf text-danger"></i>
+                </button>
+                <button (click)="shareEntry(entry)" class="btn btn-sm btn-icon" title="Share">
+                  <i class="bi bi-share text-success"></i>
+                </button>
+                <button (click)="confirmDelete(entry.id)" class="btn btn-sm btn-icon" title="Delete">
+                  <i class="bi bi-trash text-danger"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredEntries.length === 0">
+            <td colspan="6" class="text-center py-5 text-muted">
+              <i class="bi bi-clipboard-x fs-1 d-block mb-2 text-light"></i>
+              No purchase entries found matching the filters.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div class="confirm-modal-backdrop" [class.show]="isDeleteModalOpen" (click)="closeDeleteModal()">
+    <div class="confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-header">
+        <div class="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5 class="confirm-modal-title">Delete Entry</h5>
+      </div>
+      <div class="confirm-modal-body">
+        Are you sure you want to delete this purchase entry? This action cannot be undone.
+      </div>
+      <div class="confirm-modal-footer">
+        <button type="button" class="btn btn-light-custom py-2 px-3" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-accent-orange py-2 px-3" (click)="confirmDeleteAction()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

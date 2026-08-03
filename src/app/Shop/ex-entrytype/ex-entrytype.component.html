@@ -1,202 +1,113 @@
-<div class="min-h-screen bg-white">
-  <!-- MAIN CONTENT -->
-  <main class="pt-24 md:pt-28 pb-20 px-4 md:px-6">
-    <div class="max-w-4xl mx-auto">
-
-      <!-- ACTION BAR -->
-      <div class="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 mb-6 border border-gray-200">
-        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-          
-          <!-- Search Bar -->
-          <div class="relative w-full md:max-w-md">
-            <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-            <input type="text" [(ngModel)]="searchQuery" (input)="searchTypes()"
-              placeholder="Search expense types by name..." 
-              class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-400 text-xs md:text-sm
-                     focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition duration-200" />
-          </div>
-
-          <!-- Add Button -->
-          <button (click)="openAddModal()" 
-            class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-2.5 rounded-xl
-                   hover:from-amber-600 hover:to-orange-700 active:scale-95 transition-all font-semibold shadow-sm flex items-center justify-center gap-2">
-            <i class="ri-add-circle-line text-lg"></i>
-            <span>Add Expense Type</span>
-          </button>
-          
-        </div>
-      </div>
-
-      <!-- LIST -->
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base md:text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <i class="ri-file-list-3-line text-amber-500 text-xl"></i>
-            <span>Expense Types</span>
-          </h3>
-          <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-medium">
-            Total: {{ filteredExpenseTypes.length }}
-          </span>
-        </div>
-
-        <!-- Empty State -->
-        <div *ngIf="filteredExpenseTypes.length === 0" class="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
-          <div class="text-6xl mb-4">📝</div>
-          <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-2">No Expense Types Found</h4>
-          <p class="text-sm text-gray-500">Create an expense type to start cataloging shop expenses</p>
-        </div>
-
-        <!-- Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div *ngFor="let item of filteredExpenseTypes" 
-               class="bg-white rounded-2xl p-5 border border-gray-200 hover:border-amber-300 hover:shadow-md transition duration-200 flex items-start gap-4">
-            
-            <!-- Icon -->
-            <div class="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-xl uppercase shadow-sm flex-shrink-0">
-              <i class="ri-bill-line text-2xl"></i>
-            </div>
-
-            <!-- Details -->
-            <div class="flex-grow min-w-0">
-              <span class="text-xs text-amber-600 font-bold uppercase tracking-wider">ID: {{ item.eX_ID }}</span>
-              <h4 class="font-bold text-gray-800 truncate text-base md:text-lg mt-0.5">
-                {{ item.name }}
-              </h4>
-
-              <!-- Action Buttons -->
-              <div class="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100">
-                <button (click)="openEditModal(item)" 
-                  class="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-800 px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1">
-                  <i class="ri-edit-line text-sm"></i> Edit
-                </button>
-                <button (click)="openDeleteConfirm(item)"
-                  class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-800 px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1">
-                  <i class="ri-delete-bin-line text-sm"></i> Delete
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
+<div class="hotels-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <span class="page-header-subtitle">MASTER</span>
+      <h1 class="page-header-title">Expense Types</h1>
     </div>
-  </main>
+    <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center gap-2 shadow-sm">
+      <i class="bi bi-plus-lg"></i>
+      <span>Add Expense Type</span>
+    </button>
+  </div>
 
-  <!-- ADD MODAL -->
-  <div *ngIf="showAddModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative border border-amber-100 max-h-[95vh] overflow-y-auto">
-      
-      <!-- Close Button -->
-      <button (click)="closeAddModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-100 transition">
-        <i class="ri-close-line text-2xl"></i>
-      </button>
-
-      <!-- Modal Header -->
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
-          <i class="ri-add-circle-line text-2xl"></i>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-gray-800">Add Expense Type</h2>
-          <p class="text-xs text-gray-500">Create a new category for shop expenses</p>
-        </div>
+  <!-- Search & Filters -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="input-group shadow-sm border-0 rounded-3 overflow-hidden">
+        <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" class="form-control border-0 ps-0 py-2.5" placeholder="Search expense types..." [(ngModel)]="searchQuery" (input)="searchTypes()">
       </div>
-
-      <!-- Form Inputs -->
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Expense Type Name <span class="text-red-500">*</span></label>
-          <div class="relative">
-            <i class="ri-edit-box-line absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-            <input type="text" [(ngModel)]="formData.name" placeholder="e.g. Electricity, Raw Materials"
-                   class="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-800 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3 mt-6">
-        <button (click)="closeAddModal()" class="flex-1 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition text-sm">
-          Cancel
-        </button>
-        <button (click)="saveType()" class="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-700 transition text-sm">
-          Save Expense Type
-        </button>
-      </div>
-
     </div>
   </div>
 
-  <!-- EDIT MODAL -->
-  <div *ngIf="showEditModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative border border-amber-100 max-h-[95vh] overflow-y-auto">
-      
-      <!-- Close Button -->
-      <button (click)="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-100 transition">
-        <i class="ri-close-line text-2xl"></i>
-      </button>
-
-      <!-- Modal Header -->
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
-          <i class="ri-edit-line text-2xl"></i>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-gray-800">Edit Expense Type</h2>
-          <p class="text-xs text-gray-500">Modify selected expense type details</p>
-        </div>
-      </div>
-
-      <!-- Form Inputs -->
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Expense Type Name <span class="text-red-500">*</span></label>
-          <div class="relative">
-            <i class="ri-edit-box-line absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-            <input type="text" [(ngModel)]="editFormData.name" placeholder="Enter name"
-                   class="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-800 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition" />
+  <!-- Cards Grid -->
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let item of filteredExpenseTypes">
+      <div class="hotel-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h4 class="fw-bold mb-0 text-truncate" style="max-width: 80%;" [title]="item.name">{{ item.name }}</h4>
+          <div class="d-flex gap-1">
+            <button (click)="openEditDrawer(item)" class="btn btn-sm btn-action-icon" title="Edit">
+              <i class="bi bi-pencil text-secondary"></i>
+            </button>
+            <button (click)="confirmDelete(item.eX_ID)" class="btn btn-sm btn-action-icon" title="Delete">
+              <i class="bi bi-trash text-danger"></i>
+            </button>
           </div>
         </div>
-      </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3 mt-6">
-        <button (click)="closeEditModal()" class="flex-1 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition text-sm">
-          Cancel
-        </button>
-        <button (click)="updateType()" class="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-700 transition text-sm">
-          Save Changes
-        </button>
+        <div class="d-flex align-items-center gap-2 text-muted mb-2 small">
+          <i class="bi bi-tag"></i>
+          <span class="text-truncate">ID: {{ item.eX_ID }}</span>
+        </div>
       </div>
+    </div>
 
+    <!-- Empty State -->
+    <div class="col-12 text-center py-5 text-muted" *ngIf="filteredExpenseTypes.length === 0">
+      <i class="bi bi-card-text fs-1 d-block mb-2 text-light"></i>
+      No expense types found. Add one to get started.
     </div>
   </div>
 
-  <!-- DELETE CONFIRM MODAL -->
-  <div *ngIf="showDeleteConfirm" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 relative border border-rose-100 text-center">
-      
-      <!-- Delete Icon -->
-      <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-600 mx-auto mb-4">
-        <i class="ri-delete-bin-6-line text-3xl animate-pulse"></i>
+  <!-- Slide Drawer (Overlay & Drawer Panel) -->
+  <div class="drawer-backdrop" [class.show]="isDrawerOpen" (click)="closeDrawer()"></div>
+  
+  <div class="side-drawer" [class.show]="isDrawerOpen">
+    <div class="drawer-header">
+      <h4 class="fw-bold mb-0">{{ editMode ? 'Edit Expense Type' : 'Add Expense Type' }}</h4>
+      <button type="button" class="btn-close" (click)="closeDrawer()"></button>
+    </div>
+
+    <div class="drawer-body">
+      <form #typeForm="ngForm">
+        <div class="mb-3">
+          <label for="name" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Expense Type Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="form-control" 
+            [(ngModel)]="formData.name" 
+            placeholder="e.g. Electricity, Rent"
+            required
+            #nameModel="ngModel"
+            [class.is-invalid]="nameModel.touched && nameModel.invalid">
+          <div class="invalid-feedback">Name is required.</div>
+        </div>
+      </form>
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-light-custom flex-grow-1 py-2.5" (click)="closeDrawer()">Cancel</button>
+      <button 
+        type="button" 
+        class="btn btn-primary-green flex-grow-1 py-2.5" 
+        (click)="saveExpenseType()" 
+        [disabled]="typeForm.invalid || isSaving">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+        Save
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div class="confirm-modal-backdrop" [class.show]="isDeleteModalOpen" (click)="closeDeleteModal()">
+    <div class="confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-header">
+        <div class="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5 class="confirm-modal-title">Delete Expense Type</h5>
       </div>
-
-      <h3 class="text-lg font-bold text-gray-800 mb-2">Delete Expense Type</h3>
-      <p class="text-sm text-gray-500 mb-6">
-        Are you sure you want to delete the expense type <strong class="text-gray-700">"{{ selectedType?.name }}"</strong>? This action cannot be undone.
-      </p>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
-        <button (click)="closeDeleteConfirm()" class="flex-1 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition text-sm">
-          Cancel
-        </button>
-        <button (click)="confirmDelete()" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl transition text-sm">
-          Yes, Delete
-        </button>
+      <div class="confirm-modal-body">
+        Are you sure you want to delete the expense type <strong>"{{ selectedType?.name }}"</strong>? This action cannot be undone.
       </div>
-
+      <div class="confirm-modal-footer">
+        <button type="button" class="btn btn-light-custom py-2 px-3" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-accent-orange py-2 px-3" (click)="confirmDeleteAction()">Delete</button>
+      </div>
     </div>
   </div>
 </div>

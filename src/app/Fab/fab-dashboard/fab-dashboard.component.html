@@ -1,0 +1,102 @@
+<div class="webforms-page-container">
+  <!-- Top Header Bar -->
+  <div class="webforms-top-bar">
+    <span class="brand-title">JB-FABRICATION</span>
+    <button (click)="logout()" class="btn-logout-webforms">Logout</button>
+  </div>
+
+  <div class="webforms-main-content">
+    <!-- Admin Portal View -->
+    <div *ngIf="isAdmin" class="webforms-grid">
+      <!-- Admin Master Card -->
+      <div class="webforms-card" routerLink="/fab/users">
+        <img src="assets/img/Fabrication/AdminMaster.png" alt="Admin Master" />
+        <span class="card-title">Admin Master</span>
+      </div>
+
+      <!-- Good Expanse Card -->
+      <div class="webforms-card" routerLink="/fab/expense">
+        <img src="assets/img/Fabrication/Expanse.png" alt="Good Expanse" />
+        <span class="card-title">Good Expanse</span>
+      </div>
+
+      <!-- Profit Card -->
+      <div class="webforms-card" routerLink="/fab/profit">
+        <img src="assets/img/Fabrication/Profit.png" alt="Profit" />
+        <span class="card-title">Profit</span>
+      </div>
+
+      <!-- Transport Master Card -->
+      <div class="webforms-card" routerLink="/fab/transport">
+        <img src="assets/img/Fabrication/Truck.png" alt="Transport Master" />
+        <span class="card-title">Transport Master</span>
+      </div>
+
+
+      <!-- Create Salary Slip Card -->
+      <div class="webforms-card" routerLink="/fab/create-salaryslip">
+        <img src="assets/img/Fabrication/AdminCreateSalaySlip.png" alt="Create Salary Slip" />
+        <span class="card-title">Create Salary Slip</span>
+      </div>
+
+      <!-- Monthly Profit Expense Card -->
+      <div class="webforms-card" routerLink="/fab/monthly-pe">
+        <img src="assets/img/Fabrication/MonthSalery.png" alt="Monthly Profit Expense" />
+        <span class="card-title">Monthly Profit Expense</span>
+      </div>
+
+      <!-- Days Profit Expense Card -->
+      <div class="webforms-card" routerLink="/fab/date-pe">
+        <img src="assets/img/Fabrication/calendar_16118660.png" alt="Days Profit Expense" />
+        <span class="card-title">Days Profit Expense</span>
+      </div>
+
+
+      <!-- History Card -->
+      <div class="webforms-card" routerLink="/fab/history">
+        <img src="assets/img/Fabrication/MonthAttendanse.png" alt="History" />
+        <span class="card-title">History</span>
+      </div>
+
+
+      <!-- Salary History List Card -->
+      <div class="webforms-card" routerLink="/fab/salary-history">
+        <img src="assets/img/Fabrication/SalaryHistory.png" alt="Salary History List" />
+        <span class="card-title">Salary History List</span>
+      </div>
+
+      <!-- Fill Attendance Card -->
+      <div class="webforms-card" routerLink="/fab/admin-attendance">
+        <img src="assets/img/Fabrication/HelperAttendance.png" alt="Fill Attendance" />
+        <span class="card-title">Fill Attendance</span>
+      </div>
+
+      <!-- Advance Card -->
+      <div class="webforms-card" routerLink="/fab/advance">
+        <img src="assets/img/Fabrication/AdvanceMoney.png" alt="Advance" />
+        <span class="card-title">Advance</span>
+      </div>
+
+      <!-- Helpers History Card -->
+      <div class="webforms-card" routerLink="/fab/helper-history">
+        <img src="assets/img/Fabrication/MonthAttendanse.png" alt="Helpers History" />
+        <span class="card-title">Helpers History</span>
+      </div>
+    </div>
+
+    <!-- Helper Portal View -->
+    <div *ngIf="!isAdmin" class="webforms-grid">
+      <!-- Fill Attendance (Helper side) -->
+      <div class="webforms-card" routerLink="/fab/helper-attendance">
+        <img src="assets/img/Fabrication/HelperAttendance.png" alt="Fill Attendance" />
+        <span class="card-title">Fill Attendance</span>
+      </div>
+
+      <!-- Salary History (Helper side) -->
+      <div class="webforms-card" routerLink="/fab/salary-history">
+        <img src="assets/img/Fabrication/SalaryHistory.png" alt="Salary History List" />
+        <span class="card-title">Salary History List</span>
+      </div>
+    </div>
+  </div>
+</div>

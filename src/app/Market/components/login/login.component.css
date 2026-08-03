@@ -1,0 +1,71 @@
+.login-wrapper {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-color);
+}
+.brand-panel {
+  background: linear-gradient(135deg, #1b4320 0%, #2b5c2e 100%);
+  height: 100%;
+  position: relative;
+}
+.brand-content {
+  max-width: 460px;
+  padding: 40px;
+  color: #ffffff;
+}
+.brand-logo-container {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.brand-logo-icon {
+  font-size: 38px;
+  color: #ffffff;
+}
+.brand-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+}
+.brand-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #c9dfca;
+  font-weight: 300;
+}
+
+.login-card-container {
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+}
+.login-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+}
+.mobile-logo-circle {
+  width: 60px;
+  height: 60px;
+  background: var(--primary-color);
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.input-group-text {
+  border: 1px solid var(--border-color);
+}

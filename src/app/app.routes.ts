@@ -10,7 +10,7 @@ import { shopAuthGuard } from './shared/shop-auth.guard';
 
 export const routes: Routes = [
 
-  { path: '', redirectTo: 'shop', pathMatch: 'full' },
+  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
   { path: 'lab', component: LoginComponent },
 
   { path: 'login', component: LoginComponent },
@@ -61,5 +61,20 @@ export const routes: Routes = [
     canActivate: [shopAuthGuard],
     loadComponent: () => import('./Shop/landing/landing.component').then(m => m.ShopLandingComponent),
     loadChildren: () => import('./Shop/shop.routes').then(m => m.SHOP_ROUTES)
+  },
+   {
+    path: 'market',
+    loadComponent: () => import('./Market/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./Market/Market.routes').then(m => m.MARKET_ROUTES)
+  },
+   {
+    path: 'fab',
+    loadComponent: () => import('./Fab/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./Fab/Fab.routes').then(m => m.FAB_ROUTES)
+  },
+  {
+    path: 'notes',
+    loadChildren: () => import('./Notes/notes.routes').then(m => m.NOTES_ROUTES)
   }
 ];
+
