@@ -3,10 +3,13 @@
     <div class="flex justify-between h-14 items-center">
       <!-- Logo & Title -->
       <div class="flex items-center space-x-3">
-        <button (click)="toggleSidebar()" class="lg:hidden p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors">
+        <button (click)="toggleSidebar()"
+          class="lg:hidden p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors">
           <i class="ri-menu-line text-lg"></i>
         </button>
-        <button (click)="toggleSidebar()" class="hidden lg:block p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors" title="Toggle Sidebar">
+        <button (click)="toggleSidebar()"
+          class="hidden lg:block p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors"
+          title="Toggle Sidebar">
           <i class="ri-layout-left-line text-lg"></i>
         </button>
         <div class="flex items-center justify-center w-8 h-8 bg-zinc-900 rounded-lg shadow-sm ml-1">
@@ -17,7 +20,8 @@
       <!-- User Profile & Actions -->
       <div class="flex items-center space-x-4">
         <div class="hidden sm:flex items-center space-x-2">
-          <div class="w-7 h-7 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-700 font-bold border border-zinc-200 text-xs">
+          <div
+            class="w-7 h-7 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-700 font-bold border border-zinc-200 text-xs">
             {{ currentUser?.name?.charAt(0) | uppercase }}
           </div>
           <span class="text-sm font-medium text-zinc-600">{{ currentUser?.name }}</span>
@@ -33,26 +37,32 @@
   </div>
 </nav>
 
-<div class="min-h-[calc(100vh-56px)] flex bg-white text-zinc-900 overflow-hidden relative" (click)="contextMenuVisible = false">
-  
+<div class="h-[calc(100vh-56px)] flex bg-white text-zinc-900 overflow-hidden relative"
+  (click)="contextMenuVisible = false">
+
   <!-- Mobile Overlay -->
-  <div *ngIf="isSidebarOpen" (click)="toggleSidebar()" class="fixed inset-0 bg-zinc-900/20 backdrop-blur-sm z-30 lg:hidden animate-fadeIn"></div>
+  <div *ngIf="isSidebarOpen" (click)="toggleSidebar()"
+    class="fixed inset-0 bg-zinc-900/20 backdrop-blur-sm z-30 lg:hidden animate-fadeIn"></div>
 
   <!-- Left Sidebar (Explorer) -->
-  <div class="absolute lg:relative z-40 bg-[#F9F9F9] border-r border-zinc-200 flex flex-col transition-transform duration-300 ease-in-out h-[calc(100vh-56px)] w-[280px] sm:w-[320px] md:w-[340px]"
-       [ngClass]="isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'">
+  <div
+    class="absolute lg:relative z-40 bg-[#F9F9F9] border-r border-zinc-200 flex flex-col transition-transform duration-300 ease-in-out h-[calc(100vh-56px)] w-[280px] sm:w-[320px] md:w-[340px]"
+    [ngClass]="isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'">
     <!-- Sidebar Header -->
     <div class="px-4 py-3 flex items-center justify-between group">
       <h2 class="font-semibold text-zinc-600 text-xs tracking-wider uppercase">Explorer</h2>
-      <button (click)="openAddFolderModal(null)" class="text-zinc-400 hover:text-zinc-900 transition-colors p-1 rounded hover:bg-zinc-200/60" title="New Root Folder">
+      <button (click)="openAddFolderModal(null)"
+        class="text-zinc-400 hover:text-zinc-900 transition-colors p-1 rounded hover:bg-zinc-200/60"
+        title="New Root Folder">
         <i class="ri-folder-add-line text-base"></i>
       </button>
     </div>
-    
+
     <!-- Search Bar -->
     <div class="px-3 pb-3">
       <div class="relative group">
-        <i class="ri-search-line absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors"></i>
+        <i
+          class="ri-search-line absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors"></i>
         <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()" placeholder="Search..."
           class="w-full pl-8 pr-3 py-1.5 bg-zinc-200/50 hover:bg-zinc-200/80 border border-transparent rounded-md text-sm focus:outline-none focus:bg-white focus:border-zinc-300 focus:ring-2 focus:ring-zinc-900/10 transition-all placeholder-zinc-500 text-zinc-900">
       </div>
@@ -60,50 +70,58 @@
 
     <!-- Tree View -->
     <div class="flex-1 overflow-y-auto p-2 explorer-scroll">
-      
+
       <!-- Search Results -->
       <div *ngIf="isSearching" class="space-y-4">
         <div *ngIf="searchResults.folders.length > 0">
           <h3 class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-2 mb-1">Folders</h3>
-          <div *ngFor="let f of searchResults.folders" class="px-2 py-1.5 flex items-center space-x-2 text-sm text-zinc-700">
+          <div *ngFor="let f of searchResults.folders"
+            class="px-2 py-1.5 flex items-center space-x-2 text-sm text-zinc-700">
             <span class="text-sm">📁</span>
             <span class="truncate">{{f.folderName}}</span>
           </div>
         </div>
         <div *ngIf="searchResults.pages.length > 0">
           <h3 class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-2 mb-1 mt-3">Pages</h3>
-          <div *ngFor="let p of searchResults.pages" (click)="openPage(p.pageId)" class="px-2 py-1.5 flex items-center space-x-2 text-sm text-zinc-700 hover:bg-zinc-200/60 rounded-md cursor-pointer transition-colors">
+          <div *ngFor="let p of searchResults.pages" (click)="openPage(p.pageId)"
+            class="px-2 py-1.5 flex items-center space-x-2 text-sm text-zinc-700 hover:bg-zinc-200/60 rounded-md cursor-pointer transition-colors">
             <span class="text-sm">📄</span>
             <span class="truncate">{{p.title}}</span>
           </div>
         </div>
-        <div *ngIf="searchResults.folders.length === 0 && searchResults.pages.length === 0" class="text-sm text-zinc-500 text-center py-6">
+        <div *ngIf="searchResults.folders.length === 0 && searchResults.pages.length === 0"
+          class="text-sm text-zinc-500 text-center py-6">
           No results found.
         </div>
       </div>
 
       <!-- Recursive Tree Template -->
       <ng-template #folderTemplate let-nodes="nodes" let-level="level">
-        <div *ngFor="let node of nodes" class="folder-node relative" [ngClass]="{'border-l border-zinc-200/60 ml-[11px]': level > 0}">
+        <div *ngFor="let node of nodes" class="folder-node relative"
+          [ngClass]="{'border-l border-zinc-200/60 ml-[11px]': level > 0}">
           <!-- Folder Item -->
-          <div class="group flex items-center justify-between py-1 pr-2 rounded-md hover:bg-zinc-200/60 cursor-pointer transition-colors mt-[2px]"
-               [ngStyle]="{'padding-left': level === 0 ? '6px' : '18px'}"
-               (click)="toggleFolder(node, $event)"
-               (contextmenu)="openContextMenu($event, node)">
-            
+          <div
+            class="group flex items-center justify-between py-1 pr-2 rounded-md hover:bg-zinc-200/60 cursor-pointer transition-colors mt-[2px]"
+            [ngStyle]="{'padding-left': level === 0 ? '6px' : '18px'}" (click)="toggleFolder(node, $event)"
+            (contextmenu)="openContextMenu($event, node)">
+
             <div class="flex items-center space-x-1.5 overflow-hidden flex-1 relative">
               <!-- Guide line connector for children -->
               <div *ngIf="level > 0" class="absolute left-[-18px] top-1/2 w-[14px] border-t border-zinc-200/60"></div>
 
-              <div class="flex-shrink-0 w-4 flex justify-center text-zinc-400 group-hover:text-zinc-600 transition-colors">
-                <i class="ri-arrow-right-s-line transition-transform duration-200" [class.rotate-90]="node.expanded" [class.invisible]="!node.subFolders?.length && !node.pages?.length"></i>
+              <div
+                class="flex-shrink-0 w-4 flex justify-center text-zinc-400 group-hover:text-zinc-600 transition-colors">
+                <i class="ri-arrow-right-s-line transition-transform duration-200" [class.rotate-90]="node.expanded"
+                  [class.invisible]="!node.subFolders?.length && !node.pages?.length"></i>
               </div>
               <span class="flex-shrink-0 text-sm leading-none opacity-80">{{ node.expanded ? '📂' : '📁' }}</span>
-              <span class="text-sm text-zinc-700 font-medium truncate select-none whitespace-nowrap">{{ node.folderName }}</span>
+              <span class="text-sm text-zinc-700 font-medium truncate select-none whitespace-nowrap">{{ node.folderName
+                }}</span>
             </div>
-            
+
             <!-- Quick Add Page Button (Hover) -->
-            <button (click)="$event.stopPropagation(); openAddPageModal(node.folderId)" class="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-900 p-1 rounded hover:bg-zinc-300/50 transition-all ml-2 flex-shrink-0">
+            <button (click)="$event.stopPropagation(); openAddPageModal(node.folderId)"
+              class="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-900 p-1 rounded hover:bg-zinc-300/50 transition-all ml-2 flex-shrink-0">
               <i class="ri-add-line"></i>
             </button>
           </div>
@@ -112,24 +130,30 @@
           <div *ngIf="node.expanded" class="animate-fadeIn overflow-hidden">
             <!-- Subfolders -->
             <ng-container *ngIf="node.subFolders?.length">
-              <ng-container *ngTemplateOutlet="folderTemplate; context: { nodes: node.subFolders, level: level + 1 }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="folderTemplate; context: { nodes: node.subFolders, level: level + 1 }"></ng-container>
             </ng-container>
-            
+
             <!-- Pages -->
-            <div *ngFor="let page of node.pages" 
-                 class="group flex items-center justify-between py-1 pr-2 rounded-md cursor-pointer transition-all mt-[2px] border-l border-zinc-200/60 ml-[11px] relative"
-                 [ngClass]="selectedPage?.pageId === page.pageId ? 'bg-zinc-200/80 text-zinc-900 border-transparent ml-0 rounded-l-none pl-[29px]' : 'hover:bg-zinc-200/60 text-zinc-600 pl-[18px]'"
-                 (click)="openPage(page.pageId)">
-              
+            <div *ngFor="let page of node.pages"
+              class="group flex items-center justify-between py-1 pr-2 rounded-md cursor-pointer transition-all mt-[2px] border-l border-zinc-200/60 ml-[11px] relative"
+              [ngClass]="selectedPage?.pageId === page.pageId ? 'bg-zinc-200/80 text-zinc-900 border-transparent ml-0 rounded-l-none pl-[29px]' : 'hover:bg-zinc-200/60 text-zinc-600 pl-[18px]'"
+              (click)="openPage(page.pageId)">
+
               <!-- Guide line connector for pages -->
-              <div *ngIf="selectedPage?.pageId !== page.pageId" class="absolute left-0 top-1/2 w-[14px] border-t border-zinc-200/60"></div>
-              
+              <div *ngIf="selectedPage?.pageId !== page.pageId"
+                class="absolute left-0 top-1/2 w-[14px] border-t border-zinc-200/60"></div>
+
               <!-- Left highlight bar for selected page -->
-              <div *ngIf="selectedPage?.pageId === page.pageId" class="absolute left-0 top-0 bottom-0 w-[3px] bg-zinc-900 rounded-r-sm"></div>
+              <div *ngIf="selectedPage?.pageId === page.pageId"
+                class="absolute left-0 top-0 bottom-0 w-[3px] bg-zinc-900 rounded-r-sm"></div>
 
               <div class="flex items-center space-x-2 overflow-hidden flex-1 relative z-10">
-                <span class="flex-shrink-0 text-sm leading-none opacity-80" [class.opacity-100]="selectedPage?.pageId === page.pageId">📄</span>
-                <span class="text-sm truncate select-none whitespace-nowrap" [ngClass]="selectedPage?.pageId === page.pageId ? 'font-medium text-zinc-900' : ''">{{ page.title }}</span>
+                <span class="flex-shrink-0 text-sm leading-none opacity-80"
+                  [class.opacity-100]="selectedPage?.pageId === page.pageId">📄</span>
+                <span class="text-sm truncate select-none whitespace-nowrap"
+                  [ngClass]="selectedPage?.pageId === page.pageId ? 'font-medium text-zinc-900' : ''">{{ page.title
+                  }}</span>
               </div>
             </div>
           </div>
@@ -150,7 +174,7 @@
 
   <!-- Right Side (Editor / Viewer) -->
   <div class="flex-1 flex flex-col bg-white overflow-hidden relative">
-    
+
     <!-- Empty State -->
     <div *ngIf="!selectedPage" class="flex-1 flex flex-col items-center justify-center text-zinc-400 bg-white">
       <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 text-zinc-200">
@@ -162,9 +186,9 @@
 
     <!-- Active Page State -->
     <div *ngIf="selectedPage" class="flex-1 flex flex-col h-full relative overflow-y-auto page-scroll">
-      
+
       <!-- Page Header -->
-      <div class="bg-white px-6 sm:px-10 py-6 sm:py-8 sticky top-0 z-10 transition-all">
+      <div class="bg-white px-6 sm:px-10 py-6 sm:py-8 relative z-10 transition-all">
         <!-- Breadcrumb -->
         <div class="flex items-center space-x-1.5 text-[13px] font-medium text-zinc-400 mb-4 tracking-wide">
           <ng-container *ngFor="let crumb of breadcrumb; let last = last">
@@ -175,10 +199,13 @@
 
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div class="flex-1 w-full">
-            <input *ngIf="isEditingPage" type="text" [(ngModel)]="selectedPage.title" 
-              class="w-full text-3xl sm:text-4xl font-bold text-zinc-900 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-900 rounded-none px-0 py-1 focus:outline-none transition-colors placeholder-zinc-300" placeholder="Page Title">
-            <h1 *ngIf="!isEditingPage" class="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight tracking-tight">{{ selectedPage.title }}</h1>
-            
+            <input *ngIf="isEditingPage" type="text" [(ngModel)]="selectedPage.title"
+              class="w-full text-3xl sm:text-4xl font-bold text-zinc-900 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-900 rounded-none px-0 py-1 focus:outline-none transition-colors placeholder-zinc-300"
+              placeholder="Page Title">
+            <h1 *ngIf="!isEditingPage"
+              class="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight tracking-tight">{{ selectedPage.title }}
+            </h1>
+
             <div class="flex items-center space-x-4 mt-3 text-xs text-zinc-400 font-medium">
               <div class="flex items-center space-x-1.5" title="Created">
                 <i class="ri-time-line"></i>
@@ -194,19 +221,24 @@
           <!-- Actions -->
           <div class="flex items-center space-x-2 self-start">
             <ng-container *ngIf="!isEditingPage">
-              <button (click)="isEditingPage = true" class="px-3.5 py-1.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-md font-medium transition-colors text-sm flex items-center space-x-1.5 shadow-sm">
+              <button (click)="isEditingPage = true"
+                class="px-3.5 py-1.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-md font-medium transition-colors text-sm flex items-center space-x-1.5 shadow-sm">
                 <i class="ri-pencil-line"></i> <span>Edit</span>
               </button>
-              <button (click)="deletePage(selectedPage.pageId)" class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Delete Page">
+              <button (click)="deletePage(selectedPage.pageId)"
+                class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                title="Delete Page">
                 <i class="ri-delete-bin-line text-lg"></i>
               </button>
             </ng-container>
-            
+
             <ng-container *ngIf="isEditingPage">
-              <button (click)="isEditingPage = false; openPage(selectedPage.pageId)" class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-100 rounded-md font-medium transition-colors text-sm">
+              <button (click)="isEditingPage = false; openPage(selectedPage.pageId)"
+                class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-100 rounded-md font-medium transition-colors text-sm">
                 Cancel
               </button>
-              <button (click)="savePage()" class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm flex items-center space-x-1.5">
+              <button (click)="savePage()"
+                class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm flex items-center space-x-1.5">
                 <i class="ri-check-line"></i> <span>Save</span>
               </button>
             </ng-container>
@@ -215,11 +247,18 @@
       </div>
 
       <!-- Page Content Viewer/Editor -->
-      <div class="flex-1 w-full flex flex-col">
-        <div *ngIf="!isEditingPage" class="flex-1 px-6 sm:px-10 pb-12 prose prose-zinc max-w-none editor-content-viewer" [innerHTML]="selectedPage.content | safeHtml"></div>
-        
-        <div *ngIf="isEditingPage" class="flex-1 bg-white flex flex-col w-full h-full relative z-0 border-t border-zinc-100">
-          <jodit-editor [defaultValue]="selectedPage.content" (onChange)="onEditorChange($event)" [config]="joditConfig" class="block w-full flex-1 border-none"></jodit-editor>
+      <div class="flex-1 w-full flex flex-col bg-zinc-100/50">
+        <!-- View Mode -->
+        <div *ngIf="!isEditingPage" class="flex-1 py-8 flex justify-center w-full">
+          <div
+            class="bg-white shadow-sm border border-zinc-200 min-h-[1056px] w-[816px] max-w-[95%] px-10 py-12 prose prose-zinc editor-content-viewer"
+            [innerHTML]="selectedPage.content | safeHtml"></div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="isEditingPage" class="flex-1 flex flex-col w-full h-full relative z-0 editor-mode-container">
+          <jodit-editor [defaultValue]="selectedPage.content" (onChange)="onEditorChange($event)" [config]="joditConfig"
+            class="block w-full flex-1 border-none"></jodit-editor>
         </div>
       </div>
 
@@ -229,65 +268,80 @@
 </div>
 
 <!-- Context Menu -->
-<div *ngIf="contextMenuVisible" 
-     class="fixed bg-white rounded-lg shadow-xl border border-zinc-200/80 py-1 min-w-[160px] z-[100] transform transition-all animate-scaleIn origin-top-left"
-     [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
-  
-  <div class="px-3 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1 px-4 truncate max-w-[160px]">
+<div *ngIf="contextMenuVisible"
+  class="fixed bg-white rounded-lg shadow-xl border border-zinc-200/80 py-1 min-w-[160px] z-[100] transform transition-all animate-scaleIn origin-top-left"
+  [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
+
+  <div
+    class="px-3 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1 px-4 truncate max-w-[160px]">
     {{ contextMenuFolder?.folderName }}
   </div>
 
-  <button (click)="openAddFolderModal(contextMenuFolder!.folderId); contextMenuVisible = false" class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+  <button (click)="openAddFolderModal(contextMenuFolder!.folderId); contextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
     <i class="ri-folder-add-line text-zinc-400"></i> <span>New Folder</span>
   </button>
-  <button (click)="openAddPageModal(contextMenuFolder!.folderId); contextMenuVisible = false" class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+  <button (click)="openAddPageModal(contextMenuFolder!.folderId); contextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
     <i class="ri-file-add-line text-zinc-400"></i> <span>New Page</span>
   </button>
   <div class="h-px bg-zinc-100 my-1 mx-2"></div>
-  <button (click)="renameFolder(contextMenuFolder!); contextMenuVisible = false" class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+  <button (click)="renameFolder(contextMenuFolder!); contextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
     <i class="ri-edit-line text-zinc-400"></i> <span>Rename</span>
   </button>
-  <button (click)="deleteFolder(contextMenuFolder!); contextMenuVisible = false" class="w-full text-left px-4 py-1.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center space-x-2">
+  <button (click)="deleteFolder(contextMenuFolder!); contextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center space-x-2">
     <i class="ri-delete-bin-line text-red-400"></i> <span>Delete</span>
   </button>
 </div>
 
 <!-- Add Folder Modal -->
-<div *ngIf="showAddFolderModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
+<div *ngIf="showAddFolderModal"
+  class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp border border-zinc-100">
     <div class="px-5 py-4 flex justify-between items-center">
       <h3 class="font-semibold text-lg text-zinc-900">New Folder</h3>
-      <button (click)="showAddFolderModal = false" class="text-zinc-400 hover:text-zinc-600 transition-colors p-1 rounded-md hover:bg-zinc-100">
+      <button (click)="showAddFolderModal = false"
+        class="text-zinc-400 hover:text-zinc-600 transition-colors p-1 rounded-md hover:bg-zinc-100">
         <i class="ri-close-line text-xl"></i>
       </button>
     </div>
     <div class="px-5 pb-5">
-      <input type="text" [(ngModel)]="newFolderName" placeholder="Folder Name" 
-        class="w-full px-3 py-2 bg-white border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-sm placeholder-zinc-400" autofocus (keyup.enter)="createFolder()">
+      <input type="text" [(ngModel)]="newFolderName" placeholder="Folder Name"
+        class="w-full px-3 py-2 bg-white border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-sm placeholder-zinc-400"
+        autofocus (keyup.enter)="createFolder()">
     </div>
     <div class="px-5 py-3.5 bg-zinc-50 border-t border-zinc-100 flex justify-end space-x-2">
-      <button (click)="showAddFolderModal = false" class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-200 rounded-md font-medium transition-colors text-sm">Cancel</button>
-      <button (click)="createFolder()" class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm">Create</button>
+      <button (click)="showAddFolderModal = false"
+        class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-200 rounded-md font-medium transition-colors text-sm">Cancel</button>
+      <button (click)="createFolder()"
+        class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm">Create</button>
     </div>
   </div>
 </div>
 
 <!-- Add Page Modal -->
-<div *ngIf="showAddPageModal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
+<div *ngIf="showAddPageModal"
+  class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp border border-zinc-100">
     <div class="px-5 py-4 flex justify-between items-center">
       <h3 class="font-semibold text-lg text-zinc-900">New Page</h3>
-      <button (click)="showAddPageModal = false" class="text-zinc-400 hover:text-zinc-600 transition-colors p-1 rounded-md hover:bg-zinc-100">
+      <button (click)="showAddPageModal = false"
+        class="text-zinc-400 hover:text-zinc-600 transition-colors p-1 rounded-md hover:bg-zinc-100">
         <i class="ri-close-line text-xl"></i>
       </button>
     </div>
     <div class="px-5 pb-5">
-      <input type="text" [(ngModel)]="newPageTitle" placeholder="Page Title" 
-        class="w-full px-3 py-2 bg-white border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-sm placeholder-zinc-400" autofocus (keyup.enter)="createPage()">
+      <input type="text" [(ngModel)]="newPageTitle" placeholder="Page Title"
+        class="w-full px-3 py-2 bg-white border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-sm placeholder-zinc-400"
+        autofocus (keyup.enter)="createPage()">
     </div>
     <div class="px-5 py-3.5 bg-zinc-50 border-t border-zinc-100 flex justify-end space-x-2">
-      <button (click)="showAddPageModal = false" class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-200 rounded-md font-medium transition-colors text-sm">Cancel</button>
-      <button (click)="createPage()" class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm">Create</button>
+      <button (click)="showAddPageModal = false"
+        class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-200 rounded-md font-medium transition-colors text-sm">Cancel</button>
+      <button (click)="createPage()"
+        class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm">Create</button>
     </div>
   </div>
 </div>

@@ -47,9 +47,9 @@ export interface NotePage {
 export class DashboardComponent implements OnInit {
   currentUser: any = null;
   folderTree: NoteFolder[] = [];
-  
+
   isSidebarOpen: boolean = true;
-  
+
   // Search
   searchQuery: string = '';
   searchResults: { folders: any[], pages: any[] } = { folders: [], pages: [] };
@@ -63,14 +63,15 @@ export class DashboardComponent implements OnInit {
   // Modals / Dialogs
   showAddFolderModal: boolean = false;
   showAddPageModal: boolean = false;
-  
+
   newFolderName: string = '';
   newPageTitle: string = '';
   targetFolderIdForAdd: number | null = null; // Can be null if root
 
   // Editor Config
   joditConfig = {
-    height: 600,
+    height: 'auto',
+    minHeight: 800,
     hidePoweredByJodit: true,
     uploader: {
       insertImageAsBase64URI: true
@@ -79,9 +80,14 @@ export class DashboardComponent implements OnInit {
     askBeforePasteFromWord: false,
     defaultActionOnPaste: 'insert_as_html',
     placeholder: 'Write Your Content Here....',
+    style: {
+      fontFamily: 'Times New Roman',
+      fontSize: '16px'
+    },
     controls: {
       font: {
         list: {
+          'Times New Roman, Times, serif': 'Times New Roman',
           'Roboto,sans-serif': 'Roboto',
           'Arial,Helvetica,sans-serif': 'Arial',
         }
@@ -104,7 +110,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.currentUser = this.auth.getNotesUser();
     this.loadTree();
-    
+
     // Close context menu on outside click
     document.addEventListener('click', () => {
       this.contextMenuVisible = false;
@@ -153,7 +159,7 @@ export class DashboardComponent implements OnInit {
       parentFolderId: this.targetFolderIdForAdd,
       folderName: this.newFolderName.trim()
     };
-    
+
     this.loader.show();
     this.http.post(`${this.api.baseurl}NotesExplorer/folders`, payload)
       .pipe(finalize(() => { this.loader.hide(); this.showAddFolderModal = false; }))
@@ -199,13 +205,13 @@ export class DashboardComponent implements OnInit {
         userId: this.currentUser.id,
         folderName: newName.trim()
       }).pipe(finalize(() => this.loader.hide()))
-      .subscribe({
-        next: () => {
-          this.toastr.success('Folder renamed.');
-          this.loadTree();
-        },
-        error: () => this.toastr.error('Failed to rename folder.')
-      });
+        .subscribe({
+          next: () => {
+            this.toastr.success('Folder renamed.');
+            this.loadTree();
+          },
+          error: () => this.toastr.error('Failed to rename folder.')
+        });
     }
   }
 
@@ -227,7 +233,7 @@ export class DashboardComponent implements OnInit {
       title: this.newPageTitle.trim(),
       content: ''
     };
-    
+
     this.loader.show();
     this.http.post<NotePage>(`${this.api.baseurl}NotesExplorer/pages`, payload)
       .pipe(finalize(() => { this.loader.hide(); this.showAddPageModal = false; }))
@@ -250,7 +256,7 @@ export class DashboardComponent implements OnInit {
           this.selectedPage = res;
           this.isEditingPage = false;
           this.buildBreadcrumb(this.folderTree, res.folderId, []);
-          
+
           if (window.innerWidth < 1024) { // Close sidebar on mobile/tablet when page opened
             this.isSidebarOpen = false;
           }
@@ -291,7 +297,7 @@ export class DashboardComponent implements OnInit {
 
   deletePage(pageId: number) {
     if (!confirm('This action cannot be undone. Are you sure you want to permanently delete this page?')) return;
-    
+
     this.loader.show();
     this.http.delete(`${this.api.baseurl}NotesExplorer/pages/${pageId}/user/${this.currentUser.id}`)
       .pipe(finalize(() => this.loader.hide()))
@@ -331,7 +337,7 @@ export class DashboardComponent implements OnInit {
       this.searchResults = { folders: [], pages: [] };
       return;
     }
-    
+
     this.isSearching = true;
     this.http.get<any>(`${this.api.baseurl}NotesExplorer/search/${this.currentUser.id}?query=${encodeURIComponent(this.searchQuery)}`)
       .subscribe({
