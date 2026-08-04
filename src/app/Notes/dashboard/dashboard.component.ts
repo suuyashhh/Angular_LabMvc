@@ -475,7 +475,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.renderer.setStyle(wysiwyg, 'transform', `scale(${scale})`);
     this.renderer.setStyle(wysiwyg, 'transform-origin', 'top center');
+
+    // Clip horizontal overflow from the scaled page but keep vertical visible
+    // so only the outer .page-scroll scrollbar is ever shown.
     this.renderer.setStyle(workplace, 'overflow-x', 'hidden');
+    this.renderer.setStyle(workplace, 'overflow-y', 'visible');
 
     // Compensate height so content below isn't pushed down by the ghost space
     // that CSS transform leaves behind (transform doesn't affect layout flow)
