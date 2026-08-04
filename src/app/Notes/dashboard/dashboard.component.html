@@ -172,10 +172,10 @@
     </div>
   </div>
 
-  <!-- Right Side (Editor / Viewer) -->
+  <!-- Right Side -->
   <div class="flex-1 flex flex-col bg-white overflow-hidden relative">
 
-    <!-- Empty State -->
+    <!-- Empty State (no page selected) -->
     <div *ngIf="!selectedPage" class="flex-1 flex flex-col items-center justify-center text-zinc-400 bg-white">
       <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 text-zinc-200">
         <i class="ri-file-edit-line text-4xl"></i>
@@ -184,13 +184,14 @@
       <p class="text-sm text-zinc-400">Select a note from the sidebar or create a new one.</p>
     </div>
 
-    <!-- Active Page State -->
+    <!-- Active Page — ONE container, ONE Jodit instance, always mounted.
+         Switching between view/edit ONLY changes readonly state. -->
     <div *ngIf="selectedPage" class="flex-1 flex flex-col h-full relative overflow-y-auto page-scroll">
 
       <!-- Page Header -->
-      <div class="bg-white px-6 sm:px-10 py-6 sm:py-8 relative z-10 transition-all">
+      <div class="bg-white px-4 sm:px-10 py-6 sm:py-8 relative z-10 border-b border-zinc-100">
         <!-- Breadcrumb -->
-        <div class="flex items-center space-x-1.5 text-[13px] font-medium text-zinc-400 mb-4 tracking-wide">
+        <div class="flex items-center space-x-1.5 text-[13px] font-medium text-zinc-400 mb-4 tracking-wide flex-wrap">
           <ng-container *ngFor="let crumb of breadcrumb; let last = last">
             <span [class.text-zinc-800]="last">{{ crumb }}</span>
             <span *ngIf="!last" class="text-zinc-300">/</span>
@@ -198,15 +199,16 @@
         </div>
 
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-          <div class="flex-1 w-full">
+          <div class="flex-1 w-full min-w-0">
+            <!-- Title: editable input in edit mode, plain heading in view mode -->
             <input *ngIf="isEditingPage" type="text" [(ngModel)]="selectedPage.title"
-              class="w-full text-3xl sm:text-4xl font-bold text-zinc-900 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-900 rounded-none px-0 py-1 focus:outline-none transition-colors placeholder-zinc-300"
+              class="w-full text-2xl sm:text-4xl font-bold text-zinc-900 bg-transparent border-b border-transparent hover:border-zinc-200 focus:border-zinc-900 rounded-none px-0 py-1 focus:outline-none transition-colors placeholder-zinc-300"
               placeholder="Page Title">
             <h1 *ngIf="!isEditingPage"
-              class="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight tracking-tight">{{ selectedPage.title }}
+              class="text-2xl sm:text-4xl font-bold text-zinc-900 leading-tight tracking-tight break-words">{{ selectedPage.title }}
             </h1>
 
-            <div class="flex items-center space-x-4 mt-3 text-xs text-zinc-400 font-medium">
+            <div class="flex items-center space-x-4 mt-3 text-xs text-zinc-400 font-medium flex-wrap gap-y-1">
               <div class="flex items-center space-x-1.5" title="Created">
                 <i class="ri-time-line"></i>
                 <span>{{ formatDate(selectedPage.createdDate) }}</span>
@@ -218,10 +220,10 @@
             </div>
           </div>
 
-          <!-- Actions -->
-          <div class="flex items-center space-x-2 self-start">
+          <!-- View / Edit action buttons -->
+          <div class="flex items-center space-x-2 self-start shrink-0">
             <ng-container *ngIf="!isEditingPage">
-              <button (click)="isEditingPage = true"
+              <button (click)="enterEditMode()"
                 class="px-3.5 py-1.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-md font-medium transition-colors text-sm flex items-center space-x-1.5 shadow-sm">
                 <i class="ri-pencil-line"></i> <span>Edit</span>
               </button>
@@ -233,7 +235,7 @@
             </ng-container>
 
             <ng-container *ngIf="isEditingPage">
-              <button (click)="isEditingPage = false; openPage(selectedPage.pageId)"
+              <button (click)="cancelEdit()"
                 class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-100 rounded-md font-medium transition-colors text-sm">
                 Cancel
               </button>
@@ -246,20 +248,17 @@
         </div>
       </div>
 
-      <!-- Page Content Viewer/Editor -->
-      <div class="flex-1 w-full flex flex-col bg-zinc-100/50">
-        <!-- View Mode -->
-        <div *ngIf="!isEditingPage" class="flex-1 py-8 flex justify-center w-full">
-          <div
-            class="bg-white shadow-sm border border-zinc-200 min-h-[1056px] w-[816px] max-w-[95%] px-10 py-12 prose prose-zinc editor-content-viewer"
-            [innerHTML]="selectedPage.content | safeHtml"></div>
-        </div>
-
-        <!-- Edit Mode -->
-        <div *ngIf="isEditingPage" class="flex-1 flex flex-col w-full h-full relative z-0 editor-mode-container">
-          <jodit-editor [defaultValue]="selectedPage.content" (onChange)="onEditorChange($event)" [config]="joditConfig"
-            class="block w-full flex-1 border-none"></jodit-editor>
-        </div>
+      <!-- THE ONE DOCUMENT — Jodit is always mounted here.
+           In view mode the toolbar is hidden via CSS (.view-mode).
+           In edit mode it shows. Content never leaves the DOM. -->
+      <div class="flex-1 w-full flex flex-col bg-zinc-100/50"
+           [class.view-mode]="!isEditingPage">
+        <jodit-editor #joditRef
+          [defaultValue]="selectedPage.content"
+          (onChange)="onEditorChange($event)"
+          [config]="joditConfig"
+          class="notes-jodit-editor block w-full">
+        </jodit-editor>
       </div>
 
     </div>

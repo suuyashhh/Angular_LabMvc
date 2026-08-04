@@ -1,4 +1,7 @@
-import { Component, OnInit, inject, ViewEncapsulation } from '@angular/core';
+import {
+  Component, OnInit, OnDestroy, inject, ViewEncapsulation,
+  HostListener, ViewChild, ElementRef, Renderer2
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -44,7 +47,7 @@ export interface NotePage {
   styleUrl: './dashboard.component.css',
   encapsulation: ViewEncapsulation.None
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   folderTree: NoteFolder[] = [];
 
@@ -66,16 +69,25 @@ export class DashboardComponent implements OnInit {
 
   newFolderName: string = '';
   newPageTitle: string = '';
-  targetFolderIdForAdd: number | null = null; // Can be null if root
+  targetFolderIdForAdd: number | null = null;
 
-  // Editor Config
-  joditConfig = {
+  // Single-document architecture: Jodit is always mounted; we only
+  // toggle readonly. The reference is held here for syncEditableState().
+  @ViewChild('joditRef', { static: false }) joditRef?: any;
+
+  private renderer = inject(Renderer2);
+  private scaleRetryTimer?: ReturnType<typeof setTimeout>;
+  private wysiwygResizeObserver?: ResizeObserver;
+
+  // Editor Config — readonly starts true; enterEditMode() flips it false
+  joditConfig: any = {
     height: 'auto',
-    minHeight: 800,
+    minHeight: 1056,
+    readonly: true,
+    toolbarAdaptive: false,
     hidePoweredByJodit: true,
-    uploader: {
-      insertImageAsBase64URI: true
-    },
+    statusbar: false,
+    uploader: { insertImageAsBase64URI: true },
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
     defaultActionOnPaste: 'insert_as_html',
@@ -110,12 +122,24 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.currentUser = this.auth.getNotesUser();
     this.loadTree();
-
-    // Close context menu on outside click
     document.addEventListener('click', () => {
       this.contextMenuVisible = false;
     });
   }
+
+  ngOnDestroy() {
+    this.wysiwygResizeObserver?.disconnect();
+    if (this.scaleRetryTimer) clearTimeout(this.scaleRetryTimer);
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.applyPageScaling();
+  }
+
+  // ============================================================
+  // Tree / Folder / Page loading
+  // ============================================================
 
   loadTree() {
     if (!this.currentUser) return;
@@ -123,9 +147,7 @@ export class DashboardComponent implements OnInit {
     this.http.get<NoteFolder[]>(`${this.api.baseurl}NotesExplorer/tree/${this.currentUser.id}`)
       .pipe(finalize(() => this.loader.hide()))
       .subscribe({
-        next: (res) => {
-          this.folderTree = res;
-        },
+        next: (res) => { this.folderTree = res; },
         error: (err) => {
           console.error(err);
           this.toastr.error('Failed to load explorer.', 'Error');
@@ -133,7 +155,10 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  // --- Folder Actions ---
+  // ============================================================
+  // Folder Actions
+  // ============================================================
+
   openContextMenu(event: MouseEvent, folder: NoteFolder) {
     event.preventDefault();
     event.stopPropagation();
@@ -159,28 +184,21 @@ export class DashboardComponent implements OnInit {
       parentFolderId: this.targetFolderIdForAdd,
       folderName: this.newFolderName.trim()
     };
-
     this.loader.show();
     this.http.post(`${this.api.baseurl}NotesExplorer/folders`, payload)
       .pipe(finalize(() => { this.loader.hide(); this.showAddFolderModal = false; }))
       .subscribe({
-        next: () => {
-          this.toastr.success('Folder created.');
-          this.loadTree();
-        },
-        error: (err) => this.toastr.error('Failed to create folder.')
+        next: () => { this.toastr.success('Folder created.'); this.loadTree(); },
+        error: () => this.toastr.error('Failed to create folder.')
       });
   }
 
   deleteFolder(folder: NoteFolder) {
     if (folder.subFolders?.length > 0 || folder.pages?.length > 0) {
-      if (!confirm('This folder contains pages and subfolders. Deleting it will permanently remove everything inside. This action cannot be undone. Delete Folder?')) {
-        return;
-      }
+      if (!confirm('This folder contains pages and subfolders. Deleting it will permanently remove everything inside. This action cannot be undone. Delete Folder?')) return;
     } else {
       if (!confirm('Are you sure you want to delete this folder?')) return;
     }
-
     this.loader.show();
     this.http.delete(`${this.api.baseurl}NotesExplorer/folders/${folder.folderId}/user/${this.currentUser.id}`)
       .pipe(finalize(() => this.loader.hide()))
@@ -206,16 +224,16 @@ export class DashboardComponent implements OnInit {
         folderName: newName.trim()
       }).pipe(finalize(() => this.loader.hide()))
         .subscribe({
-          next: () => {
-            this.toastr.success('Folder renamed.');
-            this.loadTree();
-          },
+          next: () => { this.toastr.success('Folder renamed.'); this.loadTree(); },
           error: () => this.toastr.error('Failed to rename folder.')
         });
     }
   }
 
-  // --- Page Actions ---
+  // ============================================================
+  // Page Actions
+  // ============================================================
+
   openAddPageModal(folderId: number) {
     this.targetFolderIdForAdd = folderId;
     this.newPageTitle = '';
@@ -233,7 +251,6 @@ export class DashboardComponent implements OnInit {
       title: this.newPageTitle.trim(),
       content: ''
     };
-
     this.loader.show();
     this.http.post<NotePage>(`${this.api.baseurl}NotesExplorer/pages`, payload)
       .pipe(finalize(() => { this.loader.hide(); this.showAddPageModal = false; }))
@@ -243,7 +260,7 @@ export class DashboardComponent implements OnInit {
           this.loadTree();
           this.openPage(res.pageId);
         },
-        error: (err) => this.toastr.error('Failed to create page.')
+        error: () => this.toastr.error('Failed to create page.')
       });
   }
 
@@ -257,9 +274,12 @@ export class DashboardComponent implements OnInit {
           this.isEditingPage = false;
           this.buildBreadcrumb(this.folderTree, res.folderId, []);
 
-          if (window.innerWidth < 1024) { // Close sidebar on mobile/tablet when page opened
+          if (window.innerWidth < 1024) {
             this.isSidebarOpen = false;
           }
+
+          // After Angular renders the Jodit element, push content + readonly state
+          setTimeout(() => this.initEditorObservers(), 0);
         },
         error: () => this.toastr.error('Failed to load page.')
       });
@@ -280,6 +300,23 @@ export class DashboardComponent implements OnInit {
     return false;
   }
 
+  // ============================================================
+  // Edit mode toggling — ONLY changes readonly state, never the DOM
+  // ============================================================
+
+  enterEditMode() {
+    if (!this.selectedPage) return;
+    this.isEditingPage = true;
+    this.syncEditableState();
+  }
+
+  cancelEdit() {
+    if (!this.selectedPage) return;
+    const pageId = this.selectedPage.pageId;
+    this.isEditingPage = false;
+    this.openPage(pageId); // reload from server to discard changes
+  }
+
   savePage() {
     if (!this.selectedPage) return;
     this.loader.show();
@@ -289,7 +326,8 @@ export class DashboardComponent implements OnInit {
         next: () => {
           this.toastr.success('Page saved.');
           this.isEditingPage = false;
-          this.loadTree(); // refresh titles just in case
+          this.syncEditableState();
+          this.loadTree();
         },
         error: () => this.toastr.error('Failed to save page.')
       });
@@ -297,7 +335,6 @@ export class DashboardComponent implements OnInit {
 
   deletePage(pageId: number) {
     if (!confirm('This action cannot be undone. Are you sure you want to permanently delete this page?')) return;
-
     this.loader.show();
     this.http.delete(`${this.api.baseurl}NotesExplorer/pages/${pageId}/user/${this.currentUser.id}`)
       .pipe(finalize(() => this.loader.hide()))
@@ -322,6 +359,10 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  // ============================================================
+  // Sidebar / Search / Misc
+  // ============================================================
+
   toggleFolder(folder: NoteFolder, event: Event) {
     event.stopPropagation();
     folder.expanded = !folder.expanded;
@@ -329,6 +370,7 @@ export class DashboardComponent implements OnInit {
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+    setTimeout(() => this.applyPageScaling(), 320);
   }
 
   onSearchChange() {
@@ -337,14 +379,9 @@ export class DashboardComponent implements OnInit {
       this.searchResults = { folders: [], pages: [] };
       return;
     }
-
     this.isSearching = true;
     this.http.get<any>(`${this.api.baseurl}NotesExplorer/search/${this.currentUser.id}?query=${encodeURIComponent(this.searchQuery)}`)
-      .subscribe({
-        next: (res) => {
-          this.searchResults = res;
-        }
-      });
+      .subscribe({ next: (res) => { this.searchResults = res; } });
   }
 
   logout() {
@@ -358,6 +395,117 @@ export class DashboardComponent implements OnInit {
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     } catch {
       return dateStr;
+    }
+  }
+
+  // ============================================================
+  // Single-document helpers
+  // ============================================================
+
+  /** Returns the live Jodit DOM nodes. */
+  private getJoditNodes(): { wysiwyg: HTMLElement | null, workplace: HTMLElement | null, container: HTMLElement | null } {
+    const wrapper = this.joditRef?.elementRef?.nativeElement as HTMLElement | undefined;
+    if (!wrapper) return { wysiwyg: null, workplace: null, container: null };
+    return {
+      wysiwyg: wrapper.querySelector('.jodit-wysiwyg') as HTMLElement | null,
+      workplace: wrapper.querySelector('.jodit-workplace') as HTMLElement | null,
+      container: wrapper.querySelector('.jodit-container') as HTMLElement | null,
+    };
+  }
+
+  /** @deprecated use getJoditNodes */
+  private getWysiwyg(): HTMLElement | null {
+    return this.getJoditNodes().wysiwyg;
+  }
+
+  /**
+   * Called once after a page is loaded. Waits for Jodit to finish mounting
+   * its internal DOM (it's async), then wires up the ResizeObserver and
+   * applies the initial readonly + scaling state.
+   */
+  private initEditorObservers(attempt: number = 0) {
+    const { wysiwyg, container } = this.getJoditNodes();
+    if (!wysiwyg || !container) {
+      if (attempt > 40) return; // ~2s timeout
+      this.scaleRetryTimer = setTimeout(() => this.initEditorObservers(attempt + 1), 50);
+      return;
+    }
+
+    // Re-scale whenever the content height changes (typing, images loading…)
+    this.wysiwygResizeObserver?.disconnect();
+    this.wysiwygResizeObserver = new ResizeObserver(() => this.applyPageScaling());
+    this.wysiwygResizeObserver.observe(wysiwyg);
+
+    this.syncEditableState(true);
+    this.applyPageScaling();
+  }
+
+  /**
+   * Scales the wysiwyg page (816 px wide) to fit the available width —
+   * like zooming a Google Docs page. The toolbar is NOT scaled so it stays
+   * fully legible on any screen size.
+   *
+   * On MOBILE (< 769px) we skip scaling entirely and let the CSS media
+   * query switch the wysiwyg to full-width fluid layout so text remains
+   * readable. Tables inside get their own horizontal scroll.
+   *
+   * On DESKTOP we use container.clientWidth (the outer .jodit-container
+   * which is 100 % wide), NOT workplace.clientWidth which expands to 816 px
+   * and always returns 816, breaking the scale calculation.
+   */
+  private applyPageScaling() {
+    const { wysiwyg, workplace, container } = this.getJoditNodes();
+    if (!wysiwyg || !workplace || !container) return;
+
+    // Mobile: restore natural layout (CSS handles it via @media)
+    if (window.innerWidth < 769) {
+      this.renderer.removeStyle(wysiwyg, 'transform');
+      this.renderer.removeStyle(wysiwyg, 'transform-origin');
+      this.renderer.removeStyle(workplace, 'height');
+      this.renderer.removeStyle(workplace, 'overflow-x');
+      return;
+    }
+
+    // Desktop: scale page down if the sidebar is open and squeezes the area
+    const availableWidth = container.clientWidth;
+    if (!availableWidth) return;
+
+    const PAGE_WIDTH = 816;
+    const scale = Math.min(1, availableWidth / PAGE_WIDTH);
+
+    this.renderer.setStyle(wysiwyg, 'transform', `scale(${scale})`);
+    this.renderer.setStyle(wysiwyg, 'transform-origin', 'top center');
+    this.renderer.setStyle(workplace, 'overflow-x', 'hidden');
+
+    // Compensate height so content below isn't pushed down by the ghost space
+    // that CSS transform leaves behind (transform doesn't affect layout flow)
+    const naturalHeight = wysiwyg.scrollHeight;
+    this.renderer.setStyle(workplace, 'height', `${Math.ceil(naturalHeight * scale)}px`);
+  }
+
+  /**
+   * Toggles Jodit between read-only and editable WITHOUT recreating
+   * or destroying the editor DOM — this is the core of the single-document
+   * architecture. The document stays visible and layout-stable at all times.
+   */
+  private syncEditableState(force: boolean = false) {
+    const { wysiwyg } = this.getJoditNodes();
+    if (!wysiwyg) return;
+
+    this.renderer.setAttribute(wysiwyg, 'contenteditable', this.isEditingPage ? 'true' : 'false');
+
+    // Also tell Jodit's internal API so toolbar/shortcuts agree
+    const instance = this.joditRef?.jodit || this.joditRef?.editor || this.joditRef?.instance;
+    if (instance) {
+      try {
+        if (typeof instance.setReadOnly === 'function') {
+          instance.setReadOnly(!this.isEditingPage);
+        } else {
+          instance.readonly = !this.isEditingPage;
+        }
+      } catch {
+        // contenteditable attribute above still covers essential behavior
+      }
     }
   }
 }
