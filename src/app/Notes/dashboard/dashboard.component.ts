@@ -845,8 +845,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.wysiwygResizeObserver = new ResizeObserver(() => this.applyPageScaling());
     this.wysiwygResizeObserver.observe(wysiwyg);
 
+    this.syncEditorContent();
     this.syncEditableState(true);
     this.applyPageScaling();
+  }
+
+  /**
+   * Pushes the new page content into the Jodit instance when switching pages.
+   */
+  private syncEditorContent() {
+    const instance = this.joditRef?.jodit || this.joditRef?.editor || this.joditRef?.instance;
+    if (instance && this.selectedPage) {
+      instance.value = this.selectedPage.content || '';
+    }
   }
 
   /**
