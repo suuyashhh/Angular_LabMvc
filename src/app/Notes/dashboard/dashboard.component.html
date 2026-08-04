@@ -37,17 +37,25 @@
   </div>
 </nav>
 
+<!-- Hidden file input — triggered programmatically -->
+<input #fileInputRef type="file" multiple hidden
+  (change)="onFilesSelected($event)"
+  accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.webp,.gif,.svg,.zip,.rar,.7z,.csv,.json,.xml,.mp4,.mp3,.odt,.ods,.odp,.rtf,.md">
+
 <div class="h-[calc(100vh-56px)] flex bg-white text-zinc-900 overflow-hidden relative"
-  (click)="contextMenuVisible = false">
+  (click)="contextMenuVisible = false; fileContextMenuVisible = false">
 
   <!-- Mobile Overlay -->
   <div *ngIf="isSidebarOpen" (click)="toggleSidebar()"
     class="fixed inset-0 bg-zinc-900/20 backdrop-blur-sm z-30 lg:hidden animate-fadeIn"></div>
 
-  <!-- Left Sidebar (Explorer) -->
+  <!-- ═══════════════════════════════════════════════════════════
+       LEFT SIDEBAR (Explorer)
+       ═══════════════════════════════════════════════════════════ -->
   <div
     class="absolute lg:relative z-40 bg-[#F9F9F9] border-r border-zinc-200 flex flex-col transition-transform duration-300 ease-in-out h-[calc(100vh-56px)] w-[280px] sm:w-[320px] md:w-[340px]"
     [ngClass]="isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'">
+
     <!-- Sidebar Header -->
     <div class="px-4 py-3 flex items-center justify-between group">
       <h2 class="font-semibold text-zinc-600 text-xs tracking-wider uppercase">Explorer</h2>
@@ -89,7 +97,15 @@
             <span class="truncate">{{p.title}}</span>
           </div>
         </div>
-        <div *ngIf="searchResults.folders.length === 0 && searchResults.pages.length === 0"
+        <div *ngIf="searchResults.files.length > 0">
+          <h3 class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-2 mb-1 mt-3">Files</h3>
+          <div *ngFor="let f of searchResults.files" (click)="openFile(f.fileId)"
+            class="px-2 py-1.5 flex items-center space-x-2 text-sm text-zinc-700 hover:bg-zinc-200/60 rounded-md cursor-pointer transition-colors">
+            <i [class]="getFileIcon(f.extension)" [style.color]="getFileColor(f.extension)" class="flex-shrink-0 text-sm"></i>
+            <span class="truncate">{{f.displayName}}{{f.extension}}</span>
+          </div>
+        </div>
+        <div *ngIf="searchResults.folders.length === 0 && searchResults.pages.length === 0 && searchResults.files.length === 0"
           class="text-sm text-zinc-500 text-center py-6">
           No results found.
         </div>
@@ -99,6 +115,7 @@
       <ng-template #folderTemplate let-nodes="nodes" let-level="level">
         <div *ngFor="let node of nodes" class="folder-node relative"
           [ngClass]="{'border-l border-zinc-200/60 ml-[11px]': level > 0}">
+
           <!-- Folder Item -->
           <div
             class="group flex items-center justify-between py-1 pr-2 rounded-md hover:bg-zinc-200/60 cursor-pointer transition-colors mt-[2px]"
@@ -112,16 +129,16 @@
               <div
                 class="flex-shrink-0 w-4 flex justify-center text-zinc-400 group-hover:text-zinc-600 transition-colors">
                 <i class="ri-arrow-right-s-line transition-transform duration-200" [class.rotate-90]="node.expanded"
-                  [class.invisible]="!node.subFolders?.length && !node.pages?.length"></i>
+                  [class.invisible]="!node.subFolders?.length && !node.pages?.length && !node.files?.length"></i>
               </div>
               <span class="flex-shrink-0 text-sm leading-none opacity-80">{{ node.expanded ? '📂' : '📁' }}</span>
-              <span class="text-sm text-zinc-700 font-medium truncate select-none whitespace-nowrap">{{ node.folderName
-                }}</span>
+              <span class="text-sm text-zinc-700 font-medium truncate select-none whitespace-nowrap">{{ node.folderName }}</span>
             </div>
 
             <!-- Quick Add Page Button (Hover) -->
             <button (click)="$event.stopPropagation(); openAddPageModal(node.folderId)"
-              class="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-900 p-1 rounded hover:bg-zinc-300/50 transition-all ml-2 flex-shrink-0">
+              class="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-zinc-900 p-1 rounded hover:bg-zinc-300/50 transition-all ml-2 flex-shrink-0"
+              title="New Page">
               <i class="ri-add-line"></i>
             </button>
           </div>
@@ -152,11 +169,38 @@
                 <span class="flex-shrink-0 text-sm leading-none opacity-80"
                   [class.opacity-100]="selectedPage?.pageId === page.pageId">📄</span>
                 <span class="text-sm truncate select-none whitespace-nowrap"
-                  [ngClass]="selectedPage?.pageId === page.pageId ? 'font-medium text-zinc-900' : ''">{{ page.title
-                  }}</span>
+                  [ngClass]="selectedPage?.pageId === page.pageId ? 'font-medium text-zinc-900' : ''">{{ page.title }}</span>
+              </div>
+            </div>
+
+            <!-- ── Files ── -->
+            <div *ngFor="let file of node.files"
+              class="group flex items-center justify-between py-1 pr-2 rounded-md cursor-pointer transition-all mt-[2px] border-l border-zinc-200/60 ml-[11px] relative"
+              [ngClass]="selectedFile?.fileId === file.fileId ? 'bg-zinc-200/80 border-transparent ml-0 rounded-l-none pl-[29px]' : 'hover:bg-zinc-200/60 text-zinc-600 pl-[18px]'"
+              (click)="openFile(file.fileId)"
+              (contextmenu)="openFileContextMenu($event, file)">
+
+              <!-- Guide line connector for files -->
+              <div *ngIf="selectedFile?.fileId !== file.fileId"
+                class="absolute left-0 top-1/2 w-[14px] border-t border-zinc-200/60"></div>
+
+              <!-- Left highlight bar for selected file -->
+              <div *ngIf="selectedFile?.fileId === file.fileId"
+                class="absolute left-0 top-0 bottom-0 w-[3px] rounded-r-sm"
+                [style.background-color]="getFileColor(file.extension)"></div>
+
+              <div class="flex items-center space-x-2 overflow-hidden flex-1 relative z-10">
+                <i [class]="getFileIcon(file.extension)"
+                   [style.color]="getFileColor(file.extension)"
+                   class="flex-shrink-0 text-sm leading-none"></i>
+                <span class="text-sm truncate select-none whitespace-nowrap"
+                  [ngClass]="selectedFile?.fileId === file.fileId ? 'font-medium text-zinc-900' : ''">
+                  {{ file.displayName }}{{ file.extension }}
+                </span>
               </div>
             </div>
           </div>
+
         </div>
       </ng-template>
 
@@ -169,14 +213,23 @@
         </div>
       </div>
 
+      <!-- Upload Progress Indicator -->
+      <div *ngIf="isUploadingFiles"
+        class="fixed bottom-4 left-4 right-4 lg:left-auto lg:right-auto lg:w-[300px] bg-zinc-900 text-white rounded-xl p-3 shadow-2xl z-[300] flex items-center space-x-3 animate-slideUp">
+        <i class="ri-upload-cloud-2-line text-lg animate-pulse"></i>
+        <span class="text-sm font-medium">Uploading files...</span>
+      </div>
+
     </div>
   </div>
 
-  <!-- Right Side -->
+  <!-- ═══════════════════════════════════════════════════════════
+       RIGHT PANEL
+       ═══════════════════════════════════════════════════════════ -->
   <div class="flex-1 flex flex-col bg-white overflow-hidden relative">
 
-    <!-- Empty State (no page selected) -->
-    <div *ngIf="!selectedPage" class="flex-1 flex flex-col items-center justify-center text-zinc-400 bg-white">
+    <!-- ── Empty State ── -->
+    <div *ngIf="!selectedPage && !selectedFile" class="flex-1 flex flex-col items-center justify-center text-zinc-400 bg-white">
       <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 text-zinc-200">
         <i class="ri-file-edit-line text-4xl"></i>
       </div>
@@ -184,8 +237,7 @@
       <p class="text-sm text-zinc-400">Select a note from the sidebar or create a new one.</p>
     </div>
 
-    <!-- Active Page — ONE container, ONE Jodit instance, always mounted.
-         Switching between view/edit ONLY changes readonly state. -->
+    <!-- ── Note Page Viewer / Editor ── -->
     <div *ngIf="selectedPage" class="flex-1 flex flex-col h-full relative overflow-y-auto page-scroll">
 
       <!-- Page Header -->
@@ -248,9 +300,7 @@
         </div>
       </div>
 
-      <!-- THE ONE DOCUMENT — Jodit is always mounted here.
-           In view mode the toolbar is hidden via CSS (.view-mode).
-           In edit mode it shows. Content never leaves the DOM. -->
+      <!-- THE ONE DOCUMENT — Jodit is always mounted here. -->
       <div class="flex-1 w-full flex flex-col bg-zinc-100/50"
            [class.view-mode]="!isEditingPage">
         <jodit-editor #joditRef
@@ -260,19 +310,183 @@
           class="notes-jodit-editor block w-full">
         </jodit-editor>
       </div>
-
     </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         FILE VIEWER PANEL
+         ══════════════════════════════════════════════════════ -->
+    <div *ngIf="selectedFile && !selectedPage" class="flex-1 flex flex-col h-full overflow-hidden">
+
+      <!-- File Header -->
+      <div class="bg-white px-4 sm:px-8 py-5 border-b border-zinc-100 flex-shrink-0">
+        <!-- Breadcrumb -->
+        <div class="flex items-center space-x-1.5 text-[13px] font-medium text-zinc-400 mb-3 tracking-wide flex-wrap">
+          <ng-container *ngFor="let crumb of breadcrumb; let last = last">
+            <span [class.text-zinc-800]="last">{{ crumb }}</span>
+            <span *ngIf="!last" class="text-zinc-300">/</span>
+          </ng-container>
+        </div>
+
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <!-- File icon + name -->
+          <div class="flex items-center space-x-4 min-w-0 flex-1">
+            <div class="file-icon-display flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
+              [style.background-color]="getFileColor(selectedFile.extension) + '18'">
+              <i [class]="getFileIcon(selectedFile.extension)" [style.color]="getFileColor(selectedFile.extension)"
+                class="text-2xl"></i>
+            </div>
+            <div class="min-w-0">
+              <!-- Rename mode -->
+              <div *ngIf="isRenamingFile" class="flex items-center space-x-2">
+                <input type="text" [(ngModel)]="fileRenameValue"
+                  class="text-xl font-bold text-zinc-900 bg-transparent border-b-2 border-zinc-900 focus:outline-none px-0 py-0.5 min-w-[200px]"
+                  (keyup.enter)="saveRenameFile()" (keyup.escape)="cancelRenameFile()" autofocus>
+                <span class="text-zinc-400 text-sm font-medium flex-shrink-0">{{ selectedFile.extension }}</span>
+              </div>
+              <!-- View mode title -->
+              <h2 *ngIf="!isRenamingFile"
+                class="text-xl sm:text-2xl font-bold text-zinc-900 truncate">
+                {{ selectedFile.displayName }}<span class="text-zinc-400 font-normal">{{ selectedFile.extension }}</span>
+              </h2>
+              <!-- File meta pills -->
+              <div class="flex items-center flex-wrap gap-2 mt-1.5">
+                <span class="file-meta-pill">
+                  <i class="ri-hard-drive-2-line text-zinc-400"></i>
+                  {{ formatFileSize(selectedFile.sizeBytes) }}
+                </span>
+                <span class="file-meta-pill">
+                  <i class="ri-calendar-line text-zinc-400"></i>
+                  {{ formatDate(selectedFile.createdDate) }}
+                </span>
+                <span class="file-meta-pill">
+                  <i class="ri-download-line text-zinc-400"></i>
+                  {{ selectedFile.downloadCount }} download{{ selectedFile.downloadCount !== 1 ? 's' : '' }}
+                </span>
+                <span class="file-type-badge" [style.background-color]="getFileColor(selectedFile.extension) + '1a'"
+                  [style.color]="getFileColor(selectedFile.extension)">
+                  {{ selectedFile.extension.toUpperCase() }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <!-- Rename actions -->
+            <ng-container *ngIf="isRenamingFile">
+              <button (click)="cancelRenameFile()"
+                class="px-3.5 py-1.5 text-zinc-600 hover:bg-zinc-100 rounded-md font-medium transition-colors text-sm">Cancel</button>
+              <button (click)="saveRenameFile()"
+                class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm flex items-center space-x-1.5">
+                <i class="ri-check-line"></i><span>Save</span>
+              </button>
+            </ng-container>
+
+            <!-- Default actions -->
+            <ng-container *ngIf="!isRenamingFile">
+              <button (click)="startRenameFile()"
+                class="px-3.5 py-1.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-md font-medium transition-colors text-sm flex items-center space-x-1.5 shadow-sm">
+                <i class="ri-edit-line"></i><span>Rename</span>
+              </button>
+              <button (click)="shareFile(selectedFile)"
+                class="px-3.5 py-1.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-md font-medium transition-colors text-sm flex items-center space-x-1.5 shadow-sm"
+                title="Share via Device">
+                <i class="ri-share-forward-line"></i><span class="hidden sm:inline">Share</span>
+              </button>
+              <button (click)="downloadFile(selectedFile)"
+                class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-md font-medium shadow-sm transition-all text-sm flex items-center space-x-1.5">
+                <i class="ri-download-line"></i><span>Download</span>
+              </button>
+              <button (click)="deleteFile(selectedFile)"
+                class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                title="Delete File">
+                <i class="ri-delete-bin-line text-lg"></i>
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Content Area -->
+      <div class="flex-1 overflow-hidden bg-zinc-50">
+
+        <!-- PDF Viewer -->
+        <div *ngIf="previewType === 'pdf'" class="w-full h-full">
+          <iframe [src]="safePreviewUrl" class="w-full h-full border-none" title="PDF Preview"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </div>
+
+        <!-- Image Viewer -->
+        <div *ngIf="previewType === 'image'"
+          class="w-full h-full flex items-center justify-center p-6 overflow-auto">
+          <img [src]="safePreviewUrl" [alt]="selectedFile.displayName"
+            class="max-w-full max-h-full object-contain rounded-lg shadow-lg select-none file-image-preview">
+        </div>
+
+        <!-- Video Player -->
+        <div *ngIf="previewType === 'video'"
+          class="w-full h-full flex items-center justify-center p-6 bg-zinc-900">
+          <video controls class="max-w-full max-h-full rounded-lg shadow-2xl" style="max-height: calc(100% - 2rem)">
+            <source [src]="safePreviewUrl" [type]="selectedFile.mimeType">
+            Your browser does not support video playback.
+          </video>
+        </div>
+
+        <!-- Audio Player -->
+        <div *ngIf="previewType === 'audio'"
+          class="w-full h-full flex flex-col items-center justify-center gap-6 p-8">
+          <div class="w-24 h-24 rounded-2xl bg-zinc-900 flex items-center justify-center mb-2">
+            <i class="ri-music-line text-white text-4xl"></i>
+          </div>
+          <p class="text-lg font-semibold text-zinc-700">{{ selectedFile.displayName }}</p>
+          <audio controls class="w-full max-w-md">
+            <source [src]="safePreviewUrl" [type]="selectedFile.mimeType">
+          </audio>
+        </div>
+
+        <!-- Text / CSV / JSON / XML Viewer -->
+        <div *ngIf="previewType === 'text'"
+          class="w-full h-full overflow-auto p-6">
+          <pre class="text-sm text-zinc-700 bg-white rounded-xl border border-zinc-200 p-6 whitespace-pre-wrap break-words font-mono shadow-sm leading-relaxed">{{ textPreviewContent }}</pre>
+        </div>
+
+        <!-- No Preview — download prompt -->
+        <div *ngIf="previewType === 'none'"
+          class="w-full h-full flex flex-col items-center justify-center gap-6 p-8 text-center">
+          <div class="w-24 h-24 rounded-2xl flex items-center justify-center"
+            [style.background-color]="getFileColor(selectedFile.extension) + '1a'">
+            <i [class]="getFileIcon(selectedFile.extension)" [style.color]="getFileColor(selectedFile.extension)"
+              class="text-5xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-zinc-800 mb-1">{{ selectedFile.displayName }}{{ selectedFile.extension }}</h3>
+            <p class="text-zinc-500 text-sm mb-1">{{ formatFileSize(selectedFile.sizeBytes) }} · {{ selectedFile.mimeType }}</p>
+            <p class="text-zinc-400 text-sm">Preview is not available for this file type.</p>
+          </div>
+          <button (click)="downloadFile(selectedFile)"
+            class="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-semibold shadow-md transition-all text-sm flex items-center space-x-2">
+            <i class="ri-download-2-line text-base"></i>
+            <span>Download File</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
 </div>
 
-<!-- Context Menu -->
+<!-- ═══════════════════════════════════════════════════════════
+     CONTEXT MENU — FOLDER
+     ═══════════════════════════════════════════════════════════ -->
 <div *ngIf="contextMenuVisible"
-  class="fixed bg-white rounded-lg shadow-xl border border-zinc-200/80 py-1 min-w-[160px] z-[100] transform transition-all animate-scaleIn origin-top-left"
-  [style.left.px]="contextMenuX" [style.top.px]="contextMenuY">
+  class="fixed bg-white rounded-lg shadow-xl border border-zinc-200/80 py-1 min-w-[172px] z-[100] transform transition-all animate-scaleIn origin-top-left"
+  [style.left.px]="contextMenuX" [style.top.px]="contextMenuY"
+  (click)="$event.stopPropagation()">
 
   <div
-    class="px-3 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1 px-4 truncate max-w-[160px]">
+    class="px-4 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1 truncate max-w-[172px]">
     {{ contextMenuFolder?.folderName }}
   </div>
 
@@ -283,6 +497,10 @@
   <button (click)="openAddPageModal(contextMenuFolder!.folderId); contextMenuVisible = false"
     class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
     <i class="ri-file-add-line text-zinc-400"></i> <span>New Page</span>
+  </button>
+  <button (click)="triggerFileUpload(contextMenuFolder!.folderId); contextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+    <i class="ri-attachment-2 text-zinc-400"></i> <span>Add File</span>
   </button>
   <div class="h-px bg-zinc-100 my-1 mx-2"></div>
   <button (click)="renameFolder(contextMenuFolder!); contextMenuVisible = false"
@@ -295,7 +513,43 @@
   </button>
 </div>
 
-<!-- Add Folder Modal -->
+<!-- ═══════════════════════════════════════════════════════════
+     CONTEXT MENU — FILE (right-click on file in sidebar)
+     ═══════════════════════════════════════════════════════════ -->
+<div *ngIf="fileContextMenuVisible"
+  class="fixed bg-white rounded-lg shadow-xl border border-zinc-200/80 py-1 min-w-[160px] z-[100] transform transition-all animate-scaleIn origin-top-left"
+  [style.left.px]="fileContextMenuX" [style.top.px]="fileContextMenuY"
+  (click)="$event.stopPropagation()">
+
+  <div class="px-4 py-1.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-1 truncate max-w-[160px]">
+    {{ fileContextMenuTarget?.displayName }}{{ fileContextMenuTarget?.extension }}
+  </div>
+  <button (click)="openFile(fileContextMenuTarget!.fileId); fileContextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+    <i class="ri-eye-line text-zinc-400"></i> <span>Open</span>
+  </button>
+  <button (click)="shareFile(fileContextMenuTarget!); fileContextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+    <i class="ri-share-forward-line text-zinc-400"></i> <span>Share</span>
+  </button>
+  <button (click)="downloadFile(fileContextMenuTarget!); fileContextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+    <i class="ri-download-line text-zinc-400"></i> <span>Download</span>
+  </button>
+  <div class="h-px bg-zinc-100 my-1 mx-2"></div>
+  <button (click)="openFile(fileContextMenuTarget!.fileId); fileContextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 transition-colors flex items-center space-x-2">
+    <i class="ri-edit-line text-zinc-400"></i> <span>Rename</span>
+  </button>
+  <button (click)="deleteFile(fileContextMenuTarget!); fileContextMenuVisible = false"
+    class="w-full text-left px-4 py-1.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center space-x-2">
+    <i class="ri-delete-bin-line text-red-400"></i> <span>Delete</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADD FOLDER MODAL
+     ═══════════════════════════════════════════════════════════ -->
 <div *ngIf="showAddFolderModal"
   class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp border border-zinc-100">
@@ -320,7 +574,9 @@
   </div>
 </div>
 
-<!-- Add Page Modal -->
+<!-- ═══════════════════════════════════════════════════════════
+     ADD PAGE MODAL
+     ═══════════════════════════════════════════════════════════ -->
 <div *ngIf="showAddPageModal"
   class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fadeIn">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp border border-zinc-100">
