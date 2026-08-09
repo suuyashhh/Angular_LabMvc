@@ -34,35 +34,34 @@
         </div>
       </div>
 
-      <div class="table-responsive">
-        <table class="premium-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Expense Head / Title</th>
-              <th style="text-align: right;">Amount</th>
-              <th style="text-align: center;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let exp of expenses">
-              <td>{{ exp.date | date:'dd-MMM-yyyy' }}</td>
-              <td><strong>{{ exp.exp_name }}</strong></td>
-              <td style="text-align: right; font-weight: 600; color: #f87171;">₹{{ exp.exp_price | number }}</td>
-              <td class="action-cell">
-                <button (click)="editExpense(exp)" class="btn-icon btn-edit" title="Edit Record">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button (click)="deleteExpense(exp.exp_id)" class="btn-icon btn-delete" title="Delete Record">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="expenses.length === 0">
-              <td colspan="4" class="no-data">No expense records found for this date range.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="timeline-container mt-6">
+        <div *ngIf="groupedExpenses.length === 0" class="text-center text-slate-500 py-6">
+          No expense records found for this date range.
+        </div>
+
+        <div *ngFor="let group of groupedExpenses" class="timeline-group">
+          <div class="timeline-date-header">
+            <span class="timeline-dot"></span>
+            <strong>{{ group.date | date:'dd-MMM-yyyy' }}</strong>
+            <span class="text-slate-400 text-sm ml-2">({{ group.records.length }})</span>
+          </div>
+          
+          <div class="timeline-items">
+            <div *ngFor="let exp of group.records" class="timeline-card cursor-pointer hover:shadow-md transition-shadow" (click)="editExpense(exp)">
+              <div class="timeline-card-left">
+                <div class="icon-box bg-orange-50 text-orange-500 rounded-lg p-2 mr-3">
+                  <img src="assets/img/Fabrication/Expanse.png" alt="Expense" class="w-8 h-8 object-contain" />
+                </div>
+                <div class="details">
+                  <h4 class="m-0 font-semibold text-slate-800">{{ exp.exp_name }}</h4>
+                </div>
+              </div>
+              <div class="timeline-card-right text-right">
+                <div class="font-bold text-red-500 text-lg">-₹{{ exp.exp_price | number }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -118,7 +117,8 @@
       </form>
     </div>
 
-    <div class="drawer-footer">
+    <div class="drawer-footer flex gap-2">
+      <button *ngIf="isEditMode" type="button" class="btn-delete flex-grow-1" (click)="deleteExpense(expenseObj.exp_id)" style="border-radius: 8px; padding: 12px; font-weight: 600; font-size: 14px;">Delete</button>
       <button type="button" class="btn-cancel flex-grow-1" (click)="closeDrawer()">Cancel</button>
       <button 
         type="button" 
