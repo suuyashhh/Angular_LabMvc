@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService } from '../../shared/api.service';
 import { LoaderService } from '../../services/loader.service';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-fab-admin-helper-history',
@@ -15,6 +16,8 @@ import { LoaderService } from '../../services/loader.service';
   styleUrls: ['./fab-admin-helper-history.component.css']
 })
 export class FabAdminHelperHistoryComponent implements OnInit {
+  user: any = null;
+  isAdmin = false;
   helpersList: any[] = [];
   filteredHelpersList: any[] = [];
   selectedHelper: any = null;
@@ -26,10 +29,15 @@ export class FabAdminHelperHistoryComponent implements OnInit {
     private http: HttpClient,
     private api: ApiService,
     private loader: LoaderService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
+    this.user = this.auth.getFabCredentialsFromCookie();
+    if (this.user) {
+      this.isAdmin = this.user.type === 'Admin';
+    }
     this.fetchHelpers();
   }
 
@@ -37,7 +45,15 @@ export class FabAdminHelperHistoryComponent implements OnInit {
     this.loader.show();
     this.http.get<any[]>(`${this.api.baseurl}Fab/Helpers`).subscribe({
       next: (res) => {
-        this.helpersList = res || [];
+        const allHelpers = res || [];
+        if (!this.isAdmin && this.user) {
+          this.helpersList = allHelpers.filter(h => h.user_id === this.user.user_id);
+          if (this.helpersList.length > 0) {
+            this.selectHelper(this.helpersList[0]);
+          }
+        } else {
+          this.helpersList = allHelpers;
+        }
         this.filterHelpers();
         this.loader.hide();
       },

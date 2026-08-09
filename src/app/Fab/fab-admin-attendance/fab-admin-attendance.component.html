@@ -126,32 +126,40 @@
         </div>
       </div>
 
-      <div class="glass-card">
-        <div class="card-header">
-          <h3>Historical Attendance Registry</h3>
+      <div *ngIf="groupedHistoryRecords.length === 0" class="glass-card mt-4 p-8 text-center">
+        <div class="text-slate-400 mb-2"><i class="fas fa-calendar-times text-4xl"></i></div>
+        <div class="text-slate-500 font-medium text-lg">No attendance records found for this period.</div>
+      </div>
+
+      <div *ngFor="let group of groupedHistoryRecords" class="glass-card mb-6 overflow-hidden">
+        <div class="bg-blue-50/50 border-b border-blue-100 p-4 flex justify-between items-center">
+          <h3 class="m-0 text-lg font-bold text-slate-800 flex items-center">
+            <i class="fas fa-calendar-day text-blue-600 mr-2 text-xl"></i>
+            {{ group.date | date:'dd-MMM-yyyy' }}
+          </h3>
+          <span class="bg-white border border-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+            {{ group.records.length }} Records
+          </span>
         </div>
 
         <div class="table-responsive">
-          <table class="premium-table">
+          <table class="premium-table w-full">
             <thead>
-              <tr>
-                <th>Date</th>
-                <th>Helper Name</th>
-                <th>Status</th>
+              <tr class="bg-slate-50/50">
+                <th class="py-3 px-4 text-left font-semibold text-slate-500">Helper Name</th>
+                <th class="py-3 px-4 text-left font-semibold text-slate-500">Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let record of historyRecords">
-                <td>{{ record.date | date:'dd-MMM-yyyy' }}</td>
-                <td><strong>{{ record.user_name }}</strong></td>
-                <td>
+              <tr *ngFor="let record of group.records" class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4">
+                  <strong class="text-slate-800">{{ record.user_name }}</strong>
+                </td>
+                <td class="py-3 px-4">
                   <span class="status-badge" [ngClass]="record.user_day.toLowerCase().replace(' ', '-')">
                     {{ record.user_day }}
                   </span>
                 </td>
-              </tr>
-              <tr *ngIf="historyRecords.length === 0">
-                <td colspan="3" class="no-data">No attendance records found for this period.</td>
               </tr>
             </tbody>
           </table>
