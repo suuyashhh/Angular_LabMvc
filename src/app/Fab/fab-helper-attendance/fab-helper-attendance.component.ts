@@ -16,6 +16,7 @@ import { LoaderService } from '../../services/loader.service';
 })
 export class FabHelperAttendanceComponent implements OnInit {
   user: any = null;
+  isAdmin = false;
   selectedStatus: string = 'Full Day';
   todayDateStr: string = new Date().toISOString().substring(0, 10);
   alreadyMarked = false;
@@ -60,6 +61,7 @@ export class FabHelperAttendanceComponent implements OnInit {
       this.toastr.error('Session expired. Please log in again.', 'Error');
       return;
     }
+    this.isAdmin = this.user.type === 'Admin';
     this.checkTodayAttendance();
     this.fetchMonthlyLogs();
   }

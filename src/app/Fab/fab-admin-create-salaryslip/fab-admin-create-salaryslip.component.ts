@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ApiService } from '../../shared/api.service';
 import { LoaderService } from '../../services/loader.service';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../shared/auth.service';
 
 @Component({
   selector: 'app-fab-admin-create-salaryslip',
@@ -15,6 +16,8 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./fab-admin-create-salaryslip.component.css']
 })
 export class FabAdminCreateSalaryslipComponent implements OnInit {
+  user: any = null;
+  isAdmin = false;
   helpers: any[] = [];
   selectedUserId: number | null = null;
   fromDate: string = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10);
@@ -31,10 +34,15 @@ export class FabAdminCreateSalaryslipComponent implements OnInit {
     private api: ApiService,
     private loader: LoaderService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
+    this.user = this.auth.getFabCredentialsFromCookie();
+    if (this.user) {
+      this.isAdmin = this.user.type === 'Admin';
+    }
     this.fetchHelpers();
   }
 
@@ -49,7 +57,15 @@ export class FabAdminCreateSalaryslipComponent implements OnInit {
   fetchHelpers() {
     this.http.get<any[]>(`${this.api.baseurl}Fab/Helpers`).subscribe({
       next: (res) => {
-        this.helpers = res || [];
+        const allHelpers = res || [];
+        if (!this.isAdmin && this.user) {
+          this.helpers = allHelpers.filter(h => h.user_id === this.user.user_id);
+          if (this.helpers.length > 0) {
+            this.selectedUserId = this.helpers[0].user_id;
+          }
+        } else {
+          this.helpers = allHelpers;
+        }
       },
       error: (err) => {
         console.error(err);

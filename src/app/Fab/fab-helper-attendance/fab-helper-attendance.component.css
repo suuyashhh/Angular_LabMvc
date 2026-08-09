@@ -1,7 +1,7 @@
 .page-container {
   min-height: 100vh;
-  background: radial-gradient(circle at 50% 0%, rgb(18, 30, 54) 0%, rgb(9, 15, 26) 100%);
-  color: #f8fafc;
+  background: #f8fafc;
+  color: #1e293b;
   font-family: 'Outfit', sans-serif;
   padding: 0;
 }
@@ -14,9 +14,9 @@
 }
 
 .btn-back {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
   padding: 8px 16px;
   border-radius: 8px;
   text-decoration: none;
@@ -29,8 +29,8 @@
 }
 
 .btn-back:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: #e2e8f0;
+  color: #1e293b;
   transform: translateX(-2px);
 }
 
@@ -55,18 +55,16 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 20px;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   padding: 30px;
 }
 
 .card-header {
   margin-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 12px;
 }
 
@@ -82,7 +80,7 @@
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  color: #f1f5f9;
+  color: #1e293b;
   display: flex;
   align-items: center;
 }
@@ -90,7 +88,7 @@
 /* Punch Form */
 .punch-info {
   font-size: 14px;
-  color: #cbd5e1;
+  color: #475569;
   margin-bottom: 20px;
   line-height: 1.6;
 }
@@ -103,17 +101,17 @@
 }
 
 .form-group label {
-  color: #cbd5e1;
+  color: #475569;
   font-size: 13px;
   font-weight: 500;
 }
 
 .form-control {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 10px;
   padding: 10px 14px;
-  color: #ffffff;
+  color: #1e293b;
   font-size: 14px;
   outline: none;
   transition: all 0.25s ease;
@@ -125,7 +123,8 @@
 
 .form-control:focus {
   border-color: #3b82f6;
-  background: rgba(255, 255, 255, 0.05);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .btn-submit {
@@ -176,12 +175,12 @@
 .punch-success h4 {
   font-size: 18px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: #1e293b;
   margin: 0 0 10px;
 }
 
 .punch-success p {
-  color: #94a3b8;
+  color: #475569;
   font-size: 13px;
   margin: 0 0 14px;
 }
@@ -197,21 +196,21 @@
 }
 
 .status-pill.full-day {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .status-pill.half-day {
-  background: rgba(14, 165, 233, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(14, 165, 233, 0.3);
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.2);
 }
 
 .status-pill.off-day {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .timestamp {
@@ -240,19 +239,19 @@
   padding: 14px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #94a3b8;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .premium-table td {
   padding: 14px 16px;
   font-size: 14px;
-  color: #cbd5e1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .premium-table tr:hover td {
-  background: rgba(255, 255, 255, 0.01);
+  background: #f8fafc;
 }
 
 .attendance-badge {
@@ -264,21 +263,21 @@
 }
 
 .attendance-badge.full-day {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .attendance-badge.half-day {
-  background: rgba(14, 165, 233, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(14, 165, 233, 0.3);
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.2);
 }
 
 .attendance-badge.off-day {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .no-data {
@@ -289,5 +288,5 @@
 
 .mr-2 { margin-right: 8px; }
 select.form-control {
-  background-color: rgb(18, 28, 49);
+  background-color: #ffffff;
 }
