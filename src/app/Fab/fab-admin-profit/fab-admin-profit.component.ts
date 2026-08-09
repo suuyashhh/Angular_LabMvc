@@ -15,6 +15,7 @@ import { LoaderService } from '../../services/loader.service';
 })
 export class FabAdminProfitComponent implements OnInit {
   profits: any[] = [];
+  groupedProfits: { date: string, records: any[] }[] = [];
   
   // Date Range Search
   searchFrom: string = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10);
@@ -69,6 +70,7 @@ export class FabAdminProfitComponent implements OnInit {
       next: (res) => {
         const data = res || [];
         this.profits = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.groupProfits();
         this.loader.hide();
       },
       error: (err) => {
@@ -77,6 +79,22 @@ export class FabAdminProfitComponent implements OnInit {
         this.loader.hide();
       }
     });
+  }
+
+  groupProfits() {
+    const groups: { [key: string]: any[] } = {};
+    this.profits.forEach(record => {
+      const dateStr = record.date.substring(0, 10);
+      if (!groups[dateStr]) {
+        groups[dateStr] = [];
+      }
+      groups[dateStr].push(record);
+    });
+
+    this.groupedProfits = Object.keys(groups).map(date => ({
+      date: date,
+      records: groups[date]
+    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   onSubmit() {
@@ -144,6 +162,7 @@ export class FabAdminProfitComponent implements OnInit {
           this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Billing record deleted', 'Success');
+            this.closeDrawer();
             this.fetchProfits();
           } else {
             this.toastr.error('Failed to delete billing record', 'Error');

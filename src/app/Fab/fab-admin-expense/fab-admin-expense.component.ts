@@ -15,6 +15,7 @@ import { LoaderService } from '../../services/loader.service';
 })
 export class FabAdminExpenseComponent implements OnInit {
   expenses: any[] = [];
+  groupedExpenses: { date: string, records: any[] }[] = [];
   
   // Date Range Search
   searchFrom: string = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10);
@@ -73,6 +74,7 @@ export class FabAdminExpenseComponent implements OnInit {
       next: (res) => {
         const data = res || [];
         this.expenses = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.groupExpenses();
         this.loader.hide();
       },
       error: (err) => {
@@ -81,6 +83,22 @@ export class FabAdminExpenseComponent implements OnInit {
         this.loader.hide();
       }
     });
+  }
+
+  groupExpenses() {
+    const groups: { [key: string]: any[] } = {};
+    this.expenses.forEach(record => {
+      const dateStr = record.date.substring(0, 10);
+      if (!groups[dateStr]) {
+        groups[dateStr] = [];
+      }
+      groups[dateStr].push(record);
+    });
+
+    this.groupedExpenses = Object.keys(groups).map(date => ({
+      date: date,
+      records: groups[date]
+    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   onSubmit() {
@@ -148,6 +166,7 @@ export class FabAdminExpenseComponent implements OnInit {
           this.closeDeleteModal();
           if (res.success) {
             this.toastr.success('Expense deleted successfully', 'Success');
+            this.closeDrawer();
             this.fetchExpenses();
           } else {
             this.toastr.error('Failed to delete expense record', 'Error');
