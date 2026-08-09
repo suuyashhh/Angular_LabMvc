@@ -184,31 +184,31 @@
 </main>
 
 <!-- Cattle Modal -->
-<div class="modal fade custom-modal-fade" id="cattleFormModal" tabindex="-1" aria-labelledby="cattleFormModalLabel"
+<div class="modal fade " id="cattleFormModal" tabindex="-1" aria-labelledby="cattleFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-lg">
-    <div class="modal-content custom-modal-content">
-      <div class="modal-header custom-modal-header">
+  <div class="modal-dialog modal-dialog-centered  modal-lg">
+    <div class="modal-content border-0 rounded-2xl shadow-2xl overflow-hidden bg-white">
+      <div class="modal-header p-4 sm:p-5 border-b border-emerald-100 bg-emerald-50/50">
         <div class="modal-title-wrapper">
           <div class="modal-icon">
             <i class="ri-file-add-line" *ngIf="ANIMAL_ID == 0 && btnAnimal == ''"></i>
             <i class="ri-edit-line" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'"></i>
             <i class="ri-delete-bin-line" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'"></i>
           </div>
-          <h5 class="modal-title custom-modal-title" *ngIf="ANIMAL_ID == 0 && btnAnimal == ''">Add Cattle</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'">Edit Cattle</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">Delete Cattle</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0" *ngIf="ANIMAL_ID == 0 && btnAnimal == ''">Add Cattle</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'">Edit Cattle</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">Delete Cattle</h5>
         </div>
-        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close hover:opacity-75 transition-opacity" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body custom-modal-body">
-        <form [formGroup]="animalForm" (ngSubmit)="submitAnimal()" class="custom-form" novalidate>
+      <div class="modal-body p-4 sm:p-6">
+        <form [formGroup]="animalForm" (ngSubmit)="submitAnimal()"  novalidate>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Left Column: Form Fields -->
             <div class="space-y-4">
               <!-- Cattle Name -->
-              <div class="custom-form-group">
+              <div class="mb-4">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="cattle-name" class="form-control" formControlName="ANIMAL_NAME"
                     placeholder="Cattle Name" [readonly]="ANIMAL_ID != 0 && btnAnimal == 'D'" />
@@ -221,7 +221,7 @@
               </div>
 
               <!-- Image Upload -->
-              <div class="custom-form-group">
+              <div class="mb-4">
                 <label class="block text-sm font-medium text-green-700 mb-2">
                   <i class="ri-image-line"></i> Cattle Image
                 </label>
@@ -261,7 +261,7 @@
               </div>
 
               <!-- Delete Reason -->
-              <div class="custom-form-group" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">
+              <div class="mb-4" *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="deleteAnimalReason" class="form-control" placeholder="Delete Reason"
                     [(ngModel)]="animalDeleteReason" [ngModelOptions]="{standalone: true}" />
@@ -276,7 +276,7 @@
 
             <!-- Right Column: Image Preview -->
             <div class="space-y-4">
-              <div class="custom-form-group">
+              <div class="mb-4">
                 <label class="block text-sm font-medium text-green-700 mb-2">
                   <i class="ri-eye-line"></i> Image Preview
                 </label>
@@ -308,17 +308,17 @@
           </div>
 
           <!-- Modal Footer Buttons -->
-          <div class="modal-footer custom-modal-footer mt-6">
-            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+          <div class="modal-footer p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 justify-end mt-6">
+            <button type="button" class="px-4 py-2 sm:py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-all font-medium flex items-center shadow-sm" data-bs-dismiss="modal">
               <i class="ri-close-line"></i> Cancel
             </button>
-            <button *ngIf="ANIMAL_ID == 0 && btnAnimal == ''" type="submit" class="custom-btn custom-btn-save">
+            <button *ngIf="ANIMAL_ID == 0 && btnAnimal == ''" type="submit" class="px-4 py-2 sm:py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium flex items-center shadow-sm shadow-emerald-200">
               <i class="ri-save-line"></i> Save
             </button>
-            <button *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'" type="submit" class="custom-btn custom-btn-save">
+            <button *ngIf="ANIMAL_ID != 0 && btnAnimal == 'E'" type="submit" class="px-4 py-2 sm:py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium flex items-center shadow-sm shadow-emerald-200">
               <i class="ri-edit-line"></i> Update Cattle
             </button>
-            <button *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'" type="submit" class="custom-btn custom-btn-delete">
+            <button *ngIf="ANIMAL_ID != 0 && btnAnimal == 'D'" type="submit" class="px-4 py-2 sm:py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium flex items-center shadow-sm shadow-red-200">
               <i class="ri-delete-bin-line"></i> Delete Cattle
             </button>
           </div>
@@ -329,31 +329,31 @@
 </div>
 
 <!-- Feed Modal -->
-<div class="modal fade custom-modal-fade" id="feedFormModal" tabindex="-1" aria-labelledby="feedFormModalLabel"
+<div class="modal fade " id="feedFormModal" tabindex="-1" aria-labelledby="feedFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered custom-modal-dialog modal-lg">
-    <div class="modal-content custom-modal-content">
-      <div class="modal-header custom-modal-header">
+  <div class="modal-dialog modal-dialog-centered  modal-lg">
+    <div class="modal-content border-0 rounded-2xl shadow-2xl overflow-hidden bg-white">
+      <div class="modal-header p-4 sm:p-5 border-b border-emerald-100 bg-emerald-50/50">
         <div class="modal-title-wrapper">
           <div class="modal-icon">
             <i class="ri-file-add-line" *ngIf="FEED_ID == 0 && btnFeed == ''"></i>
             <i class="ri-edit-line" *ngIf="FEED_ID != 0 && btnFeed == 'E'"></i>
             <i class="ri-delete-bin-line" *ngIf="FEED_ID != 0 && btnFeed == 'D'"></i>
           </div>
-          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID == 0 && btnFeed == ''">Add Feed</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID != 0 && btnFeed == 'E'">Edit Feed</h5>
-          <h5 class="modal-title custom-modal-title" *ngIf="FEED_ID != 0 && btnFeed == 'D'">Delete Feed</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0" *ngIf="FEED_ID == 0 && btnFeed == ''">Add Feed</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0" *ngIf="FEED_ID != 0 && btnFeed == 'E'">Edit Feed</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0" *ngIf="FEED_ID != 0 && btnFeed == 'D'">Delete Feed</h5>
         </div>
-        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close hover:opacity-75 transition-opacity" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body custom-modal-body">
-        <form [formGroup]="feedForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
+      <div class="modal-body p-4 sm:p-6">
+        <form [formGroup]="feedForm" (ngSubmit)="submitFeed()"  novalidate>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Left Column: Form Fields -->
             <div class="space-y-4">
               <!-- Feed Name -->
-              <div class="custom-form-group">
+              <div class="mb-4">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="feed-name" class="form-control" formControlName="FEED_NAME"
                     placeholder="Feed Name" [readonly]="FEED_ID != 0 && btnFeed == 'D'" />
@@ -366,7 +366,7 @@
               </div>
 
               <!-- Image Upload -->
-              <div class="custom-form-group">
+              <div class="mb-4">
                 <label class="block text-sm font-medium text-green-700 mb-2">
                   <i class="ri-image-line"></i> Feed Image
                 </label>
@@ -406,7 +406,7 @@
               </div>
 
               <!-- Delete Reason -->
-              <div class="custom-form-group" *ngIf="FEED_ID != 0 && btnFeed == 'D'">
+              <div class="mb-4" *ngIf="FEED_ID != 0 && btnFeed == 'D'">
                 <div class="form-floating form-floating-outline">
                   <input type="text" id="deleteFeedReason" class="form-control" placeholder="Delete Reason"
                     [(ngModel)]="feedDeleteReason" [ngModelOptions]="{standalone: true}" />
@@ -421,7 +421,7 @@
 
             <!-- Right Column: Image Preview -->
             <div class="space-y-4">
-              <div class="custom-form-group">
+              <div class="mb-4">
                 <label class="block text-sm font-medium text-green-700 mb-2">
                   <i class="ri-eye-line"></i> Image Preview
                 </label>
@@ -453,17 +453,17 @@
           </div>
 
           <!-- Modal Footer Buttons -->
-          <div class="modal-footer custom-modal-footer mt-6">
-            <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+          <div class="modal-footer p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 justify-end mt-6">
+            <button type="button" class="px-4 py-2 sm:py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-all font-medium flex items-center shadow-sm" data-bs-dismiss="modal">
               <i class="ri-close-line"></i> Cancel
             </button>
-            <button *ngIf="FEED_ID == 0 && btnFeed == ''" type="submit" class="custom-btn custom-btn-save">
+            <button *ngIf="FEED_ID == 0 && btnFeed == ''" type="submit" class="px-4 py-2 sm:py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium flex items-center shadow-sm shadow-emerald-200">
               <i class="ri-save-line"></i> Save
             </button>
-            <button *ngIf="FEED_ID != 0 && btnFeed == 'E'" type="submit" class="custom-btn custom-btn-save">
+            <button *ngIf="FEED_ID != 0 && btnFeed == 'E'" type="submit" class="px-4 py-2 sm:py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium flex items-center shadow-sm shadow-emerald-200">
               <i class="ri-edit-line"></i> Update Feed
             </button>
-            <button *ngIf="FEED_ID != 0 && btnFeed == 'D'" type="submit" class="custom-btn custom-btn-delete">
+            <button *ngIf="FEED_ID != 0 && btnFeed == 'D'" type="submit" class="px-4 py-2 sm:py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium flex items-center shadow-sm shadow-red-200">
               <i class="ri-delete-bin-line"></i> Delete Feed
             </button>
           </div>
@@ -475,23 +475,23 @@
 
 
 <!-- Image Preview Modal (Form-Style UI) -->
-<div class="modal fade custom-modal-fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
-    <div class="modal-content custom-modal-content">
+<div class="modal fade " id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg ">
+    <div class="modal-content border-0 rounded-2xl shadow-2xl overflow-hidden bg-white">
 
       <!-- Header -->
-      <div class="modal-header custom-modal-header">
+      <div class="modal-header p-4 sm:p-5 border-b border-emerald-100 bg-emerald-50/50">
         <div class="modal-title-wrapper">
           <div class="modal-icon bg-green-100 text-green-700">
             <i class="ri-image-line"></i>
           </div>
-          <h5 class="modal-title custom-modal-title">Image Preview</h5>
+          <h5 class="modal-title text-lg font-bold text-emerald-800 m-0">Image Preview</h5>
         </div>
-        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close hover:opacity-75 transition-opacity" data-bs-dismiss="modal"></button>
       </div>
 
       <!-- Body -->
-      <div class="modal-body custom-modal-body">
+      <div class="modal-body p-4 sm:p-6">
 
         <div class="flex items-center justify-center">
           <div class="relative bg-green-50 border-2 border-dashed border-green-200 rounded-2xl p-4 shadow-inner">
@@ -510,8 +510,8 @@
       </div>
 
       <!-- Footer -->
-      <div class="modal-footer custom-modal-footer">
-        <button type="button" class="custom-btn custom-btn-cancel" data-bs-dismiss="modal">
+      <div class="modal-footer p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 justify-end">
+        <button type="button" class="px-4 py-2 sm:py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-all font-medium flex items-center shadow-sm" data-bs-dismiss="modal">
           <i class="ri-close-line"></i> Close
         </button>
       </div>

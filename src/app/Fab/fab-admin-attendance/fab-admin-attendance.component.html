@@ -131,38 +131,49 @@
         <div class="text-slate-500 font-medium text-lg">No attendance records found for this period.</div>
       </div>
 
-      <div *ngFor="let group of groupedHistoryRecords" class="glass-card mb-6 overflow-hidden">
-        <div class="bg-blue-50/50 border-b border-blue-100 p-4 flex justify-between items-center">
-          <h3 class="m-0 text-lg font-bold text-slate-800 flex items-center">
-            <i class="fas fa-calendar-day text-blue-600 mr-2 text-xl"></i>
-            {{ group.date | date:'dd-MMM-yyyy' }}
-          </h3>
-          <span class="bg-white border border-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-            {{ group.records.length }} Records
-          </span>
-        </div>
+      <div class="mt-6 space-y-4 sm:space-y-6">
+        <!-- Group by Date -->
+        <div *ngFor="let group of groupedHistoryRecords" class="relative">
+          <!-- Date Header -->
+          <div class="sticky top-14 sm:top-16 z-20 bg-white py-2 sm:py-3 mb-2 sm:mb-3 border-b border-slate-200">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500 flex-shrink-0"></div>
+              <h3 class="text-sm sm:text-lg font-semibold text-slate-900 truncate m-0">{{ group.date | date:'dd-MMM-yyyy' }}</h3>
+              <span class="text-xs sm:text-sm text-slate-500 whitespace-nowrap">({{ group.records.length }})</span>
+            </div>
+          </div>
 
-        <div class="table-responsive">
-          <table class="premium-table w-full">
-            <thead>
-              <tr class="bg-slate-50/50">
-                <th class="py-3 px-4 text-left font-semibold text-slate-500">Helper Name</th>
-                <th class="py-3 px-4 text-left font-semibold text-slate-500">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let record of group.records" class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                <td class="py-3 px-4">
-                  <strong class="text-slate-800">{{ record.user_name }}</strong>
-                </td>
-                <td class="py-3 px-4">
-                  <span class="status-badge" [ngClass]="record.user_day.toLowerCase().replace(' ', '-')">
-                    {{ record.user_day }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Attendance Items for this Date -->
+          <div class="space-y-1.5 sm:space-y-2 ml-3 sm:ml-4 border-l border-slate-200 pl-3 sm:pl-4">
+            <div *ngFor="let record of group.records"
+              class="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3 shadow-sm hover:shadow-md transition-shadow">
+
+              <div class="flex items-center gap-2.5 sm:gap-3">
+                <!-- Icon -->
+                <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg overflow-hidden flex-shrink-0 bg-blue-50 border border-blue-100 flex items-center justify-center p-1">
+                  <i class="fas fa-user text-blue-500 text-lg sm:text-xl"></i>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-medium text-slate-900 text-sm sm:text-base m-0 truncate">
+                        {{ record.user_name }}
+                      </h4>
+                    </div>
+
+                    <div class="flex-shrink-0">
+                      <span class="status-badge" [ngClass]="record.user_day.toLowerCase().replace(' ', '-')">
+                        {{ record.user_day }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
