@@ -140,11 +140,11 @@
 </main>
 
 <!-- Doctor Modal (Add/Edit/Delete) -->
-<div class="modal fade custom-modal-fade" #DoctorModal tabindex="-1" aria-labelledby="doctorFormModalLabel"
+<div class="modal fade " #DoctorModal tabindex="-1" aria-labelledby="doctorFormModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
-    <div class="modal-content custom-modal-content">
-      <div class="modal-header custom-modal-header">
+  <div class="modal-dialog modal-dialog-centered modal-lg ">
+    <div class="modal-content border-0 rounded-2xl shadow-2xl overflow-hidden bg-white">
+      <div class="modal-header p-4 sm:p-5 border-b border-emerald-100 bg-emerald-50/50">
         <div class="modal-title-wrapper flex items-center">
           <!-- Image Container -->
           <div *ngIf="modalMode === 'edit' || modalMode === 'delete'"
@@ -161,25 +161,25 @@
               <i class="ri-edit-line text-xl sm:text-2xl" *ngIf="modalMode === 'edit'"></i>
               <i class="ri-delete-bin-line text-xl sm:text-2xl" *ngIf="modalMode === 'delete'"></i>
             </div>
-            <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
+            <h5 class="modal-title text-lg font-bold text-emerald-800 m-0 text-sm sm:text-base md:text-lg truncate">
               {{ modalMode === 'add' ? 'Add Doctor' :
               modalMode === 'edit' ? 'Edit Doctor' : 'Delete Doctor' }}
             </h5>
           </div>
         </div>
 
-        <button type="button" class="btn-close custom-btn-close" (click)="closeModal()" aria-label="Close"
+        <button type="button" class="btn-close hover:opacity-75 transition-opacity" (click)="closeModal()" aria-label="Close"
           [disabled]="isSaving || isUpdating || isDeleting"></button>
       </div>
 
-      <div class="modal-body custom-modal-body">
-        <form [formGroup]="doctorForm" (ngSubmit)="submitFeed()" class="custom-form" novalidate>
+      <div class="modal-body p-4 sm:p-6">
+        <form [formGroup]="doctorForm" (ngSubmit)="submitFeed()"  novalidate>
           <div class="form-group-wrapper">
 
 
             <!-- Breeding Switch -->
             <!-- Breeding Switch -->
-            <div class="custom-form-group">
+            <div class="mb-4">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <div class="switch-container">
                   <span class="switch-label">Breeding</span>
@@ -196,7 +196,7 @@
             </div>
 
             <!-- Date -->
-            <div class="custom-form-group">
+            <div class="mb-4">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="date" id="doctor-date" class="form-control" formControlName="date" placeholder="Date"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
@@ -209,7 +209,7 @@
             </div>
 
             <!-- Animal Search -->
-            <div class="custom-form-group position-relative">
+            <div class="mb-4 position-relative">
               <div class="form-floating form-floating-outline mb-0">
                 <input #doctorInput id="doctor-animal-input" type="text" class="form-control branch-input"
                   name="animalSearch" [(ngModel)]="selectedAnimalName" (input)="onFeedSearch($event)"
@@ -425,7 +425,7 @@
             </style>
 
             <!-- Reason -->
-            <div class="custom-form-group">
+            <div class="mb-4">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="text" id="doctor-reason" class="form-control" formControlName="reason" placeholder="Reason"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
@@ -439,7 +439,7 @@
             </div>
 
             <!-- Price -->
-            <div class="custom-form-group">
+            <div class="mb-4">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="number" id="doctor-price" class="form-control" formControlName="price" placeholder="Price"
                   [readonly]="modalMode === 'delete' || isSaving || isUpdating || isDeleting"
@@ -454,7 +454,7 @@
             </div>
 
             <!-- Delete Reason -->
-            <div class="custom-form-group" *ngIf="modalMode === 'delete'">
+            <div class="mb-4" *ngIf="modalMode === 'delete'">
               <div class="form-floating form-floating-outline mb-3 sm:mb-4">
                 <input type="text" id="deleteDoctorReason" class="form-control" placeholder="Delete Reason"
                   [(ngModel)]="deleteReason" [ngModelOptions]="{standalone: true}" [disabled]="isDeleting" />
@@ -469,15 +469,15 @@
           </div>
 
           <!-- Modal Footer Buttons -->
-          <div class="modal-footer custom-modal-footer flex-col sm:flex-row gap-2 sm:gap-3">
-            <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
+          <div class="modal-footer p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 justify-end flex-col sm:flex-row gap-2 sm:gap-3">
+            <button type="button" class="px-4 py-2 sm:py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-all font-medium flex items-center shadow-sm w-full sm:w-auto justify-center"
               (click)="closeModal()" [disabled]="isSaving || isUpdating || isDeleting">
               <i class="ri-close-line"></i> Cancel
             </button>
 
             <!-- Save Button with loading -->
             <button *ngIf="modalMode === 'add'" type="submit"
-              class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+              class="px-4 py-2 sm:py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium flex items-center shadow-sm shadow-emerald-200 w-full sm:w-auto justify-center"
               [disabled]="isSaving || doctorForm.invalid">
               <span *ngIf="!isSaving">
                 <i class="ri-save-line"></i> Save
@@ -490,7 +490,7 @@
 
             <!-- Update Button with loading -->
             <button *ngIf="modalMode === 'edit'" type="submit"
-              class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+              class="px-4 py-2 sm:py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all font-medium flex items-center shadow-sm shadow-emerald-200 w-full sm:w-auto justify-center"
               [disabled]="isUpdating || doctorForm.invalid">
               <span *ngIf="!isUpdating">
                 <i class="ri-edit-line"></i> Update
@@ -503,7 +503,7 @@
 
             <!-- Delete Button with loading -->
             <button *ngIf="modalMode === 'delete'" type="submit"
-              class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
+              class="px-4 py-2 sm:py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-medium flex items-center shadow-sm shadow-red-200 w-full sm:w-auto justify-center"
               [disabled]="isDeleting || !deleteReason">
               <span *ngIf="!isDeleting">
                 <i class="ri-delete-bin-line"></i> Delete
@@ -521,84 +521,84 @@
 </div>
 
 <!-- View Doctor Modal -->
-<div class="modal fade custom-modal-fade" #viewModal tabindex="-1" aria-labelledby="viewDoctorModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm sm:modal-md custom-modal-dialog">
-    <div class="modal-content custom-modal-content">
+<div class="modal fade" #viewModal tabindex="-1" aria-labelledby="viewDoctorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm sm:modal-md">
+    <div class="modal-content border-0 rounded-2xl shadow-2xl overflow-hidden">
 
-      <div class="modal-header custom-modal-header">
-        <div class="modal-title-wrapper flex items-center">
-          <div class="flex items-center min-w-0">
-            <div class="modal-icon mr-1.5 sm:mr-2">
-              <i class="ri-stethoscope-line text-xl sm:text-2xl text-blue-600"></i>
+      <div class="modal-header bg-emerald-50 border-b border-emerald-100 p-4">
+        <div class="flex items-center w-full">
+          <div class="flex items-center min-w-0 flex-1">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mr-3 flex-shrink-0">
+              <i class="ri-stethoscope-line text-xl text-emerald-600"></i>
             </div>
-            <h5 class="modal-title custom-modal-title text-sm sm:text-base md:text-lg truncate">
+            <h5 class="text-lg font-bold text-emerald-800 truncate m-0">
               Doctor Details
             </h5>
           </div>
+          <button type="button" class="text-slate-400 hover:text-red-500 transition-colors ml-auto bg-transparent border-0" (click)="closeViewModal()" aria-label="Close">
+            <i class="ri-close-line text-2xl"></i>
+          </button>
         </div>
-
-        <button type="button" class="btn-close custom-btn-close" (click)="closeViewModal()" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body custom-modal-body">
-        <div *ngIf="selectedDoctorView" class="space-y-3 sm:space-y-4">
+      <div class="modal-body p-5">
+        <div *ngIf="selectedDoctorView" class="space-y-4">
 
           <!-- Image Preview -->
-          <div class="text-center">
-            <div
-              class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto rounded-lg overflow-hidden border-2 border-blue-200 bg-blue-50">
+          <div class="flex justify-center">
+            <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-xl overflow-hidden border-4 border-emerald-50 bg-emerald-50/50 shadow-sm relative group">
               <img [src]="viewImageUrl || '../../../assets/DairryFarmImg/doctor_16802630.png'" alt="Doctor Image"
-                class="w-full h-full object-contain p-1.5 sm:p-2"
+                class="w-full h-full object-contain p-2"
                 (error)="viewImageUrl = '../../../assets/DairryFarmImg/doctor_16802630.png'">
             </div>
           </div>
 
           <!-- Details Card -->
-          <div class="bg-blue-50 rounded-xl p-3 sm:p-4">
-            <div class="space-y-2.5 sm:space-y-3">
+          <div class="bg-emerald-50/60 rounded-xl p-4 border border-emerald-100">
+            <div class="space-y-4">
 
-              <!-- Date -->
-              <div>
-                <label class="block text-xs font-medium text-blue-600 mb-1">Date</label>
-                <p class="text-sm text-blue-900">
-                  {{ formatDateForView(selectedDoctorView.date) }}
-                </p>
-              </div>
-
-              <!-- Reason with Breeding tag -->
-              <div>
-                <label class="block text-xs font-medium text-blue-600 mb-1">Reason</label>
-                <div class="flex items-center gap-2">
-                  <p class="text-base sm:text-lg font-semibold text-blue-900">
-                    {{ selectedDoctorView.reason || 'N/A' }}
+              <!-- Date & Reason -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-emerald-600 tracking-wider mb-1">Date</label>
+                  <p class="text-sm font-medium text-slate-800 m-0">
+                    {{ formatDateForView(selectedDoctorView.date) }}
                   </p>
-                  <!-- Show Breeding tag if Switch is 22 -->
-                  <span *ngIf="selectedDoctorView.Switch === 22 || selectedDoctorView.switch === 22"
-                    class="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
-                    Breeding
-                  </span>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold uppercase text-emerald-600 tracking-wider mb-1">Reason</label>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-medium text-slate-800 m-0">
+                      {{ selectedDoctorView.reason || 'N/A' }}
+                    </p>
+                    <!-- Show Breeding tag if Switch is 22 -->
+                    <span *ngIf="selectedDoctorView.Switch === 22 || selectedDoctorView.switch === 22"
+                      class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wide rounded-md">
+                      Breeding
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              <!-- Divider -->
+              <div class="h-px bg-emerald-200/50 w-full"></div>
 
               <!-- Doctor Details -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <div>
-                  <label class="block text-xs font-medium text-blue-600 mb-1">Animal</label>
-                  <p class="text-sm text-blue-900 truncate">{{ selectedDoctorView.animal_name || 'N/A' }}</p>
+                  <label class="block text-xs font-semibold uppercase text-emerald-600 tracking-wider mb-1">Animal</label>
+                  <p class="text-sm font-medium text-slate-800 truncate m-0">{{ selectedDoctorView.animal_name || 'N/A' }}</p>
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-blue-600 mb-1">Price</label>
-                  <p class="text-sm text-blue-900 truncate">₹{{ selectedDoctorView.price || '0' }}</p>
+                  <label class="block text-xs font-semibold uppercase text-emerald-600 tracking-wider mb-1">Price</label>
+                  <p class="text-sm font-bold text-red-500 truncate m-0">-₹{{ selectedDoctorView.price || '0' }}</p>
                 </div>
-              </div>
-
-              <!-- Switch Status -->
-              <div *ngIf="selectedDoctorView.Switch || selectedDoctorView.switch">
-                <label class="block text-xs font-medium text-blue-600 mb-1">Type</label>
-                <p class="text-sm text-blue-900">
-                  {{ (selectedDoctorView.Switch === 22 || selectedDoctorView.switch === 22) ? 'Breeding' : 'Regular' }}
-                </p>
+                <div *ngIf="selectedDoctorView.Switch || selectedDoctorView.switch">
+                  <label class="block text-xs font-semibold uppercase text-emerald-600 tracking-wider mb-1">Type</label>
+                  <p class="text-sm font-medium text-slate-800 m-0">
+                    {{ (selectedDoctorView.Switch === 22 || selectedDoctorView.switch === 22) ? 'Breeding' : 'Regular' }}
+                  </p>
+                </div>
               </div>
 
             </div>
@@ -608,23 +608,17 @@
       </div>
 
       <!-- ACTION BUTTONS IN VIEW MODAL -->
-      <div class="modal-footer custom-modal-footer flex-col sm:flex-row gap-2 sm:gap-3">
+      <div class="modal-footer bg-slate-50 border-t border-slate-100 p-4 flex flex-col sm:flex-row gap-2 justify-end">
         <!-- Edit Button -->
-        <button type="button" class="custom-btn custom-btn-save w-full sm:w-auto justify-center"
+        <button type="button" class="w-full sm:w-auto px-4 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
           (click)="editFromViewModal()">
           <i class="ri-edit-line"></i> Edit
         </button>
 
         <!-- Delete Button -->
-        <button type="button" class="custom-btn custom-btn-delete w-full sm:w-auto justify-center"
+        <button type="button" class="w-full sm:w-auto px-4 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 bg-red-50 text-red-600 hover:bg-red-100"
           (click)="deleteFromViewModal()">
           <i class="ri-delete-bin-line"></i> Delete
-        </button>
-
-        <!-- Close Button -->
-        <button type="button" class="custom-btn custom-btn-cancel w-full sm:w-auto justify-center"
-          (click)="closeViewModal()">
-          <i class="ri-close-line"></i> Close
         </button>
       </div>
     </div>
