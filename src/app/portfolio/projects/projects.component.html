@@ -103,6 +103,16 @@
                   class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
                   <i class="fas fa-arrow-up-right-from-square text-[10px] sm:text-[11px]"></i> <span>Live Demo</span>
                 </a>
+                <a *ngIf="project.links.android" [href]="project.links.android" download
+                  class="py-2 bg-emerald-50 border border-dashed border-emerald-200 text-center text-emerald-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  [class.col-span-2]="!project.links.desktop">
+                  <i class="fab fa-android text-[11px] sm:text-xs"></i> <span>Apk</span>
+                </a>
+                <a *ngIf="project.links.desktop" [href]="project.links.desktop" download
+                  class="py-2 bg-blue-50 border border-dashed border-blue-200 text-center text-blue-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  [class.col-span-2]="!project.links.android">
+                  <i class="fas fa-desktop text-[11px] sm:text-xs"></i> <span>Desktop</span>
+                </a>
               </div>
             </div>
           </div>
@@ -178,6 +188,16 @@
                 <a [href]="project.links.demo" target="_blank" rel="noopener"
                   class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
                   <i class="fas fa-arrow-up-right-from-square text-[10px] sm:text-[11px]"></i> <span>Live Demo</span>
+                </a>
+                <a *ngIf="project.links.android" [href]="project.links.android" download
+                  class="py-2 bg-emerald-50 border border-dashed border-emerald-200 text-center text-emerald-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  [class.col-span-2]="!project.links.desktop">
+                  <i class="fab fa-android text-[11px] sm:text-xs"></i> <span>Apk</span>
+                </a>
+                <a *ngIf="project.links.desktop" [href]="project.links.desktop" download
+                  class="py-2 bg-blue-50 border border-dashed border-blue-200 text-center text-blue-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  [class.col-span-2]="!project.links.android">
+                  <i class="fas fa-desktop text-[11px] sm:text-xs"></i> <span>Desktop</span>
                 </a>
               </div>
             </div>
