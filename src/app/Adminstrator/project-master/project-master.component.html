@@ -1,0 +1,42 @@
+<div class="max-w-7xl mx-auto">
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-zinc-900 tracking-tight">Project Master</h2>
+      <p class="text-sm text-zinc-500 mt-1">Manage, configure, and oversee all system projects.</p>
+    </div>
+    <div class="mt-4 sm:mt-0">
+      <button class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all duration-200 hover:shadow-md active:scale-95">
+        <i class="fas fa-plus mr-2"></i> Create Project
+      </button>
+    </div>
+  </div>
+  
+  <div class="bg-white shadow-sm rounded-xl border border-zinc-200 overflow-hidden">
+    <!-- Filters / Search -->
+    <div class="p-4 border-b border-zinc-100 flex flex-col sm:flex-row gap-4 justify-between bg-zinc-50/50">
+      <div class="relative max-w-md w-full">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-search text-zinc-400"></i>
+        </div>
+        <input type="text" class="block w-full pl-10 pr-3 py-2 border border-zinc-300 rounded-lg leading-5 bg-white placeholder-zinc-500 focus:outline-none focus:placeholder-zinc-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors" placeholder="Search projects...">
+      </div>
+      <div class="flex gap-2">
+        <button class="px-3 py-2 border border-zinc-300 rounded-lg text-sm font-medium text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm flex items-center">
+          <i class="fas fa-filter mr-2"></i> Filter
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State (Placeholder for table) -->
+    <div class="p-12 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 mb-4">
+        <i class="fas fa-folder-open text-3xl text-indigo-500"></i>
+      </div>
+      <h3 class="text-lg font-medium text-zinc-900 mb-2">No projects found</h3>
+      <p class="text-zinc-500 max-w-sm mx-auto mb-6">Get started by creating a new project. Projects help you organize resources and manage permissions effectively.</p>
+      <button class="inline-flex items-center px-4 py-2 border border-zinc-300 shadow-sm text-sm font-medium rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 transition-colors">
+        <i class="fas fa-book-reader mr-2 text-zinc-400"></i> Read Documentation
+      </button>
+    </div>
+  </div>
+</div>

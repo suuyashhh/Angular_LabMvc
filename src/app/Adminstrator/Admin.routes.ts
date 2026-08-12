@@ -12,8 +12,18 @@ export const Admin_ROUTES: Routes = [
         loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
     },
     {
-        path: 'dashboard',
+        path: '',
         canActivate: [adminAuthGuard],
-        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
+        children: [
+            {
+                path: 'dashboard',
+                loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+            },
+            {
+                path: 'project-master',
+                loadComponent: () => import('./project-master/project-master.component').then(m => m.ProjectMasterComponent)
+            }
+        ]
     }
 ];
