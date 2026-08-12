@@ -1,23 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { PortfolioProjectService } from '../../Adminstrator/services/portfolio-project.service';
+import { PortfolioProject } from '../../Adminstrator/models/portfolio-project';
 
 declare const particlesJS: any;
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  images: string[];
-  tech: string[];
-  links: {
-    code: string;
-    demo: string;
-    android?: string;
-    desktop?: string;
-  };
-  category: 'webApp' | 'website';
-}
 
 @Component({
   selector: 'app-projects',
@@ -27,8 +14,8 @@ interface Project {
   styleUrls: ['./projects.component.css']
 })
 export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
-  activeTab: 'webApps' | 'websites' = 'webApps';
-  currentImageIndex: { [key: string]: number } = {};
+  activeTab: 'webApp' | 'website' = 'webApp'; // Note: category is saved as 'webApp' or 'website'
+  currentImageIndex: { [key: number]: number } = {};
   
   private observer: IntersectionObserver | null = null;
 
@@ -36,144 +23,26 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
   showImagePreview = false;
   previewImage = '';
   previewProjectTitle = '';
-  currentPreviewProjectId = '';
+  currentPreviewProjectId = 0;
 
-  projects: Project[] = [
-    {
-      id: 'laboratory',
-      title: 'Laboratory - App',
-      description: 'Manage laboratory operations efficiently with our comprehensive solution.',
-      images: [
-        '../../../assets/img/LabApplication/LabApp2.png',
-        '../../../assets/img/LabApplication/LabApp1.png',
-        '../../../assets/img/LabApplication/LapApp3.png',
-        '../../../assets/img/LabApplication/LabApp4.png'
-      ],
-      tech: ['Angular', 'Tailwind CSS', 'Typescript', 'SQL', '.Net Core', 'Android Studio'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://suyashpatil.in/lab',
-        android: '/assets/apks/Lab.apk'
-      },
-      category: 'webApp'
-    },
-    {
-      id: 'dairy',
-      title: 'DairyFarm - App',
-      description: 'Manage your dairy farm operations efficiently with our comprehensive solution.',
-      images: [
-        '../../../assets/img/DairFarm/DF1.png',
-        '../../../assets/img/DairFarm/DF2.png',
-        '../../../assets/img/DairFarm/DF3.png',
-        '../../../assets/img/DairFarm/DF4.png'
-      ],
-      tech: ['Angular', '.Net Core Web Api', 'SQL', 'Android Studio'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://suyashpatil.in/dairyfarm',
-        android: '/assets/apks/DairyFarm.apk',
-        desktop: '/assets/desktop-files/Dairy-Farm.lnk'
-      },
-      category: 'webApp'
-    },
-    {
-      id: 'fabrication',
-      title: 'Fabrication - App',
-      description: 'Streamline your fabrication management processes with our powerful tools.',
-      images: [
-        '../../../assets/img/Fabrication/img1.png',
-        '../../../assets/img/Fabrication/img2.png',
-        '../../../assets/img/Fabrication/img3.png',
-        '../../../assets/img/Fabrication/img4.png'
-      ],
-      tech: ['JavaScript', 'Bootstrap', 'SQL', '.Net Webforms', 'Android Studio'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://dairyfarm.revolutionit.in/Fabrication_Admin',
-        android: '/assets/apks/Fabrication.apk'
-      },
-      category: 'webApp'
-    },
-    {
-      id: 'farm',
-      title: 'Farm Management App',
-      description: 'Complete farm management solution for modern agriculture.',
-      images: [
-        '../../../assets/img/Farm/Farm1.png',
-        '../../../assets/img/Farm/Farm2.png',
-        '../../../assets/img/Farm/Farm3.png',
-        '../../../assets/img/Farm/Farm4.png'
-      ],
-      tech: ['Angular', 'SQL', '.Net Core'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://suyashpatil.in/farm',
-        android: '/assets/apks/Fabrication.apk'
-      },
-      category: 'webApp'
-    },
-    {
-      id: 'SmartParking',
-      title: 'SmartParking - App',
-      description: 'SmartParking is a Smart City based parking management application developed for a college project',
-      images: [
-        '../../../assets/img/SmartParking/SP1.png',
-        '../../../assets/img/SmartParking/SP4.png',
-        '../../../assets/img/SmartParking/SP2.png',
-        '../../../assets/img/SmartParking/SP3.png'
-      ],
-      tech: ['Angular', 'SQL', '.Net Core', 'Android Studio'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://suyashpatil.in/parking/dashboard',
-        android: '/assets/apks/SmartParking.apk'
-      },
-      category: 'webApp'
-    },    
-    {
-      id: 'portfolio',
-      title: 'Lab Website',
-      description: 'A modern personal Lab website showcasing my skills and projects.',
-      images: [
-        '../../../assets/img/LabApplication/LabWeb1.png',
-        '../../../assets/img/LabApplication/LabWeb2.png'
-      ],
-      tech: ['HTML5', 'CSS3', 'JavaScript', 'Tailwind CSS'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://rupeshlabmanipaltrutest.com/'
-      },
-      category: 'website'
-    },
-    {
-      id: 'ecommerce',
-      title: 'Fabrication Website',
-      description: 'A fully responsive e-commerce platform with product listings and cart functionality.',
-      images: [
-        '../../../assets/img/Fabrication/FabWeb1.png',
-        '../../../assets/img/Fabrication/FabWeb2.png'
-      ],
-      tech: ['HTML5', 'CSS', 'JavaScript'],
-      links: {
-        code: 'https://github.com/suuyashhh',
-        demo: 'https://dairyfarm.revolutionit.in/WebFabrication.html'
-      },
-      category: 'website'
-    }
-  ];
+  projects: PortfolioProject[] = [];
+  isLoading: boolean = true;
+  hasError: boolean = false;
 
-  constructor(private toastr: ToastrService) {
-    // Initialize image indices
-    this.projects.forEach(project => {
-      this.currentImageIndex[project.id] = 0;
-    });
-  }
+  constructor(
+    private toastr: ToastrService,
+    private projectService: PortfolioProjectService
+  ) {}
 
   ngOnInit(): void {
+    this.loadProjects();
+
     // Initialize particles.js
-    particlesJS.load('particles-js', 'assets/particles.json', () => {
-      console.log('Particles.js loaded');
-    });
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS.load('particles-js', 'assets/particles.json', () => {
+          console.log('Particles.js loaded');
+        });
+    }
 
     // Keyboard navigation for image preview
     document.addEventListener('keydown', (e) => {
@@ -187,6 +56,46 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
+  }
+
+  loadProjects(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.projectService.getAllProjects(true).subscribe({
+      next: (data) => {
+        this.projects = data || [];
+        this.projects.forEach(project => {
+          this.currentImageIndex[project.projectId] = 0;
+        });
+        this.isLoading = false;
+        setTimeout(() => {
+          this.initScrollReveal();
+        }, 100);
+      },
+      error: (err) => {
+        this.hasError = true;
+        this.isLoading = false;
+        this.toastr.error('Failed to load portfolio projects');
+      }
+    });
+  }
+
+  getProjectImages(project: PortfolioProject): string[] {
+    const images: string[] = [];
+    if (project.image1) images.push(this.projectService.getFullUrl(project.image1));
+    if (project.image2) images.push(this.projectService.getFullUrl(project.image2));
+    if (project.image3) images.push(this.projectService.getFullUrl(project.image3));
+    if (project.image4) images.push(this.projectService.getFullUrl(project.image4));
+    return images;
+  }
+
+  getFullUrl(path: string | undefined): string {
+    return this.projectService.getFullUrl(path);
+  }
+
+  getProjectTech(project: PortfolioProject): string[] {
+    if (!project.technologies) return [];
+    return project.technologies.split(',').map(t => t.trim()).filter(t => t.length > 0);
   }
 
   ngOnDestroy() {
@@ -222,7 +131,7 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Switch between tabs
-  switchTab(tab: 'webApps' | 'websites'): void {
+  switchTab(tab: 'webApp' | 'website'): void {
     this.activeTab = tab;
     setTimeout(() => {
       this.initScrollReveal();
@@ -230,28 +139,37 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Navigate to next image in carousel
-  nextImage(projectId: string): void {
-    const project = this.projects.find(p => p.id === projectId);
+  nextImage(projectId: number): void {
+    const project = this.projects.find(p => p.projectId === projectId);
     if (project) {
-      this.currentImageIndex[projectId] = 
-        (this.currentImageIndex[projectId] + 1) % project.images.length;
+      const images = this.getProjectImages(project);
+      if (images.length > 0) {
+          this.currentImageIndex[projectId] = 
+            (this.currentImageIndex[projectId] + 1) % images.length;
+      }
     }
   }
 
   // Navigate to previous image in carousel
-  prevImage(projectId: string): void {
-    const project = this.projects.find(p => p.id === projectId);
+  prevImage(projectId: number): void {
+    const project = this.projects.find(p => p.projectId === projectId);
     if (project) {
-      this.currentImageIndex[projectId] = 
-        (this.currentImageIndex[projectId] - 1 + project.images.length) % project.images.length;
+      const images = this.getProjectImages(project);
+      if (images.length > 0) {
+          this.currentImageIndex[projectId] = 
+            (this.currentImageIndex[projectId] - 1 + images.length) % images.length;
+      }
     }
   }
 
   // Open image preview modal
-  openImagePreview(project: Project): void {
-    this.previewImage = project.images[this.currentImageIndex[project.id]];
-    this.previewProjectTitle = project.title;
-    this.currentPreviewProjectId = project.id;
+  openImagePreview(project: PortfolioProject): void {
+    const images = this.getProjectImages(project);
+    if (images.length === 0) return;
+
+    this.previewImage = images[this.currentImageIndex[project.projectId]];
+    this.previewProjectTitle = project.projectName;
+    this.currentPreviewProjectId = project.projectId;
     this.showImagePreview = true;
     document.body.style.overflow = 'hidden';
   }
@@ -264,28 +182,30 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Navigate to next image in preview modal
   nextImageInPreview(): void {
-    const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
+    const project = this.projects.find(p => p.projectId === this.currentPreviewProjectId);
     if (project) {
+      const images = this.getProjectImages(project);
       this.currentImageIndex[this.currentPreviewProjectId] = 
-        (this.currentImageIndex[this.currentPreviewProjectId] + 1) % project.images.length;
-      this.previewImage = project.images[this.currentImageIndex[this.currentPreviewProjectId]];
+        (this.currentImageIndex[this.currentPreviewProjectId] + 1) % images.length;
+      this.previewImage = images[this.currentImageIndex[this.currentPreviewProjectId]];
     }
   }
 
   // Navigate to previous image in preview modal
   prevImageInPreview(): void {
-    const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
+    const project = this.projects.find(p => p.projectId === this.currentPreviewProjectId);
     if (project) {
+      const images = this.getProjectImages(project);
       this.currentImageIndex[this.currentPreviewProjectId] = 
-        (this.currentImageIndex[this.currentPreviewProjectId] - 1 + project.images.length) % project.images.length;
-      this.previewImage = project.images[this.currentImageIndex[this.currentPreviewProjectId]];
+        (this.currentImageIndex[this.currentPreviewProjectId] - 1 + images.length) % images.length;
+      this.previewImage = images[this.currentImageIndex[this.currentPreviewProjectId]];
     }
   }
 
   // Get current project images for counter
   getCurrentProjectImages(): string[] {
-    const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
-    return project ? project.images : [];
+    const project = this.projects.find(p => p.projectId === this.currentPreviewProjectId);
+    return project ? this.getProjectImages(project) : [];
   }
 
   // Show toast notification

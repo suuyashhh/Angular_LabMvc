@@ -1,5 +1,4 @@
-<main
-  class="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-16 max-w-5xl min-h-screen flex flex-col items-center">
+<main class="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-16 max-w-5xl min-h-screen flex flex-col items-center">
 
   <!-- Header Section -->
   <div class="text-center space-y-3 mb-8 w-full scroll-reveal reveal-fade-up">
@@ -13,53 +12,67 @@
     <div class="inline-flex bg-zinc-50 border border-dashed border-zinc-200 p-1.5 rounded-full gap-1.5 shadow-sm">
       <button
         class="px-5 py-2 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm cursor-pointer focus:outline-none"
-        [class]="activeTab === 'webApps' 
-          ? 'bg-zinc-200 text-zinc-950 shadow-inner' 
-          : 'text-zinc-650 hover:text-zinc-950 hover:bg-zinc-100'" (click)="switchTab('webApps')">
+        [class]="activeTab === 'webApp' ? 'bg-zinc-200 text-zinc-950 shadow-inner' : 'text-zinc-650 hover:text-zinc-950 hover:bg-zinc-100'" 
+        (click)="switchTab('webApp')">
         <i class="fas fa-laptop-code text-sm"></i>
         <span>Web Apps</span>
       </button>
 
       <button
         class="px-5 py-2 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm cursor-pointer focus:outline-none"
-        [class]="activeTab === 'websites' 
-          ? 'bg-zinc-200 text-zinc-950 shadow-inner' 
-          : 'text-zinc-650 hover:text-zinc-950 hover:bg-zinc-100'" (click)="switchTab('websites')">
+        [class]="activeTab === 'website' ? 'bg-zinc-200 text-zinc-950 shadow-inner' : 'text-zinc-650 hover:text-zinc-950 hover:bg-zinc-100'" 
+        (click)="switchTab('website')">
         <i class="fas fa-globe text-sm"></i>
         <span>Websites</span>
       </button>
     </div>
   </div>
 
+  <!-- Loading / Error States -->
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 w-full">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+    <p class="text-zinc-500 font-medium">Loading projects...</p>
+  </div>
+  
+  <div *ngIf="!isLoading && hasError" class="flex flex-col items-center justify-center py-20 w-full text-center">
+    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+    <p class="text-zinc-700 font-medium text-lg">Unable to load projects at the moment.</p>
+    <p class="text-zinc-500">Please try again later.</p>
+  </div>
+
+  <div *ngIf="!isLoading && !hasError && projects.length === 0" class="flex flex-col items-center justify-center py-20 w-full text-center">
+    <i class="fas fa-folder-open text-4xl text-zinc-300 mb-4 block"></i>
+    <p class="text-zinc-600 font-medium text-lg">No projects available.</p>
+  </div>
+
   <!-- Projects Grid -->
-  <section class="w-full mb-12 flex-grow">
+  <section *ngIf="!isLoading && !hasError && projects.length > 0" class="w-full mb-12 flex-grow">
 
-    <!-- ================= WEB APPS SECTION ================= -->
-    <div *ngIf="activeTab === 'webApps'" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-
+    <!-- Projects List based on active category -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
       <ng-container *ngFor="let project of projects; let idx = index">
-        <div *ngIf="project.category === 'webApp'"
+        <div *ngIf="project.category === activeTab"
           class="bg-white border border-dashed border-zinc-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md hover:border-zinc-300 transition-all duration-300 flex flex-col group scroll-reveal reveal-scale-up"
-          [style.transition-delay.ms]="150 * (idx + 1)">
+          [style.transition-delay.ms]="150 * ((idx % 4) + 1)">
 
           <!-- Image Carousel Area -->
-          <div
+          <div *ngIf="getProjectImages(project).length > 0"
             class="relative h-48 sm:h-56 overflow-hidden cursor-pointer bg-zinc-50 border-b border-dashed border-zinc-150"
             (click)="openImagePreview(project)">
 
-            <img *ngFor="let image of project.images; let i = index" [src]="image" [alt]="project.title"
-              [class.opacity-100]="currentImageIndex[project.id] === i"
-              [class.opacity-0]="currentImageIndex[project.id] !== i"
+            <img *ngFor="let image of getProjectImages(project); let i = index" [src]="image" [alt]="project.projectName"
+              [class.opacity-100]="currentImageIndex[project.projectId] === i"
+              [class.opacity-0]="currentImageIndex[project.projectId] !== i"
               class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300">
 
             <!-- Navigation Controls -->
-            <button *ngIf="project.images.length > 1" (click)="prevImage(project.id); $event.stopPropagation()"
+            <button *ngIf="getProjectImages(project).length > 1" (click)="prevImage(project.projectId); $event.stopPropagation()"
               class="absolute top-1/2 left-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
               aria-label="Previous image">
               <i class="fas fa-chevron-left text-xs"></i>
             </button>
 
-            <button *ngIf="project.images.length > 1" (click)="nextImage(project.id); $event.stopPropagation()"
+            <button *ngIf="getProjectImages(project).length > 1" (click)="nextImage(project.projectId); $event.stopPropagation()"
               class="absolute top-1/2 right-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
               aria-label="Next image">
               <i class="fas fa-chevron-right text-xs"></i>
@@ -71,23 +84,27 @@
               <i class="fas fa-magnifying-glass-plus text-[10px]"></i> Zoom Project
             </div>
           </div>
+          <div *ngIf="getProjectImages(project).length === 0" class="h-48 sm:h-56 bg-zinc-100 flex items-center justify-center border-b border-dashed border-zinc-200">
+             <i class="fas fa-image text-3xl text-zinc-300"></i>
+          </div>
 
           <!-- Details Area -->
           <div class="p-5 flex-grow flex flex-col justify-between">
             <div>
               <h3 class="text-lg font-bold text-zinc-900 group-hover:text-zinc-950 transition-colors leading-snug mb-2">
-                {{ project.title }}
+                {{ project.projectName }}
               </h3>
               <p
-                class="text-xs sm:text-sm text-zinc-550 dark:text-zinc-500 font-medium leading-relaxed mb-4 line-clamp-2">
-                {{ project.description }}
+                class="text-xs sm:text-sm text-zinc-550 dark:text-zinc-500 font-medium leading-relaxed mb-4 line-clamp-2"
+                [title]="project.projectDescription">
+                {{ project.projectDescription }}
               </p>
             </div>
 
             <div>
               <!-- Tech tags -->
               <div class="flex flex-wrap gap-1.5 mb-4">
-                <span *ngFor="let tech of project.tech"
+                <span *ngFor="let tech of getProjectTech(project)"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold bg-zinc-50 border border-dashed border-zinc-200 text-zinc-600 rounded-full shadow-sm">
                   {{ tech }}
                 </span>
@@ -95,108 +112,24 @@
 
               <!-- Links -->
               <div class="grid grid-cols-2 gap-2 mt-auto">
-                <a [href]="project.links.code" target="_blank" rel="noopener"
-                  class="py-2 bg-zinc-50 border border-dashed border-zinc-200 text-center text-zinc-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                <a *ngIf="project.codeLink" [href]="project.codeLink" target="_blank" rel="noopener"
+                  class="py-2 bg-zinc-50 border border-dashed border-zinc-200 text-center text-zinc-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  [class.col-span-2]="!project.liveDemoLink">
                   <i class="fas fa-code text-[11px] sm:text-xs"></i> <span>Code</span>
                 </a>
-                <a [href]="project.links.demo" target="_blank" rel="noopener"
-                  class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                <a *ngIf="project.liveDemoLink" [href]="project.liveDemoLink" target="_blank" rel="noopener"
+                  class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  [class.col-span-2]="!project.codeLink">
                   <i class="fas fa-arrow-up-right-from-square text-[10px] sm:text-[11px]"></i> <span>Live Demo</span>
                 </a>
-                <a *ngIf="project.links.android" [href]="project.links.android" download
+                <a *ngIf="project.apkFile" [href]="getFullUrl(project.apkFile)" download
                   class="py-2 bg-emerald-50 border border-dashed border-emerald-200 text-center text-emerald-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                  [class.col-span-2]="!project.links.desktop">
+                  [class.col-span-2]="!project.desktopFile">
                   <i class="fab fa-android text-[11px] sm:text-xs"></i> <span>Apk</span>
                 </a>
-                <a *ngIf="project.links.desktop" [href]="project.links.desktop" download
+                <a *ngIf="project.desktopFile" [href]="getFullUrl(project.desktopFile)" download
                   class="py-2 bg-blue-50 border border-dashed border-blue-200 text-center text-blue-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                  [class.col-span-2]="!project.links.android">
-                  <i class="fas fa-desktop text-[11px] sm:text-xs"></i> <span>Desktop</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-
-    <!-- ================= WEBSITES SECTION ================= -->
-    <div *ngIf="activeTab === 'websites'" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-
-      <ng-container *ngFor="let project of projects; let idx = index">
-        <div *ngIf="project.category === 'website'"
-          class="bg-white border border-dashed border-zinc-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md hover:border-zinc-300 transition-all duration-300 flex flex-col group scroll-reveal reveal-scale-up"
-          [style.transition-delay.ms]="150 * (idx + 1)">
-
-          <!-- Image Carousel Area -->
-          <div
-            class="relative h-48 sm:h-56 overflow-hidden cursor-pointer bg-zinc-50 border-b border-dashed border-zinc-150"
-            (click)="openImagePreview(project)">
-
-            <img *ngFor="let image of project.images; let i = index" [src]="image" [alt]="project.title"
-              [class.opacity-100]="currentImageIndex[project.id] === i"
-              [class.opacity-0]="currentImageIndex[project.id] !== i"
-              class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300">
-
-            <!-- Navigation Controls -->
-            <button *ngIf="project.images.length > 1" (click)="prevImage(project.id); $event.stopPropagation()"
-              class="absolute top-1/2 left-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
-              aria-label="Previous image">
-              <i class="fas fa-chevron-left text-xs"></i>
-            </button>
-
-            <button *ngIf="project.images.length > 1" (click)="nextImage(project.id); $event.stopPropagation()"
-              class="absolute top-1/2 right-3 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 border border-zinc-200/50 shadow-md flex items-center justify-center text-zinc-700 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all z-10"
-              aria-label="Next image">
-              <i class="fas fa-chevron-right text-xs"></i>
-            </button>
-
-            <!-- Zoom indicator -->
-            <div
-              class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-zinc-950/75 backdrop-blur-sm text-white px-3.5 py-1.5 rounded-full text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1.5 shadow-md">
-              <i class="fas fa-magnifying-glass-plus text-[10px]"></i> Zoom Project
-            </div>
-          </div>
-
-          <!-- Details Area -->
-          <div class="p-5 flex-grow flex flex-col justify-between">
-            <div>
-              <h3 class="text-lg font-bold text-zinc-900 group-hover:text-zinc-950 transition-colors leading-snug mb-2">
-                {{ project.title }}
-              </h3>
-              <p
-                class="text-xs sm:text-sm text-zinc-550 dark:text-zinc-500 font-medium leading-relaxed mb-4 line-clamp-2">
-                {{ project.description }}
-              </p>
-            </div>
-
-            <div>
-              <!-- Tech tags -->
-              <div class="flex flex-wrap gap-1.5 mb-4">
-                <span *ngFor="let tech of project.tech"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold bg-zinc-50 border border-dashed border-zinc-200 text-zinc-600 rounded-full shadow-sm">
-                  {{ tech }}
-                </span>
-              </div>
-
-              <!-- Links -->
-              <div class="grid grid-cols-2 gap-2 mt-auto">
-                <a [href]="project.links.code" target="_blank" rel="noopener"
-                  class="py-2 bg-zinc-50 border border-dashed border-zinc-200 text-center text-zinc-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
-                  <i class="fas fa-code text-[11px] sm:text-xs"></i> <span>Code</span>
-                </a>
-                <a [href]="project.links.demo" target="_blank" rel="noopener"
-                  class="py-2 bg-zinc-950 text-center text-zinc-50 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-zinc-900 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
-                  <i class="fas fa-arrow-up-right-from-square text-[10px] sm:text-[11px]"></i> <span>Live Demo</span>
-                </a>
-                <a *ngIf="project.links.android" [href]="project.links.android" download
-                  class="py-2 bg-emerald-50 border border-dashed border-emerald-200 text-center text-emerald-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                  [class.col-span-2]="!project.links.desktop">
-                  <i class="fab fa-android text-[11px] sm:text-xs"></i> <span>Apk</span>
-                </a>
-                <a *ngIf="project.links.desktop" [href]="project.links.desktop" download
-                  class="py-2 bg-blue-50 border border-dashed border-blue-200 text-center text-blue-700 text-xs sm:text-sm font-semibold rounded-2xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-                  [class.col-span-2]="!project.links.android">
+                  [class.col-span-2]="!project.apkFile">
                   <i class="fas fa-desktop text-[11px] sm:text-xs"></i> <span>Desktop</span>
                 </a>
               </div>
@@ -208,27 +141,21 @@
 
   </section>
 
-
   <footer class="w-full mt-1 border-t border-dashed border-zinc-200 dark:border-zinc-800 pt-1 pb-1 text-center">
-
     <!-- Social Icons -->
     <div id="suyash-social-icons" class="flex items-center justify-center gap-3 mb-1">
-        <!-- GitHub -->
       <a href="https://github.com/suuyashhh" target="_blank"
         class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
         <i class="fab fa-github text-base text-zinc-800 dark:text-zinc-100"></i>
       </a>
-      <!-- LinkedIn -->
       <a href="https://www.linkedin.com/in/suyash-patil-877398282/" target="_blank"
         class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
         <i class="fab fa-linkedin text-base text-[#0077B5]"></i>
       </a>
-      <!-- Instagram -->
       <a href="https://www.instagram.com/suyashpatil_.03" target="_blank"
         class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
         <i class="fab fa-instagram text-base text-[#E4405F]"></i>
       </a>
-      <!-- WhatsApp -->
       <a href="https://wa.me/918180821173" target="_blank"
         class="w-10 h-10 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center hover:-translate-y-1 hover:shadow-md transition-all duration-300 shadow-sm">
         <i class="fab fa-whatsapp text-base text-[#25D366]"></i>
