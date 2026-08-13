@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs/operators';
@@ -37,13 +37,24 @@ export class LogindairyComponent {
     private auth: AuthService,
     private loader: LoaderService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     if (this.auth.isDairyLoggedIn()) {
       this.router.navigate(['SDF']);
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['autoLogin'] === 'true') {
+        this.loginObj.contact = params['u'];
+        this.loginObj.password = params['p'];
+        setTimeout(() => {
+          this.login();
+        }, 100);
+      }
+    });
   }
 
   login() {

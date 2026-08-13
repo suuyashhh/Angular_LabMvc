@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
 import { AuthService } from '../shared/auth.service';
@@ -28,7 +28,8 @@ export class LoginComponent implements OnInit {
   private secretKey: string = 'mySecretKey123';
 
   constructor(private router: Router, private auth: AuthService,
-    private toastr: ToastrService, private loader: LoaderService) { }
+    private toastr: ToastrService, private loader: LoaderService,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
     if (this.auth.isLoggedIn()) {
@@ -42,6 +43,16 @@ export class LoginComponent implements OnInit {
         this.router.navigate(["ADMIN"]);
       }
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['autoLogin'] === 'true') {
+        this.loginObj.contact = params['u'];
+        this.loginObj.password = params['p'];
+        setTimeout(() => {
+          this.login();
+        }, 100);
+      }
+    });
   }
 
   login() {
