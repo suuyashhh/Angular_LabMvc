@@ -12,8 +12,18 @@ import { AdminAuthService } from '../services/admin-auth.service';
 })
 export class LayoutComponent {
   private authService = inject(AdminAuthService);
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
 
   logout() {
     this.authService.logout();
   }
 }
+

@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto">
     <!-- Project Tabs -->
     <div class="mb-6 border-b border-zinc-200">
-      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+      <nav class="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto pb-1" aria-label="Tabs">
         <button *ngFor="let project of projects" 
                 (click)="selectProject(project)"
                 [class.border-indigo-500]="selectedProject?.key === project.key"

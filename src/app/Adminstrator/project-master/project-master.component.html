@@ -1,15 +1,15 @@
 <div class="max-w-7xl mx-auto">
   <!-- Header -->
-  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+  <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h2 class="text-2xl font-bold text-zinc-900 tracking-tight">Project Master</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Project Master</h2>
       <p class="text-sm text-zinc-500 mt-1">Manage, configure, and oversee all system projects.</p>
     </div>
-    <div class="mt-4 sm:mt-0 flex gap-2">
-      <button *ngIf="!showForm" (click)="openAddForm()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all duration-200 hover:shadow-md active:scale-95">
+    <div class="flex gap-2">
+      <button *ngIf="!showForm" (click)="openAddForm()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all duration-200 hover:shadow-md active:scale-95 w-full sm:w-auto">
         <i class="fas fa-plus mr-2"></i> Create Project
       </button>
-      <button *ngIf="showForm" (click)="cancelForm()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-zinc-700 bg-zinc-200 hover:bg-zinc-300 shadow-sm transition-all duration-200">
+      <button *ngIf="showForm" (click)="cancelForm()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-zinc-700 bg-zinc-200 hover:bg-zinc-300 shadow-sm transition-all duration-200 w-full sm:w-auto">
         <i class="fas fa-times mr-2"></i> Cancel
       </button>
     </div>
@@ -63,8 +63,8 @@
               </button>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button (click)="openEditForm(p)" class="text-indigo-600 hover:text-indigo-900 mr-4"><i class="fas fa-edit"></i> Edit</button>
-              <button (click)="deleteProject(p.projectId)" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i> Delete</button>
+              <button (click)="openEditForm(p)" class="text-indigo-600 hover:text-indigo-900 mr-2 sm:mr-4 inline-block mb-2 sm:mb-0"><i class="fas fa-edit"></i> Edit</button>
+              <button (click)="deleteProject(p.projectId)" class="text-red-600 hover:text-red-900 inline-block"><i class="fas fa-trash"></i> Delete</button>
             </td>
           </tr>
         </tbody>
