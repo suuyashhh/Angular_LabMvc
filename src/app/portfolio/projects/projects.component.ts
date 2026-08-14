@@ -1,10 +1,9 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { PortfolioProjectService } from '../../Adminstrator/services/portfolio-project.service';
 import { PortfolioProject } from '../../Adminstrator/models/portfolio-project';
-
-declare const particlesJS: any;
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-projects',
@@ -13,11 +12,9 @@ declare const particlesJS: any;
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ProjectsComponent implements OnInit {
   activeTab: 'webApp' | 'website' = 'webApp'; // Note: category is saved as 'webApp' or 'website'
   currentImageIndex: { [key: number]: number } = {};
-  
-  private observer: IntersectionObserver | null = null;
 
   // Image preview modal
   showImagePreview = false;
@@ -31,18 +28,12 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private toastr: ToastrService,
-    private projectService: PortfolioProjectService
+    private projectService: PortfolioProjectService,
+    private loader: LoaderService
   ) {}
 
   ngOnInit(): void {
     this.loadProjects();
-
-    // Initialize particles.js
-    if (typeof particlesJS !== 'undefined') {
-        particlesJS.load('particles-js', 'assets/particles.json', () => {
-          console.log('Particles.js loaded');
-        });
-    }
 
     // Keyboard navigation for image preview
     document.addEventListener('keydown', (e) => {
@@ -61,6 +52,7 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
   loadProjects(): void {
     this.isLoading = true;
     this.hasError = false;
+    this.loader.show();
     this.projectService.getAllProjects(true).subscribe({
       next: (data) => {
         this.projects = data || [];
@@ -68,13 +60,12 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
           this.currentImageIndex[project.projectId] = 0;
         });
         this.isLoading = false;
-        setTimeout(() => {
-          this.initScrollReveal();
-        }, 100);
+        this.loader.hide();
       },
       error: (err) => {
         this.hasError = true;
         this.isLoading = false;
+        this.loader.hide();
         this.toastr.error('Failed to load portfolio projects');
       }
     });
@@ -98,44 +89,9 @@ export class ProjectsComponent implements OnInit, AfterViewInit, OnDestroy {
     return project.technologies.split(',').map(t => t.trim()).filter(t => t.length > 0);
   }
 
-  ngOnDestroy() {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
-  }
-
-  ngAfterViewInit() {
-    this.initScrollReveal();
-  }
-
-  initScrollReveal() {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
-    
-    this.observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-visible');
-        } else {
-          entry.target.classList.remove('reveal-visible');
-        }
-      });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px'
-    });
-
-    const targets = document.querySelectorAll('.scroll-reveal');
-    targets.forEach(target => this.observer!.observe(target));
-  }
-
   // Switch between tabs
   switchTab(tab: 'webApp' | 'website'): void {
     this.activeTab = tab;
-    setTimeout(() => {
-      this.initScrollReveal();
-    }, 50);
   }
 
   // Navigate to next image in carousel
