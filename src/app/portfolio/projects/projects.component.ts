@@ -169,4 +169,10 @@ export class ProjectsComponent implements OnInit {
     event.preventDefault();
     this.toastr.warning('Coming soon..!');
   }
+
+  showWorkInProgressToast(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.toastr.warning('work in prograce');
+  }
 }
