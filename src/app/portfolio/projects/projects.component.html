@@ -162,49 +162,51 @@
 
 <!-- ================= IMAGE PREVIEW MODAL ================= -->
 <div *ngIf="showImagePreview"
-  class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-md p-4 sm:p-6"
+  class="fixed inset-0 z-[99999] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 sm:p-8 md:p-12 transition-all duration-300"
   (click)="closeImagePreview()">
 
-  <div class="relative w-full max-w-4xl h-full max-h-[85vh] flex flex-col justify-between"
+  <!-- Padded Modal Card -->
+  <div class="relative w-full max-w-6xl h-full max-h-[90vh] bg-white border border-zinc-200/80 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
     (click)="$event.stopPropagation()">
 
     <!-- Header Bar -->
-    <div class="flex items-center justify-between pb-3 border-b border-dashed border-zinc-800">
-      <h3 class="text-white font-bold text-base sm:text-lg truncate max-w-[80%]">
+    <div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 bg-white/80 backdrop-blur-md border-b border-zinc-100 z-20">
+      <h3 class="text-zinc-800 font-bold text-sm sm:text-base truncate flex items-center gap-2">
+        <i class="fas fa-image text-emerald-500 text-xs sm:text-sm"></i>
         {{ previewProjectTitle }}
       </h3>
       <button (click)="closeImagePreview()"
-        class="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+        class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-50 border border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center shadow-sm active:scale-95 transition-all cursor-pointer">
         <i class="fas fa-times text-sm"></i>
       </button>
     </div>
 
     <!-- Main Image View area -->
-    <div class="relative flex-1 flex items-center justify-center py-4 min-h-0">
+    <div class="relative flex-1 flex items-center justify-center p-2 sm:p-6 bg-zinc-50/50 min-h-0 overflow-hidden z-10">
       <img [src]="previewImage" [alt]="previewProjectTitle"
-        class="max-w-full max-h-full object-contain rounded-2xl border-2 border-dashed border-zinc-800 shadow-2xl">
+        class="max-w-full max-h-full object-contain rounded-lg shadow-sm select-none cursor-default border border-zinc-200/50">
 
       <!-- Navigation Arrows -->
       <button *ngIf="getCurrentProjectImages().length > 1" (click)="prevImageInPreview()"
-        class="absolute left-3 w-10 h-10 rounded-full bg-zinc-900/90 border border-zinc-850 text-white flex items-center justify-center hover:bg-zinc-850 active:scale-95 transition-transform shadow-lg z-10 cursor-pointer">
-        <i class="fas fa-chevron-left text-sm"></i>
+        class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200 text-zinc-700 hover:text-emerald-600 flex items-center justify-center shadow-lg hover:bg-white active:scale-95 transition-transform z-30 cursor-pointer">
+        <i class="fas fa-chevron-left text-sm sm:text-base pr-0.5"></i>
       </button>
       <button *ngIf="getCurrentProjectImages().length > 1" (click)="nextImageInPreview()"
-        class="absolute right-3 w-10 h-10 rounded-full bg-zinc-900/90 border border-zinc-850 text-white flex items-center justify-center hover:bg-zinc-850 active:scale-95 transition-transform shadow-lg z-10 cursor-pointer">
-        <i class="fas fa-chevron-right text-sm"></i>
+        class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200 text-zinc-700 hover:text-emerald-600 flex items-center justify-center shadow-lg hover:bg-white active:scale-95 transition-transform z-30 cursor-pointer">
+        <i class="fas fa-chevron-right text-sm sm:text-base pl-0.5"></i>
       </button>
     </div>
 
-    <!-- Bottom Counter & Action -->
-    <div class="flex items-center justify-between pt-3 border-t border-dashed border-zinc-800">
-      <span
-        class="text-zinc-400 font-semibold text-xs bg-zinc-900 px-3 py-1.5 border border-zinc-850 rounded-full select-none">
-        {{ currentImageIndex[currentPreviewProjectId] + 1 }} / {{ getCurrentProjectImages().length }}
+    <!-- Bottom Counter -->
+    <div class="flex items-center justify-center px-4 py-3 sm:px-6 sm:py-4 bg-white/80 backdrop-blur-md border-t border-zinc-100 z-20">
+      <span *ngIf="getCurrentProjectImages().length > 1" class="text-zinc-500 font-medium text-xs sm:text-sm flex items-center gap-2">
+        <i class="fas fa-camera text-zinc-400"></i>
+        Image {{ currentImageIndex[currentPreviewProjectId] + 1 }} of {{ getCurrentProjectImages().length }}
       </span>
-      <button (click)="closeImagePreview()"
-        class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2 rounded-full text-xs font-semibold hover:bg-red-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5">
-        <i class="fas fa-times text-[10px]"></i> Close Preview
-      </button>
+      <span *ngIf="getCurrentProjectImages().length <= 1" class="text-zinc-400 text-xs sm:text-sm">
+        Image Preview
+      </span>
     </div>
+
   </div>
 </div>
