@@ -2,10 +2,10 @@
 
   <!-- Header Section -->
   <div class="text-center space-y-4 mb-12 w-full animate-fade-in-up">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-semibold uppercase tracking-wider mb-2">
-      <i class="fas fa-star text-indigo-500"></i> Featured Work
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold uppercase tracking-wider mb-2">
+      <i class="fas fa-star text-zinc-500"></i> Featured Work
     </div>
-    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-500 pb-2">
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-900 pb-2">
       My Projects
     </h1>
     <p class="text-zinc-500 max-w-2xl mx-auto text-sm md:text-base font-medium leading-relaxed">
@@ -18,19 +18,17 @@
     <div class="inline-flex bg-white/60 backdrop-blur-xl border border-zinc-200/60 p-1.5 rounded-full gap-2 shadow-sm ring-1 ring-black/5">
       <button
         class="px-6 py-2.5 rounded-full font-bold transition-all duration-300 flex items-center gap-2.5 text-sm cursor-pointer focus:outline-none relative overflow-hidden group"
-        [class]="activeTab === 'webApp' ? 'text-white shadow-md transform scale-105' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80'" 
+        [class]="activeTab === 'webApp' ? 'bg-zinc-900 text-white shadow-md transform scale-105' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80'" 
         (click)="switchTab('webApp')">
-        <div *ngIf="activeTab === 'webApp'" class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 z-0 rounded-full"></div>
-        <i class="fas fa-laptop-code text-sm relative z-10 transition-transform group-hover:scale-110" [ngClass]="{'text-white': activeTab === 'webApp', 'text-indigo-500': activeTab !== 'webApp'}"></i>
+        <i class="fas fa-laptop-code text-sm relative z-10 transition-transform group-hover:scale-110" [ngClass]="{'text-white': activeTab === 'webApp', 'text-zinc-500': activeTab !== 'webApp'}"></i>
         <span class="relative z-10">Web Apps</span>
       </button>
 
       <button
         class="px-6 py-2.5 rounded-full font-bold transition-all duration-300 flex items-center gap-2.5 text-sm cursor-pointer focus:outline-none relative overflow-hidden group"
-        [class]="activeTab === 'website' ? 'text-white shadow-md transform scale-105' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80'" 
+        [class]="activeTab === 'website' ? 'bg-zinc-900 text-white shadow-md transform scale-105' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80'" 
         (click)="switchTab('website')">
-        <div *ngIf="activeTab === 'website'" class="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-500 z-0 rounded-full"></div>
-        <i class="fas fa-globe text-sm relative z-10 transition-transform group-hover:scale-110" [ngClass]="{'text-white': activeTab === 'website', 'text-purple-500': activeTab !== 'website'}"></i>
+        <i class="fas fa-globe text-sm relative z-10 transition-transform group-hover:scale-110" [ngClass]="{'text-white': activeTab === 'website', 'text-zinc-500': activeTab !== 'website'}"></i>
         <span class="relative z-10">Websites</span>
       </button>
     </div>
@@ -58,7 +56,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <ng-container *ngFor="let project of projects; let idx = index">
         <div *ngIf="project.category === activeTab"
-          class="bg-white rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-100 hover:border-indigo-100 transition-all duration-500 flex flex-col group hover:-translate-y-1.5">
+          class="bg-white rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-100 hover:border-zinc-300 transition-all duration-500 flex flex-col group hover:-translate-y-1.5">
           
           <!-- Image Carousel Area -->
           <div *ngIf="getProjectImages(project).length > 0"
@@ -75,20 +73,20 @@
 
             <!-- Navigation Controls -->
             <button *ngIf="getProjectImages(project).length > 1" (click)="prevImage(project.projectId); $event.stopPropagation()"
-              class="absolute top-1/2 left-3 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-lg flex items-center justify-center text-white hover:bg-indigo-600 active:scale-95 transition-all z-20"
+              class="absolute top-1/2 left-3 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-lg flex items-center justify-center text-white hover:bg-zinc-700 active:scale-95 transition-all z-20"
               aria-label="Previous image">
               <i class="fas fa-chevron-left text-sm"></i>
             </button>
 
             <button *ngIf="getProjectImages(project).length > 1" (click)="nextImage(project.projectId); $event.stopPropagation()"
-              class="absolute top-1/2 right-3 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-lg flex items-center justify-center text-white hover:bg-indigo-600 active:scale-95 transition-all z-20"
+              class="absolute top-1/2 right-3 -translate-y-1/2 w-9 h-9 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 shadow-lg flex items-center justify-center text-white hover:bg-zinc-700 active:scale-95 transition-all z-20"
               aria-label="Next image">
               <i class="fas fa-chevron-right text-sm"></i>
             </button>
 
             <!-- Click to preview indicator -->
             <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md text-zinc-900 px-4 py-2 rounded-full text-xs font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-2 shadow-xl z-20 translate-y-4 group-hover:translate-y-0">
-              <i class="fas fa-expand text-indigo-500"></i> View Gallery
+              <i class="fas fa-expand text-zinc-600"></i> View Gallery
             </div>
             
             <!-- Image Counter -->
@@ -104,7 +102,7 @@
           <!-- Details Area -->
           <div class="p-6 flex-grow flex flex-col justify-between relative z-10 bg-white">
             <div class="mb-6">
-              <h3 class="text-xl font-extrabold text-zinc-900 group-hover:text-indigo-600 transition-colors duration-300 leading-tight mb-3">
+              <h3 class="text-xl font-extrabold text-zinc-900 group-hover:text-zinc-700 transition-colors duration-300 leading-tight mb-3">
                 {{ project.projectName }}
               </h3>
               <p class="text-sm text-zinc-500 font-medium leading-relaxed line-clamp-3" [title]="project.projectDescription">
@@ -116,7 +114,7 @@
               <!-- Tech tags -->
               <div class="flex flex-wrap gap-2 mb-6">
                 <span *ngFor="let tech of getProjectTech(project)"
-                  class="px-3 py-1.5 text-[11px] font-bold bg-indigo-50/50 border border-indigo-100/50 text-indigo-600 rounded-lg shadow-sm hover:bg-indigo-100/50 transition-colors">
+                  class="px-3 py-1.5 text-[11px] font-bold bg-zinc-100 border border-zinc-200 text-zinc-700 rounded-lg shadow-sm hover:bg-zinc-200 transition-colors">
                   {{ tech }}
                 </span>
               </div>
@@ -129,7 +127,7 @@
                   <i class="fab fa-github text-base"></i> <span>Source Code</span>
                 </a>
                 <a *ngIf="project.liveDemoLink" [href]="project.liveDemoLink" target="_blank" rel="noopener"
-                  class="py-2 bg-zinc-900 text-white text-xs font-bold rounded-xl hover:bg-indigo-600 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.98]"
+                  class="py-2 bg-zinc-900 text-white text-xs font-bold rounded-xl hover:bg-zinc-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.98]"
                   [class.col-span-2]="!project.codeLink">
                   <i class="fas fa-external-link-alt text-base"></i> <span>Live Demo</span>
                 </a>
@@ -199,7 +197,7 @@
     <!-- Header Bar -->
     <div class="flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-zinc-100 z-20">
       <h3 class="text-zinc-900 font-extrabold text-lg truncate flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500">
+        <div class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-700">
           <i class="fas fa-image text-sm"></i>
         </div>
         {{ previewProjectTitle }}
@@ -217,12 +215,12 @@
 
       <!-- Navigation Arrows -->
       <button *ngIf="getCurrentProjectImages().length > 1" (click)="prevImageInPreview()"
-        class="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 text-white hover:bg-indigo-600 flex items-center justify-center shadow-xl hover:shadow-indigo-500/40 active:scale-95 transition-all z-30 cursor-pointer">
+        class="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 text-white hover:bg-zinc-700 flex items-center justify-center shadow-xl hover:shadow-zinc-500/40 active:scale-95 transition-all z-30 cursor-pointer">
         <i class="fas fa-chevron-left text-lg pr-1"></i>
       </button>
       
       <button *ngIf="getCurrentProjectImages().length > 1" (click)="nextImageInPreview()"
-        class="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 text-white hover:bg-indigo-600 flex items-center justify-center shadow-xl hover:shadow-indigo-500/40 active:scale-95 transition-all z-30 cursor-pointer">
+        class="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-zinc-900/60 backdrop-blur-md border border-white/10 text-white hover:bg-zinc-700 flex items-center justify-center shadow-xl hover:shadow-zinc-500/40 active:scale-95 transition-all z-30 cursor-pointer">
         <i class="fas fa-chevron-right text-lg pl-1"></i>
       </button>
     </div>
@@ -231,7 +229,7 @@
     <div class="flex items-center justify-center px-6 py-4 bg-white/90 backdrop-blur-md border-t border-zinc-100 z-20">
       <div *ngIf="getCurrentProjectImages().length > 1" class="flex items-center gap-3">
         <span class="text-zinc-500 font-bold text-sm bg-zinc-100 px-4 py-1.5 rounded-full shadow-inner flex items-center gap-2">
-          <i class="fas fa-images text-indigo-500"></i>
+          <i class="fas fa-images text-zinc-700"></i>
           Image {{ currentImageIndex[currentPreviewProjectId] + 1 }} of {{ getCurrentProjectImages().length }}
         </span>
         
@@ -239,12 +237,12 @@
         <div class="flex items-center gap-1.5 ml-2">
           <div *ngFor="let img of getCurrentProjectImages(); let i = index" 
             class="w-2 h-2 rounded-full transition-all duration-300"
-            [ngClass]="currentImageIndex[currentPreviewProjectId] === i ? 'bg-indigo-600 w-4' : 'bg-zinc-300'">
+            [ngClass]="currentImageIndex[currentPreviewProjectId] === i ? 'bg-zinc-800 w-4' : 'bg-zinc-300'">
           </div>
         </div>
       </div>
       <span *ngIf="getCurrentProjectImages().length <= 1" class="text-zinc-500 font-bold text-sm bg-zinc-100 px-4 py-1.5 rounded-full shadow-inner flex items-center gap-2">
-        <i class="fas fa-image text-indigo-500"></i> Image Preview
+        <i class="fas fa-image text-zinc-700"></i> Image Preview
       </span>
     </div>
 
