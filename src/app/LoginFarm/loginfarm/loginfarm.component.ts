@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs/operators';
@@ -30,13 +30,24 @@ export class LoginfarmComponent {
     private auth: AuthService,
     private loader: LoaderService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
     if (this.auth.isFarmUserLoggedIn()) {
       this.router.navigate(['SF']);
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['autoLogin'] === 'true') {
+        this.loginObj.CONTACT = params['u'];
+        this.loginObj.PASSWORD = params['p'];
+        setTimeout(() => {
+          this.login();
+        }, 100);
+      }
+    });
   }
 
   /**

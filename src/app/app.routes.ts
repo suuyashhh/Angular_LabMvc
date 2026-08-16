@@ -75,6 +75,10 @@ export const routes: Routes = [
   {
     path: 'notes',
     loadChildren: () => import('./Notes/notes.routes').then(m => m.NOTES_ROUTES)
+  },
+   {
+    path: 'admin',
+    loadChildren: () => import('./Adminstrator/Admin.routes').then(m => m.Admin_ROUTES)
   }
 ];
 

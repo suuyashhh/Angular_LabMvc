@@ -18,10 +18,6 @@
            [class]="isActive('home') ? activeClass : inactiveClass">Home</a>
         <a [routerLink]="['/portfolio/projects']" 
            [class]="isActive('projects') ? activeClass : inactiveClass">Projects</a>
-        <a [routerLink]="['/portfolio/resume']" 
-           [class]="isActive('resume') ? activeClass : inactiveClass">Resume</a>
-        <a [routerLink]="['/portfolio/contact']" 
-           [class]="isActive('contact') ? activeClass : inactiveClass">Contact</a>
       </div>
     </div>
 
@@ -45,11 +41,5 @@
     <a [routerLink]="['/portfolio/projects']" 
        [class]="isActive('projects') ? mobileActiveClass : mobileInactiveClass"
        (click)="closeMobileMenu()">Projects</a>
-    <a [routerLink]="['/portfolio/resume']" 
-       [class]="isActive('resume') ? mobileActiveClass : mobileInactiveClass"
-       (click)="closeMobileMenu()">Resume</a>
-    <a [routerLink]="['/portfolio/contact']" 
-       [class]="isActive('contact') ? mobileActiveClass : mobileInactiveClass"
-       (click)="closeMobileMenu()">Contact</a>
   </div>
 </nav>
