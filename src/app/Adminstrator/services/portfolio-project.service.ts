@@ -30,10 +30,13 @@ export class PortfolioProjectService {
     return this.api.delete(`PortfolioProjects/${id}`) as Observable<any>;
   }
 
-  uploadFile(file: File, type: string): Observable<any> {
+  uploadFile(file: File, type: string, oldPath?: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
+    if (oldPath) {
+      formData.append('oldPath', oldPath);
+    }
     return this.api.upload('PortfolioProjects/upload', formData) as Observable<any>;
   }
 
