@@ -105,7 +105,8 @@ export class ProjectMasterComponent implements OnInit {
     if (file) {
       try {
         this.toastr.info('Uploading file...');
-        const res = await this.projectService.uploadFile(file, type).toPromise();
+        const oldPath = (this.currentProject as any)[fieldName];
+        const res = await this.projectService.uploadFile(file, type, oldPath).toPromise();
         if (res && res.path) {
           (this.currentProject as any)[fieldName] = res.path;
           this.toastr.success('File uploaded successfully');
