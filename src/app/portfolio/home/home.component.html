@@ -18,7 +18,7 @@
     <!-- Greeting with Waving Hand Capsule -->
     <div class="flex items-center justify-center space-x-3.5 scroll-reveal reveal-fade-up delay-100">
       <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-sans">
-        Hi, I'm Suyash
+        Hi, I'm Suyash Patil
       </h1>
       <!-- Waving Hand Pill -->
       <div
@@ -84,11 +84,11 @@
       </a>
     </div>
     <!-- GitHub Contributions Section -->
-    <div
+    <section
       class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-left scroll-reveal reveal-fade-up">
-      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-4 text-center">
+      <h2 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-4 text-center">
         GitHub Contributions
-      </h1>
+      </h2>
 
       <!-- Card Container -->
       <div id="contrib-card-container"
@@ -186,15 +186,15 @@
 
         </div>
       </div>
-    </div>
+    </section>
 
 
     <!-- Tech Stack Section -->
-    <div
+    <section
       class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
-      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+      <h2 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
         Tech Stack
-      </h1>
+      </h2>
 
       <!-- Grid Container matching screenshot style -->
       <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
@@ -282,13 +282,13 @@
 
 
       </div>
-    </div>
+    </section>
 
-    <div
+    <section
       class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
-      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+      <h2 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
         Tools & Platforms
-      </h1>
+      </h2>
 
       <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
 
@@ -335,14 +335,14 @@
         </div>
 
       </div>
-    </div>
+    </section>
 
     <!-- Work Experience Section -->
-    <div
+    <section
       class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
-      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+      <h2 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
         Work Experience
-      </h1>
+      </h2>
 
       <!-- Experience Cards Container -->
       <div class="space-y-6 text-left max-w-xl mx-auto">
@@ -447,14 +447,14 @@
         </div>
 
       </div>
-    </div>
+    </section>
 
     <!-- Featured Projects Section -->
-    <div
+    <section
       class="pt-10 border-t border-dashed border-zinc-200 dark:border-zinc-800 text-center scroll-reveal reveal-fade-up">
-      <h1 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
+      <h2 class="pb-5 text-lg md:text-xl font-bold text-zinc-950 dark:text-zinc-50 mb-6">
         Featured Projects
-      </h1>
+      </h2>
 
       <!-- Projects Grid Container -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl md:max-w-none mx-auto">
@@ -469,8 +469,8 @@
             class="relative h-48 sm:h-56 overflow-hidden cursor-pointer bg-zinc-50 border-b border-dashed border-zinc-150"
             (click)="openImagePreview(project)">
 
-            <img *ngFor="let image of project.images; let i = index" [src]="image" [alt]="project.title"
-              [class.opacity-100]="currentImageIndex[project.id] === i"
+            <img *ngFor="let image of project.images; let i = index" [src]="image" [alt]="project.title + ' Screenshot ' + (i + 1)"
+              loading="lazy" [class.opacity-100]="currentImageIndex[project.id] === i"
               [class.opacity-0]="currentImageIndex[project.id] !== i"
               class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300">
 
@@ -540,7 +540,7 @@
           <i class="fas fa-chevron-right text-xs"></i>
         </a>
       </div>
-    </div>
+    </section>
 
 
     <footer class="w-full mt-1 border-t border-dashed border-zinc-200 dark:border-zinc-800 pt-1 pb-1 text-center">
