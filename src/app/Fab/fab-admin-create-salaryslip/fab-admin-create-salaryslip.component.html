@@ -66,7 +66,7 @@
                 <td>Full Day</td>
                 <td style="text-align: center;">{{ calculatedSlip.full_day }}</td>
                 <td style="text-align: right;">
-                  <input type="number" [(ngModel)]="calculatedSlip.full_salary" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
+                  <input type="number" [(ngModel)]="calculatedSlip.full_salary" (input)="onSalaryInputsChange()" [disabled]="!isAdmin" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
                 </td>
                 <td style="text-align: right; color: #28a745; font-weight: 600;">₹{{ calculatedSlip.full_day_Total | number:'1.2-2' }}</td>
               </tr>
@@ -74,7 +74,7 @@
                 <td>Half Day</td>
                 <td style="text-align: center;">{{ calculatedSlip.half_day }}</td>
                 <td style="text-align: right;">
-                  <input type="number" [(ngModel)]="calculatedSlip.half_salary" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
+                  <input type="number" [(ngModel)]="calculatedSlip.half_salary" (input)="onSalaryInputsChange()" [disabled]="!isAdmin" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
                 </td>
                 <td style="text-align: right; color: #28a745; font-weight: 600;">₹{{ calculatedSlip.half_day_total | number:'1.2-2' }}</td>
               </tr>
@@ -88,7 +88,7 @@
                 <td>Advance</td>
                 <td style="text-align: center;">-</td>
                 <td style="text-align: right;">
-                  <input type="number" [(ngModel)]="calculatedSlip.advance_total" (input)="onSalaryInputsChange()" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
+                  <input type="number" [(ngModel)]="calculatedSlip.advance_total" (input)="onSalaryInputsChange()" [disabled]="!isAdmin" class="webforms-table-input" style="text-align: right; width: 100px; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;" />
                 </td>
                 <td style="text-align: right; color: #dc3545; font-weight: 600;">- ₹{{ calculatedSlip.advance_total | number:'1.2-2' }}</td>
               </tr>
@@ -100,7 +100,7 @@
           </table>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4" *ngIf="isAdmin">
           <button (click)="saveSalarySlip()" class="webforms-btn-success">
             <i class="fas fa-file-invoice-dollar mr-2"></i> Approve & Save Payslip
           </button>

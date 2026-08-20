@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs/operators';
@@ -29,11 +29,22 @@ export class LoginComponent implements OnInit {
   private loader = inject(LoaderService);
   private toastr = inject(ToastrService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   ngOnInit() {
     if (this.auth.isNotesLoggedIn()) {
       this.router.navigate(['/notes/dashboard']);
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['autoLogin'] === 'true') {
+        this.loginObj.number = params['u'];
+        this.loginObj.password = params['p'];
+        setTimeout(() => {
+          this.login();
+        }, 100);
+      }
+    });
   }
 
   login() {

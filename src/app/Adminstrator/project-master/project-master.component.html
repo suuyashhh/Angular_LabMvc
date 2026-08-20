@@ -1,0 +1,197 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Project Master</h2>
+      <p class="text-sm text-zinc-500 mt-1">Manage, configure, and oversee all system projects.</p>
+    </div>
+    <div class="flex gap-2">
+      <button *ngIf="!showForm" (click)="openAddForm()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all duration-200 hover:shadow-md active:scale-95 w-full sm:w-auto">
+        <i class="fas fa-plus mr-2"></i> Create Project
+      </button>
+      <button *ngIf="showForm" (click)="cancelForm()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-zinc-700 bg-zinc-200 hover:bg-zinc-300 shadow-sm transition-all duration-200 w-full sm:w-auto">
+        <i class="fas fa-times mr-2"></i> Cancel
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center p-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+  </div>
+  
+  <!-- Data Grid -->
+  <div *ngIf="!showForm && !isLoading" class="bg-white shadow-sm rounded-xl border border-zinc-200 overflow-hidden">
+    <!-- Filters / Search -->
+    <div class="p-4 border-b border-zinc-100 flex flex-col sm:flex-row gap-4 justify-between bg-zinc-50/50">
+      <div class="relative max-w-md w-full">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i class="fas fa-search text-zinc-400"></i>
+        </div>
+        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="filterProjects()" class="block w-full pl-10 pr-3 py-2 border border-zinc-300 rounded-lg leading-5 bg-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Search projects...">
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-zinc-200">
+        <thead class="bg-zinc-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Sr No</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Project Name</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Category</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-zinc-200">
+          <tr *ngIf="filteredProjects.length === 0">
+            <td colspan="5" class="px-6 py-12 text-center text-zinc-500">
+              <i class="fas fa-folder-open text-3xl text-zinc-300 mb-3 block"></i>
+              No projects found.
+            </td>
+          </tr>
+          <tr *ngFor="let p of filteredProjects" class="hover:bg-zinc-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 font-medium">{{ p.srNo }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900">
+              {{ p.projectName }}
+              <div class="text-xs text-zinc-500">{{ p.technologies }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">{{ p.category }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <button (click)="toggleActive(p)" [ngClass]="p.isActive ? 'bg-green-100 text-green-800' : 'bg-zinc-100 text-zinc-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full hover:opacity-80">
+                {{ p.isActive ? 'Active' : 'Inactive' }}
+              </button>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button (click)="openEditForm(p)" class="text-indigo-600 hover:text-indigo-900 mr-2 sm:mr-4 inline-block mb-2 sm:mb-0"><i class="fas fa-edit"></i> Edit</button>
+              <button (click)="deleteProject(p.projectId)" class="text-red-600 hover:text-red-900 inline-block"><i class="fas fa-trash"></i> Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add / Edit Form -->
+  <div *ngIf="showForm" class="bg-white shadow-sm rounded-xl border border-zinc-200 p-6 animate-fade-in-up">
+    <h3 class="text-lg font-medium text-zinc-900 mb-6">{{ isEditing ? 'Edit Project' : 'Add New Project' }}</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Basic Details -->
+      <div class="space-y-4">
+        <h4 class="font-medium text-zinc-700 border-b pb-2">Basic Details</h4>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">Sr No</label>
+            <input type="number" [(ngModel)]="currentProject.srNo" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-zinc-700 mb-1">Category</label>
+            <select [(ngModel)]="currentProject.category" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="webApp">Web App</option>
+              <option value="website">Website</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Project Name *</label>
+          <input type="text" [(ngModel)]="currentProject.projectName" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Description *</label>
+          <textarea [(ngModel)]="currentProject.projectDescription" rows="3" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Technologies * (comma separated)</label>
+          <input type="text" [(ngModel)]="currentProject.technologies" placeholder="Angular, SQL, .Net Core" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+      </div>
+
+      <!-- Links & Files -->
+      <div class="space-y-4">
+        <h4 class="font-medium text-zinc-700 border-b pb-2">Links & Application Files</h4>
+        
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Code Link</label>
+          <input type="text" [(ngModel)]="currentProject.codeLink" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Live Demo Link</label>
+          <input type="text" [(ngModel)]="currentProject.liveDemoLink" class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">APK File Upload</label>
+          <div class="flex items-center gap-2">
+            <input type="file" (change)="onFileChange($event, 'apkFile', 'apk')" accept=".apk" class="text-sm">
+            <span *ngIf="currentProject.apkFile" class="text-xs text-green-600"><i class="fas fa-check-circle"></i> Uploaded</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-zinc-700 mb-1">Desktop File Upload</label>
+          <div class="flex items-center gap-2">
+            <input type="file" (change)="onFileChange($event, 'desktopFile', 'desktop')" class="text-sm">
+            <span *ngIf="currentProject.desktopFile" class="text-xs text-green-600"><i class="fas fa-check-circle"></i> Uploaded</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Images -->
+      <div class="md:col-span-2 space-y-4 mt-2">
+        <h4 class="font-medium text-zinc-700 border-b pb-2">Project Images (Max 4)</h4>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Image 1 -->
+          <div class="border border-dashed border-zinc-300 rounded-lg p-4 text-center relative hover:bg-zinc-50 transition-colors">
+            <label class="block text-sm font-medium text-zinc-700 mb-2">Image 1</label>
+            <input type="file" (change)="onFileChange($event, 'image1', 'image')" accept="image/*" class="w-full text-xs">
+            <div *ngIf="currentProject.image1" class="mt-2">
+              <img [src]="getFullUrl(currentProject.image1)" class="h-16 mx-auto rounded object-cover">
+            </div>
+          </div>
+          <!-- Image 2 -->
+          <div class="border border-dashed border-zinc-300 rounded-lg p-4 text-center relative hover:bg-zinc-50 transition-colors">
+            <label class="block text-sm font-medium text-zinc-700 mb-2">Image 2</label>
+            <input type="file" (change)="onFileChange($event, 'image2', 'image')" accept="image/*" class="w-full text-xs">
+            <div *ngIf="currentProject.image2" class="mt-2">
+              <img [src]="getFullUrl(currentProject.image2)" class="h-16 mx-auto rounded object-cover">
+            </div>
+          </div>
+          <!-- Image 3 -->
+          <div class="border border-dashed border-zinc-300 rounded-lg p-4 text-center relative hover:bg-zinc-50 transition-colors">
+            <label class="block text-sm font-medium text-zinc-700 mb-2">Image 3</label>
+            <input type="file" (change)="onFileChange($event, 'image3', 'image')" accept="image/*" class="w-full text-xs">
+            <div *ngIf="currentProject.image3" class="mt-2">
+              <img [src]="getFullUrl(currentProject.image3)" class="h-16 mx-auto rounded object-cover">
+            </div>
+          </div>
+          <!-- Image 4 -->
+          <div class="border border-dashed border-zinc-300 rounded-lg p-4 text-center relative hover:bg-zinc-50 transition-colors">
+            <label class="block text-sm font-medium text-zinc-700 mb-2">Image 4</label>
+            <input type="file" (change)="onFileChange($event, 'image4', 'image')" accept="image/*" class="w-full text-xs">
+            <div *ngIf="currentProject.image4" class="mt-2">
+              <img [src]="getFullUrl(currentProject.image4)" class="h-16 mx-auto rounded object-cover">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <div class="mt-8 flex justify-end gap-3 border-t pt-4">
+      <button (click)="cancelForm()" class="px-5 py-2 border border-zinc-300 rounded-lg text-zinc-700 bg-white hover:bg-zinc-50 font-medium transition-colors">
+        Cancel
+      </button>
+      <button (click)="saveProject()" class="px-5 py-2 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 font-medium transition-colors shadow-sm flex items-center">
+        <i class="fas fa-save mr-2"></i> Save Project
+      </button>
+    </div>
+  </div>
+</div>

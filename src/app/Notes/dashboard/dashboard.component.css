@@ -1,14 +1,418 @@
-/* Custom scrollbar style for note view */
-.max-h-\[85vh\] ::-webkit-scrollbar {
-  width: 8px;
+/* Custom scrollbar for Explorer */
+.explorer-scroll::-webkit-scrollbar { width: 6px; }
+.explorer-scroll::-webkit-scrollbar-track { background: transparent; }
+.explorer-scroll::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 10px; }
+.explorer-scroll::-webkit-scrollbar-thumb:hover { background: #d4d4d8; }
+
+/* Custom scrollbar for the single outer page scroll */
+.page-scroll::-webkit-scrollbar { width: 8px; }
+.page-scroll::-webkit-scrollbar-track { background: #f4f4f5; }
+.page-scroll::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 4px; }
+.page-scroll::-webkit-scrollbar-thumb:hover { background: #d4d4d8; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.max-h-\[85vh\] ::-webkit-scrollbar-track {
-  background: #0f172a;
+.animate-fadeIn { animation: fadeIn 0.2s ease-in-out; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.max-h-\[85vh\] ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+.animate-slideUp { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scaleIn { animation: scaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* ============================================================
+   SINGLE DOCUMENT: notes-jodit-editor
+   ONE Jodit instance, always mounted.
+   View mode  → toolbar hidden via CSS, contenteditable=false.
+   Edit mode  → toolbar shown,  contenteditable=true.
+   ============================================================ */
+
+/* Host fills its flex slot.
+   IMPORTANT: use overflow-x: clip, NOT hidden.
+   `overflow: hidden` creates a new scroll context which prevents
+   `position: sticky` from working on child elements.
+   `overflow: clip`  clips visually without creating a scroll context,
+   so the sticky toolbar can still anchor to the outer .page-scroll. */
+.notes-jodit-editor {
+  display: block !important;
+  width: 100% !important;
+  overflow-x: clip !important;
+}
+
+/* Remove all Jodit chrome.
+   overflow: visible keeps the sticky toolbar working.
+   width: 100% makes container.clientWidth === available viewport width,
+   which applyPageScaling() reads to compute the correct scale factor. */
+.notes-jodit-editor .jodit-container {
+  border: none !important;
+  background: transparent !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* "Desk" area around the paper page.
+   overflow: visible removes Jodit's internal scrollbar — the outer
+   .page-scroll is the ONLY scroll container on the page. */
+.notes-jodit-editor .jodit-workplace {
+  background-color: transparent !important;
+  padding: 2rem 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  overflow: visible !important;   /* NO internal scroll */
+  /* height is set dynamically by applyPageScaling() on desktop only */
+}
+
+/* "Paper" page — A4 proportions on desktop.
+   overflow: visible + auto height → grows with content, no scrollbar. */
+.notes-jodit-editor .jodit-wysiwyg {
+  background-color: #ffffff !important;
+  width: 816px !important;
+  min-height: 1056px !important;
+  padding: 3rem !important;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.10), 0 1px 2px 0 rgba(0,0,0,0.06) !important;
+  border: 1px solid #e4e4e7 !important;
+  margin: 0 auto !important;
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 16px !important;
+  overflow: visible !important;   /* NO internal scrollbar */
+  height: auto !important;        /* grows with content */
+  /* transform + transform-origin are applied dynamically by applyPageScaling() */
+}
+
+/* ── Sticky Toolbar ────────────────────────────────────────────
+   position: sticky works here because NONE of the ancestors
+   between this element and .page-scroll use overflow: hidden.
+   (.notes-jodit-editor uses clip; .jodit-container uses visible)
+   ────────────────────────────────────────────────────────────── */
+.notes-jodit-editor .jodit-toolbar__box {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 40 !important;
+  width: 100% !important;
+}
+
+/* VIEW MODE: hide toolbar; restore pointer cursor */
+.view-mode .notes-jodit-editor .jodit-toolbar__box {
+  display: none !important;
+}
+.view-mode .notes-jodit-editor .jodit-wysiwyg {
+  cursor: default !important;
+}
+
+/* EDIT MODE: text cursor */
+.notes-jodit-editor .jodit-wysiwyg[contenteditable="true"] {
+  cursor: text !important;
+  outline: none !important;
+}
+
+/* Custom status-bar label */
+.notes-jodit-editor .jodit-status-bar-link {
+  font-size: 0 !important;
+  color: transparent !important;
+  text-decoration: none !important;
+}
+.notes-jodit-editor .jodit-status-bar-link::after {
+  content: 'POWERED BY SUYASH';
+  font-size: 11px;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  pointer-events: none;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+/* Table styles */
+.notes-jodit-editor .jodit-wysiwyg table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+.notes-jodit-editor .jodit-wysiwyg th,
+.notes-jodit-editor .jodit-wysiwyg td {
+  border: 1px solid #e4e4e7;
+  padding: 0.75rem;
+}
+.notes-jodit-editor .jodit-wysiwyg th {
+  background-color: #f4f4f5;
+  font-weight: 600;
+  color: #18181b;
+}
+
+/* Images */
+.notes-jodit-editor .jodit-wysiwyg img {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+}
+
+/* ============================================================
+   MOBILE LAYOUT (< 769px)
+   Fluid full-width document so text stays readable.
+   Tables get their own horizontal scroll.
+   ============================================================ */
+@media (max-width: 768px) {
+  .notes-jodit-editor .jodit-wysiwyg {
+    width: 100% !important;
+    min-height: auto !important;
+    padding: 1rem 1.25rem !important;
+    box-shadow: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+  }
+
+  .notes-jodit-editor .jodit-workplace {
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  /* Tables scroll horizontally within themselves, not the whole page */
+  .notes-jodit-editor .jodit-wysiwyg table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: max-content !important;
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   FILE EXPLORER STYLES
+   ============================================================ */
+
+/* File meta pill — small badges in the file header */
+.file-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #71717a;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+/* File type badge (e.g. PDF, DOCX) */
+.file-type-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   border-radius: 4px;
+  padding: 2px 7px;
+  text-transform: uppercase;
 }
-.max-h-\[85vh\] ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+
+/* Image preview — smooth render */
+.file-image-preview {
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  transition: transform 0.2s;
+}
+.file-image-preview:hover {
+  transform: scale(1.01);
+}
+
+/* Text preview pre block scrollbar */
+.file-text-preview::-webkit-scrollbar { width: 6px; height: 6px; }
+.file-text-preview::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 4px; }
+
+/* Sidebar file item icon — no extra margin needed, uses existing item styles */
+.folder-node .file-item-icon {
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Upload toast pulse */
+@keyframes uploadPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-pulse { animation: uploadPulse 1.5s ease-in-out infinite; }
+
+
+/* ============================================================
+   SINGLE DOCUMENT: notes-jodit-editor
+   ONE Jodit instance, always mounted.
+   View mode  → toolbar hidden via CSS, contenteditable=false.
+   Edit mode  → toolbar shown,  contenteditable=true.
+   ============================================================ */
+
+/* Host fills its flex slot.
+   IMPORTANT: use overflow-x: clip, NOT hidden.
+   `overflow: hidden` creates a new scroll context which prevents
+   `position: sticky` from working on child elements.
+   `overflow: clip`  clips visually without creating a scroll context,
+   so the sticky toolbar can still anchor to the outer .page-scroll. */
+.notes-jodit-editor {
+  display: block !important;
+  width: 100% !important;
+  overflow-x: clip !important;
+}
+
+/* Remove all Jodit chrome.
+   overflow: visible keeps the sticky toolbar working.
+   width: 100% makes container.clientWidth === available viewport width,
+   which applyPageScaling() reads to compute the correct scale factor. */
+.notes-jodit-editor .jodit-container {
+  border: none !important;
+  background: transparent !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* "Desk" area around the paper page.
+   overflow: visible removes Jodit's internal scrollbar — the outer
+   .page-scroll is the ONLY scroll container on the page. */
+.notes-jodit-editor .jodit-workplace {
+  background-color: transparent !important;
+  padding: 2rem 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  overflow: visible !important;   /* NO internal scroll */
+  /* height is set dynamically by applyPageScaling() on desktop only */
+}
+
+/* "Paper" page — A4 proportions on desktop.
+   overflow: visible + auto height → grows with content, no scrollbar. */
+.notes-jodit-editor .jodit-wysiwyg {
+  background-color: #ffffff !important;
+  width: 816px !important;
+  min-height: 1056px !important;
+  padding: 3rem !important;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.10), 0 1px 2px 0 rgba(0,0,0,0.06) !important;
+  border: 1px solid #e4e4e7 !important;
+  margin: 0 auto !important;
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 16px !important;
+  overflow: visible !important;   /* NO internal scrollbar */
+  height: auto !important;        /* grows with content */
+  /* transform + transform-origin are applied dynamically by applyPageScaling() */
+}
+
+/* ── Sticky Toolbar ────────────────────────────────────────────
+   position: sticky works here because NONE of the ancestors
+   between this element and .page-scroll use overflow: hidden.
+   (.notes-jodit-editor uses clip; .jodit-container uses visible)
+   ────────────────────────────────────────────────────────────── */
+.notes-jodit-editor .jodit-toolbar__box {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 40 !important;
+  width: 100% !important;
+}
+
+/* VIEW MODE: hide toolbar; restore pointer cursor */
+.view-mode .notes-jodit-editor .jodit-toolbar__box {
+  display: none !important;
+}
+.view-mode .notes-jodit-editor .jodit-wysiwyg {
+  cursor: default !important;
+}
+
+/* EDIT MODE: text cursor */
+.notes-jodit-editor .jodit-wysiwyg[contenteditable="true"] {
+  cursor: text !important;
+  outline: none !important;
+}
+
+/* Custom status-bar label */
+.notes-jodit-editor .jodit-status-bar-link {
+  font-size: 0 !important;
+  color: transparent !important;
+  text-decoration: none !important;
+}
+.notes-jodit-editor .jodit-status-bar-link::after {
+  content: 'POWERED BY SUYASH';
+  font-size: 11px;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  pointer-events: none;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+/* Table styles */
+.notes-jodit-editor .jodit-wysiwyg table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+.notes-jodit-editor .jodit-wysiwyg th,
+.notes-jodit-editor .jodit-wysiwyg td {
+  border: 1px solid #e4e4e7;
+  padding: 0.75rem;
+}
+.notes-jodit-editor .jodit-wysiwyg th {
+  background-color: #f4f4f5;
+  font-weight: 600;
+  color: #18181b;
+}
+
+/* Images */
+.notes-jodit-editor .jodit-wysiwyg img {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+}
+
+/* ============================================================
+   MOBILE LAYOUT (< 769px)
+   Fluid full-width document so text stays readable.
+   Tables get their own horizontal scroll.
+   ============================================================ */
+@media (max-width: 768px) {
+  .notes-jodit-editor .jodit-wysiwyg {
+    width: 100% !important;
+    min-height: auto !important;
+    padding: 1rem 1.25rem !important;
+    box-shadow: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+  }
+
+  .notes-jodit-editor .jodit-workplace {
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  /* Tables scroll horizontally within themselves, not the whole page */
+  .notes-jodit-editor .jodit-wysiwyg table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: max-content !important;
+    max-width: 100%;
+  }
 }

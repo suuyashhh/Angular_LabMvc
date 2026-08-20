@@ -15,15 +15,5 @@ export const PORTFOLIO_ROUTES: Routes = [
     path:'projects',
     loadComponent:() => import('../portfolio/projects/projects.component')
         .then(m => m.ProjectsComponent)
- },
- {
-    path:'resume',
-    loadComponent: () => import('../portfolio/resume/resume.component')
-        .then(m =>m.ResumeComponent)
- },
- {
-    path:'contact',
-    loadComponent: () => import('../portfolio/contact/contact.component')
-        .then(m => m.ContactComponent)
  }
 ];

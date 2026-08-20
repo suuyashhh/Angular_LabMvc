@@ -24,6 +24,7 @@ export class FabAdminAttendanceComponent implements OnInit {
   historyFrom: string = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().substring(0, 10);
   historyTo: string = new Date().toISOString().substring(0, 10);
   historyRecords: any[] = [];
+  groupedHistoryRecords: { date: string, records: any[] }[] = [];
 
   constructor(
     private http: HttpClient,
@@ -153,6 +154,7 @@ export class FabAdminAttendanceComponent implements OnInit {
       next: (res) => {
         const data = res || [];
         this.historyRecords = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.groupHistoryRecords();
         this.loader.hide();
       },
       error: (err) => {
@@ -161,6 +163,22 @@ export class FabAdminAttendanceComponent implements OnInit {
         this.loader.hide();
       }
     });
+  }
+
+  groupHistoryRecords() {
+    const groups: { [key: string]: any[] } = {};
+    this.historyRecords.forEach(record => {
+      const dateStr = record.date.substring(0, 10); // Standardize date key
+      if (!groups[dateStr]) {
+        groups[dateStr] = [];
+      }
+      groups[dateStr].push(record);
+    });
+
+    this.groupedHistoryRecords = Object.keys(groups).map(date => ({
+      date: date,
+      records: groups[date]
+    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   deleteAttendanceRecord(hId: number) {

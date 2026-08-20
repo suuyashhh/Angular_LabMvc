@@ -14,7 +14,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 30px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .brand-title {
@@ -64,14 +64,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   min-height: 140px;
 }
 
 .webforms-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.06);
   border-color: #007bff;
 }
 
@@ -95,15 +95,18 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
+
   .webforms-card {
     padding: 16px 10px;
     min-height: 110px;
   }
+
   .webforms-card img {
     width: 40px;
     height: 40px;
     margin-bottom: 10px;
   }
+
   .card-title {
     font-size: 12px;
   }
@@ -114,15 +117,18 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
+
   .webforms-card {
     padding: 12px 6px;
     min-height: 90px;
   }
+
   .webforms-card img {
     width: 32px;
     height: 32px;
     margin-bottom: 8px;
   }
+
   .card-title {
     font-size: 11px;
   }
@@ -133,17 +139,20 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
+
   .webforms-card {
-    padding: 8px 4px;
-    min-height: 75px;
+    padding: 12px 6px;
+    min-height: 95px;
   }
+
   .webforms-card img {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 6px;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
   }
+
   .card-title {
-    font-size: 9px;
-    line-height: 1.1;
+    font-size: 11px;
+    line-height: 1.2;
   }
 }

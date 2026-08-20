@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../shared/auth.service';
 import { ApiService } from '../../shared/api.service';
 import { ToastrService } from 'ngx-toastr';
@@ -20,6 +20,7 @@ export class ProviderLoginComponent implements OnInit {
   private authService = inject(AuthService);
   private toastr = inject(ToastrService);
   private loader = inject(LoaderService);
+  private route = inject(ActivatedRoute);
   hidePassword = true;
   isEmailFocused = false;
   isPasswordFocused = false;
@@ -41,6 +42,16 @@ export class ProviderLoginComponent implements OnInit {
       password: '',
       remember: true
     };
+
+    this.route.queryParams.subscribe(params => {
+      if (params['autoLogin'] === 'true') {
+        this.loginData.phone = params['u'];
+        this.loginData.password = params['p'];
+        setTimeout(() => {
+          this.onLogin();
+        }, 100);
+      }
+    });
   }
 
   onLogin() {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs/operators';
@@ -30,13 +30,31 @@ export class FabLoginComponent implements OnInit {
     private auth: AuthService,
     private loader: LoaderService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     if (this.auth.isFabLoggedIn()) {
       this.router.navigate(['/fab/dashboard']);
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['autoLogin'] === 'true') {
+        this.loginObj.username = params['u'];
+        this.loginObj.password = params['p'];
+        // If we want to support both Admin and Helper, the backend query we wrote returns 'Admin' as Username for admins
+        // Let's set the type based on if username is Admin
+        if (params['u'] === 'Admin' || params['u'] === 'admin') {
+            this.loginObj.type = 'Admin';
+        } else {
+            this.loginObj.type = 'Helper';
+        }
+        setTimeout(() => {
+          this.login();
+        }, 100);
+      }
+    });
   }
 
   login() {
