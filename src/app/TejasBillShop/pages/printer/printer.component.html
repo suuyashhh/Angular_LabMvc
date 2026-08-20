@@ -1,0 +1,95 @@
+<div class="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pb-24 text-[#2C1810] font-sans">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-extrabold tracking-tight">Printer</h1>
+    <p class="text-[14px] font-medium text-[#8B7355] mt-0.5">Configure thermal receipt printer</p>
+  </div>
+
+  <!-- Printer Status -->
+  <div class="bg-[#D4F5E4] rounded-2xl p-5 flex items-center justify-between mb-6 shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-[#22A565] shadow-[0_0_0_3px_rgba(34,165,101,0.2)] animate-[pulse_2s_infinite]"></div>
+      <div>
+        <p class="text-base font-bold text-[#2C1810]">Ready to print</p>
+        <p class="text-[13px] text-[#8B7355] mt-0.5">{{ settings.connectionType.toUpperCase() }} · {{ settings.paperWidth }}</p>
+      </div>
+    </div>
+    <div class="w-11 h-11 rounded-full bg-[#EAFBF1] flex items-center justify-center">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#22A565" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20,6 9,17 4,12"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Connection Type -->
+  <div class="mb-6">
+    <h3 class="text-[15px] font-bold mb-3">Connection Type</h3>
+    <div class="grid grid-cols-3 gap-2.5">
+      <button
+        *ngFor="let type of connectionTypes"
+        class="p-4 rounded-xl text-[14px] font-semibold flex flex-col items-center gap-2 transition-all border-2 focus:outline-none"
+        [ngClass]="settings.connectionType === type.value ? 'bg-[#FDE8DD] border-[#C94A20] text-[#C94A20]' : 'bg-[#F5EDE4] border-transparent text-[#2C1810] hover:bg-[#EFE5DA]'"
+        (click)="setConnectionType(type.value)">
+        <span class="flex items-center justify-center" [innerHTML]="type.icon"></span>
+        <span>{{ type.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="flex gap-3 p-4 bg-[#FDE8DD] rounded-xl mb-6 text-[13px] text-[#8B7355] leading-relaxed">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#C94A20" stroke-width="2" class="shrink-0 mt-0.5">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+    <p>Direct {{ settings.connectionType.toUpperCase() }} thermal printing requires a native build (EAS). In this preview, "Test Print" uses the system print dialog to render a {{ settings.paperWidth }} receipt PDF you can send to any connected printer.</p>
+  </div>
+
+  <!-- Paper Width -->
+  <div class="mb-6">
+    <h3 class="text-[15px] font-bold mb-3">Paper Width</h3>
+    <div class="grid grid-cols-2 gap-2.5">
+      <button
+        class="p-4 rounded-xl text-[15px] font-semibold transition-all border-2 focus:outline-none"
+        [ngClass]="settings.paperWidth === '58mm' ? 'bg-[#FDE8DD] border-[#C94A20] text-[#C94A20]' : 'bg-[#F5EDE4] border-transparent text-[#2C1810] hover:bg-[#EFE5DA]'"
+        (click)="setPaperWidth('58mm')">
+        58mm
+      </button>
+      <button
+        class="p-4 rounded-xl text-[15px] font-semibold transition-all border-2 focus:outline-none"
+        [ngClass]="settings.paperWidth === '80mm' ? 'bg-[#FDE8DD] border-[#C94A20] text-[#C94A20]' : 'bg-[#F5EDE4] border-transparent text-[#2C1810] hover:bg-[#EFE5DA]'"
+        (click)="setPaperWidth('80mm')">
+        80mm
+      </button>
+    </div>
+  </div>
+
+  <!-- Shop Details -->
+  <div class="mb-8">
+    <h3 class="text-[15px] font-bold mb-3">Shop Details (on receipt)</h3>
+
+    <div class="mb-4">
+      <label class="block text-[14px] font-bold mb-1.5">Shop Name</label>
+      <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none" [(ngModel)]="shop.shopName" (blur)="saveShopDetails()">
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-[14px] font-bold mb-1.5">Address</label>
+      <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none" [(ngModel)]="shop.address" (blur)="saveShopDetails()">
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-[14px] font-bold mb-1.5">Phone</label>
+      <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" [(ngModel)]="shop.phone" placeholder="Enter phone number" (blur)="saveShopDetails()">
+    </div>
+  </div>
+
+  <!-- Test Print -->
+  <button class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="testPrint()">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6,9 6,2 18,2 18,9"/>
+      <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+      <rect x="6" y="14" width="12" height="8"/>
+    </svg>
+    Test Print
+  </button>
+</div>

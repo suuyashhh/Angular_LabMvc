@@ -79,6 +79,10 @@ export const routes: Routes = [
    {
     path: 'admin',
     loadChildren: () => import('./Adminstrator/Admin.routes').then(m => m.Admin_ROUTES)
+  },
+  {
+    path: 'tejas',
+    loadChildren: () => import('./TejasBillShop/tejas.routes').then(m => m.routes)
   }
 ];
 

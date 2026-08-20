@@ -1,0 +1,145 @@
+<div class="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pb-24 text-[#2C1810] font-sans" *ngIf="bill">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button class="w-11 h-11 rounded-xl bg-[#F5EDE4] flex items-center justify-center border-none text-[#2C1810] hover:bg-[#EFE5DA] transition-colors focus:outline-none" (click)="goBack()">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15,18 9,12 15,6"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-xl font-extrabold">{{ bill.billNumber }}</h1>
+      <p class="text-[13px] text-[#8B7355]">{{ formatDate(bill.createdAt) }}</p>
+    </div>
+    <button class="w-11 h-11 rounded-xl bg-[#FDE8DD] flex items-center justify-center border-none text-[#C94A20] hover:bg-[#FAD2C2] transition-colors focus:outline-none" (click)="deleteBill()">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+        <line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Items -->
+  <div class="flex flex-col gap-2 mb-4">
+    <div class="flex items-center justify-between p-3.5 bg-[#F5EDE4] rounded-2xl" *ngFor="let item of bill.items; let i = index">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl w-11 h-11 bg-[#FDE8DD] rounded-xl flex items-center justify-center">{{ getEmoji(item.name) }}</span>
+        <div>
+          <p class="text-[15px] font-bold mb-0.5">{{ item.name }}</p>
+          <p class="text-[13px] text-[#8B7355]">₹{{ item.price | number:'1.2-2' }} each</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center bg-[#F5EDE4] rounded-full border border-[#E8DDD0] overflow-hidden">
+          <button class="w-8 h-8 flex items-center justify-center text-base font-bold text-[#C94A20] hover:bg-[#FAD2C2] focus:outline-none" (click)="changeQty(i, -1)">−</button>
+          <span class="min-w-[24px] text-center text-sm font-bold">{{ item.quantity }}</span>
+          <button class="w-8 h-8 flex items-center justify-center text-base font-bold text-[#C94A20] hover:bg-[#FAD2C2] focus:outline-none" (click)="changeQty(i, 1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add more items -->
+  <button class="w-full p-3.5 bg-[#FDE8DD] border border-dashed border-[#C94A20] rounded-2xl text-[#C94A20] text-[15px] font-semibold flex items-center justify-center gap-2 mb-4 hover:bg-[#FAD2C2] transition-colors focus:outline-none" (click)="openAddItemsSheet()">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Add more items
+  </button>
+
+  <!-- Summary -->
+  <div class="bg-[#F5EDE4] rounded-2xl p-4 mb-4">
+    <div class="flex justify-between text-[15px] text-[#8B7355] mb-2">
+      <span>Subtotal</span>
+      <span>₹{{ bill.subtotal | number:'1.2-2' }}</span>
+    </div>
+    <div class="flex justify-between text-xl font-extrabold text-[#C94A20] pt-2 border-t border-dashed border-[#E8DDD0]">
+      <span>Grand Total</span>
+      <span>₹{{ bill.grandTotal | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Update -->
+  <button class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="updateBill()">
+    Update Bill
+  </button>
+
+  <!-- Add Items Bottom Sheet -->
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-50 flex items-end justify-center animate-in fade-in" *ngIf="showAddSheet" (click)="closeAddItemsSheet()">
+    <div class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg max-h-[85vh] flex flex-col px-5 pb-7 pt-3 animate-in slide-in-from-bottom" (click)="$event.stopPropagation()">
+      <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4 shrink-0"></div>
+      <h2 class="text-xl font-bold mb-4 shrink-0">Add Items</h2>
+
+      <!-- Search -->
+      <div class="flex items-center gap-2.5 bg-[#F5EDE4] border border-[#E8DDD0] rounded-xl px-3.5 py-2.5 mb-3 shrink-0">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#A89580]">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="flex-1 bg-transparent border-none text-[15px] text-[#2C1810] placeholder-[#A89580] focus:outline-none" placeholder="Search items..." [(ngModel)]="searchQuery" (ngModelChange)="filterAvailableItems()">
+      </div>
+
+      <!-- Category Filter -->
+      <div class="flex gap-1.5 overflow-x-auto pb-1 mb-3.5 shrink-0 hide-scrollbar">
+        <button
+          *ngFor="let cat of categories"
+          class="shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-colors focus:outline-none"
+          [ngClass]="selectedCategory === cat ? 'bg-[#C94A20] text-white' : 'bg-[#F5EDE4] text-[#2C1810]'"
+          (click)="selectCategory(cat)">
+          {{ cat }}
+        </button>
+      </div>
+
+      <!-- Available Items List -->
+      <div class="flex flex-col gap-1.5 overflow-y-auto pr-0.5" *ngIf="filteredAvailableItems.length > 0">
+        <div class="flex items-center justify-between p-3 bg-[#F5EDE4] rounded-xl hover:bg-[#EFE5DA] transition-colors" *ngFor="let food of filteredAvailableItems">
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <span class="text-[22px] w-10 h-10 bg-[#FDE8DD] rounded-lg flex items-center justify-center shrink-0">{{ getEmoji(food.name) }}</span>
+            <div class="min-w-0">
+              <p class="text-[14px] font-bold mb-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{{ food.name }}</p>
+              <p class="text-[12px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.2-2' }}</p>
+            </div>
+          </div>
+          <button class="w-9 h-9 rounded-lg bg-[#C94A20] text-white flex items-center justify-center border-none shrink-0 hover:bg-[#A83A18] hover:scale-105 active:scale-95 transition-all focus:outline-none" (click)="addItemToBill(food)" *ngIf="!isInBill(food.id)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <span class="flex items-center gap-1 px-3 py-1.5 bg-[#D4F5E4] text-[#22A565] rounded-full text-[12px] font-bold shrink-0" *ngIf="isInBill(food.id)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            Added
+          </span>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="text-center py-8 px-4 text-[#A89580] text-[14px]" *ngIf="filteredAvailableItems.length === 0">
+        <p>No items found</p>
+      </div>
+
+      <!-- Done Button -->
+      <button class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none mt-4 shrink-0 shadow-md" (click)="closeAddItemsSheet()">
+        Done
+      </button>
+    </div>
+  </div>
+
+  <!-- Updated confirmation -->
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-50 flex items-end justify-center animate-in fade-in" *ngIf="showUpdated" (click)="showUpdated = false">
+    <div class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg px-5 pb-7 pt-3 text-center animate-in slide-in-from-bottom" (click)="$event.stopPropagation()">
+      <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4"></div>
+      <div class="py-5">
+        <div class="w-18 h-18 rounded-full bg-[#22A565] flex items-center justify-center mx-auto mb-4 animate-in zoom-in w-16 h-16 shadow-lg shadow-green-500/20">
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20,6 9,17 4,12"/>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-extrabold mb-2">Bill Updated</h2>
+        <p class="text-[16px] text-[#C94A20] font-bold">{{ bill.billNumber }}</p>
+      </div>
+      <button class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="goBack()">
+        Back to Entries
+      </button>
+    </div>
+  </div>
+</div>

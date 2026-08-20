@@ -1,0 +1,51 @@
+<div class="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pb-24 text-[#2C1810] font-sans">
+  <div class="mb-5">
+    <h1 class="text-3xl font-extrabold tracking-tight">Entries</h1>
+    <p class="text-[14px] font-medium text-[#8B7355] mt-0.5">{{ bills.length }} bill{{ bills.length !== 1 ? 's' : '' }}</p>
+  </div>
+
+  <!-- Bills List -->
+  <div class="flex flex-col gap-3" *ngIf="bills.length > 0">
+    <div class="bg-[#F5EDE4] rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow" *ngFor="let bill of bills">
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <p class="text-base font-bold text-[#2C1810] mb-0.5">{{ bill.billNumber }}</p>
+          <p class="text-[13px] text-[#8B7355]">{{ formatDate(bill.createdAt) }}</p>
+        </div>
+        <p class="text-xl font-extrabold text-[#C94A20]">₹{{ bill.grandTotal | number:'1.2-2' }}</p>
+      </div>
+      <p class="text-[13px] text-[#A89580] mb-3.5 leading-relaxed line-clamp-2">
+        {{ getTotalItems(bill) }} items · {{ getItemNames(bill) }}
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <a [routerLink]="['/tejas/entries', bill.id]" class="bg-[#FAD2C2] text-[#C94A20] font-semibold text-[13px] px-3.5 py-2 rounded-full flex items-center gap-1.5 hover:bg-[#FDE8DD] transition-colors focus:outline-none">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+          View
+        </a>
+        <a [routerLink]="['/tejas/entries', bill.id]" [queryParams]="{edit: true}" class="bg-[#FAD2C2] text-[#C94A20] font-semibold text-[13px] px-3.5 py-2 rounded-full flex items-center gap-1.5 hover:bg-[#FDE8DD] transition-colors focus:outline-none">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </a>
+        <button class="bg-[#FAD2C2] text-[#C94A20] font-semibold text-[13px] px-3.5 py-2 rounded-full flex items-center gap-1.5 hover:bg-[#FDE8DD] transition-colors focus:outline-none" (click)="reprintBill(bill)">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6,9 6,2 18,2 18,9"/>
+            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          Reprint
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="text-center p-12 bg-[#F5EDE4] rounded-2xl" *ngIf="bills.length === 0">
+    <p class="text-5xl mb-3">📋</p>
+    <p class="text-[15px] text-[#8B7355]">No bills yet. Go to Billing to create one!</p>
+  </div>
+</div>

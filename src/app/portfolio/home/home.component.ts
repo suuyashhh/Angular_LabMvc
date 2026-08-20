@@ -135,21 +135,23 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-visible');
-        } else {
-          entry.target.classList.remove('reveal-visible');
-        }
+    if (isPlatformBrowser(this.platformId)) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-visible');
+          } else {
+            entry.target.classList.remove('reveal-visible');
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -60px 0px'
       });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px'
-    });
 
-    const targets = document.querySelectorAll('.scroll-reveal');
-    targets.forEach(target => observer.observe(target));
+      const targets = document.querySelectorAll('.scroll-reveal');
+      targets.forEach(target => observer.observe(target));
+    }
   }
   fetchContributions() {
     fetch('https://github-contributions-api.jogruber.de/v4/suuyashhh')
