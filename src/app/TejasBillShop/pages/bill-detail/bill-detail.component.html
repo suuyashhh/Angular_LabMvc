@@ -64,7 +64,7 @@
   </button>
 
   <!-- Add Items Bottom Sheet -->
-  <div class="fixed inset-0 bg-[#1E0F08]/55 z-50 flex items-end justify-center animate-in fade-in" *ngIf="showAddSheet" (click)="closeAddItemsSheet()">
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in" *ngIf="showAddSheet" (click)="closeAddItemsSheet()">
     <div class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg max-h-[85vh] flex flex-col px-5 pb-7 pt-3 animate-in slide-in-from-bottom" (click)="$event.stopPropagation()">
       <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4 shrink-0"></div>
       <h2 class="text-xl font-bold mb-4 shrink-0">Add Items</h2>
@@ -125,7 +125,7 @@
   </div>
 
   <!-- Updated confirmation -->
-  <div class="fixed inset-0 bg-[#1E0F08]/55 z-50 flex items-end justify-center animate-in fade-in" *ngIf="showUpdated" (click)="showUpdated = false">
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in" *ngIf="showUpdated" (click)="showUpdated = false">
     <div class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg px-5 pb-7 pt-3 text-center animate-in slide-in-from-bottom" (click)="$event.stopPropagation()">
       <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4"></div>
       <div class="py-5">
