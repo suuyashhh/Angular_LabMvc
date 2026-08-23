@@ -6,6 +6,7 @@ import { StorageService } from './storage.service';
 import { ApiService } from '../../shared/api.service';
 
 const COUNTER_KEY = 'bc_bill_counter';
+const COUNTER_DATE_KEY = 'bc_bill_counter_date';
 
 @Injectable({ providedIn: 'root' })
 export class BillingService {
@@ -91,15 +92,26 @@ export class BillingService {
 
   generateBillNumber(): string {
     const now = new Date();
-    const datePart = now.getFullYear().toString() +
-      (now.getMonth() + 1).toString().padStart(2, '0') +
-      now.getDate().toString().padStart(2, '0');
+    const yy = now.getFullYear().toString().slice(-2);  // Last 2 digits of year
+    const dd = now.getDate().toString().padStart(2, '0'); // Day of month
 
-    let counter = this.storage.get<number>(COUNTER_KEY) || 0;
-    counter++;
+    // Date key to detect day change (YYMMDD format)
+    const todayKey = yy + (now.getMonth() + 1).toString().padStart(2, '0') + dd;
+    const storedDate = this.storage.get<string>(COUNTER_DATE_KEY) || '';
+
+    let counter: number;
+    if (storedDate === todayKey) {
+      // Same day — increment existing counter
+      counter = (this.storage.get<number>(COUNTER_KEY) || 0) + 1;
+    } else {
+      // New day — reset counter to 1
+      counter = 1;
+      this.storage.set(COUNTER_DATE_KEY, todayKey);
+    }
     this.storage.set(COUNTER_KEY, counter);
 
-    return 'BR' + datePart + counter.toString().padStart(5, '0');
+    // Format: BR + YY + DD + SequenceNumber (e.g. BR26231, BR26232)
+    return 'BR' + yy + dd + counter;
   }
 
   saveBill(): Bill {

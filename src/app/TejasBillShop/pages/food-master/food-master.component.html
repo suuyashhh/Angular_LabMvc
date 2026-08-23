@@ -20,7 +20,7 @@
         <span class="text-2xl w-12 h-12 bg-[#FDE8DD] rounded-[14px] flex items-center justify-center shrink-0">{{ getEmoji(food.name) }}</span>
         <div class="min-w-0">
           <p class="text-[15px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{ food.name }}</p>
-          <p class="text-[13px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.2-2' }}</p>
+          <p class="text-[13px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.0-0':'en-IN' }}</p>
         </div>
       </div>
       <div class="flex items-center gap-3 shrink-0">
@@ -41,7 +41,7 @@
   </div>
 
   <!-- Add/Edit Bottom Sheet -->
-  <div class="fixed inset-0 bg-[#1E0F08]/55 z-50 flex items-end justify-center animate-in fade-in" *ngIf="showSheet" (click)="closeSheet()">
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in" *ngIf="showSheet" (click)="closeSheet()">
     <div class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg max-h-[90vh] overflow-y-auto px-5 pb-7 pt-3 animate-in slide-in-from-bottom" (click)="$event.stopPropagation()">
       <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4"></div>
       <h2 class="text-xl font-bold mb-5 text-center">{{ editingFood ? 'Edit Food' : 'Add Food' }}</h2>
@@ -87,7 +87,7 @@
 
       <div class="mb-4">
         <label class="block text-[14px] font-bold mb-1.5">Price (₹)</label>
-        <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" type="number" [(ngModel)]="formPrice" placeholder="0.00" min="0" step="5">
+        <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" type="number" [(ngModel)]="formPrice" placeholder="0" min="0" step="5">
       </div>
 
       <div class="mb-4">

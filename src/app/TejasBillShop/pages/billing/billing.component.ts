@@ -26,6 +26,9 @@ export class BillingComponent implements OnInit, OnDestroy {
   showCartSheet = false;
   showSavedSheet = false;
   savedBill: Bill | null = null;
+  isPrinterConnected = false;
+  isPrinting = false;
+  printMessage = '';
 
   private subs: Subscription[] = [];
 
@@ -46,7 +49,8 @@ export class BillingComponent implements OnInit, OnDestroy {
         this.cart = cart;
         this.cartTotal = this.billing.getCartTotal();
         this.cartCount = this.billing.getCartCount();
-      })
+      }),
+      this.printer.connected$.subscribe(c => this.isPrinterConnected = c)
     );
   }
 
@@ -104,10 +108,24 @@ export class BillingComponent implements OnInit, OnDestroy {
     this.savedBill = null;
   }
 
-  printBill(): void {
-    if (this.savedBill) {
-      this.printer.printBill(this.savedBill);
+  async printBill(): Promise<void> {
+    if (!this.savedBill) return;
+    this.isPrinting = true;
+    this.printMessage = '';
+    try {
+      const result = await this.printer.printBill(this.savedBill);
+      if (result === 'not_connected') {
+        this.printMessage = '⚠ Printer is not connected! Go to Printer page to connect.';
+      } else if (result === 'success') {
+        this.printMessage = '✓ Sent to printer!';
+      } else {
+        this.printMessage = '✗ Print failed — try reconnecting';
+      }
+    } catch (err) {
+      this.printMessage = '✗ Print failed';
     }
+    this.isPrinting = false;
+    setTimeout(() => this.printMessage = '', 4000);
   }
 
   editSavedBill(): void {

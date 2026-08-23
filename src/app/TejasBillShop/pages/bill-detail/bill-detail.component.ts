@@ -6,6 +6,7 @@ import { Bill, BillItem, FoodItem } from '../../models/interfaces';
 import { FOOD_EMOJI_MAP } from '../../models/mock-data';
 import { BillingService } from '../../services/billing.service';
 import { FoodService } from '../../services/food.service';
+import { PrinterService } from '../../services/printer.service';
 
 @Component({
   selector: 'app-bill-detail',
@@ -18,6 +19,8 @@ export class BillDetailComponent implements OnInit {
   bill: Bill | null = null;
   showUpdated = false;
   showAddSheet = false;
+  isPrinterConnected = false;
+  printMessage = '';
 
   // Add Items sheet state
   allFoods: FoodItem[] = [];
@@ -30,7 +33,8 @@ export class BillDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private billing: BillingService,
-    private foodService: FoodService
+    private foodService: FoodService,
+    private printer: PrinterService
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +54,8 @@ export class BillDetailComponent implements OnInit {
       this.categories = this.foodService.getCategories();
       this.filterAvailableItems();
     });
+
+    this.printer.connected$.subscribe(c => this.isPrinterConnected = c);
   }
 
   formatDate(iso: string): string {
@@ -96,6 +102,19 @@ export class BillDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/tejas/entries']);
+  }
+
+  async printBill(): Promise<void> {
+    if (!this.bill) return;
+    const result = await this.printer.printBill(this.bill);
+    if (result === 'not_connected') {
+      this.printMessage = '⚠ Printer is not connected!';
+    } else if (result === 'success') {
+      this.printMessage = '✓ Sent to printer!';
+    } else {
+      this.printMessage = '✗ Print failed';
+    }
+    setTimeout(() => this.printMessage = '', 4000);
   }
 
   // ── Add Items Sheet ──

@@ -31,8 +31,18 @@ export interface Bill {
 }
 
 export interface PrinterSettings {
-  connectionType: 'bluetooth' | 'usb' | 'wifi';
+  connectionType: 'bluetooth' | 'usb';
   paperWidth: '58mm' | '80mm';
+  connectedDeviceName?: string;
+  connectedDeviceId?: string;
+}
+
+export interface DiscoveredPrinter {
+  id: string;
+  name: string;
+  type: 'bluetooth' | 'usb';
+  paired: boolean;
+  device?: any; // BluetoothDevice or USBDevice reference
 }
 
 export interface ShopDetails {

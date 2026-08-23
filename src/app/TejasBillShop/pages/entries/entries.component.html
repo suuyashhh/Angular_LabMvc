@@ -12,7 +12,7 @@
           <p class="text-base font-bold text-[#2C1810] mb-0.5">{{ bill.billNumber }}</p>
           <p class="text-[13px] text-[#8B7355]">{{ formatDate(bill.createdAt) }}</p>
         </div>
-        <p class="text-xl font-extrabold text-[#C94A20]">₹{{ bill.grandTotal | number:'1.2-2' }}</p>
+        <p class="text-xl font-extrabold text-[#C94A20]">₹{{ bill.grandTotal | number:'1.0-0':'en-IN' }}</p>
       </div>
       <p class="text-[13px] text-[#A89580] mb-3.5 leading-relaxed line-clamp-2">
         {{ getTotalItems(bill) }} items · {{ getItemNames(bill) }}
@@ -47,5 +47,12 @@
   <div class="text-center p-12 bg-[#F5EDE4] rounded-2xl" *ngIf="bills.length === 0">
     <p class="text-5xl mb-3">📋</p>
     <p class="text-[15px] text-[#8B7355]">No bills yet. Go to Billing to create one!</p>
+  </div>
+
+  <!-- Print toast message -->
+  <div class="fixed bottom-[80px] left-1/2 -translate-x-1/2 w-max max-w-[90vw] py-3 px-5 rounded-2xl text-[14px] font-semibold text-center shadow-lg z-[100] animate-in slide-in-from-bottom fade-in"
+    *ngIf="printMessage"
+    [ngClass]="printMessage.startsWith('✓') ? 'bg-[#22A565] text-white' : 'bg-[#C94A20] text-white'">
+    {{ printMessage }}
   </div>
 </div>

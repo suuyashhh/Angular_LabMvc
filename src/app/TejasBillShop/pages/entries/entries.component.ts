@@ -14,6 +14,7 @@ import { PrinterService } from '../../services/printer.service';
 })
 export class EntriesComponent implements OnInit {
   bills: Bill[] = [];
+  printMessage = '';
 
   constructor(
     private billing: BillingService,
@@ -43,7 +44,15 @@ export class EntriesComponent implements OnInit {
     return bill.items.map(i => i.name).join(', ');
   }
 
-  reprintBill(bill: Bill): void {
-    this.printer.printBill(bill);
+  async reprintBill(bill: Bill): Promise<void> {
+    const result = await this.printer.printBill(bill);
+    if (result === 'not_connected') {
+      this.printMessage = '⚠ Printer is not connected! Go to Printer page to connect.';
+    } else if (result === 'success') {
+      this.printMessage = '✓ Sent to printer!';
+    } else {
+      this.printMessage = '✗ Print failed — try reconnecting';
+    }
+    setTimeout(() => this.printMessage = '', 4000);
   }
 }

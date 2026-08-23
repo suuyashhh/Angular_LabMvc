@@ -15,7 +15,7 @@
     <div class="relative z-10 flex items-center justify-between">
       <div>
         <p class="text-sm font-medium opacity-90 mb-1">Today's Sales</p>
-        <p class="text-4xl font-extrabold tracking-tight mb-1">₹{{ todaysSales | number:'1.2-2' }}</p>
+        <p class="text-4xl font-extrabold tracking-tight mb-1">₹{{ todaysSales | number:'1.0-0':'en-IN' }}</p>
         <p class="text-[13px] opacity-80">{{ todaysBillCount }} bill{{ todaysBillCount !== 1 ? 's' : '' }} generated today</p>
       </div>
       <div class="w-12 h-12 opacity-30">
@@ -46,7 +46,7 @@
           <polyline points="17,6 23,6 23,12"/>
         </svg>
       </div>
-      <p class="text-2xl font-extrabold mb-0.5">₹{{ avgOrderValue | number:'1.2-2' }}</p>
+      <p class="text-2xl font-extrabold mb-0.5">₹{{ avgOrderValue | number:'1.0-0':'en-IN' }}</p>
       <p class="text-[13px] font-medium text-[#8B7355]">Avg Order Value</p>
     </div>
   </div>
@@ -63,7 +63,7 @@
         <div>
           <p class="text-sm font-bold truncate mb-1">{{ item.name }}</p>
           <p class="text-xs text-[#8B7355]">{{ item.sold }} sold</p>
-          <p class="text-sm font-bold text-[#C94A20] mt-1">₹{{ item.revenue | number:'1.2-2' }}</p>
+          <p class="text-sm font-bold text-[#C94A20] mt-1">₹{{ item.revenue | number:'1.0-0':'en-IN' }}</p>
         </div>
       </div>
     </div>

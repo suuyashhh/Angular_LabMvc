@@ -2,21 +2,39 @@
   <!-- Header -->
   <div class="mb-6">
     <h1 class="text-3xl font-extrabold tracking-tight">Printer</h1>
-    <p class="text-[14px] font-medium text-[#8B7355] mt-0.5">Configure thermal receipt printer</p>
+    <p class="text-[14px] font-medium text-[#8B7355] mt-0.5">Connect & configure thermal receipt printer</p>
   </div>
 
-  <!-- Printer Status -->
-  <div class="bg-[#D4F5E4] rounded-2xl p-5 flex items-center justify-between mb-6 shadow-sm">
+  <!-- Printer Status Card -->
+  <div class="rounded-2xl p-5 flex items-center justify-between mb-6 shadow-sm transition-all"
+    [ngClass]="isConnected ? 'bg-[#D4F5E4]' : 'bg-[#FDE8DD]'">
     <div class="flex items-center gap-3">
-      <div class="w-3 h-3 rounded-full bg-[#22A565] shadow-[0_0_0_3px_rgba(34,165,101,0.2)] animate-[pulse_2s_infinite]"></div>
+      <!-- Status dot -->
+      <div class="w-3 h-3 rounded-full shadow-[0_0_0_3px_rgba(34,165,101,0.2)]"
+        [ngClass]="{
+          'bg-[#22A565] animate-[pulse_2s_infinite]': isConnected,
+          'bg-[#C94A20] animate-[pulse_3s_infinite]': isConnecting || isScanning,
+          'bg-[#A89580]': !isConnected && !isConnecting && !isScanning
+        }">
+      </div>
       <div>
-        <p class="text-base font-bold text-[#2C1810]">Ready to print</p>
-        <p class="text-[13px] text-[#8B7355] mt-0.5">{{ settings.connectionType.toUpperCase() }} · {{ settings.paperWidth }}</p>
+        <p class="text-base font-bold text-[#2C1810]">
+          {{ isConnected ? 'Connected' : (isConnecting ? 'Connecting...' : (isScanning ? 'Scanning...' : 'Not Connected')) }}
+        </p>
+        <p class="text-[13px] text-[#8B7355] mt-0.5">{{ printerStatus }}</p>
       </div>
     </div>
-    <div class="w-11 h-11 rounded-full bg-[#EAFBF1] flex items-center justify-center">
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#22A565" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <div class="w-11 h-11 rounded-full flex items-center justify-center"
+      [ngClass]="isConnected ? 'bg-[#EAFBF1]' : 'bg-[#FAD2C2]'">
+      <!-- Connected icon -->
+      <svg *ngIf="isConnected" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#22A565" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20,6 9,17 4,12"/>
+      </svg>
+      <!-- Disconnected icon -->
+      <svg *ngIf="!isConnected" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#C94A20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6,9 6,2 18,2 18,9"/>
+        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+        <rect x="6" y="14" width="12" height="8"/>
       </svg>
     </div>
   </div>
@@ -24,11 +42,12 @@
   <!-- Connection Type -->
   <div class="mb-6">
     <h3 class="text-[15px] font-bold mb-3">Connection Type</h3>
-    <div class="grid grid-cols-3 gap-2.5">
+    <div class="grid grid-cols-2 gap-2.5">
       <button
         *ngFor="let type of connectionTypes"
         class="p-4 rounded-xl text-[14px] font-semibold flex flex-col items-center gap-2 transition-all border-2 focus:outline-none"
         [ngClass]="settings.connectionType === type.value ? 'bg-[#FDE8DD] border-[#C94A20] text-[#C94A20]' : 'bg-[#F5EDE4] border-transparent text-[#2C1810] hover:bg-[#EFE5DA]'"
+        [disabled]="isConnected || isScanning || isConnecting"
         (click)="setConnectionType(type.value)">
         <span class="flex items-center justify-center" [innerHTML]="type.icon"></span>
         <span>{{ type.label }}</span>
@@ -36,60 +55,86 @@
     </div>
   </div>
 
-  <!-- Info Card -->
-  <div class="flex gap-3 p-4 bg-[#FDE8DD] rounded-xl mb-6 text-[13px] text-[#8B7355] leading-relaxed">
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#C94A20" stroke-width="2" class="shrink-0 mt-0.5">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-    </svg>
-    <p>Direct {{ settings.connectionType.toUpperCase() }} thermal printing requires a native build (EAS). In this preview, "Test Print" uses the system print dialog to render a {{ settings.paperWidth }} receipt PDF you can send to any connected printer.</p>
-  </div>
-
-  <!-- Paper Width -->
+  <!-- Scan / Connect / Disconnect Buttons -->
   <div class="mb-6">
-    <h3 class="text-[15px] font-bold mb-3">Paper Width</h3>
-    <div class="grid grid-cols-2 gap-2.5">
+    <h3 class="text-[15px] font-bold mb-3">Device</h3>
+
+    <!-- Not supported warning -->
+    <div class="flex gap-3 p-4 bg-[#FDE8DD] rounded-xl mb-4 text-[13px] text-[#8B7355] leading-relaxed"
+      *ngIf="!isApiSupported">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#C94A20" stroke-width="2" class="shrink-0 mt-0.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>
+        Web {{ settings.connectionType === 'bluetooth' ? 'Bluetooth' : 'USB' }} is not supported in this browser.
+        Use Chrome or Edge on Desktop/Android. For Bluetooth, also ensure it's enabled in your system settings.
+      </p>
+    </div>
+
+    <!-- Scan Button -->
+    <button
+      *ngIf="!isConnected && isApiSupported"
+      class="w-full bg-[#2C1810] text-white py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-3 hover:bg-[#1E0F08] transition-all focus:outline-none shadow-md mb-3 disabled:opacity-50"
+      [disabled]="isScanning || isConnecting"
+      (click)="scanForPrinters()">
+      <!-- Bluetooth scan icon -->
+      <svg *ngIf="!isScanning" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="1"/>
+        <path d="M20.2 20.2c2.04-2.03 .02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/>
+        <path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/>
+      </svg>
+      <!-- Scanning spinner -->
+      <svg *ngIf="isScanning" class="animate-spin" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      </svg>
+      {{ isScanning ? 'Scanning...' : 'Scan for ' + (settings.connectionType === 'bluetooth' ? 'Bluetooth' : 'USB') + ' Printers' }}
+    </button>
+
+    <!-- Connected Device Card -->
+    <div *ngIf="isConnected" class="bg-[#D4F5E4] rounded-2xl p-4 mb-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-[#EAFBF1] flex items-center justify-center">
+            <!-- Bluetooth icon -->
+            <svg *ngIf="settings.connectionType === 'bluetooth'" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#22A565" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6.5,6.5 17.5,17.5"/><path d="M7 17l10-10-5-5v20l5-5"/>
+            </svg>
+            <!-- USB icon -->
+            <svg *ngIf="settings.connectionType === 'usb'" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#22A565" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22V2"/><path d="M5 12H2a10 10 0 0020 0h-3"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[15px] font-bold text-[#2C1810]">{{ settings.connectedDeviceName || 'Printer' }}</p>
+            <p class="text-[12px] text-[#22A565] font-semibold mt-0.5">● Connected via {{ settings.connectionType === 'bluetooth' ? 'Bluetooth' : 'USB' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disconnect button -->
       <button
-        class="p-4 rounded-xl text-[15px] font-semibold transition-all border-2 focus:outline-none"
-        [ngClass]="settings.paperWidth === '58mm' ? 'bg-[#FDE8DD] border-[#C94A20] text-[#C94A20]' : 'bg-[#F5EDE4] border-transparent text-[#2C1810] hover:bg-[#EFE5DA]'"
-        (click)="setPaperWidth('58mm')">
-        58mm
+        class="w-full mt-3 py-2.5 rounded-xl border-2 border-[#EF4444] text-[#EF4444] font-semibold text-[14px] bg-transparent hover:bg-[#FEE2E2] transition-colors focus:outline-none flex items-center justify-center gap-2"
+        (click)="disconnectPrinter()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Disconnect
       </button>
-      <button
-        class="p-4 rounded-xl text-[15px] font-semibold transition-all border-2 focus:outline-none"
-        [ngClass]="settings.paperWidth === '80mm' ? 'bg-[#FDE8DD] border-[#C94A20] text-[#C94A20]' : 'bg-[#F5EDE4] border-transparent text-[#2C1810] hover:bg-[#EFE5DA]'"
-        (click)="setPaperWidth('80mm')">
-        80mm
-      </button>
+    </div>
+
+    <!-- Info about how scanning works -->
+    <div class="flex gap-3 p-4 bg-[#F5EDE4] rounded-xl text-[13px] text-[#8B7355] leading-relaxed"
+      *ngIf="isApiSupported && !isConnected">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#C94A20" stroke-width="2" class="shrink-0 mt-0.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <p *ngIf="settings.connectionType === 'bluetooth'">
+        Tap <strong>Scan</strong> to discover nearby Bluetooth thermal printers. Make sure your printer is powered on and in pairing mode. A browser popup will show available devices – select your printer to pair and connect.
+      </p>
+      <p *ngIf="settings.connectionType === 'usb'">
+        Tap <strong>Scan</strong> to detect connected USB printers. Ensure the printer is plugged in via USB cable. A browser popup will show available USB devices – select your printer to connect.
+      </p>
     </div>
   </div>
 
-  <!-- Shop Details -->
-  <div class="mb-8">
-    <h3 class="text-[15px] font-bold mb-3">Shop Details (on receipt)</h3>
-
-    <div class="mb-4">
-      <label class="block text-[14px] font-bold mb-1.5">Shop Name</label>
-      <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none" [(ngModel)]="shop.shopName" (blur)="saveShopDetails()">
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-[14px] font-bold mb-1.5">Address</label>
-      <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none" [(ngModel)]="shop.address" (blur)="saveShopDetails()">
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-[14px] font-bold mb-1.5">Phone</label>
-      <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" [(ngModel)]="shop.phone" placeholder="Enter phone number" (blur)="saveShopDetails()">
-    </div>
-  </div>
-
-  <!-- Test Print -->
-  <button class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="testPrint()">
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="6,9 6,2 18,2 18,9"/>
-      <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
-      <rect x="6" y="14" width="12" height="8"/>
-    </svg>
-    Test Print
-  </button>
 </div>

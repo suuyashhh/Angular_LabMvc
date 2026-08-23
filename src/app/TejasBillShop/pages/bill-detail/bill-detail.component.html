@@ -25,7 +25,7 @@
         <span class="text-2xl w-11 h-11 bg-[#FDE8DD] rounded-xl flex items-center justify-center">{{ getEmoji(item.name) }}</span>
         <div>
           <p class="text-[15px] font-bold mb-0.5">{{ item.name }}</p>
-          <p class="text-[13px] text-[#8B7355]">₹{{ item.price | number:'1.2-2' }} each</p>
+          <p class="text-[13px] text-[#8B7355]">₹{{ item.price | number:'1.0-0':'en-IN' }} each</p>
         </div>
       </div>
       <div class="flex items-center gap-3">
@@ -50,18 +50,37 @@
   <div class="bg-[#F5EDE4] rounded-2xl p-4 mb-4">
     <div class="flex justify-between text-[15px] text-[#8B7355] mb-2">
       <span>Subtotal</span>
-      <span>₹{{ bill.subtotal | number:'1.2-2' }}</span>
+      <span>₹{{ bill.subtotal | number:'1.0-0':'en-IN' }}</span>
     </div>
     <div class="flex justify-between text-xl font-extrabold text-[#C94A20] pt-2 border-t border-dashed border-[#E8DDD0]">
       <span>Grand Total</span>
-      <span>₹{{ bill.grandTotal | number:'1.2-2' }}</span>
+      <span>₹{{ bill.grandTotal | number:'1.0-0':'en-IN' }}</span>
     </div>
   </div>
 
-  <!-- Update -->
-  <button class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="updateBill()">
-    Update Bill
-  </button>
+  <!-- Update & Print -->
+  <div class="flex gap-3 mb-2">
+    <button class="flex-1 bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="updateBill()">
+      Update Bill
+    </button>
+    <button class="py-4 px-5 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-colors focus:outline-none shadow-md"
+      [ngClass]="isPrinterConnected ? 'bg-[#22A565] text-white hover:bg-[#1B8A53]' : 'bg-[#F5EDE4] text-[#2C1810] hover:bg-[#EFE5DA]'"
+      (click)="printBill()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6,9 6,2 18,2 18,9"/>
+        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+        <rect x="6" y="14" width="12" height="8"/>
+      </svg>
+      🖨️
+    </button>
+  </div>
+
+  <!-- Print toast message -->
+  <div class="mb-4 py-2.5 px-4 rounded-xl text-[14px] font-semibold text-center animate-in fade-in"
+    *ngIf="printMessage"
+    [ngClass]="printMessage.startsWith('✓') ? 'bg-[#D4F5E4] text-[#22A565]' : 'bg-[#FDE8DD] text-[#C94A20]'">
+    {{ printMessage }}
+  </div>
 
   <!-- Add Items Bottom Sheet -->
   <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in" *ngIf="showAddSheet" (click)="closeAddItemsSheet()">
@@ -95,7 +114,7 @@
             <span class="text-[22px] w-10 h-10 bg-[#FDE8DD] rounded-lg flex items-center justify-center shrink-0">{{ getEmoji(food.name) }}</span>
             <div class="min-w-0">
               <p class="text-[14px] font-bold mb-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{{ food.name }}</p>
-              <p class="text-[12px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.2-2' }}</p>
+              <p class="text-[12px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.0-0':'en-IN' }}</p>
             </div>
           </div>
           <button class="w-9 h-9 rounded-lg bg-[#C94A20] text-white flex items-center justify-center border-none shrink-0 hover:bg-[#A83A18] hover:scale-105 active:scale-95 transition-all focus:outline-none" (click)="addItemToBill(food)" *ngIf="!isInBill(food.id)">
