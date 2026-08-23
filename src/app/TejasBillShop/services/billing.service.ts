@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CartItem, Bill, BillItem, FoodItem, TopSellingItem } from '../models/interfaces';
 import { StorageService } from './storage.service';
 import { ApiService } from '../../shared/api.service';
+import { LoaderService } from '../../services/loader.service';
 
 const COUNTER_KEY = 'bc_bill_counter';
 const COUNTER_DATE_KEY = 'bc_bill_counter_date';
@@ -17,7 +18,7 @@ export class BillingService {
   bills$ = this.billsSubject.asObservable();
   private apiUrl: string;
 
-  constructor(private storage: StorageService, private http: HttpClient, private apiService: ApiService) {
+  constructor(private storage: StorageService, private http: HttpClient, private apiService: ApiService, private loader: LoaderService) {
     this.apiUrl = this.apiService.baseUrl + 'TejasBilling';
     this.loadBills();
   }
@@ -77,7 +78,7 @@ export class BillingService {
   // ── Bills ──
 
   private loadBills(): void {
-    this.http.get<Bill[]>(this.apiUrl).subscribe(bills => {
+    this.loader.withLoader(this.http.get<Bill[]>(this.apiUrl)).subscribe(bills => {
       this.billsSubject.next(bills);
     });
   }
@@ -91,30 +92,12 @@ export class BillingService {
   }
 
   generateBillNumber(): string {
-    const now = new Date();
-    const yy = now.getFullYear().toString().slice(-2);  // Last 2 digits of year
-    const dd = now.getDate().toString().padStart(2, '0'); // Day of month
-
-    // Date key to detect day change (YYMMDD format)
-    const todayKey = yy + (now.getMonth() + 1).toString().padStart(2, '0') + dd;
-    const storedDate = this.storage.get<string>(COUNTER_DATE_KEY) || '';
-
-    let counter: number;
-    if (storedDate === todayKey) {
-      // Same day — increment existing counter
-      counter = (this.storage.get<number>(COUNTER_KEY) || 0) + 1;
-    } else {
-      // New day — reset counter to 1
-      counter = 1;
-      this.storage.set(COUNTER_DATE_KEY, todayKey);
-    }
+    let counter = (this.storage.get<number>(COUNTER_KEY) || 0) + 1;
     this.storage.set(COUNTER_KEY, counter);
-
-    // Format: BR + YY + DD + SequenceNumber (e.g. BR26231, BR26232)
-    return 'BR' + yy + dd + counter;
+    return 'BR' + counter;
   }
 
-  saveBill(): Bill {
+  saveBill(): Promise<Bill> {
     const cart = this.getCart();
     const items: BillItem[] = cart.map(c => ({
       foodId: c.food.id,
@@ -137,22 +120,23 @@ export class BillingService {
       updatedAt: now
     };
 
-    // Optimistically add to UI, then sync
     const bills = this.getAllBills();
     
-    this.http.post<Bill>(this.apiUrl, bill).subscribe({
-      next: (savedBill) => {
-        bills.unshift(savedBill);
-        this.billsSubject.next([...bills]);
-      },
-      error: (err) => {
-        console.error('Failed to save bill to DB', err);
-        alert('Failed to save bill to database! Error: ' + (err.error?.title || err.error || err.message));
-      }
+    return new Promise((resolve, reject) => {
+      this.loader.withLoader(this.http.post<Bill>(this.apiUrl, bill)).subscribe({
+        next: (savedBill) => {
+          bills.unshift(savedBill);
+          this.billsSubject.next([...bills]);
+          this.clearCart();
+          resolve(savedBill);
+        },
+        error: (err) => {
+          console.error('Failed to save bill to DB', err);
+          alert('Failed to save bill to database! Error: ' + (err.error?.title || err.error || err.message));
+          reject(err);
+        }
+      });
     });
-
-    this.clearCart();
-    return bill;
   }
 
   updateBill(updated: Bill): void {
@@ -163,7 +147,7 @@ export class BillingService {
     toSave.grandTotal = toSave.subtotal;
     toSave.updatedAt = new Date().toISOString();
     
-    this.http.put<Bill>(`${this.apiUrl}/${toSave.id}`, toSave).subscribe(() => {
+    this.loader.withLoader(this.http.put<Bill>(`${this.apiUrl}/${toSave.id}`, toSave)).subscribe(() => {
       // Update local object so UI reflects totals/dates if needed
       updated.subtotal = toSave.subtotal;
       updated.grandTotal = toSave.grandTotal;
@@ -175,7 +159,7 @@ export class BillingService {
   }
 
   deleteBill(id: string): void {
-    this.http.delete(`${this.apiUrl}/${id}`).subscribe(() => {
+    this.loader.withLoader(this.http.delete(`${this.apiUrl}/${id}`)).subscribe(() => {
       const bills = this.getAllBills().filter(b => b.id !== id);
       this.billsSubject.next([...bills]);
     });

@@ -96,11 +96,15 @@ export class BillingComponent implements OnInit, OnDestroy {
     this.showCartSheet = false;
   }
 
-  saveBill(): void {
+  async saveBill(): Promise<void> {
     if (this.cart.length === 0) return;
-    this.savedBill = this.billing.saveBill();
-    this.showCartSheet = false;
-    this.showSavedSheet = true;
+    try {
+      this.savedBill = await this.billing.saveBill();
+      this.showCartSheet = false;
+      this.showSavedSheet = true;
+    } catch (err) {
+      console.error('Save failed', err);
+    }
   }
 
   closeSavedSheet(): void {
