@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CartItem, Bill, BillItem, FoodItem, TopSellingItem } from '../models/interfaces';
 import { StorageService } from './storage.service';
@@ -78,9 +78,18 @@ export class BillingService {
   // ── Bills ──
 
   private loadBills(): void {
-    this.loader.withLoader(this.http.get<Bill[]>(this.apiUrl)).subscribe(bills => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const end = new Date(today);
+    end.setHours(23, 59, 59, 999);
+
+    this.loader.withLoader(this.http.get<Bill[]>(`${this.apiUrl}?startDate=${today.toISOString()}&endDate=${end.toISOString()}`)).subscribe(bills => {
       this.billsSubject.next(bills);
     });
+  }
+
+  fetchBillsByDateRange(startDate: string, endDate: string): Observable<Bill[]> {
+    return this.loader.withLoader(this.http.get<Bill[]>(`${this.apiUrl}?startDate=${startDate}&endDate=${endDate}`));
   }
 
   getAllBills(): Bill[] {
@@ -187,14 +196,8 @@ export class BillingService {
     return this.getTodaysSales() / bills.length;
   }
 
-  getTopSelling(days: number = 7): TopSellingItem[] {
-    const since = new Date();
-    since.setDate(since.getDate() - days);
-    since.setHours(0, 0, 0, 0);
-
-    const bills = this.getAllBills().filter(b => new Date(b.createdAt) >= since);
+  getTopSellingFromBills(bills: Bill[]): TopSellingItem[] {
     const map = new Map<string, TopSellingItem>();
-
     for (const bill of bills) {
       if (!bill.items) continue; // safety check
       for (const item of bill.items) {
@@ -212,8 +215,15 @@ export class BillingService {
         }
       }
     }
-
     return Array.from(map.values()).sort((a, b) => b.sold - a.sold);
+  }
+
+  getTopSelling(days: number = 7): TopSellingItem[] {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+    since.setHours(0, 0, 0, 0);
+    const bills = this.getAllBills().filter(b => new Date(b.createdAt) >= since);
+    return this.getTopSellingFromBills(bills);
   }
 
   // ── Load bill into cart for editing ──

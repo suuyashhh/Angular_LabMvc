@@ -5,16 +5,22 @@ import { Bill } from '../../models/interfaces';
 import { BillingService } from '../../services/billing.service';
 import { PrinterService } from '../../services/printer.service';
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-entries',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './entries.component.html',
   styleUrls: ['./entries.component.css']
 })
 export class EntriesComponent implements OnInit {
   bills: Bill[] = [];
   printMessage = '';
+  
+  showFilterModal = false;
+  startDate: string = '';
+  endDate: string = '';
 
   constructor(
     private billing: BillingService,
@@ -22,9 +28,45 @@ export class EntriesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.billing.bills$.subscribe(bills => {
-      this.bills = [...bills];
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    this.startDate = todayStr;
+    this.endDate = todayStr;
+
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const start = new Date(this.startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(this.endDate);
+    end.setHours(23, 59, 59, 999);
+
+    this.billing.fetchBillsByDateRange(start.toISOString(), end.toISOString()).subscribe(bills => {
+      let filtered = [...bills];
+
+      filtered.sort((a, b) => {
+        const dateDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        if (dateDiff !== 0) return dateDiff;
+        const numA = parseInt(a.billNumber.replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(b.billNumber.replace(/\D/g, ''), 10) || 0;
+        return numB - numA;
+      });
+
+      this.bills = filtered;
+      this.showFilterModal = false;
     });
+  }
+
+  openFilterModal(): void {
+    this.showFilterModal = true;
+  }
+
+  closeFilterModal(): void {
+    this.showFilterModal = false;
   }
 
   formatDate(iso: string): string {

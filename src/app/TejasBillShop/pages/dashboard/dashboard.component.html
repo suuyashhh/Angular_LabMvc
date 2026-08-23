@@ -5,18 +5,25 @@
       <p class="text-[13px] font-medium text-[#8B7355] mb-0.5">Good day!</p>
       <h1 class="text-3xl font-extrabold tracking-tight">Dashboard</h1>
     </div>
-    <button class="w-12 h-12 rounded-full bg-[#FAD2C2] flex items-center justify-center hover:scale-105 transition-transform" routerLink="/tejas/billing">
-      <span class="text-2xl">☕</span>
-    </button>
+    <div class="flex gap-2">
+      <button class="w-12 h-12 rounded-full bg-[#F5EDE4] flex items-center justify-center hover:scale-105 transition-transform text-[#8B7355] focus:outline-none" (click)="openFilterModal()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+      </button>
+      <button class="w-12 h-12 rounded-full bg-[#FAD2C2] flex items-center justify-center hover:scale-105 transition-transform" routerLink="/tejas/billing">
+        <span class="text-2xl">☕</span>
+      </button>
+    </div>
   </div>
 
   <!-- Today's Sales Card -->
   <div class="relative overflow-hidden rounded-3xl p-6 text-white mb-4 shadow-md bg-gradient-to-br from-[#C94A20] to-[#D95A30]">
     <div class="relative z-10 flex items-center justify-between">
       <div>
-        <p class="text-sm font-medium opacity-90 mb-1">Today's Sales</p>
+        <p class="text-sm font-medium opacity-90 mb-1">{{ dateRangeText === 'Today' ? 'Today\'s Sales' : 'Sales' }}</p>
         <p class="text-4xl font-extrabold tracking-tight mb-1">₹{{ todaysSales | number:'1.0-0':'en-IN' }}</p>
-        <p class="text-[13px] opacity-80">{{ todaysBillCount }} bill{{ todaysBillCount !== 1 ? 's' : '' }} generated today</p>
+        <p class="text-[13px] opacity-80">{{ todaysBillCount }} bill{{ todaysBillCount !== 1 ? 's' : '' }} generated {{ dateRangeText === 'Today' ? 'today' : 'in period' }}</p>
       </div>
       <div class="w-12 h-12 opacity-30">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -53,7 +60,9 @@
 
   <!-- Top Selling -->
   <div class="mb-6">
-    <h2 class="text-lg font-bold mb-3.5">Top Selling (7 days)</h2>
+    <div class="flex items-center justify-between mb-3.5">
+      <h2 class="text-lg font-bold">Top Selling ({{ dateRangeText }})</h2>
+    </div>
     
     <div *ngIf="topSelling.length > 0" class="flex gap-3 overflow-x-auto pb-2 snap-x hide-scrollbar">
       <div *ngFor="let item of topSelling" class="shrink-0 w-36 bg-[#F5EDE4] rounded-2xl p-3.5 snap-start hover:-translate-y-0.5 transition-transform">
@@ -115,6 +124,33 @@
         </div>
         <span class="text-sm font-semibold">Printer</span>
       </a>
+    </div>
+  </div>
+
+  <!-- Filter Modal -->
+  <div class="fixed inset-0 bg-black/40 z-[200] flex justify-center items-center p-4 animate-in fade-in" *ngIf="showFilterModal" (click)="closeFilterModal()">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-xl animate-in zoom-in-95" (click)="$event.stopPropagation()">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-[#2C1810]">Filter Dashboard</h2>
+        <button class="text-[#8B7355] hover:text-[#2C1810]" (click)="closeFilterModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="flex flex-col gap-4 mb-6">
+        <div>
+          <label class="block text-[13px] font-bold text-[#8B7355] mb-1">Start Date</label>
+          <input type="date" [(ngModel)]="startDate" class="w-full bg-[#FDF6F0] text-[#2C1810] px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-[#C94A20]/50 transition-all font-medium border border-transparent focus:border-[#C94A20]/30">
+        </div>
+        <div>
+          <label class="block text-[13px] font-bold text-[#8B7355] mb-1">End Date</label>
+          <input type="date" [(ngModel)]="endDate" class="w-full bg-[#FDF6F0] text-[#2C1810] px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-[#C94A20]/50 transition-all font-medium border border-transparent focus:border-[#C94A20]/30">
+        </div>
+      </div>
+      
+      <button class="w-full bg-[#C94A20] text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-[#b0401b] transition-colors focus:outline-none" (click)="applyDashboardFilter()">
+        Search
+      </button>
     </div>
   </div>
 </div>

@@ -66,15 +66,14 @@
     <button class="flex-1 bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md" (click)="updateBill()">
       Update Bill
     </button>
-    <button class="py-4 px-5 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-colors focus:outline-none shadow-md"
-      [ngClass]="isPrinterConnected ? 'bg-[#22A565] text-white hover:bg-[#1B8A53]' : 'bg-[#F5EDE4] text-[#2C1810] hover:bg-[#EFE5DA]'"
+    <button class="py-4 px-6 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-colors focus:outline-none shadow-md bg-[#FAD2C2] text-[#C94A20] hover:bg-[#FDE8DD]"
       (click)="printBill()">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="6,9 6,2 18,2 18,9"/>
         <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
         <rect x="6" y="14" width="12" height="8"/>
       </svg>
-      🖨️
+      Print
     </button>
   </div>
 
