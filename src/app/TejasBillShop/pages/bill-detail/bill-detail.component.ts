@@ -53,6 +53,18 @@ export class BillDetailComponent implements OnInit {
       this.allFoods = items.filter(f => f.active);
       this.categories = this.foodService.getCategories();
       this.filterAvailableItems();
+
+      // Patch images back into bill items
+      if (this.bill && this.bill.items) {
+        this.bill.items.forEach(bi => {
+          if (!bi.image) {
+            const food = items.find(f => f.id === bi.foodId);
+            if (food && food.image) {
+              bi.image = food.image;
+            }
+          }
+        });
+      }
     });
 
     this.printer.connected$.subscribe(c => this.isPrinterConnected = c);

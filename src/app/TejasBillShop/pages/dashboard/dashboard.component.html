@@ -57,8 +57,9 @@
     
     <div *ngIf="topSelling.length > 0" class="flex gap-3 overflow-x-auto pb-2 snap-x hide-scrollbar">
       <div *ngFor="let item of topSelling" class="shrink-0 w-36 bg-[#F5EDE4] rounded-2xl p-3.5 snap-start hover:-translate-y-0.5 transition-transform">
-        <div class="w-full h-16 bg-[#FDE8DD] rounded-xl flex items-center justify-center mb-2.5">
-          <span class="text-3xl">{{ getEmoji(item.name) }}</span>
+        <div class="w-full h-16 bg-[#FDE8DD] rounded-xl flex items-center justify-center overflow-hidden mb-2.5">
+          <span *ngIf="!item.image" class="text-3xl">{{ getEmoji(item.name) }}</span>
+          <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-full h-full object-cover">
         </div>
         <div>
           <p class="text-sm font-bold truncate mb-1">{{ item.name }}</p>

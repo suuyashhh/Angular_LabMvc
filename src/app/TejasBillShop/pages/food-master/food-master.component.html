@@ -17,7 +17,10 @@
   <div class="flex flex-col gap-2">
     <div class="flex items-center justify-between p-3.5 bg-[#F5EDE4] rounded-2xl cursor-pointer hover:bg-[#EFE5DA] transition-colors" *ngFor="let food of foods" (click)="openEditSheet(food)">
       <div class="flex items-center gap-3 flex-1 min-w-0">
-        <span class="text-2xl w-12 h-12 bg-[#FDE8DD] rounded-[14px] flex items-center justify-center shrink-0">{{ getEmoji(food.name) }}</span>
+        <div class="w-12 h-12 bg-[#FDE8DD] rounded-[14px] flex items-center justify-center overflow-hidden shrink-0">
+          <span *ngIf="!food.image" class="text-2xl">{{ getEmoji(food.name) }}</span>
+          <img *ngIf="food.image" [src]="food.image" [alt]="food.name" class="w-full h-full object-cover">
+        </div>
         <div class="min-w-0">
           <p class="text-[15px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{ food.name }}</p>
           <p class="text-[13px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.0-0':'en-IN' }}</p>

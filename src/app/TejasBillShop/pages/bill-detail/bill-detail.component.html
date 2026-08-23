@@ -22,7 +22,10 @@
   <div class="flex flex-col gap-2 mb-4">
     <div class="flex items-center justify-between p-3.5 bg-[#F5EDE4] rounded-2xl" *ngFor="let item of bill.items; let i = index">
       <div class="flex items-center gap-3">
-        <span class="text-2xl w-11 h-11 bg-[#FDE8DD] rounded-xl flex items-center justify-center">{{ getEmoji(item.name) }}</span>
+        <div class="w-11 h-11 bg-[#FDE8DD] rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+          <span *ngIf="!item.image" class="text-3xl">{{ getEmoji(item.name) }}</span>
+          <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-full h-full object-cover">
+        </div>
         <div>
           <p class="text-[15px] font-bold mb-0.5">{{ item.name }}</p>
           <p class="text-[13px] text-[#8B7355]">₹{{ item.price | number:'1.0-0':'en-IN' }} each</p>
@@ -111,7 +114,10 @@
       <div class="flex flex-col gap-1.5 overflow-y-auto pr-0.5" *ngIf="filteredAvailableItems.length > 0">
         <div class="flex items-center justify-between p-3 bg-[#F5EDE4] rounded-xl hover:bg-[#EFE5DA] transition-colors" *ngFor="let food of filteredAvailableItems">
           <div class="flex items-center gap-2.5 flex-1 min-w-0">
-            <span class="text-[22px] w-10 h-10 bg-[#FDE8DD] rounded-lg flex items-center justify-center shrink-0">{{ getEmoji(food.name) }}</span>
+            <div class="w-10 h-10 bg-[#FDE8DD] rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+              <span *ngIf="!food.image" class="text-[22px]">{{ getEmoji(food.name) }}</span>
+              <img *ngIf="food.image" [src]="food.image" [alt]="food.name" class="w-full h-full object-cover">
+            </div>
             <div class="min-w-0">
               <p class="text-[14px] font-bold mb-0.5 whitespace-nowrap overflow-hidden text-ellipsis">{{ food.name }}</p>
               <p class="text-[12px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.0-0':'en-IN' }}</p>

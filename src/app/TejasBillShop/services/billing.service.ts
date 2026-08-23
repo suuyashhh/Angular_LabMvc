@@ -156,11 +156,19 @@ export class BillingService {
   }
 
   updateBill(updated: Bill): void {
-    updated.subtotal = updated.items.reduce((s, i) => s + i.price * i.quantity, 0);
-    updated.grandTotal = updated.subtotal;
-    updated.updatedAt = new Date().toISOString();
+    const toSave = JSON.parse(JSON.stringify(updated)) as Bill;
+    toSave.items.forEach(i => i.image = '');
     
-    this.http.put<Bill>(`${this.apiUrl}/${updated.id}`, updated).subscribe(() => {
+    toSave.subtotal = toSave.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    toSave.grandTotal = toSave.subtotal;
+    toSave.updatedAt = new Date().toISOString();
+    
+    this.http.put<Bill>(`${this.apiUrl}/${toSave.id}`, toSave).subscribe(() => {
+      // Update local object so UI reflects totals/dates if needed
+      updated.subtotal = toSave.subtotal;
+      updated.grandTotal = toSave.grandTotal;
+      updated.updatedAt = toSave.updatedAt;
+      
       const bills = this.getAllBills().map(b => b.id === updated.id ? updated : b);
       this.billsSubject.next([...bills]);
     });
