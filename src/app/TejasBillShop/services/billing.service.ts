@@ -6,8 +6,6 @@ import { StorageService } from './storage.service';
 import { ApiService } from '../../shared/api.service';
 import { LoaderService } from '../../services/loader.service';
 
-const COUNTER_KEY = 'bc_bill_counter';
-const COUNTER_DATE_KEY = 'bc_bill_counter_date';
 
 @Injectable({ providedIn: 'root' })
 export class BillingService {
@@ -100,12 +98,6 @@ export class BillingService {
     return this.getAllBills().find(b => b.id === id);
   }
 
-  generateBillNumber(): string {
-    let counter = (this.storage.get<number>(COUNTER_KEY) || 0) + 1;
-    this.storage.set(COUNTER_KEY, counter);
-    return 'BR' + counter;
-  }
-
   saveBill(): Promise<Bill> {
     const cart = this.getCart();
     const items: BillItem[] = cart.map(c => ({
@@ -121,7 +113,7 @@ export class BillingService {
 
     const bill: Bill = {
       id: '',
-      billNumber: this.generateBillNumber(),
+      billNumber: '',
       items,
       subtotal,
       grandTotal: subtotal,

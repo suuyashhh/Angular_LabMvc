@@ -40,12 +40,10 @@ export class EntriesComponent implements OnInit {
   }
 
   applyFilter(): void {
-    const start = new Date(this.startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(this.endDate);
-    end.setHours(23, 59, 59, 999);
+    const startStr = `${this.startDate}T00:00:00`;
+    const endStr = `${this.endDate}T23:59:59`;
 
-    this.billing.fetchBillsByDateRange(start.toISOString(), end.toISOString()).subscribe(bills => {
+    this.billing.fetchBillsByDateRange(startStr, endStr).subscribe(bills => {
       let filtered = [...bills];
 
       filtered.sort((a, b) => {

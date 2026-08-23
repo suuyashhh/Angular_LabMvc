@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Bill, BillItem, FoodItem } from '../../models/interfaces';
 import { FOOD_EMOJI_MAP } from '../../models/mock-data';
@@ -15,7 +16,7 @@ import { PrinterService } from '../../services/printer.service';
   templateUrl: './bill-detail.component.html',
   styleUrls: ['./bill-detail.component.css']
 })
-export class BillDetailComponent implements OnInit {
+export class BillDetailComponent implements OnInit, OnDestroy {
   bill: Bill | null = null;
   showUpdated = false;
   showAddSheet = false;
@@ -28,6 +29,7 @@ export class BillDetailComponent implements OnInit {
   categories: string[] = [];
   selectedCategory = 'All';
   searchQuery = '';
+  private subs: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -49,25 +51,30 @@ export class BillDetailComponent implements OnInit {
     }
 
     // Load food items for the "Add Items" sheet
-    this.foodService.items$.subscribe(items => {
-      this.allFoods = items.filter(f => f.active);
-      this.categories = this.foodService.getCategories();
-      this.filterAvailableItems();
+    this.subs.push(
+      this.foodService.items$.subscribe(items => {
+        this.allFoods = items.filter(f => f.active);
+        this.categories = this.foodService.getCategories();
+        this.filterAvailableItems();
 
-      // Patch images back into bill items
-      if (this.bill && this.bill.items) {
-        this.bill.items.forEach(bi => {
-          if (!bi.image) {
-            const food = items.find(f => f.id === bi.foodId);
-            if (food && food.image) {
-              bi.image = food.image;
+        // Patch images back into bill items
+        if (this.bill && this.bill.items) {
+          this.bill.items.forEach(bi => {
+            if (!bi.image) {
+              const food = items.find(f => f.id === bi.foodId);
+              if (food && food.image) {
+                bi.image = food.image;
+              }
             }
-          }
-        });
-      }
-    });
+          });
+        }
+      }),
+      this.printer.connected$.subscribe(c => this.isPrinterConnected = c)
+    );
+  }
 
-    this.printer.connected$.subscribe(c => this.isPrinterConnected = c);
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
   }
 
   formatDate(iso: string): string {

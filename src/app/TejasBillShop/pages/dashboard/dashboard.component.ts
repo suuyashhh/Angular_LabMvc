@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BillingService } from '../../services/billing.service';
 import { FoodService } from '../../services/food.service';
 import { TopSellingItem, FoodItem } from '../../models/interfaces';
@@ -14,7 +15,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   todaysSales = 0;
   todaysBillCount = 0;
   avgOrderValue = 0;
@@ -25,6 +26,8 @@ export class DashboardComponent implements OnInit {
   startDate: string = '';
   endDate: string = '';
   dateRangeText = '7 days';
+
+  private subs: Subscription[] = [];
 
   constructor(private billing: BillingService, private foodService: FoodService) {}
 
@@ -39,26 +42,29 @@ export class DashboardComponent implements OnInit {
     this.startDate = fmt(today);
     this.endDate = fmt(today);
 
-    this.foodService.items$.subscribe(items => {
-      this.allFoods = items;
-      this.patchTopSellingImages();
-    });
-
-    this.billing.bills$.subscribe(() => {
-      // Re-apply filter if bills change (e.g. new bill created)
-      if (this.dateRangeText === 'Today') {
-        this.applyDashboardFilter();
-      }
-    });
+    this.subs.push(
+      this.foodService.items$.subscribe(items => {
+        this.allFoods = items;
+        this.patchTopSellingImages();
+      }),
+      this.billing.bills$.subscribe(() => {
+        // Re-apply filter if bills change (e.g. new bill created)
+        if (this.dateRangeText === 'Today') {
+          this.applyDashboardFilter();
+        }
+      })
+    );
 
     this.applyDashboardFilter();
   }
 
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+  }
+
   applyDashboardFilter(): void {
-    const start = new Date(this.startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(this.endDate);
-    end.setHours(23, 59, 59, 999);
+    const startStr = `${this.startDate}T00:00:00`;
+    const endStr = `${this.endDate}T23:59:59`;
 
     const todayStr = new Date().toISOString().split('T')[0];
     if (this.startDate === todayStr && this.endDate === todayStr) {
@@ -69,7 +75,7 @@ export class DashboardComponent implements OnInit {
       this.dateRangeText = 'Custom Range';
     }
 
-    this.billing.fetchBillsByDateRange(start.toISOString(), end.toISOString()).subscribe(bills => {
+    this.billing.fetchBillsByDateRange(startStr, endStr).subscribe(bills => {
       this.todaysBillCount = bills.length;
       this.todaysSales = bills.reduce((sum, b) => sum + b.grandTotal, 0);
       this.avgOrderValue = bills.length > 0 ? this.todaysSales / bills.length : 0;
