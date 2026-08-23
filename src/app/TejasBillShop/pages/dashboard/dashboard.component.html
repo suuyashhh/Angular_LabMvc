@@ -1,0 +1,156 @@
+<div class="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pb-24 text-[#2C1810] font-sans">
+  <!-- Header -->
+  <div class="flex items-start justify-between mb-5">
+    <div>
+      <p class="text-[13px] font-medium text-[#8B7355] mb-0.5">Good day!</p>
+      <h1 class="text-3xl font-extrabold tracking-tight">Dashboard</h1>
+    </div>
+    <div class="flex gap-2">
+      <button class="w-12 h-12 rounded-full bg-[#F5EDE4] flex items-center justify-center hover:scale-105 transition-transform text-[#8B7355] focus:outline-none" (click)="openFilterModal()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+      </button>
+      <button class="w-12 h-12 rounded-full bg-[#FAD2C2] flex items-center justify-center hover:scale-105 transition-transform" routerLink="/tejas/billing">
+        <span class="text-2xl">☕</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Today's Sales Card -->
+  <div class="relative overflow-hidden rounded-3xl p-6 text-white mb-4 shadow-md bg-gradient-to-br from-[#C94A20] to-[#D95A30]">
+    <div class="relative z-10 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium opacity-90 mb-1">{{ dateRangeText === 'Today' ? 'Today\'s Sales' : 'Sales' }}</p>
+        <p class="text-4xl font-extrabold tracking-tight mb-1">₹{{ todaysSales | number:'1.0-0':'en-IN' }}</p>
+        <p class="text-[13px] opacity-80">{{ todaysBillCount }} bill{{ todaysBillCount !== 1 ? 's' : '' }} generated {{ dateRangeText === 'Today' ? 'today' : 'in period' }}</p>
+      </div>
+      <div class="w-12 h-12 opacity-30">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+        </svg>
+      </div>
+    </div>
+    <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10"></div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-2 gap-3 mb-6">
+    <div class="bg-[#F5EDE4] rounded-2xl p-5">
+      <div class="w-10 h-10 bg-[#FAD2C2] rounded-xl flex items-center justify-center mb-3">
+        <svg class="w-5 h-5 stroke-[#C94A20]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+      </div>
+      <p class="text-2xl font-extrabold mb-0.5">{{ todaysBillCount }}</p>
+      <p class="text-[13px] font-medium text-[#8B7355]">Total Bills</p>
+    </div>
+    <div class="bg-[#F5EDE4] rounded-2xl p-5">
+      <div class="w-10 h-10 bg-[#D4F5E4] rounded-xl flex items-center justify-center mb-3">
+        <svg class="w-5 h-5 stroke-[#22A565]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
+          <polyline points="17,6 23,6 23,12"/>
+        </svg>
+      </div>
+      <p class="text-2xl font-extrabold mb-0.5">₹{{ avgOrderValue | number:'1.0-0':'en-IN' }}</p>
+      <p class="text-[13px] font-medium text-[#8B7355]">Avg Order Value</p>
+    </div>
+  </div>
+
+  <!-- Top Selling -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between mb-3.5">
+      <h2 class="text-lg font-bold">Top Selling ({{ dateRangeText }})</h2>
+    </div>
+    
+    <div *ngIf="topSelling.length > 0" class="flex gap-3 overflow-x-auto pb-2 snap-x hide-scrollbar">
+      <div *ngFor="let item of topSelling" class="shrink-0 w-36 bg-[#F5EDE4] rounded-2xl p-3.5 snap-start hover:-translate-y-0.5 transition-transform">
+        <div class="w-full h-16 bg-[#FDE8DD] rounded-xl flex items-center justify-center overflow-hidden mb-2.5">
+          <span *ngIf="!item.image" class="text-3xl">{{ getEmoji(item.name) }}</span>
+          <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <p class="text-sm font-bold truncate mb-1">{{ item.name }}</p>
+          <p class="text-xs text-[#8B7355]">{{ item.sold }} sold</p>
+          <p class="text-sm font-bold text-[#C94A20] mt-1">₹{{ item.revenue | number:'1.0-0':'en-IN' }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="topSelling.length === 0" class="text-center p-8 bg-[#F5EDE4] rounded-2xl">
+      <p class="text-4xl mb-2">📊</p>
+      <p class="text-sm text-[#8B7355]">No sales data yet. Create your first bill!</p>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="mb-6">
+    <h2 class="text-lg font-bold mb-3.5">Quick Actions</h2>
+    <div class="grid grid-cols-2 gap-3">
+      <a routerLink="/tejas/billing" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FAD2C2]">
+          <svg class="w-6 h-6 stroke-[#C94A20]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+        <span class="text-sm font-semibold">New Bill</span>
+      </a>
+      <a routerLink="/tejas/food-master" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FDE8DD]">
+          <svg class="w-6 h-6 stroke-[#C94A20]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+          </svg>
+        </div>
+        <span class="text-sm font-semibold">Food Master</span>
+      </a>
+      <a routerLink="/tejas/entries" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#D4F5E4]">
+          <svg class="w-6 h-6 stroke-[#22A565]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <span class="text-sm font-semibold">Entries</span>
+      </a>
+      <a routerLink="/tejas/printer" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#E8E0F5]">
+          <svg class="w-6 h-6 stroke-[#7C5CBF]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6,9 6,2 18,2 18,9"/>
+            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+        </div>
+        <span class="text-sm font-semibold">Printer</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Modal -->
+  <div class="fixed inset-0 bg-black/40 z-[200] flex justify-center items-center p-4 animate-in fade-in" *ngIf="showFilterModal" (click)="closeFilterModal()">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-xl animate-in zoom-in-95" (click)="$event.stopPropagation()">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-[#2C1810]">Filter Dashboard</h2>
+        <button class="text-[#8B7355] hover:text-[#2C1810]" (click)="closeFilterModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="flex flex-col gap-4 mb-6">
+        <div>
+          <label class="block text-[13px] font-bold text-[#8B7355] mb-1">Start Date</label>
+          <input type="date" [(ngModel)]="startDate" class="w-full bg-[#FDF6F0] text-[#2C1810] px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-[#C94A20]/50 transition-all font-medium border border-transparent focus:border-[#C94A20]/30">
+        </div>
+        <div>
+          <label class="block text-[13px] font-bold text-[#8B7355] mb-1">End Date</label>
+          <input type="date" [(ngModel)]="endDate" class="w-full bg-[#FDF6F0] text-[#2C1810] px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-[#C94A20]/50 transition-all font-medium border border-transparent focus:border-[#C94A20]/30">
+        </div>
+      </div>
+      
+      <button class="w-full bg-[#C94A20] text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-[#b0401b] transition-colors focus:outline-none" (click)="applyDashboardFilter()">
+        Search
+      </button>
+    </div>
+  </div>
+</div>

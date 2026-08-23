@@ -1,0 +1,191 @@
+<div class="min-h-screen bg-[#FDF6F0] p-4 md:p-6 text-[#2C1810] font-sans"
+  [style.padding-bottom]="cart.length > 0 ? '6rem' : '1.5rem'">
+  <!-- Header -->
+  <div class="mb-5">
+    <h1 class="text-3xl font-extrabold tracking-tight">Billing</h1>
+    <p class="text-[14px] font-medium text-[#8B7355] mt-0.5">Tap items to add to bill</p>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="flex gap-2 overflow-x-auto pb-1.5 mb-4 hide-scrollbar">
+    <button *ngFor="let cat of categories"
+      class="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors focus:outline-none"
+      [ngClass]="selectedCategory === cat ? 'bg-[#C94A20] text-white' : 'bg-[#F5EDE4] text-[#2C1810] hover:bg-[#EFE5DA]'"
+      (click)="selectCategory(cat)">
+      {{ cat }}
+    </button>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <div *ngFor="let food of filteredFoods"
+      class="rounded-2xl overflow-hidden cursor-pointer transition-all bg-[#F5EDE4] hover:-translate-y-0.5 hover:shadow-md active:scale-95"
+      (click)="addToCart(food)" [attr.id]="'product-' + food.id">
+
+      <!-- Image area -->
+      <div class="relative h-32 bg-[#FDE8DD] flex items-center justify-center overflow-hidden">
+        <img *ngIf="food.image" [src]="food.image" [alt]="food.name"
+          class="absolute inset-0 w-full h-full object-cover z-0">
+        <span *ngIf="!food.image" class="text-5xl z-10 drop-shadow-sm">{{ getEmoji(food.name) }}</span>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#1e0f08]/70 to-transparent/60 z-10"></div>
+        <div class="absolute bottom-2.5 left-3 right-3 z-20">
+          <p class="text-sm font-bold text-white text-shadow">{{ food.name }}</p>
+          <p class="text-base font-extrabold text-white">₹{{ food.price }}</p>
+        </div>
+        <!-- Quantity badge -->
+        <div
+          class="absolute top-2 right-2 w-7 h-7 rounded-full bg-[#C94A20] text-white text-[13px] font-bold flex items-center justify-center z-30 shadow-[0_2px_6px_rgba(201,74,32,0.4)] animate-in zoom-in"
+          *ngIf="getCartQty(food.id) > 0">
+          {{ getCartQty(food.id) }}
+        </div>
+      </div>
+
+      <!-- Category strip -->
+      <div class="px-3 py-2 text-xs font-semibold text-[#8B7355] bg-[#F5EDE4]">
+        {{ food.category }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Bar -->
+  <div
+    class="fixed bottom-[80px] left-4 right-4 bg-[#C94A20] text-white p-3 px-5 rounded-full shadow-[0_8px_16px_rgba(201,74,32,0.3)] flex items-center justify-between cursor-pointer z-[60] transition-transform hover:brightness-105 hover:-translate-y-0.5 active:scale-95 animate-in slide-in-from-bottom-2"
+    *ngIf="cart.length > 0" (click)="openCartSheet()">
+    <div class="flex items-center gap-3">
+      <span class="rounded-full bg-white text-[#C94A20] flex items-center justify-center text-[15px] font-extrabold w-8 h-8">{{ cartCount }}</span>
+      <span class="text-[15px] font-bold">View Cart</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-base font-extrabold">₹{{ cartTotal | number:'1.2-2':'en-IN' }}</span>
+      <span class="text-[11px] opacity-90 mt-0.5">▲</span>
+    </div>
+  </div>
+
+  <!-- Current Bill Bottom Sheet -->
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in"
+    *ngIf="showCartSheet" (click)="closeCartSheet()">
+    <div
+      class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg max-h-[90vh] overflow-y-auto px-5 pb-7 pt-3 animate-in slide-in-from-bottom"
+      (click)="$event.stopPropagation()">
+      <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4"></div>
+      <h2 class="text-xl font-bold mb-4 text-center">Current Bill</h2>
+
+      <div class="mb-4 space-y-2">
+        <div class="flex items-center justify-between p-3.5 bg-[#F5EDE4] rounded-2xl" *ngFor="let item of cart">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-[#FDE8DD] rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+              <span *ngIf="!item.food.image" class="text-3xl">{{ getEmoji(item.food.name) }}</span>
+              <img *ngIf="item.food.image" [src]="item.food.image" [alt]="item.food.name"
+                class="w-full h-full object-cover">
+            </div>
+            <div>
+              <p class="text-[15px] font-bold mb-0.5">{{ item.food.name }}</p>
+              <p class="text-[13px] text-[#8B7355]">₹{{ item.food.price | number:'1.0-0':'en-IN' }} each</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-1.5">
+            <div class="flex items-center bg-[#F5EDE4] rounded-full border border-[#E8DDD0] overflow-hidden">
+              <button
+                class="w-9 h-9 flex items-center justify-center text-lg font-bold text-[#C94A20] hover:bg-[#FAD2C2] focus:outline-none"
+                (click)="changeQty(item.food.id, -1)">−</button>
+              <span class="min-w-[28px] text-center text-base font-bold">{{ item.quantity }}</span>
+              <button
+                class="w-9 h-9 flex items-center justify-center text-lg font-bold text-[#C94A20] hover:bg-[#FAD2C2] focus:outline-none"
+                (click)="changeQty(item.food.id, 1)">+</button>
+            </div>
+            <p class="text-[15px] font-bold text-[#C94A20]">₹{{ (item.food.price * item.quantity) |
+              number:'1.0-0':'en-IN' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#F5EDE4] rounded-2xl p-4 mb-4">
+        <div class="flex justify-between text-[15px] text-[#8B7355] mb-2">
+          <span>Subtotal</span>
+          <span>₹{{ cartTotal | number:'1.0-0':'en-IN' }}</span>
+        </div>
+        <div
+          class="flex justify-between text-xl font-extrabold text-[#C94A20] pt-2 border-t border-dashed border-[#E8DDD0]">
+          <span>Grand Total</span>
+          <span>₹{{ cartTotal | number:'1.0-0':'en-IN' }}</span>
+        </div>
+      </div>
+
+      <button
+        class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none shadow-md"
+        (click)="saveBill()">
+        Save Bill
+      </button>
+    </div>
+  </div>
+
+  <!-- Bill Saved Bottom Sheet -->
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in"
+    *ngIf="showSavedSheet" (click)="closeSavedSheet()">
+    <div
+      class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg max-h-[90vh] overflow-y-auto px-5 pb-7 pt-3 text-center animate-in slide-in-from-bottom"
+      (click)="$event.stopPropagation()">
+      <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4"></div>
+
+      <div class="py-5">
+        <div
+          class="rounded-full bg-[#22A565] flex items-center justify-center mx-auto mb-4 animate-in zoom-in w-16 h-16 shadow-lg shadow-green-500/20">
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="20,6 9,17 4,12" />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-extrabold mb-2">Bill Saved</h2>
+        <p class="text-sm text-[#8B7355] mb-1">Bill Number</p>
+        <p class="text-xl font-extrabold text-[#C94A20]">{{ savedBill?.billNumber }}</p>
+      </div>
+
+      <!-- Print status message -->
+      <div class="mb-3 py-2 px-4 rounded-xl text-[14px] font-semibold animate-in fade-in" *ngIf="printMessage"
+        [ngClass]="printMessage.startsWith('✓') ? 'bg-[#D4F5E4] text-[#22A565]' : 'bg-[#FDE8DD] text-[#C94A20]'">
+        {{ printMessage }}
+      </div>
+
+      <!-- Printer connection hint -->
+      <p class="text-[12px] text-[#A89580] mb-3" *ngIf="!isPrinterConnected && !printMessage">
+        No printer connected · will use browser print
+      </p>
+
+      <div class="flex gap-3 justify-center mb-1">
+        <button
+          class="flex-1 max-w-[160px] font-semibold py-3 rounded-full flex items-center justify-center gap-2 transition-colors focus:outline-none disabled:opacity-60 bg-[#FAD2C2] text-[#C94A20] hover:bg-[#FDE8DD]"
+          [disabled]="isPrinting" (click)="printBill()">
+          <!-- Spinner while printing -->
+          <svg *ngIf="isPrinting" class="animate-spin" viewBox="0 0 24 24" width="18" height="18" fill="none"
+            stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.3" />
+            <path d="M12 2a10 10 0 019.95 9" stroke-linecap="round" />
+          </svg>
+          <!-- Printer icon when not printing -->
+          <svg *ngIf="!isPrinting" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6,9 6,2 18,2 18,9" />
+            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          {{ isPrinting ? 'Printing...' : 'Print' }}
+        </button>
+        <button
+          class="flex-1 max-w-[160px] bg-[#FAD2C2] text-[#C94A20] font-semibold py-3 rounded-full flex items-center justify-center gap-2 hover:bg-[#FDE8DD] transition-colors focus:outline-none"
+          (click)="editSavedBill()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+          Edit
+        </button>
+      </div>
+
+      <button
+        class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none mt-4 shadow-md"
+        (click)="newBill()">
+        New Bill
+      </button>
+    </div>
+  </div>
+</div>

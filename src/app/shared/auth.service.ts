@@ -43,13 +43,19 @@ export class AuthService {
 
   // Get current user object
   getUser(): any {
-    const userJson = localStorage.getItem('userDetails');
-    return userJson ? JSON.parse(userJson) : null;
+    if (typeof localStorage !== 'undefined') {
+      const userJson = localStorage.getItem('userDetails');
+      return userJson ? JSON.parse(userJson) : null;
+    }
+    return null;
   }
 
   // Get JWT token from localStorage
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
 
   // Get token from cookies
@@ -121,9 +127,13 @@ export class AuthService {
 
   // Clear session from browser
   private clearLocalSession(): void {
-    localStorage.clear();
-    document.cookie = 'authToken=; path=/; max-age=0';
-    document.cookie = 'shopCredentials=; path=/; max-age=0';
+    if (typeof localStorage !== 'undefined') {
+      localStorage.clear();
+    }
+    if (typeof document !== 'undefined') {
+      document.cookie = 'authToken=; path=/; max-age=0';
+      document.cookie = 'shopCredentials=; path=/; max-age=0';
+    }
     this.router.navigate(['/lab']);
   }
 
