@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   totalContributions = 0;
   isLoading = true;
   hasError = false;
-
+  
   // Tooltip properties
   hoveredDay: any = null;
   tooltipX = 0;
@@ -73,34 +73,6 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
     });
   }
 
-  toggleFullScreen() {
-    if (isPlatformBrowser(this.platformId)) {
-      const docElm = document.documentElement as any;
-      if (!document.fullscreenElement) {
-        if (docElm.requestFullscreen) {
-          docElm.requestFullscreen().catch((err: any) => console.error(err));
-        } else if (docElm.mozRequestFullScreen) {
-          docElm.mozRequestFullScreen();
-        } else if (docElm.webkitRequestFullScreen) {
-          docElm.webkitRequestFullScreen();
-        } else if (docElm.msRequestFullscreen) {
-          docElm.msRequestFullscreen();
-        }
-      } else {
-        const doc = document as any;
-        if (doc.exitFullscreen) {
-          doc.exitFullscreen();
-        } else if (doc.mozCancelFullScreen) {
-          doc.mozCancelFullScreen();
-        } else if (doc.webkitExitFullscreen) {
-          doc.webkitExitFullscreen();
-        } else if (doc.msExitFullscreen) {
-          doc.msExitFullscreen();
-        }
-      }
-    }
-  }
-
   ngOnInit() {
     this.seoService.setSeoData({
       title: "Suyash Patil | Full Stack Developer & Software Engineer",
@@ -139,7 +111,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
     if (container) {
       const containerRect = container.getBoundingClientRect();
       const targetRect = (event.target as HTMLElement).getBoundingClientRect();
-
+      
       this.tooltipX = targetRect.left - containerRect.left + (targetRect.width / 2);
       this.tooltipY = targetRect.top - containerRect.top - 6;
     }
@@ -200,14 +172,14 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
         }
 
         let rawContributions = data.contributions || [];
-
+        
         // Filter out future dates (since the API returns placeholders for the entire current year)
         const today = new Date();
         const yToday = today.getFullYear();
         const mToday = String(today.getMonth() + 1).padStart(2, '0');
         const dToday = String(today.getDate()).padStart(2, '0');
         const todayStr = `${yToday}-${mToday}-${dToday}`;
-
+        
         rawContributions = rawContributions.filter((c: any) => c.date <= todayStr);
 
         // Sort contributions ascending so the latest date is at the end
@@ -225,7 +197,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
         const lastDayOfWeek = lastDate.getDay(); // 0: Sunday, 6: Saturday
 
         const totalDaysNeeded = 53 * 7;
-
+        
         // Find Saturday of the last week
         const endDate = new Date(lastDate);
         endDate.setDate(lastDate.getDate() + (6 - lastDayOfWeek));
@@ -252,7 +224,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
             const dayNum = String(currentDate.getDate()).padStart(2, '0');
             const dateStr = `${y}-${m}-${dayNum}`;
             const dayData = contribMap[dateStr] || { date: dateStr, count: 0, level: 0 };
-
+            
             week.push({
               ...dayData,
               monthName: currentDate.toLocaleDateString('en-US', { month: 'short' })
@@ -282,7 +254,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
 
   getDayClass(level: number): string {
     const base = 'w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-200 hover:scale-125 cursor-pointer ';
-    switch (level) {
+    switch(level) {
       case 1:
         return base + 'bg-emerald-200 dark:bg-emerald-950/70 border border-emerald-100 dark:border-emerald-900/30';
       case 2:
@@ -317,7 +289,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   nextImage(projectId: string): void {
     const project = this.projects.find(p => p.id === projectId);
     if (project) {
-      this.currentImageIndex[projectId] =
+      this.currentImageIndex[projectId] = 
         (this.currentImageIndex[projectId] + 1) % project.images.length;
     }
   }
@@ -326,7 +298,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   prevImage(projectId: string): void {
     const project = this.projects.find(p => p.id === projectId);
     if (project) {
-      this.currentImageIndex[projectId] =
+      this.currentImageIndex[projectId] = 
         (this.currentImageIndex[projectId] - 1 + project.images.length) % project.images.length;
     }
   }
@@ -335,7 +307,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   nextImageInPreview(): void {
     const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
     if (project) {
-      this.currentImageIndex[this.currentPreviewProjectId] =
+      this.currentImageIndex[this.currentPreviewProjectId] = 
         (this.currentImageIndex[this.currentPreviewProjectId] + 1) % project.images.length;
       this.previewImage = project.images[this.currentImageIndex[this.currentPreviewProjectId]];
     }
@@ -345,7 +317,7 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   prevImageInPreview(): void {
     const project = this.projects.find(p => p.id === this.currentPreviewProjectId);
     if (project) {
-      this.currentImageIndex[this.currentPreviewProjectId] =
+      this.currentImageIndex[this.currentPreviewProjectId] = 
         (this.currentImageIndex[this.currentPreviewProjectId] - 1 + project.images.length) % project.images.length;
       this.previewImage = project.images[this.currentImageIndex[this.currentPreviewProjectId]];
     }
