@@ -1,4 +1,12 @@
 <div class="flex-grow flex flex-col items-center justify-center px-4 pt-24 pb-8 md:pt-32 md:pb-16 select-none">
+  
+  <!-- Full Screen Toggle Button -->
+  <button (click)="toggleFullScreen()" 
+    class="fixed top-6 right-6 z-50 w-11 h-11 rounded-full bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:scale-105 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all cursor-pointer"
+    title="Toggle Full Screen">
+    <i class="fas fa-expand text-base"></i>
+  </button>
+
   <div class="w-full max-w-4xl text-center space-y-8">
 
     <!-- Profile Image -->
