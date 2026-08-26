@@ -2,12 +2,12 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../shared/api.service';
-import { AuthService } from '../../shared/auth.service';
+import { ApiService } from '../../../shared/api.service';
+import { AuthService } from '../../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
-import { LoaderService } from '../../services/loader.service';
+import { LoaderService } from '../../../services/loader.service';
 
-interface ShopExpenseType {
+interface TejasExpenseType {
   eX_ID: number;
   name: string;
 }
@@ -20,13 +20,13 @@ interface ShopExpenseType {
   styleUrl: './ex-entrytype.component.css'
 })
 export class ExEntrytypeComponent implements OnInit {
-  expenseTypes: ShopExpenseType[] = [];
-  filteredExpenseTypes: ShopExpenseType[] = [];
+  expenseTypes: TejasExpenseType[] = [];
+  filteredExpenseTypes: TejasExpenseType[] = [];
   searchQuery = '';
   private isBrowser: boolean;
 
   // Selected item for edit/delete
-  selectedType: ShopExpenseType | null = null;
+  selectedType: TejasExpenseType | null = null;
 
   // Drawer and Modal State
   isDrawerOpen = false;
@@ -52,9 +52,9 @@ export class ExEntrytypeComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.auth.isShopLoggedIn()) {
+    if (!this.auth.isTejasLoggedIn()) {
       this.toastr.warning('Please login to manage expense types');
-      this.router.navigate(['/shop/login']);
+      this.router.navigate(['/tejas/login']);
       return;
     }
     this.loadExpenseTypes();
@@ -62,14 +62,14 @@ export class ExEntrytypeComponent implements OnInit {
 
   loadExpenseTypes() {
     this.loader.show();
-    this.api.get('ShopExpenseType/GetAll').subscribe({
+    this.api.get('TejasExpenseType/GetAll').subscribe({
       next: (res: any) => {
         const rawTypes = Array.isArray(res) ? res : [];
         this.expenseTypes = rawTypes.map((t: any) => this.normalizeType(t));
         this.filteredExpenseTypes = [...this.expenseTypes];
         this.loader.hide();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error loading expense types:', err);
         this.toastr.error('Failed to load expense types');
         this.loader.hide();
@@ -77,7 +77,7 @@ export class ExEntrytypeComponent implements OnInit {
     });
   }
 
-  normalizeType(item: any): ShopExpenseType {
+  normalizeType(item: any): TejasExpenseType {
     return {
       eX_ID: item.eX_ID ?? item.ex_ID ?? item.ex_id ?? item.EX_ID ?? item.exId ?? 0,
       name: item.name ?? item.NAME ?? ''
@@ -105,7 +105,7 @@ export class ExEntrytypeComponent implements OnInit {
     this.isDrawerOpen = true;
   }
 
-  openEditDrawer(item: ShopExpenseType) {
+  openEditDrawer(item: TejasExpenseType) {
     this.editMode = true;
     this.selectedType = item;
     this.formData = {
@@ -136,7 +136,7 @@ export class ExEntrytypeComponent implements OnInit {
         NAME: this.formData.name.trim()
       };
 
-      this.api.put('ShopExpenseType/Update', payload).subscribe({
+      this.api.put('TejasExpenseType/Update', payload).subscribe({
         next: (res: any) => {
           this.isSaving = false;
           if (res && res.success) {
@@ -147,7 +147,7 @@ export class ExEntrytypeComponent implements OnInit {
             this.toastr.error(res?.message || 'Failed to update expense type');
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           this.isSaving = false;
           console.error('Update error:', err);
           this.toastr.error('Error updating expense type');
@@ -159,7 +159,7 @@ export class ExEntrytypeComponent implements OnInit {
         NAME: this.formData.name.trim()
       };
 
-      this.api.post('ShopExpenseType/Insert', payload).subscribe({
+      this.api.post('TejasExpenseType/Insert', payload).subscribe({
         next: (res: any) => {
           this.isSaving = false;
           if (res && res.success) {
@@ -170,7 +170,7 @@ export class ExEntrytypeComponent implements OnInit {
             this.toastr.error(res?.message || 'Failed to add expense type');
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           this.isSaving = false;
           console.error('Insert error:', err);
           this.toastr.error('Error adding expense type');
@@ -196,7 +196,7 @@ export class ExEntrytypeComponent implements OnInit {
     if (!this.selectedType) return;
 
     this.loader.show();
-    this.api.delete('ShopExpenseType/Delete', { exId: this.selectedType.eX_ID }).subscribe({
+    this.api.delete('TejasExpenseType/Delete', { exId: this.selectedType.eX_ID }).subscribe({
       next: (res: any) => {
         if (res && res.success) {
           this.toastr.success('Expense type deleted successfully');
@@ -207,7 +207,7 @@ export class ExEntrytypeComponent implements OnInit {
           this.loader.hide();
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Delete error:', err);
         this.toastr.error('Error deleting expense type');
         this.loader.hide();

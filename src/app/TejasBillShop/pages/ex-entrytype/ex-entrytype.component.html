@@ -1,11 +1,11 @@
-<div class="hotels-container">
+<div class="container-fluid px-3 px-md-4 py-4">
   <!-- Page Header -->
-  <div class="page-header">
+  <div class="page-header d-flex flex-column flex-sm-row gap-3 align-items-start align-items-sm-center">
     <div>
       <span class="page-header-subtitle">MASTER</span>
       <h1 class="page-header-title">Expense Types</h1>
     </div>
-    <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center gap-2 shadow-sm">
+    <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center justify-content-center gap-2 shadow-sm w-100 w-sm-auto">
       <i class="bi bi-plus-lg"></i>
       <span>Add Expense Type</span>
     </button>
@@ -13,7 +13,7 @@
 
   <!-- Search & Filters -->
   <div class="row mb-4">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
       <div class="input-group shadow-sm border-0 rounded-3 overflow-hidden">
         <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
         <input type="text" class="form-control border-0 ps-0 py-2.5" placeholder="Search expense types..." [(ngModel)]="searchQuery" (input)="searchTypes()">

@@ -14,7 +14,7 @@ import { PrinterService } from '../../services/printer.service';
 })
 export class PrinterComponent implements OnInit, OnDestroy {
   settings: PrinterSettings = { connectionType: 'bluetooth', paperWidth: '58mm' };
-  shop: ShopDetails = { shopName: 'Breakfast Center', address: '123 Main Road', phone: '' };
+  Tejas: ShopDetails = { shopName: 'Breakfast Center', address: '123 Main Road', phone: '' };
 
   isConnected = false;
   isScanning = false;
@@ -43,7 +43,7 @@ export class PrinterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.settings = { ...this.printerService.getSettings() };
-    this.shop = { ...this.printerService.getShopDetails() };
+    this.Tejas = { ...this.printerService.getShopDetails() };
 
     this.subs.push(
       this.printerService.connected$.subscribe(c => this.isConnected = c),
@@ -65,7 +65,7 @@ export class PrinterComponent implements OnInit, OnDestroy {
 
 
   saveShopDetails(): void {
-    this.printerService.updateShopDetails(this.shop);
+    this.printerService.updateShopDetails(this.Tejas);
   }
 
   testPrint(): void {
