@@ -25,6 +25,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   topSelling: TopSellingItem[] = [];
   allFoods: FoodItem[] = [];
   isAdmin = false;
+  userImage: string | null = null;
 
   showFilterModal = false;
   startDate: string = '';
@@ -48,6 +49,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const user = this.auth.getTejasCredentialsFromCookie();
     this.isAdmin = user && user.role && user.role.toLowerCase() === 'admin';
+    this.userImage = user?.user_img || null;
 
     this.subs.push(
       this.foodService.items$.subscribe(items => {
