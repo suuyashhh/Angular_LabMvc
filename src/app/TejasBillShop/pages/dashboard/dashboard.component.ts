@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BillingService } from '../../services/billing.service';
 import { FoodService } from '../../services/food.service';
+import { AuthService } from '../../../shared/auth.service';
+import { ApiService } from '../../../shared/api.service';
 import { TopSellingItem, FoodItem } from '../../models/interfaces';
 import { FOOD_EMOJI_MAP } from '../../models/mock-data';
 import { FormsModule } from '@angular/forms';
@@ -19,8 +21,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   todaysSales = 0;
   todaysBillCount = 0;
   avgOrderValue = 0;
+  totalExpenses = 0;
   topSelling: TopSellingItem[] = [];
   allFoods: FoodItem[] = [];
+  isAdmin = false;
+  userImage: string | null = null;
 
   showFilterModal = false;
   startDate: string = '';
@@ -29,7 +34,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(private billing: BillingService, private foodService: FoodService) {}
+  constructor(private billing: BillingService, private foodService: FoodService, private auth: AuthService, private api: ApiService) {}
 
   ngOnInit(): void {
     const today = new Date();
@@ -41,6 +46,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
     this.startDate = fmt(today);
     this.endDate = fmt(today);
+
+    const user = this.auth.getTejasCredentialsFromCookie();
+    this.isAdmin = user && user.role && user.role.toLowerCase() === 'admin';
+    this.userImage = user?.user_img || null;
 
     this.subs.push(
       this.foodService.items$.subscribe(items => {
@@ -84,6 +93,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.patchTopSellingImages();
       this.showFilterModal = false;
     });
+
+    // Fetch expenses for the same date range
+    const tejasUser = this.auth.getTejasCredentialsFromCookie();
+    if (tejasUser && tejasUser.userId) {
+      this.api.get('TejasEntry/GetAllTypesEntrys', { 
+        userId: tejasUser.userId,
+        fromDate: this.startDate,
+        toDate: this.endDate
+      }).subscribe({
+        next: (res: any) => {
+          const entries = Array.isArray(res) ? res : [];
+          this.totalExpenses = entries.reduce((sum, entry) => sum + (entry.price || 0), 0);
+        },
+        error: (err: any) => {
+          console.error('Error fetching expenses for dashboard:', err);
+          this.totalExpenses = 0;
+        }
+      });
+    }
   }
 
   openFilterModal(): void {
@@ -109,5 +137,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getEmoji(name: string): string {
     return FOOD_EMOJI_MAP[name] || '🍽️';
+  }
+
+  logout() {
+    this.auth.tejasLogout();
   }
 }

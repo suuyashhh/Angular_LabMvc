@@ -2,14 +2,14 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../shared/api.service';
-import { AuthService } from '../../shared/auth.service';
+import { ApiService } from '../../../shared/api.service';
+import { AuthService } from '../../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
-import { LoaderService } from '../../services/loader.service';
-import { ImageCompressionService } from '../../shared/Imagecompression.service';
+import { LoaderService } from '../../../services/loader.service';
+import { ImageCompressionService } from '../../../shared/Imagecompression.service';
 
-interface ShopEntry {
-  shoP_ENTRY_ID: number;
+interface TejasEntry {
+  tejaS_ENTRY_ID: number;
   iS_PAID: boolean;
   reason: string;
   price: number;
@@ -23,44 +23,37 @@ interface ShopEntry {
 }
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-history',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  templateUrl: './history.component.html',
+  styleUrl: './history.component.css'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class HistoryComponent implements OnInit, OnDestroy {
   // User data
   userId: string = '';
   userName: string = '';
 
   // UI state
   showMenu = false;
-  showModal = false;
   showViewModal = false;
   showEditModal = false;
   searchQuery = '';
   showDeleteEntryConfirm = false;
-
+  
+  // Date filters
+  fromDate: string = '';
+  toDate: string = '';
+  
   // Entries data
-  entries: ShopEntry[] = [];
-  filteredEntries: ShopEntry[] = [];
-  groupedEntries: { date: string; count: number; entries: ShopEntry[]; totalPaid: number; totalUnpaid: number }[] = [];
-  expenseTypes: any[] = [];
-
+  entries: TejasEntry[] = [];
+  filteredEntries: TejasEntry[] = [];
+  groupedEntries: { date: string; count: number; entries: TejasEntry[]; totalPaid: number; totalUnpaid: number; totalExpense: number; }[] = [];
+  
   // Selected entry for view/edit
-  selectedEntry: ShopEntry | null = null;
+  selectedEntry: TejasEntry | null = null;
   viewImages: string[] = [];
-
-  // Form data for adding
-  formData = {
-    isPaid: true,
-    reason: '',
-    price: 0,
-    date: new Date().toISOString().split('T')[0],
-    entryType: 2
-  };
-
+  
   // Form data for editing
   editFormData = {
     isPaid: true,
@@ -69,28 +62,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     date: '',
     entryType: 2
   };
-
-  // Add modal files
-  selectedFiles: File[] = [];
-  previewImages: string[] = [];
-
+  
   // Edit modal files
   selectedEditFiles: File[] = [];
   editPreviewImages: string[] = [];
   existingImages: string[] = [];
-
+  
   // Image preview
   showImagePreview = false;
   previewImageUrl: string = '';
   currentImageIndex = 0;
-
-  netBalance = 0;
+  
   totalPaid = 0;
   totalPending = 0;
-  totalProfit = 0;
   totalExpense = 0;
-  netTotal = 0;
-
+  
   private isBrowser: boolean;
 
   constructor(
@@ -107,31 +93,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadShopUserData();
+    this.initDates();
+    this.loadTejasUserData();
     this.loadEntries();
-    this.loadExpenseTypes();
-  }
-
-  loadExpenseTypes() {
-    this.api.get('ShopExpenseType/GetAll').subscribe({
-      next: (res: any) => {
-        this.expenseTypes = Array.isArray(res) ? res : [];
-      },
-      error: (err) => {
-        console.error('Error loading expense types for dropdown:', err);
-      }
-    });
-  }
-
-  onExpenseTypeSelect(event: any, isEdit: boolean) {
-    const value = event.target.value;
-    if (value) {
-      if (isEdit) {
-        this.editFormData.reason = value;
-      } else {
-        this.formData.reason = value;
-      }
-    }
   }
 
   ngOnDestroy() {
@@ -140,16 +104,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadShopUserData() {
-    const shopUser = this.auth.getShopCredentialsFromCookie();
-    if (shopUser) {
-      this.userId = shopUser.userId ? shopUser.userId.toString() : '';
-      this.userName = shopUser.name || 'Shop Admin';
-      console.log('Shop User Loaded:', { userId: this.userId, userName: this.userName });
+  private initDates() {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    
+    const formatDateLocal = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+    
+    this.fromDate = formatDateLocal(firstDay);
+    this.toDate = formatDateLocal(lastDay);
+  }
+
+  private loadTejasUserData() {
+    const TejasUser = this.auth.getTejasCredentialsFromCookie();
+    if (TejasUser) {
+      this.userId = TejasUser.userId ? TejasUser.userId.toString() : '';
+      this.userName = TejasUser.name || 'Tejas Admin';
+      console.log('Tejas User Loaded:', { userId: this.userId, userName: this.userName });
     } else {
-      console.warn('Shop User not found in cookie');
+      console.warn('Tejas User not found in cookie');
       this.toastr.warning('Please log in again');
-      this.router.navigate(['/shop/login']);
+      this.router.navigate(['/tejas/login']);
     }
   }
 
@@ -160,17 +140,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     this.loader.show();
-
-    const today = new Date();
-    const y = today.getFullYear();
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const d = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${y}-${m}-${d}`;
-
-    this.api.get('ShopEntry/GetAllTypesEntrys', {
+    
+    this.api.get('TejasEntry/GetAllTypesEntrys', { 
       userId: this.userId,
-      fromDate: todayStr,
-      toDate: todayStr
+      fromDate: this.fromDate,
+      toDate: this.toDate
     }).subscribe({
       next: (res: any) => {
         this.entries = Array.isArray(res) ? res : [];
@@ -179,17 +153,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.calculateTotals();
         this.loader.hide();
       },
-      error: (err) => {
-        console.error('Error loading shop entries:', err);
-        this.toastr.error('Failed to load shop entries');
+      error: (err: any) => {
+        console.error('Error loading Tejas entries:', err);
+        this.toastr.error('Failed to load Tejas entries');
         this.loader.hide();
       }
     });
   }
 
   groupEntriesByDate() {
-    const grouped = new Map<string, ShopEntry[]>();
-
+    const grouped = new Map<string, TejasEntry[]>();
+    
     this.filteredEntries.forEach(entry => {
       const dateKey = this.formatDate(entry.date);
       if (!grouped.has(dateKey)) {
@@ -201,7 +175,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.groupedEntries = Array.from(grouped.entries()).map(([date, entries]) => {
       let paidSum = 0;
       let unpaidSum = 0;
-      let profitSum = 0;
       let expenseSum = 0;
       entries.forEach(e => {
         if (e.iS_PAID) {
@@ -209,12 +182,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } else {
           unpaidSum += e.price;
         }
-
-        if (e.entryType === 1) {
-          profitSum += e.price;
-        } else {
-          expenseSum += e.price;
-        }
+        
+        expenseSum += e.price;
       });
       return {
         date,
@@ -222,20 +191,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
         entries,
         totalPaid: paidSum,
         totalUnpaid: unpaidSum,
-        totalProfit: profitSum,
         totalExpense: expenseSum
       };
     });
   }
 
   calculateTotals() {
-    this.netBalance = 0;
     this.totalPaid = 0;
     this.totalPending = 0;
-    this.totalProfit = 0;
     this.totalExpense = 0;
-    this.netTotal = 0;
-
+    
     this.filteredEntries.forEach(entry => {
       if (entry.iS_PAID) {
         this.totalPaid += entry.price;
@@ -243,16 +208,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.totalPending += entry.price;
       }
 
-      if (entry.entryType === 1) {
-        this.totalProfit += entry.price;
-      } else {
-        this.totalExpense += entry.price;
-      }
+      this.totalExpense += entry.price;
     });
-
-    // Net Balance is the sum of Paid amount
-    this.netBalance = this.totalPaid;
-    this.netTotal = this.totalProfit - this.totalExpense;
   }
 
   formatDate(dateString: string): string {
@@ -269,160 +226,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.filteredEntries = [...this.entries];
     } else {
       const query = this.searchQuery.toLowerCase();
-      this.filteredEntries = this.entries.filter(entry =>
-        entry.reason.toLowerCase().includes(query) ||
-        (entry.iS_PAID ? 'paid' : 'pending').includes(query)
-      );
+      this.filteredEntries = this.entries.filter(entry => {
+        const formattedDate = this.formatDate(entry.date).toLowerCase();
+        return entry.reason.toLowerCase().includes(query) ||
+          (entry.iS_PAID ? 'paid' : 'pending').includes(query) ||
+          formattedDate.includes(query);
+      });
     }
     this.groupEntriesByDate();
     this.calculateTotals();
   }
 
-  // ============= ADD MODAL =============
-  openAddModal(type: number = 2) {
-    this.showModal = true;
-    this.resetForm(type);
-    if (type === 1) {
-      this.formData.isPaid = true;
-    }
-  }
-
-  closeModal() {
-    this.showModal = false;
-    this.resetForm();
-  }
-
-  resetForm(type: number = 2) {
-    this.formData = {
-      isPaid: true,
-      reason: '',
-      price: 0,
-      date: new Date().toISOString().split('T')[0],
-      entryType: type
-    };
-    this.selectedFiles = [];
-    this.previewImages = [];
-
-    if (this.isBrowser) {
-      const fileInput = document.querySelector('#fileInput') as HTMLInputElement;
-      if (fileInput) fileInput.value = '';
-    }
-  }
-
-  async onFileSelect(event: any) {
-    const files = Array.from(event.target.files) as File[];
-
-    if (this.selectedFiles.length + files.length > 4) {
-      this.toastr.warning('Maximum 4 images allowed');
-      return;
-    }
-
-    this.toastr.info('Compressing images...', '', { timeOut: 2000 });
-
-    for (const file of files) {
-      if (!file.type.startsWith('image/')) {
-        this.toastr.error(`${file.name} is not an image file`);
-        continue;
-      }
-
-      try {
-        const originalSizeKB = this.imageCompression.getFileSizeKB(file);
-        console.log(`Original size of ${file.name}: ${originalSizeKB.toFixed(2)} KB`);
-
-        // Compress image to 50KB target size
-        const compressedFile = await this.imageCompression.compressImage(file, 50);
-
-        const compressedSizeKB = this.imageCompression.getFileSizeKB(compressedFile);
-        console.log(`Compressed size of ${file.name}: ${compressedSizeKB.toFixed(2)} KB`);
-
-        this.selectedFiles.push(compressedFile);
-
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.previewImages.push(e.target.result);
-        };
-        reader.readAsDataURL(compressedFile);
-
-        this.toastr.success(
-          `${file.name} compressed from ${originalSizeKB.toFixed(1)}KB to ${compressedSizeKB.toFixed(1)}KB`,
-          'Image Compressed',
-          { timeOut: 3000 }
-        );
-
-      } catch (error) {
-        console.error('Compression error:', error);
-        this.toastr.error(`Failed to compress ${file.name}`);
-      }
-    }
-  }
-
-  removeImage(index: number) {
-    this.selectedFiles.splice(index, 1);
-    this.previewImages.splice(index, 1);
-  }
-
-  async saveEntry() {
-    if (!this.formData.reason.trim()) {
-      this.toastr.error('Please enter a description');
-      return;
-    }
-
-    if (this.formData.price <= 0) {
-      this.toastr.error('Please enter a valid price');
-      return;
-    }
-
-    try {
-      this.loader.show();
-
-      let imagePaths = ['', '', '', ''];
-
-      // Upload files
-      for (let i = 0; i < this.selectedFiles.length; i++) {
-        const formData = new FormData();
-        formData.append('file', this.selectedFiles[i]);
-
-        const uploadResult: any = await this.api.upload('ShopFileUpload/Upload', formData).toPromise();
-
-        if (uploadResult && uploadResult.success) {
-          imagePaths[i] = uploadResult.filePath;
-        }
-      }
-
-      // Save entry
-      const payload = {
-        iS_PAID: this.formData.isPaid,
-        reason: this.formData.reason.trim(),
-        price: this.formData.price,
-        useR_ID: Number(this.userId),
-        image1: imagePaths[0],
-        image2: imagePaths[1],
-        image3: imagePaths[2],
-        image4: imagePaths[3],
-        date: this.formData.date,
-        entryType: this.formData.entryType
-      };
-
-      const result: any = await this.api.post('ShopEntry/Insert', payload).toPromise();
-
-      if (result.success) {
-        this.toastr.success('Entry added successfully');
-        this.closeModal();
-        this.loadEntries();
-      } else {
-        this.toastr.error(result.message || 'Failed to add entry');
-        this.loader.hide();
-      }
-
-    } catch (error: any) {
-      console.error('Save error:', error);
-      this.toastr.error(error?.error?.message || error?.message || 'Error saving entry');
-      this.loader.hide();
-    }
-  }
-
   // ============= VIEW MODAL =============
-  viewEntry(entry: ShopEntry) {
+  viewEntry(entry: TejasEntry) {
     this.selectedEntry = entry;
     this.loadViewImages();
     this.showViewModal = true;
@@ -442,18 +258,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private loadViewImages() {
     if (!this.selectedEntry) return;
-
+    
     const img1 = this.selectedEntry.imagE1 || '';
     const img2 = this.selectedEntry.imagE2 || '';
     const img3 = this.selectedEntry.imagE3 || '';
     const img4 = this.selectedEntry.imagE4 || '';
-
+    
     this.viewImages = [img1, img2, img3, img4].filter(img => img && img.trim() !== '');
   }
 
   openEditFromView() {
     if (!this.selectedEntry) return;
-
+    
     this.editFormData = {
       isPaid: this.selectedEntry.iS_PAID,
       reason: this.selectedEntry.reason,
@@ -461,11 +277,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       date: this.selectedEntry.date.split('T')[0],
       entryType: this.selectedEntry.entryType || 2
     };
-
+    
     this.existingImages = [...this.viewImages];
     this.selectedEditFiles = [];
     this.editPreviewImages = [];
-
+    
     this.showViewModal = false;
     this.showEditModal = true;
   }
@@ -481,12 +297,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   confirmDeleteEntry() {
     if (!this.selectedEntry) return;
-
+    
     this.showDeleteEntryConfirm = false;
     this.loader.show();
 
-    this.api.delete('ShopEntry/Delete', {
-      shopEntryId: this.selectedEntry.shoP_ENTRY_ID,
+    this.api.delete('TejasEntry/Delete', {
+      tejasEntryId: this.selectedEntry.tejaS_ENTRY_ID,
       userId: this.selectedEntry.useR_ID
     }).subscribe({
       next: (result: any) => {
@@ -499,7 +315,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.loader.hide();
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Delete error:', err);
         this.toastr.error(err.error?.message || 'Failed to delete entry');
         this.loader.hide();
@@ -517,7 +333,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.selectedEditFiles = [];
     this.editPreviewImages = [];
     this.existingImages = [];
-
+    
     if (this.isBrowser) {
       const fileInput = document.getElementById('editFileInput') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
@@ -526,7 +342,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async onEditFileSelect(event: any) {
     const files = Array.from(event.target.files) as File[];
-
+    
     const totalImages = this.existingImages.length + this.selectedEditFiles.length + files.length;
     if (totalImages > 4) {
       this.toastr.warning('Maximum 4 images allowed in total');
@@ -543,13 +359,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       try {
         const originalSizeKB = this.imageCompression.getFileSizeKB(file);
-
+        
         // Compress image to 50KB target size
         const compressedFile = await this.imageCompression.compressImage(file, 50);
         const compressedSizeKB = this.imageCompression.getFileSizeKB(compressedFile);
 
         this.selectedEditFiles.push(compressedFile);
-
+        
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.editPreviewImages.push(e.target.result);
@@ -561,7 +377,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           'Image Compressed',
           { timeOut: 3000 }
         );
-
+        
       } catch (error) {
         console.error('Compression error:', error);
         this.toastr.error(`Failed to compress ${file.name}`);
@@ -598,39 +414,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     try {
       this.loader.show();
-
+      
       let imagePaths = ['', '', '', ''];
-
+      
       // Preserve existing images relative paths
       for (let i = 0; i < this.existingImages.length; i++) {
         const img = this.existingImages[i];
         if (img) {
-          if (img.includes('/ShopImgs/')) {
-            const parts = img.split('/ShopImgs/');
-            imagePaths[i] = '/ShopImgs/' + parts[parts.length - 1];
+          if (img.includes('/TejasImgs/')) {
+            const parts = img.split('/TejasImgs/');
+            imagePaths[i] = '/TejasImgs/' + parts[parts.length - 1];
           } else {
             imagePaths[i] = img;
           }
         }
       }
-
+      
       // Upload new images starting after existing images
       let currentIndex = this.existingImages.length;
       for (let i = 0; i < this.selectedEditFiles.length && currentIndex < 4; i++) {
         const formData = new FormData();
         formData.append('file', this.selectedEditFiles[i]);
-
-        const uploadResult: any = await this.api.upload('ShopFileUpload/Upload', formData).toPromise();
-
+        
+        const uploadResult: any = await this.api.upload('TejasFileUpload/Upload', formData).toPromise();
+        
         if (uploadResult && uploadResult.success) {
           imagePaths[currentIndex] = uploadResult.filePath;
           currentIndex++;
         }
       }
-
+      
       // Update entry
       const payload = {
-        shoP_ENTRY_ID: this.selectedEntry.shoP_ENTRY_ID,
+        tejaS_ENTRY_ID: this.selectedEntry.tejaS_ENTRY_ID,
         iS_PAID: this.editFormData.isPaid,
         reason: this.editFormData.reason.trim(),
         price: this.editFormData.price,
@@ -642,9 +458,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         date: this.editFormData.date,
         entryType: this.editFormData.entryType
       };
-
-      const result: any = await this.api.put('ShopEntry/Update', payload).toPromise();
-
+      
+      const result: any = await this.api.put('TejasEntry/Update', payload).toPromise();
+      
       if (result.success) {
         this.toastr.success('Entry updated successfully');
         this.closeEditModal();
@@ -654,7 +470,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.toastr.error(result.message || 'Failed to update entry');
         this.loader.hide();
       }
-
+      
     } catch (error: any) {
       console.error('Update error:', error);
       this.toastr.error(error?.error?.message || error?.message || 'Error updating entry');
@@ -696,7 +512,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // ============= NAVIGATION & MENU =============
   logout() {
-    this.auth.shopLogout();
+    this.auth.tejasLogout();
   }
 
   toggleMenu() {
@@ -708,15 +524,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   // ============= FILE INPUT TRIGGERS =============
-  triggerFileInput() {
-    if (this.isBrowser) {
-      const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.click();
-      }
-    }
-  }
-
   triggerEditFileInput() {
     if (this.isBrowser) {
       const fileInput = document.getElementById('editFileInput') as HTMLInputElement;

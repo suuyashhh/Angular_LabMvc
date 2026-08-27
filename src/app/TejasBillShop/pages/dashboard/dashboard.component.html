@@ -11,14 +11,25 @@
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
         </svg>
       </button>
-      <button class="w-12 h-12 rounded-full bg-[#FAD2C2] flex items-center justify-center hover:scale-105 transition-transform" routerLink="/tejas/billing">
-        <span class="text-2xl">☕</span>
+      <div class="w-12 h-12 rounded-full bg-[#F5EDE4] overflow-hidden flex items-center justify-center border-2 border-white shadow-sm ring-2 ring-[#FAD2C2]">
+        <img *ngIf="userImage" [src]="userImage" alt="Profile" class="w-full h-full object-cover">
+        <svg *ngIf="!userImage" viewBox="0 0 24 24" class="w-6 h-6 text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <button class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center hover:scale-105 transition-transform text-red-600 focus:outline-none" (click)="logout()" title="Logout">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
       </button>
     </div>
   </div>
 
   <!-- Today's Sales Card -->
-  <div class="relative overflow-hidden rounded-3xl p-6 text-white mb-4 shadow-md bg-gradient-to-br from-[#C94A20] to-[#D95A30]">
+  <div *ngIf="isAdmin" class="relative overflow-hidden rounded-3xl p-6 text-white mb-4 shadow-md bg-gradient-to-br from-[#C94A20] to-[#D95A30]">
     <div class="relative z-10 flex items-center justify-between">
       <div>
         <p class="text-sm font-medium opacity-90 mb-1">{{ dateRangeText === 'Today' ? 'Today\'s Sales' : 'Sales' }}</p>
@@ -36,7 +47,7 @@
 
   <!-- Stats Grid -->
   <div class="grid grid-cols-2 gap-3 mb-6">
-    <div class="bg-[#F5EDE4] rounded-2xl p-5">
+    <div class="bg-[#F5EDE4] rounded-2xl p-5" [ngClass]="{'col-span-2': !isAdmin}">
       <div class="w-10 h-10 bg-[#FAD2C2] rounded-xl flex items-center justify-center mb-3">
         <svg class="w-5 h-5 stroke-[#C94A20]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -46,15 +57,12 @@
       <p class="text-2xl font-extrabold mb-0.5">{{ todaysBillCount }}</p>
       <p class="text-[13px] font-medium text-[#8B7355]">Total Bills</p>
     </div>
-    <div class="bg-[#F5EDE4] rounded-2xl p-5">
-      <div class="w-10 h-10 bg-[#D4F5E4] rounded-xl flex items-center justify-center mb-3">
-        <svg class="w-5 h-5 stroke-[#22A565]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
-          <polyline points="17,6 23,6 23,12"/>
-        </svg>
+    <div *ngIf="isAdmin" class="bg-[#F5EDE4] rounded-2xl p-5">
+      <div class="w-10 h-10 bg-[#FDE8DD] rounded-xl flex items-center justify-center mb-3">
+        <span class="text-lg">💰</span>
       </div>
-      <p class="text-2xl font-extrabold mb-0.5">₹{{ avgOrderValue | number:'1.0-0':'en-IN' }}</p>
-      <p class="text-[13px] font-medium text-[#8B7355]">Avg Order Value</p>
+      <p class="text-2xl font-extrabold mb-0.5 text-[#C94A20]">₹{{ totalExpenses | number:'1.0-0':'en-IN' }}</p>
+      <p class="text-[13px] font-medium text-[#8B7355]">Total Expenses</p>
     </div>
   </div>
 
@@ -84,45 +92,33 @@
     </div>
   </div>
 
-  <!-- Quick Actions -->
-  <div class="mb-6">
-    <h2 class="text-lg font-bold mb-3.5">Quick Actions</h2>
+  <!-- Expense Management -->
+  <div *ngIf="isAdmin" class="mb-6">
+    <h2 class="text-lg font-bold mb-3.5">Expense Management</h2>
     <div class="grid grid-cols-2 gap-3">
-      <a routerLink="/tejas/billing" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+      <a routerLink="/tejas/expenses" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FAD2C2]">
-          <svg class="w-6 h-6 stroke-[#C94A20]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
+          <span class="text-xl">💰</span>
         </div>
-        <span class="text-sm font-semibold">New Bill</span>
+        <span class="text-sm font-semibold">Expenses</span>
       </a>
-      <a routerLink="/tejas/food-master" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+      <a routerLink="/tejas/history" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FDE8DD]">
-          <svg class="w-6 h-6 stroke-[#C94A20]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
-          </svg>
+          <span class="text-xl">📜</span>
         </div>
-        <span class="text-sm font-semibold">Food Master</span>
+        <span class="text-sm font-semibold">History</span>
       </a>
-      <a routerLink="/tejas/entries" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+      <a routerLink="/tejas/ex-entrytype" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#D4F5E4]">
-          <svg class="w-6 h-6 stroke-[#22A565]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
+          <span class="text-xl">🏷️</span>
         </div>
-        <span class="text-sm font-semibold">Entries</span>
+        <span class="text-sm font-semibold">Expense Types</span>
       </a>
-      <a routerLink="/tejas/printer" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
+      <a routerLink="/tejas/tejas-users" class="bg-[#F5EDE4] rounded-2xl p-5 flex flex-col items-center gap-2.5 hover:-translate-y-0.5 hover:shadow-md transition-all">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#E8E0F5]">
-          <svg class="w-6 h-6 stroke-[#7C5CBF]" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6,9 6,2 18,2 18,9"/>
-            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8"/>
-          </svg>
+          <span class="text-xl">👥</span>
         </div>
-        <span class="text-sm font-semibold">Printer</span>
+        <span class="text-sm font-semibold">Tejas Users</span>
       </a>
     </div>
   </div>

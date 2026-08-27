@@ -6,7 +6,6 @@ import { dairyAuthGuard } from './shared/dairy-auth.guard';
 import { LoginfarmComponent } from './LoginFarm/loginfarm/loginfarm.component';
 import { farmAuthGuard } from './shared/farm-auth.guard';
 import { parkingAuthGuard } from './shared/parking-auth.guard';
-import { shopAuthGuard } from './shared/shop-auth.guard';
 
 export const routes: Routes = [
 
@@ -52,16 +51,6 @@ export const routes: Routes = [
     loadComponent: () => import('./SmartParking/landing/landing.component').then(m => m.SmartParkingLandingComponent),
     loadChildren: () => import('./SmartParking/parking.routes').then(m => m.PARKING_ROUTES)
   },
-  {
-    path: 'shop/login',
-    loadComponent: () => import('./LoginShop/login-shop.component').then(m => m.LoginShopComponent)
-  },
-  {
-    path: 'shop',
-    canActivate: [shopAuthGuard],
-    loadComponent: () => import('./Shop/landing/landing.component').then(m => m.ShopLandingComponent),
-    loadChildren: () => import('./Shop/shop.routes').then(m => m.SHOP_ROUTES)
-  },
    {
     path: 'market',
     loadComponent: () => import('./Market/landing/landing.component').then(m => m.LandingComponent),
@@ -80,7 +69,7 @@ export const routes: Routes = [
     path: 'admin',
     loadChildren: () => import('./Adminstrator/Admin.routes').then(m => m.Admin_ROUTES)
   },
-  {
+   {
     path: 'tejas',
     loadChildren: () => import('./TejasBillShop/tejas.routes').then(m => m.routes)
   }

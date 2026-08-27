@@ -3,14 +3,14 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 
-export const shopAuthGuard: CanActivateFn = () => {
+export const tejasAuthGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.isShopLoggedIn()) {
+  if (auth.isTejasLoggedIn()) {
     return true;
   }
 
-  router.navigate(['/shop/login']);
+  router.navigate(['/tejas/login']);
   return false;
 };

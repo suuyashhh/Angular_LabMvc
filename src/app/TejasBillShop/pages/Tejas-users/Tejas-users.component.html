@@ -1,11 +1,11 @@
-<div class="hotels-container">
+<div class="container-fluid px-3 px-md-4 py-4">
   <!-- Page Header -->
-  <div class="page-header">
+  <div class="page-header d-flex flex-column flex-sm-row gap-3 align-items-start align-items-sm-center">
     <div>
       <span class="page-header-subtitle">MASTER</span>
-      <h1 class="page-header-title">Shop Users</h1>
+      <h1 class="page-header-title">Tejas Users</h1>
     </div>
-    <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center gap-2 shadow-sm">
+    <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center justify-content-center gap-2 shadow-sm w-100 w-sm-auto">
       <i class="bi bi-person-plus"></i>
       <span>Add User</span>
     </button>
@@ -13,7 +13,7 @@
 
   <!-- Search & Filters -->
   <div class="row mb-4">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
       <div class="input-group shadow-sm border-0 rounded-3 overflow-hidden">
         <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
         <input type="text" class="form-control border-0 ps-0 py-2.5" placeholder="Search users by name or contact..." [(ngModel)]="searchQuery" (input)="searchUsers()">
@@ -34,7 +34,10 @@
               <i class="bi bi-person text-secondary"></i>
             </div>
             <div>
-              <h4 class="fw-bold mb-0 text-truncate" style="max-width: 150px;" [title]="user.useR_NAME">{{ user.useR_NAME }}</h4>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <h4 class="fw-bold mb-0 text-truncate" style="max-width: 120px;" [title]="user.useR_NAME">{{ user.useR_NAME }}</h4>
+                <span class="badge" [ngClass]="user.role?.toLowerCase() === 'admin' ? 'bg-success' : 'bg-secondary'">{{ (user.role || 'employee') | titlecase }}</span>
+              </div>
               <span class="text-muted small">ID: {{ user.useR_ID }}</span>
             </div>
           </div>
@@ -58,7 +61,7 @@
     <!-- Empty State -->
     <div class="col-12 text-center py-5 text-muted" *ngIf="filteredUsers.length === 0">
       <i class="bi bi-people fs-1 d-block mb-2 text-light"></i>
-      No shop users found. Add a user to get started.
+      No Tejas users found. Add a user to get started.
     </div>
   </div>
 
@@ -121,6 +124,19 @@
             #contactModel="ngModel"
             [class.is-invalid]="contactModel.touched && contactModel.invalid">
           <div class="invalid-feedback">Contact number is required.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="role" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Role *</label>
+          <select 
+            id="role" 
+            name="role" 
+            class="form-select" 
+            [(ngModel)]="formData.role" 
+            required>
+            <option value="employee">Employee</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         <div class="mb-3">

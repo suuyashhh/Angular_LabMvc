@@ -132,7 +132,7 @@ export class AuthService {
     }
     if (typeof document !== 'undefined') {
       document.cookie = 'authToken=; path=/; max-age=0';
-      document.cookie = 'shopCredentials=; path=/; max-age=0';
+      document.cookie = 'TejasCredentials=; path=/; max-age=0';
     }
     this.router.navigate(['/lab']);
   }
@@ -337,26 +337,26 @@ clearFarmUserDetailsCookie(): void {
 }
 
 
-// ===== Tejas SWEETS Shop Auth Methods =====
+// ===== Tejas SWEETS Tejas Auth Methods =====
 
-  private readonly shopSessionExpiredMessage = 'the user loged in other device';
+  private readonly TejasSessionExpiredMessage = 'the user loged in other device';
 
-  isShopLoggedIn(): boolean {
+  isTejasLoggedIn(): boolean {
     if (!isPlatformBrowser(this.platformId)) return false;
-    const shopUser = localStorage.getItem('shop_user');
-    return !!shopUser;
+    const TejasUser = localStorage.getItem('Tejas_user');
+    return !!TejasUser;
   }
 
-  getShopToken(): string | null {
+  getTejasToken(): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;
     try {
-      return localStorage.getItem('shop_token');
+      return localStorage.getItem('Tejas_token');
     } catch {
       return null;
     }
   }
 
-  setShopCredentialsCookie(value: any, days: number = 30): void {
+  setTejasCredentialsCookie(value: any, days: number = 30): void {
     try {
       // Exclude user_img from the cookie to keep it under the 4KB browser limit
       const { user_img, ...cookieValue } = value;
@@ -364,25 +364,25 @@ clearFarmUserDetailsCookie(): void {
       const encoded = encodeURIComponent(json);
       const expires = new Date();
       expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-      document.cookie = `shopCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+      document.cookie = `TejasCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
     } catch (e) {
-      console.error('Failed to set shop credentials', e);
+      console.error('Failed to set Tejas credentials', e);
     }
   }
 
-  getShopCredentialsFromCookie(): any | null {
+  getTejasCredentialsFromCookie(): any | null {
     try {
       const cookies = document.cookie ? document.cookie.split('; ') : [];
       for (const cookie of cookies) {
         const [name, value] = cookie.split('=');
-        if (name === 'shopCredentials' && value) {
+        if (name === 'TejasCredentials' && value) {
           const decoded = decodeURIComponent(value);
           const userObj = JSON.parse(decoded);
 
           // Restore user_img from localStorage if available in browser
           if (isPlatformBrowser(this.platformId)) {
             try {
-              const localUserStr = localStorage.getItem('shop_user');
+              const localUserStr = localStorage.getItem('Tejas_user');
               if (localUserStr) {
                 const localUser = JSON.parse(localUserStr);
                 if (localUser && localUser.user_img) {
@@ -397,40 +397,40 @@ clearFarmUserDetailsCookie(): void {
         }
       }
     } catch (e) {
-      console.error('Failed to read shop credentials', e);
+      console.error('Failed to read Tejas credentials', e);
     }
     return null;
   }
 
-  private shopConflictSubject = new BehaviorSubject<boolean>(false);
-  public shopConflict$ = this.shopConflictSubject.asObservable();
+  private TejasConflictSubject = new BehaviorSubject<boolean>(false);
+  public TejasConflict$ = this.TejasConflictSubject.asObservable();
 
-  clearShopConflictFlag(): void {
-    this.shopConflictSubject.next(false);
+  clearTejasConflictFlag(): void {
+    this.TejasConflictSubject.next(false);
   }
 
-  validateShopSession(showExpiredToast: boolean = false) {
+  validateTejasSession(showExpiredToast: boolean = false) {
     return of(null);
   }
 
-  handleShopSessionExpired(message: string = this.shopSessionExpiredMessage, showToast: boolean = true): void {
-    console.log('handleShopSessionExpired called with message:', message);
-    this.shopConflictSubject.next(true);
-    this.clearShopSession(showToast, false, message, 'Session Expired');
+  handleTejasSessionExpired(message: string = this.TejasSessionExpiredMessage, showToast: boolean = true): void {
+    console.log('handleTejasSessionExpired called with message:', message);
+    this.TejasConflictSubject.next(true);
+    this.clearTejasSession(showToast, false, message, 'Session Expired');
   }
 
-  private clearShopSession(
+  private clearTejasSession(
     showToast: boolean,
     navigateToLogin: boolean,
     message: string = 'Logged out from Tejas SWEETS',
     title: string = 'Logout'
   ): void {
-    document.cookie = 'shopCredentials=; path=/; max-age=0';
+    document.cookie = 'TejasCredentials=; path=/; max-age=0';
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('shop_user');
-      localStorage.removeItem('shop_token');
+      localStorage.removeItem('Tejas_user');
+      localStorage.removeItem('Tejas_token');
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('shopCredentials');
+        sessionStorage.removeItem('TejasCredentials');
       }
     }
 
@@ -447,12 +447,12 @@ clearFarmUserDetailsCookie(): void {
     }
 
     if (navigateToLogin) {
-      this.router.navigate(['/shop/login']);
+      this.router.navigate(['/tejas/login']);
     }
   }
 
-  shopLogout(): void {
-    this.clearShopSession(true, true);
+  tejasLogout(): void {
+    this.clearTejasSession(true, true);
   }
 
 

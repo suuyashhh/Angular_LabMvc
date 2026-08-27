@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (isSmartParkingProtectedRequest) {
     requestToken = localStorage.getItem('parking_token');
   } else if (isShopRequest && !isShopLoginRequest) {
-    requestToken = authService.getShopToken();
+    requestToken = authService.getTejasToken();
   }
 
   const clonedRequest = req.headers.has('Authorization')
@@ -56,8 +56,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (isShopRequest && !isShopLoginRequest) {
         if (err.status === 401 || err.status === 403 || err.status === 0) {
-          console.log('Detected 401/403/0 shop session expiration. Calling handleShopSessionExpired.');
-          authService.handleShopSessionExpired(
+          console.log('Detected 401/403/0 shop session expiration. Calling handleTejasSessionExpired.');
+          authService.handleTejasSessionExpired(
             'the user loged in other device',
             true
           );

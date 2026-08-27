@@ -1,92 +1,19 @@
 <div class="min-h-screen bg-white">
 
   <!-- MAIN CONTENT -->
- <main class="pt-6 md:pt-8 pb-20 px-4 md:px-6">
+  <main class="pt-6 md:pt-8 pb-20 px-4 md:px-6">
     <div class="max-w-4xl mx-auto">
-
-      <!-- FINANCIAL SUMMARY WIDGETS -->
-      <div class="bg-white rounded-xl md:rounded-2xl border border-gray-200 shadow-sm p-6 mb-6 max-w-md mx-auto">
-        <div class="space-y-4">
-          <!-- Profit Row -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-                <i class="ri-add-line text-lg font-bold"></i>
-              </div>
-              <span class="text-sm font-semibold text-gray-600">Profit</span>
-            </div>
-            <span class="text-base md:text-lg font-bold text-emerald-600">₹{{ totalProfit | number:'1.0-0' }}</span>
-          </div>
-
-          <!-- Expense Row -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-600">
-                <i class="ri-subtract-line text-lg font-bold"></i>
-              </div>
-              <span class="text-sm font-semibold text-gray-600">Expense</span>
-            </div>
-            <span class="text-base md:text-lg font-bold text-rose-600">₹{{ totalExpense | number:'1.0-0' }}</span>
-          </div>
-
-          <!-- Divider -->
-          <div class="border-t border-dashed border-gray-200 my-2"></div>
-
-          <!-- Net Total Row -->
-          <div class="flex items-center justify-between pt-1">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center"
-                   [ngClass]="netTotal >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
-                <i class="ri-wallet-3-line text-lg"></i>
-              </div>
-              <span class="text-sm font-bold text-gray-800">Net Total</span>
-            </div>
-            <span class="text-lg md:text-xl font-extrabold"
-                  [ngClass]="netTotal >= 0 ? 'text-emerald-600' : 'text-rose-600'">
-              ₹{{ netTotal | number:'1.0-0' }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ACTION BAR with Date Filters -->
+      <!-- ACTION BAR -->
       <div class="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 mb-6 border border-gray-200">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          
-          <!-- From Date -->
-          <div class="w-full">
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">From Date</label>
-            <div class="relative">
-              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-[#2b5c2e] text-sm"></i>
-              <input type="date" [(ngModel)]="fromDate" (change)="loadEntries()"
-                class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50/50 text-gray-700 text-xs md:text-sm
-                       focus:ring-2 focus:ring-[#2b5c2e] focus:border-[#2b5c2e] focus:bg-white outline-none transition duration-150" />
-            </div>
-          </div>
-          
-          <!-- To Date -->
-          <div class="w-full">
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">To Date</label>
-            <div class="relative">
-              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-[#2b5c2e] text-sm"></i>
-              <input type="date" [(ngModel)]="toDate" (change)="loadEntries()"
-                class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50/50 text-gray-700 text-xs md:text-sm
-                       focus:ring-2 focus:ring-[#2b5c2e] focus:border-[#2b5c2e] focus:bg-white outline-none transition duration-150" />
-            </div>
-          </div>
-
-          <!-- Search Bar -->
-          <div class="w-full sm:col-span-2 md:col-span-1">
-            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Search</label>
-            <div class="relative">
-              <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-              <input type="text" [(ngModel)]="searchQuery" (input)="searchEntries()"
-                placeholder="Search by description or status..." 
-                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-800 placeholder-gray-400 text-xs md:text-sm
-                       focus:ring-2 focus:ring-[#2b5c2e] focus:border-[#2b5c2e] outline-none transition duration-200" />
-            </div>
-          </div>
-          
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button (click)="openAddModal(2)" class="w-full sm:w-auto bg-[#2b5c2e] 
+                       text-white px-5 py-2.5 rounded-lg md:rounded-xl 
+                       hover:bg-[#1e4220] transition-all duration-200
+                       flex items-center justify-center gap-2 font-semibold text-sm md:text-base
+                       shadow-sm hover:shadow-md">
+            <i class="ri-subtract-line text-lg md:text-xl"></i>
+            <span>Add Expense</span>
+          </button>
         </div>
       </div>
 
@@ -95,7 +22,7 @@
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-base md:text-lg font-semibold text-gray-800 flex items-center gap-2">
             <i class="ri-history-line text-[#2b5c2e]"></i>
-            <span>Shop History</span>
+            <span>Today's Tejas Logs</span>
           </h3>
           <span class="text-xs bg-[#e8f5e9] text-[#2b5c2e] px-2 py-1 rounded-full font-medium">
             Showing {{ filteredEntries.length }} entries
@@ -106,7 +33,12 @@
         <div *ngIf="groupedEntries.length === 0" class="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
           <div class="text-6xl mb-4">🏪</div>
           <h4 class="text-lg md:text-xl font-bold text-gray-700 mb-2">No Records Found</h4>
-          <p class="text-sm text-gray-500">No shop entries found in the selected date range</p>
+          <p class="text-sm text-gray-500 mb-6">Create your first entry for today</p>
+          <button (click)="openAddModal()" class="bg-[#2b5c2e] 
+                       text-white px-6 py-3 rounded-xl hover:bg-[#1e4220] 
+                       transition font-semibold shadow">
+            Add First Entry
+          </button>
         </div>
 
         <!-- Entries List -->
@@ -118,11 +50,7 @@
               <div class="w-2.5 h-2.5 rounded-full bg-[#f6f7f3]0"></div>
               <h4 class="font-bold text-gray-800 text-sm md:text-base">{{ group.date }}</h4>
               <span class="text-xs text-gray-400">({{ group.count }})</span>
-            </div>
-            <div class="flex items-center gap-3 text-xs md:text-sm font-bold">
-              <span class="text-emerald-600">Profit: ₹{{ group.totalProfit | number:'1.0-0' }}</span>
-              <span class="text-red-600">Expense: ₹{{ group.totalExpense | number:'1.0-0' }}</span>
-            </div>
+            </div>          
           </div>
 
           <!-- Cards list -->
@@ -136,18 +64,14 @@
                 <div class="flex items-start gap-3 flex-1 min-w-0">
                   <!-- Payment Status Icon -->
                   <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border"
-                       [ngClass]="entry.entryType === 1 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : (entry.iS_PAID ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600')">
-                    <i [class]="entry.entryType === 1 ? 'ri-arrow-up-circle-line text-xl' : (entry.iS_PAID ? 'ri-checkbox-circle-line text-xl' : 'ri-time-line text-xl')"></i>
+                       [ngClass]="entry.iS_PAID ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'">
+                    <i [class]="entry.iS_PAID ? 'ri-checkbox-circle-line text-xl' : 'ri-time-line text-xl'"></i>
                   </div>
 
                   <!-- Text Details -->
                   <div class="flex-1 min-w-0 pt-0.5">
-                     <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-2 flex-wrap">
                       <span class="text-xs font-bold px-2 py-0.5 rounded-full"
-                            [ngClass]="entry.entryType === 1 ? 'bg-emerald-100 text-emerald-800' : 'bg-[#e8f5e9] text-[#2b5c2e]'">
-                        {{ entry.entryType === 1 ? 'Profit' : 'Expense' }}
-                      </span>
-                      <span *ngIf="entry.entryType !== 1" class="text-xs font-bold px-2 py-0.5 rounded-full"
                             [ngClass]="entry.iS_PAID ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'">
                         {{ entry.iS_PAID ? 'Paid' : 'Pending' }}
                       </span>
@@ -163,8 +87,7 @@
 
                 <!-- Right Price -->
                 <div class="flex-shrink-0 text-right">
-                  <span class="text-base md:text-lg font-bold" 
-                        [ngClass]="entry.entryType === 1 ? 'text-emerald-600' : 'text-red-600'">
+                  <span class="text-base md:text-lg font-bold text-red-600">
                     ₹{{ entry.price | number:'1.0-0' }}
                   </span>
                   <p class="text-[10px] text-gray-400 mt-1">Click to view</p>
@@ -176,6 +99,156 @@
       </div>
     </div>
   </main>
+
+  <!-- ADD ENTRY MODAL -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 
+                relative border border-[#e5e8e1] max-h-[90vh] overflow-y-auto">
+
+      <!-- Close Button -->
+      <button (click)="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 
+                     p-1.5 rounded-full hover:bg-gray-100 transition">
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#2b5c2e]">
+          <i class="ri-subtract-line text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+            Add New Expense
+          </h2>
+          <p class="text-xs md:text-sm text-gray-500">
+            Record a new transaction for Tejas SWEETS
+          </p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <!-- Date -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Date <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <i class="ri-calendar-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <input type="date" [(ngModel)]="formData.date" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm md:text-base
+                            focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent 
+                            outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Payment Status Checkbox -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Payment Status
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer p-2.5 bg-gray-50 border border-gray-200 rounded-xl select-none hover:bg-gray-100/50 transition">
+              <input type="checkbox" [(ngModel)]="formData.isPaid" class="w-5 h-5 accent-[#2b5c2e] rounded cursor-pointer" />
+              <div>
+                <span class="text-sm font-bold" [ngClass]="formData.isPaid ? 'text-emerald-600' : 'text-rose-600'">
+                  {{ formData.isPaid ? 'Paid' : 'Pending' }}
+                </span>
+                <p class="text-[10px] text-gray-400">
+                  {{ formData.isPaid ? 'Fully settled' : 'Outstanding credit' }}
+                </p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <!-- Expense Type helper dropdown -->
+          <div class="mb-3">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Quick-Select Expense Type (Optional helper)
+            </label>
+            <div class="relative">
+              <i class="ri-price-tag-3-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <select (change)="onExpenseTypeSelect($event, false)" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent outline-none transition">
+                <option value="">--Choose for fill description--</option>
+                <option *ngFor="let t of expenseTypes" [value]="t.name">{{ t.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Description / Reason <span class="text-red-500">*</span>
+          </label>
+          <textarea [(ngModel)]="formData.reason" placeholder="Description" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                           bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                           focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent 
+                           outline-none resize-none transition"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Amount (₹) <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="ri-money-rupee-circle-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            <input type="number" [(ngModel)]="formData.price" placeholder="0.00" min="0.01" step="0.01" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                          rounded-xl bg-white text-gray-800 placeholder-gray-400 text-sm md:text-base
+                          focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent 
+                          outline-none transition" />
+          </div>
+        </div>
+
+        <!-- Images Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Upload Images <span class="text-gray-400 text-xs font-normal">(Maximum 4)</span>
+          </label>
+
+          <div class="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center 
+                      hover:border-[#2b5c2e] hover:bg-[#f6f7f3]/50 transition cursor-pointer"
+            (click)="triggerFileInput()">
+            <i class="ri-upload-cloud-2-line text-4xl text-gray-400 mb-2"></i>
+            <p class="text-sm text-gray-600 mb-1 font-semibold">Click to upload receipts/photos</p>
+            <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP (Images will be auto-compressed)</p>
+          </div>
+
+          <input id="fileInput" type="file" (change)="onFileSelect($event)" accept="image/*" multiple class="hidden" />
+
+          <!-- Image Previews -->
+          <div *ngIf="previewImages.length > 0" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+            <div *ngFor="let img of previewImages; let i = index" class="relative group rounded-xl overflow-hidden shadow-sm border border-[#e5e8e1]">
+              <img [src]="img" class="w-full h-24 object-cover" />
+              <button (click)="removeImage(i)" class="absolute top-1.5 right-1.5 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full 
+                             transition shadow flex items-center justify-center">
+                <i class="ri-close-line text-sm"></i>
+              </button>
+              <div class="absolute bottom-1 left-1.5 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                Image {{ i + 1 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+        <button (click)="closeModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+                       hover:bg-gray-50 font-semibold transition text-sm md:text-base">
+          Cancel
+        </button>
+        <button (click)="saveEntry()" [disabled]="!formData.reason.trim() || formData.price <= 0" class="w-full sm:w-auto bg-[#2b5c2e] 
+                       text-white px-6 py-2.5 rounded-xl shadow-lg hover:bg-[#1e4220] transition
+                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex justify-center items-center text-sm md:text-base">
+          <i class="ri-save-line mr-1.5"></i><span>Save Record</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- VIEW ENTRY MODAL -->
   <div *ngIf="showViewModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
@@ -210,22 +283,15 @@
             </p>
           </div>
           <div>
-            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Type</p>
-            <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.entryType === 1 ? 'text-emerald-700' : 'text-[#2b5c2e]'">
-              <i [class]="selectedEntry?.entryType === 1 ? 'ri-arrow-up-circle-line text-base' : 'ri-arrow-down-circle-line text-base'"></i>
-              <span>{{ selectedEntry?.entryType === 1 ? 'Profit' : 'Expense' }}</span>
-            </p>
-          </div>
-          <div *ngIf="selectedEntry?.entryType !== 1">
             <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Payment Status</p>
             <p class="font-bold mt-1 text-sm flex items-center gap-1.5" [ngClass]="selectedEntry?.iS_PAID ? 'text-emerald-700' : 'text-rose-700'">
               <i [class]="selectedEntry?.iS_PAID ? 'ri-checkbox-circle-line text-base' : 'ri-time-line text-base'"></i>
               <span>{{ selectedEntry?.iS_PAID ? 'Paid' : 'Pending' }}</span>
             </p>
           </div>
-          <div [ngClass]="selectedEntry?.entryType === 1 ? 'sm:col-span-1' : 'sm:col-span-2'">
+          <div class="sm:col-span-2">
             <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Amount</p>
-            <p class="font-extrabold mt-1 text-base md:text-lg" [ngClass]="selectedEntry?.entryType === 1 ? 'text-emerald-600' : 'text-red-600'">
+            <p class="font-extrabold mt-1 text-base md:text-lg text-red-600">
               ₹{{ selectedEntry?.price | number:'1.0-0' }}
             </p>
           </div>
@@ -269,19 +335,19 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
-        <button (click)="closeViewModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+      <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+        <button (click)="closeViewModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
                        hover:bg-gray-50 font-semibold transition text-sm md:text-base">
           Close
         </button>
-        <button (click)="openEditFromView()" class="bg-[#2b5c2e] 
+        <button (click)="openEditFromView()" class="w-full sm:w-auto bg-[#2b5c2e] 
                        text-white px-5 py-2.5 rounded-xl shadow-lg hover:bg-[#1e4220] transition font-semibold
-                       flex items-center gap-1.5 text-sm md:text-base">
+                       flex justify-center items-center gap-1.5 text-sm md:text-base">
           <i class="ri-edit-line"></i>
           <span>Edit</span>
         </button>
-        <button (click)="deleteEntryFromView()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl shadow-lg
-                       transition font-semibold flex items-center gap-1.5 text-sm md:text-base">
+        <button (click)="deleteEntryFromView()" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl shadow-lg
+                       transition font-semibold flex justify-center items-center gap-1.5 text-sm md:text-base">
           <i class="ri-delete-bin-line"></i>
           <span>Delete</span>
         </button>
@@ -301,13 +367,12 @@
       </button>
 
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 rounded-full flex items-center justify-center"
-             [ngClass]="editFormData.entryType === 1 ? 'bg-emerald-100 text-emerald-600' : 'bg-[#e8f5e9] text-[#2b5c2e]'">
-          <i [class]="editFormData.entryType === 1 ? 'ri-coins-line text-2xl' : 'ri-edit-line text-2xl'"></i>
+        <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#2b5c2e]">
+          <i class="ri-edit-line text-2xl"></i>
         </div>
         <div>
           <h2 class="text-xl md:text-2xl font-bold text-gray-800">
-            {{ editFormData.entryType === 1 ? 'Edit Profit Log' : 'Edit Expense Log' }}
+            Edit Expense Log
           </h2>
           <p class="text-xs md:text-sm text-gray-500">Update transaction details and photos</p>
         </div>
@@ -316,7 +381,7 @@
       <!-- Form -->
       <div class="space-y-4">
         
-        <div class="grid grid-cols-1 gap-4" [ngClass]="editFormData.entryType === 1 ? 'sm:grid-cols-1' : 'sm:grid-cols-2'">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- Date -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -332,7 +397,7 @@
           </div>
 
           <!-- Payment Status Checkbox -->
-          <div *ngIf="editFormData.entryType !== 1">
+          <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
               Payment Status
             </label>
@@ -352,6 +417,21 @@
 
         <!-- Description -->
         <div>
+          <!-- Expense Type helper dropdown -->
+          <div class="mb-3">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+              Quick-Select Expense Type (Optional helper)
+            </label>
+            <div class="relative">
+              <i class="ri-price-tag-3-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+              <select (change)="onExpenseTypeSelect($event, true)" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 
+                            rounded-xl bg-white text-gray-800 text-sm focus:ring-2 focus:ring-[#2b5c2e] focus:border-transparent outline-none transition">
+                <option value="">-- Choose an expense type to fill description --</option>
+                <option *ngFor="let t of expenseTypes" [value]="t.name">{{ t.name }}</option>
+              </select>
+            </div>
+          </div>
+
           <label class="block text-sm font-semibold text-gray-700 mb-1.5">
             Description / Reason <span class="text-red-500">*</span>
           </label>
@@ -446,14 +526,14 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
-        <button (click)="closeEditModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+      <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+        <button (click)="closeEditModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 
                        hover:bg-gray-50 font-semibold transition text-sm md:text-base">
           Cancel
         </button>
-        <button (click)="updateEntry()" [disabled]="!editFormData.reason.trim() || editFormData.price <= 0" class="bg-[#2b5c2e] 
+        <button (click)="updateEntry()" [disabled]="!editFormData.reason.trim() || editFormData.price <= 0" class="w-full sm:w-auto bg-[#2b5c2e] 
                        text-white px-6 py-2.5 rounded-xl shadow-lg hover:bg-[#1e4220] transition
-                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center gap-1.5 text-sm md:text-base">
+                       disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex justify-center items-center gap-1.5 text-sm md:text-base">
           <i class="ri-save-line"></i>
           <span>Update Record</span>
         </button>
@@ -524,13 +604,13 @@
       This operation cannot be undone.
     </p>
 
-    <div class="flex gap-3">
-      <button (click)="cancelDeleteEntry()" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 
+    <div class="flex flex-col-reverse sm:flex-row gap-3">
+      <button (click)="cancelDeleteEntry()" class="w-full sm:flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 
                      hover:bg-gray-50 font-semibold transition text-sm">
         Cancel
       </button>
 
-      <button (click)="confirmDeleteEntry()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white 
+      <button (click)="confirmDeleteEntry()" class="w-full sm:flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white 
                      hover:bg-red-700 font-semibold transition text-sm flex items-center justify-center gap-1.5">
         <i class="ri-delete-bin-line"></i>
         Delete
