@@ -1,0 +1,10 @@
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.text-shadow {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}

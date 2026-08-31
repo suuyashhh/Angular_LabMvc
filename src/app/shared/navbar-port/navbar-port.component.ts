@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-navbar-port',
@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./navbar-port.component.css']
 })
 export class NavbarPortComponent implements OnInit {
+  private platformId = inject(PLATFORM_ID);
   mobileMenuOpen = false;
   isDarkMode = false;
 
@@ -22,8 +23,10 @@ export class NavbarPortComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.isDarkMode = false;
-    this.applyTheme();
+    if (isPlatformBrowser(this.platformId)) {
+      this.isDarkMode = false;
+      this.applyTheme();
+    }
   }
 
   toggleMobileMenu(): void {

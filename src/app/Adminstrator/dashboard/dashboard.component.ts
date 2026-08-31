@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit {
   projects = [
     { name: 'Dairy Farm', key: 'DairyFarm', route: '/dairyfarm' },
     { name: 'Farm', key: 'Farm', route: '/farm' },
-    { name: 'Shop', key: 'Shop', route: '/shop/login' },
+    { name: 'Shop', key: 'Shop', route: '/tejas/login' },
     { name: 'Lab Management', key: 'Lab', route: '/lab' },
     { name: 'Smart Parking', key: 'Parking', route: '/parking/provider-login' },
     { name: 'Market', key: 'Market', route: '/market/login' },

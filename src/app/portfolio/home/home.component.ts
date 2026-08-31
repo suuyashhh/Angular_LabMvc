@@ -1,6 +1,7 @@
-import { Component, OnInit, AfterViewChecked, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, AfterViewInit, inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { SeoService } from '../../shared/seo.service';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
+  private seoService = inject(SeoService);
+  private platformId = inject(PLATFORM_ID);
   weeks: any[][] = [];
   totalContributions = 0;
   isLoading = true;
@@ -71,14 +74,36 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   }
 
   ngOnInit() {
+    this.seoService.setSeoData({
+      title: "Suyash Patil | Full Stack Developer & Software Engineer",
+      description: "Suyash Patil is a Full Stack Developer specializing in Angular, .NET Core, SQL, and mobile app development. Explore his portfolio and projects.",
+      url: "https://suyashpatil.in/portfolio/home",
+      image: "https://suyashpatil.in/assets/images/suyashpatil.png",
+      type: "profile",
+      schema: {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Suyash Patil",
+        "jobTitle": "Full Stack Developer",
+        "url": "https://suyashpatil.in",
+        "image": "https://suyashpatil.in/assets/images/suyashpatil.png",
+        "sameAs": [
+          "https://github.com/suuyashhh",
+          "https://www.linkedin.com/in/suyash-patil-877398282/",
+          "https://www.instagram.com/suyashpatil_.03"
+        ]
+      }
+    });
     this.fetchContributions();
 
     // Keyboard navigation for image preview
-    document.addEventListener('keydown', (e) => {
-      if (this.showImagePreview && e.key === 'Escape') {
-        this.closeImagePreview();
-      }
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      document.addEventListener('keydown', (e) => {
+        if (this.showImagePreview && e.key === 'Escape') {
+          this.closeImagePreview();
+        }
+      });
+    }
   }
   showTooltip(day: any, event: MouseEvent) {
     this.hoveredDay = day;
@@ -97,32 +122,36 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
   }
 
   ngAfterViewChecked() {
-    // Auto-scroll contribution grid to the right (most recent contributions)
-    if (!this.isLoading && !this.hasError && !this.hasScrolledToEnd) {
-      const container = document.getElementById('contrib-grid-viewport');
-      if (container) {
-        container.scrollLeft = container.scrollWidth;
-        this.hasScrolledToEnd = true;
+    if (isPlatformBrowser(this.platformId)) {
+      // Auto-scroll contribution grid to the right (most recent contributions)
+      if (!this.isLoading && !this.hasError && !this.hasScrolledToEnd) {
+        const container = document.getElementById('contrib-grid-viewport');
+        if (container) {
+          container.scrollLeft = container.scrollWidth;
+          this.hasScrolledToEnd = true;
+        }
       }
     }
   }
 
   ngAfterViewInit() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-visible');
-        } else {
-          entry.target.classList.remove('reveal-visible');
-        }
+    if (isPlatformBrowser(this.platformId)) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-visible');
+          } else {
+            entry.target.classList.remove('reveal-visible');
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -60px 0px'
       });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px'
-    });
 
-    const targets = document.querySelectorAll('.scroll-reveal');
-    targets.forEach(target => observer.observe(target));
+      const targets = document.querySelectorAll('.scroll-reveal');
+      targets.forEach(target => observer.observe(target));
+    }
   }
   fetchContributions() {
     fetch('https://github-contributions-api.jogruber.de/v4/suuyashhh')
@@ -311,4 +340,4 @@ export class HomeComponent implements OnInit, AfterViewChecked, AfterViewInit {
       default: return 'th';
     }
   }
-}
+}

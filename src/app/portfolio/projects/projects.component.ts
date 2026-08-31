@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { PortfolioProjectService } from '../../Adminstrator/services/portfolio-project.service';
 import { PortfolioProject } from '../../Adminstrator/models/portfolio-project';
 import { LoaderService } from '../../services/loader.service';
+import { SeoService } from '../../shared/seo.service';
 
 @Component({
   selector: 'app-projects',
@@ -13,6 +14,8 @@ import { LoaderService } from '../../services/loader.service';
   styleUrls: ['./projects.component.css']
 })
 export class ProjectsComponent implements OnInit {
+  private seoService = inject(SeoService);
+  private platformId = inject(PLATFORM_ID);
   activeTab: 'webApp' | 'website' = 'webApp'; // Note: category is saved as 'webApp' or 'website'
   currentImageIndex: { [key: number]: number } = {};
 
@@ -33,20 +36,29 @@ export class ProjectsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.seoService.setSeoData({
+      title: "Suyash Patil | Projects & Portfolio",
+      description: "Explore the projects built by Suyash Patil, ranging from laboratory management systems to dairy farm apps, using Angular, .NET Core, and SQL.",
+      url: "https://suyashpatil.in/portfolio/projects",
+      image: "https://suyashpatil.in/assets/images/suyashpatil.png",
+      type: "website"
+    });
     this.loadProjects();
 
     // Keyboard navigation for image preview
-    document.addEventListener('keydown', (e) => {
-      if (this.showImagePreview) {
-        if (e.key === 'ArrowRight') {
-          this.nextImageInPreview();
-        } else if (e.key === 'ArrowLeft') {
-          this.prevImageInPreview();
-        } else if (e.key === 'Escape') {
-          this.closeImagePreview();
+    if (isPlatformBrowser(this.platformId)) {
+      document.addEventListener('keydown', (e) => {
+        if (this.showImagePreview) {
+          if (e.key === 'ArrowRight') {
+            this.nextImageInPreview();
+          } else if (e.key === 'ArrowLeft') {
+            this.prevImageInPreview();
+          } else if (e.key === 'Escape') {
+            this.closeImagePreview();
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   loadProjects(): void {

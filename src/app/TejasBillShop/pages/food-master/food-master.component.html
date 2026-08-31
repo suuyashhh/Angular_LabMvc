@@ -1,0 +1,119 @@
+<div class="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pb-24 text-[#2C1810] font-sans">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight">Food Master</h1>
+      <p class="text-[14px] font-medium text-[#8B7355] mt-0.5">{{ foods.length }} items</p>
+    </div>
+    <button class="bg-[#C94A20] text-white px-4 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-[#A83A18] transition-colors focus:outline-none" (click)="openAddSheet()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Item
+    </button>
+  </div>
+
+  <!-- Food List -->
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between p-3.5 bg-[#F5EDE4] rounded-2xl cursor-pointer hover:bg-[#EFE5DA] transition-colors" *ngFor="let food of foods" (click)="openEditSheet(food)">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <div class="w-12 h-12 bg-[#FDE8DD] rounded-[14px] flex items-center justify-center overflow-hidden shrink-0">
+          <span *ngIf="!food.image" class="text-2xl">{{ getEmoji(food.name) }}</span>
+          <img *ngIf="food.image" [src]="food.image" [alt]="food.name" class="w-full h-full object-cover">
+        </div>
+        <div class="min-w-0">
+          <p class="text-[15px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{ food.name }}</p>
+          <p class="text-[13px] text-[#8B7355]">{{ food.category }} · ₹{{ food.price | number:'1.0-0':'en-IN' }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <label class="relative inline-flex items-center cursor-pointer" (click)="$event.stopPropagation()">
+          <input type="checkbox" class="sr-only peer" [checked]="food.active" (change)="toggleActive(food)">
+          <div class="w-11 h-6 bg-[#E8DDD0] rounded-full peer peer-checked:bg-[#22A565] peer-focus:outline-none transition-colors duration-300">
+            <div class="absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transition-transform duration-300 peer-checked:translate-x-5 shadow-sm"></div>
+          </div>
+        </label>
+        <button class="w-9 h-9 rounded-[10px] bg-[#FAD2C2] text-[#C94A20] flex items-center justify-center border-none hover:bg-[#FDE8DD] focus:outline-none" (click)="$event.stopPropagation(); deleteFood(food)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3,6 5,6 21,6"/>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Bottom Sheet -->
+  <div class="fixed inset-0 bg-[#1E0F08]/55 z-[100] flex items-end justify-center animate-in fade-in" *ngIf="showSheet" (click)="closeSheet()">
+    <div class="bg-[#FDF6F0] rounded-t-[24px] w-full max-w-lg max-h-[90vh] overflow-y-auto px-5 pb-7 pt-3 animate-in slide-in-from-bottom" (click)="$event.stopPropagation()">
+      <div class="w-10 h-1 bg-[#E8DDD0] rounded-full mx-auto mb-4"></div>
+      <h2 class="text-xl font-bold mb-5 text-center">{{ editingFood ? 'Edit Food' : 'Add Food' }}</h2>
+
+      <!-- Image Section -->
+      <div class="mb-5 text-center">
+        <div class="w-[120px] h-[120px] rounded-2xl overflow-hidden mx-auto mb-3 bg-[#F5EDE4]" *ngIf="formImage">
+          <img [src]="formImage" alt="Food preview" class="w-full h-full object-cover">
+        </div>
+        <div class="w-[120px] h-[120px] rounded-2xl bg-[#F5EDE4] flex items-center justify-center mx-auto mb-3 border-2 border-dashed border-[#E8DDD0]" *ngIf="!formImage">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#A89580" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21,15 16,10 5,21"/>
+          </svg>
+        </div>
+        <div class="flex justify-center gap-2">
+          <button class="bg-[#F5EDE4] text-[#2C1810] font-semibold text-[13px] px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:bg-[#EFE5DA] transition-colors focus:outline-none" (click)="fileInput.click()">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21,15 16,10 5,21"/>
+            </svg>
+            Gallery
+          </button>
+          <button class="bg-[#F5EDE4] text-[#2C1810] font-semibold text-[13px] px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:bg-[#EFE5DA] transition-colors focus:outline-none" (click)="cameraInput.click()">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Camera
+          </button>
+        </div>
+        <input #fileInput type="file" accept="image/*" (change)="onImageSelected($event)" style="display:none;">
+        <input #cameraInput type="file" accept="image/*" capture="environment" (change)="onImageSelected($event)" style="display:none;">
+      </div>
+
+      <!-- Form -->
+      <div class="mb-4">
+        <label class="block text-[14px] font-bold mb-1.5">Name</label>
+        <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" [(ngModel)]="formName" placeholder="e.g. Masala Dosa">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-[14px] font-bold mb-1.5">Price (₹)</label>
+        <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" type="number" [(ngModel)]="formPrice" placeholder="0" min="0" step="5">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-[14px] font-bold mb-1.5">Category</label>
+        <input class="w-full bg-[#F5EDE4] border-none rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-[#C94A20] focus:outline-none placeholder-[#A89580]" [(ngModel)]="formCategory" placeholder="e.g. Dosa, Idli, Drinks">
+      </div>
+
+      <div class="flex items-center justify-between mb-6">
+        <span class="text-[14px] font-bold">Active (visible on Billing)</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer" [(ngModel)]="formActive">
+          <div class="w-11 h-6 bg-[#E8DDD0] rounded-full peer peer-checked:bg-[#22A565] peer-focus:outline-none transition-colors duration-300">
+            <div class="absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transition-transform duration-300 peer-checked:translate-x-5 shadow-sm"></div>
+          </div>
+        </label>
+      </div>
+
+      <button
+        class="w-full bg-[#C94A20] text-white py-4 rounded-2xl font-semibold text-base hover:bg-[#A83A18] transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+        (click)="saveForm()"
+        [disabled]="!formName || !formCategory">
+        {{ editingFood ? '✓ Update' : '✓ Add' }}
+      </button>
+    </div>
+  </div>
+</div>

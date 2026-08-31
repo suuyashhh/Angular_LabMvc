@@ -1,0 +1,188 @@
+<div class="container-fluid px-3 px-md-4 py-4">
+  <!-- Page Header -->
+  <div class="page-header d-flex flex-column flex-sm-row gap-3 align-items-start align-items-sm-center">
+    <div>
+      <span class="page-header-subtitle">MASTER</span>
+      <h1 class="page-header-title">Tejas Users</h1>
+    </div>
+    <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center justify-content-center gap-2 shadow-sm w-100 w-sm-auto">
+      <i class="bi bi-person-plus"></i>
+      <span>Add User</span>
+    </button>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="row mb-4">
+    <div class="col-12 col-md-6">
+      <div class="input-group shadow-sm border-0 rounded-3 overflow-hidden">
+        <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" class="form-control border-0 ps-0 py-2.5" placeholder="Search users by name or contact..." [(ngModel)]="searchQuery" (input)="searchUsers()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let user of filteredUsers">
+      <div class="hotel-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="user-avatar" *ngIf="user.useR_IMG">
+              <img [src]="user.useR_IMG" alt="User Image">
+            </div>
+            <div class="user-avatar placeholder" *ngIf="!user.useR_IMG">
+              <i class="bi bi-person text-secondary"></i>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <h4 class="fw-bold mb-0 text-truncate" style="max-width: 120px;" [title]="user.useR_NAME">{{ user.useR_NAME }}</h4>
+                <span class="badge" [ngClass]="user.role?.toLowerCase() === 'admin' ? 'bg-success' : 'bg-secondary'">{{ (user.role || 'employee') | titlecase }}</span>
+              </div>
+              <span class="text-muted small">ID: {{ user.useR_ID }}</span>
+            </div>
+          </div>
+          <div class="d-flex gap-1">
+            <button (click)="openEditDrawer(user)" class="btn btn-sm btn-action-icon" title="Edit">
+              <i class="bi bi-pencil text-secondary"></i>
+            </button>
+            <button (click)="confirmDelete(user.useR_ID)" class="btn btn-sm btn-action-icon" title="Delete">
+              <i class="bi bi-trash text-danger"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 text-muted small mt-3 border-top pt-3">
+          <i class="bi bi-telephone"></i>
+          <span>{{ user.contact || 'No contact provided' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="col-12 text-center py-5 text-muted" *ngIf="filteredUsers.length === 0">
+      <i class="bi bi-people fs-1 d-block mb-2 text-light"></i>
+      No Tejas users found. Add a user to get started.
+    </div>
+  </div>
+
+  <!-- Slide Drawer (Overlay & Drawer Panel) -->
+  <div class="drawer-backdrop" [class.show]="isDrawerOpen" (click)="closeDrawer()"></div>
+  
+  <div class="side-drawer" [class.show]="isDrawerOpen">
+    <div class="drawer-header">
+      <h4 class="fw-bold mb-0">{{ editMode ? 'Edit User' : 'Add User' }}</h4>
+      <button type="button" class="btn-close" (click)="closeDrawer()"></button>
+    </div>
+
+    <div class="drawer-body">
+      <form #userForm="ngForm">
+        <div class="mb-3">
+          <label for="username" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Username *</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            class="form-control" 
+            [(ngModel)]="formData.username" 
+            placeholder="Enter username"
+            required
+            #usernameModel="ngModel"
+            [class.is-invalid]="usernameModel.touched && usernameModel.invalid">
+          <div class="invalid-feedback">Username is required.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Password *</label>
+          <div class="input-group">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password" 
+              name="password" 
+              class="form-control border-end-0" 
+              [(ngModel)]="formData.password" 
+              placeholder="Enter password"
+              required
+              #passwordModel="ngModel"
+              [class.is-invalid]="passwordModel.touched && passwordModel.invalid">
+            <button class="btn btn-outline-secondary border-start-0 bg-white" type="button" (click)="showPassword = !showPassword">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <div class="text-danger small mt-1" *ngIf="passwordModel.touched && passwordModel.invalid">Password is required.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="contact" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Contact Number *</label>
+          <input 
+            type="text" 
+            id="contact" 
+            name="contact" 
+            class="form-control" 
+            [(ngModel)]="formData.contact" 
+            placeholder="Enter contact number"
+            required
+            #contactModel="ngModel"
+            [class.is-invalid]="contactModel.touched && contactModel.invalid">
+          <div class="invalid-feedback">Contact number is required.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="role" class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Role *</label>
+          <select 
+            id="role" 
+            name="role" 
+            class="form-select" 
+            [(ngModel)]="formData.role" 
+            required>
+            <option value="employee">Employee</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-uppercase fw-semibold" style="font-size: 11px;">Profile Image</label>
+          <div *ngIf="formData.user_img" class="mb-2 position-relative d-inline-block">
+            <img [src]="formData.user_img" alt="Preview" class="img-thumbnail" style="height: 100px; width: 100px; object-fit: cover;">
+            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle" style="transform: translate(50%, -50%); padding: 2px 6px;" (click)="removeImage()">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          <input type="file" class="form-control" accept="image/*" (change)="onFileSelected($event)">
+          <span class="text-muted small mt-1 d-block">Max size: 2MB. Valid formats: JPG, PNG, WEBP.</span>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-light-custom flex-grow-1 py-2.5" (click)="closeDrawer()">Cancel</button>
+      <button 
+        type="button" 
+        class="btn btn-primary-green flex-grow-1 py-2.5" 
+        (click)="saveUser()" 
+        [disabled]="userForm.invalid || isSaving">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+        Save
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Delete Confirmation Modal -->
+  <div class="confirm-modal-backdrop" [class.show]="isDeleteModalOpen" (click)="closeDeleteModal()">
+    <div class="confirm-modal-card" (click)="$event.stopPropagation()">
+      <div class="confirm-modal-header">
+        <div class="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <h5 class="confirm-modal-title">Delete User</h5>
+      </div>
+      <div class="confirm-modal-body">
+        Are you sure you want to delete the user <strong>"{{ selectedUser?.useR_NAME }}"</strong>? This action cannot be undone.
+      </div>
+      <div class="confirm-modal-footer">
+        <button type="button" class="btn btn-light-custom py-2 px-3" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-accent-orange py-2 px-3" (click)="confirmDeleteAction()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

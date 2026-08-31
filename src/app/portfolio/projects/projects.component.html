@@ -6,7 +6,7 @@
       <i class="fas fa-star text-zinc-500"></i> Featured Work
     </div>
     <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-900 pb-2">
-      My Projects
+      Suyash Patil's Projects
     </h1>
     <p class="text-zinc-500 max-w-2xl mx-auto text-sm md:text-base font-medium leading-relaxed">
       Explore my latest web applications and responsive websites, crafted with modern technologies and a focus on user experience.
@@ -63,8 +63,8 @@
             class="relative h-56 sm:h-60 overflow-hidden cursor-pointer bg-zinc-50"
             (click)="openImagePreview(project)">
             
-            <img *ngFor="let image of getProjectImages(project); let i = index" [src]="image" [alt]="project.projectName"
-              [class.opacity-100]="currentImageIndex[project.projectId] === i"
+            <img *ngFor="let image of getProjectImages(project); let i = index" [src]="image" [alt]="project.projectName + ' Screenshot ' + (i + 1)"
+              loading="lazy" [class.opacity-100]="currentImageIndex[project.projectId] === i"
               [class.opacity-0]="currentImageIndex[project.projectId] !== i"
               class="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105">
 
@@ -102,9 +102,9 @@
           <!-- Details Area -->
           <div class="p-6 flex-grow flex flex-col justify-between relative z-10 bg-white">
             <div class="mb-6">
-              <h3 class="text-xl font-extrabold text-zinc-900 group-hover:text-zinc-700 transition-colors duration-300 leading-tight mb-3">
+              <h2 class="text-xl font-extrabold text-zinc-900 group-hover:text-zinc-700 transition-colors duration-300 leading-tight mb-3">
                 {{ project.projectName }}
-              </h3>
+              </h2>
               <p class="text-sm text-zinc-500 font-medium leading-relaxed line-clamp-3" [title]="project.projectDescription">
                 {{ project.projectDescription }}
               </p>
