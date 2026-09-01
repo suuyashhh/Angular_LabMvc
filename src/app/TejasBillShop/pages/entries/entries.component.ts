@@ -85,13 +85,18 @@ export class EntriesComponent implements OnInit {
   }
 
   async reprintBill(bill: Bill): Promise<void> {
-    const result = await this.printer.printBill(bill);
-    if (result === 'not_connected') {
-      this.printMessage = '⚠ Printer is not connected! Go to Printer page to connect.';
-    } else if (result === 'success') {
-      this.printMessage = '✓ Sent to printer!';
-    } else {
-      this.printMessage = '✗ Print failed — try reconnecting';
+    this.printMessage = 'Connecting & Printing...';
+    try {
+      const result = await this.printer.printBill(bill);
+      if (result === 'not_connected') {
+        this.printMessage = '⚠ Bluetooth printer scan cancelled or unavailable';
+      } else if (result === 'success') {
+        this.printMessage = '✓ Sent to printer!';
+      } else {
+        this.printMessage = '✗ Print failed — try again';
+      }
+    } catch (err) {
+      this.printMessage = '✗ Print failed';
     }
     setTimeout(() => this.printMessage = '', 4000);
   }

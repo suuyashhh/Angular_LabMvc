@@ -114,7 +114,9 @@ export class FabHelperAttendanceComponent implements OnInit {
   fetchMonthlyLogs() {
     this.http.get<any[]>(`${this.api.baseurl}Fab/Attendance/Helper/Month?userId=${this.user.user_id}&month=${this.selectedMonth}&year=${this.selectedYear}`).subscribe({
       next: (res) => {
-        this.attendanceLogs = res || [];
+        const logs = res || [];
+        logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.attendanceLogs = logs;
       },
       error: (err) => {
         console.error(err);

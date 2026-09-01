@@ -71,9 +71,9 @@
             </thead>
             <tbody>
               <tr *ngFor="let log of attendanceLogs">
-                <td>{{ log.date | date:'dd-MMM-yyyy' }}</td>
-                <td>{{ log.date | date:'EEEE' }}</td>
-                <td>
+                <td class="whitespace-nowrap">{{ log.date | date:'dd-MMM-yyyy' }}</td>
+                <td class="whitespace-nowrap">{{ log.date | date:'EEEE' }}</td>
+                <td class="whitespace-nowrap">
                   <span class="attendance-badge" [ngClass]="log.user_day.toLowerCase().replace(' ', '-')">
                     {{ log.user_day }}
                   </span>

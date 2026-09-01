@@ -271,7 +271,10 @@
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 6px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   text-transform: capitalize;
 }
 

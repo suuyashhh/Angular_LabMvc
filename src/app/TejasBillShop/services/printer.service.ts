@@ -115,7 +115,13 @@ export class PrinterService {
     try {
       const device = await (navigator as any).bluetooth.requestDevice({
         acceptAllDevices: true,
-        optionalServices: [BT_PRINTER_SERVICE, BT_SPP_SERVICE]
+        optionalServices: [
+          BT_PRINTER_SERVICE,
+          BT_SPP_SERVICE,
+          '00001101-0000-1000-8000-00805f9b34fb', // Standard SPP
+          '0000fee7-0000-1000-8000-00805f9b34fb', // Thermal printer
+          '00004991-0000-1000-8000-00805f9b34fb'  // POS-58
+        ]
       });
 
       const printer: DiscoveredPrinter = {
@@ -160,15 +166,26 @@ export class PrinterService {
           service = await server.getPrimaryService(BT_SPP_SERVICE);
           characteristic = await service.getCharacteristic(BT_SPP_CHAR);
         } catch {
-          // Try getting any available service
-          const services = await server.getPrimaryServices();
-          if (services.length > 0) {
-            service = services[0];
-            const chars = await service.getCharacteristics();
-            // Look for writable characteristic
-            characteristic = chars.find((c: any) =>
-              c.properties.write || c.properties.writeWithoutResponse
-            );
+          // Try getting any available service & characteristic
+          try {
+            const services = await server.getPrimaryServices();
+            for (const s of services) {
+              try {
+                const chars = await s.getCharacteristics();
+                const foundChar = chars.find((c: any) =>
+                  c.properties.write || c.properties.writeWithoutResponse
+                );
+                if (foundChar) {
+                  service = s;
+                  characteristic = foundChar;
+                  break;
+                }
+              } catch (e) {
+                console.warn('Error fetching characteristics:', e);
+              }
+            }
+          } catch (e) {
+            console.warn('Error fetching primary services:', e);
           }
         }
       }
@@ -563,8 +580,76 @@ export class PrinterService {
 
   async printBill(bill: Bill): Promise<'success' | 'failed' | 'not_connected'> {
     if (!this.isConnected()) {
-      this.printerStatusSubject.next('Printer not connected');
-      return 'not_connected';
+      this.printerStatusSubject.next('Connecting to printer...');
+
+      // Try quick GATT reconnect if bluetoothDevice is already in memory
+      let reconnected = false;
+      if (this.bluetoothDevice && this.bluetoothDevice.gatt) {
+        try {
+          const server = await this.bluetoothDevice.gatt.connect();
+          let service: any = null;
+          let characteristic: any = null;
+
+          try {
+            service = await server.getPrimaryService(BT_PRINTER_SERVICE);
+            characteristic = await service.getCharacteristic(BT_PRINTER_CHAR);
+          } catch {
+            try {
+              service = await server.getPrimaryService(BT_SPP_SERVICE);
+              characteristic = await service.getCharacteristic(BT_SPP_CHAR);
+            } catch {
+              const services = await server.getPrimaryServices();
+              for (const s of services) {
+                try {
+                  const chars = await s.getCharacteristics();
+                  const foundChar = chars.find((c: any) =>
+                    c.properties.write || c.properties.writeWithoutResponse
+                  );
+                  if (foundChar) {
+                    service = s;
+                    characteristic = foundChar;
+                    break;
+                  }
+                } catch {}
+              }
+            }
+          }
+
+          if (characteristic) {
+            this.bluetoothCharacteristic = characteristic;
+            this.connectedSubject.next(true);
+            const settings = this.getSettings();
+            this.printerStatusSubject.next(`Connected: ${settings.connectedDeviceName || 'Printer'}`);
+            reconnected = true;
+          }
+        } catch (e) {
+          console.log('Quick GATT reconnect failed, scanning for printers...', e);
+        }
+      }
+
+      // If not reconnected, trigger bluetooth scan & connect
+      if (!reconnected) {
+        const settings = this.getSettings();
+        let printer: DiscoveredPrinter | null = null;
+
+        if (settings.connectionType === 'bluetooth' || !settings.connectionType) {
+          printer = await this.scanBluetooth();
+          if (printer) {
+            const connected = await this.connectBluetooth(printer);
+            if (!connected) return 'failed';
+          } else {
+            return 'not_connected';
+          }
+        } else if (settings.connectionType === 'usb') {
+          printer = await this.scanUsb();
+          if (printer) {
+            const connected = await this.connectUsb(printer);
+            if (!connected) return 'failed';
+          } else {
+            return 'not_connected';
+          }
+        }
+      }
     }
 
     // Direct print to connected printer
@@ -577,7 +662,7 @@ export class PrinterService {
       setTimeout(() => {
         if (this.isConnected()) {
           const s = this.getSettings();
-          this.printerStatusSubject.next(`Connected: ${s.connectedDeviceName}`);
+          this.printerStatusSubject.next(`Connected: ${s.connectedDeviceName || 'Printer'}`);
         }
       }, 3000);
       return 'success';
