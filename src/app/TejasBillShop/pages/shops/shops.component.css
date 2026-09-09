@@ -1,0 +1,134 @@
+.page-header-subtitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #2b5c2e;
+  text-transform: uppercase;
+  display: block;
+}
+
+.page-header-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0;
+}
+
+.btn-primary-green {
+  background-color: #2b5c2e;
+  border-color: #2b5c2e;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-green:hover {
+  background-color: #1e3f20;
+  border-color: #1e3f20;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.active-shop-banner {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 1px solid #c8e6c9;
+}
+
+.shop-badge-icon {
+  width: 48px;
+  height: 48px;
+  background: #2b5c2e;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shop-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e0;
+}
+
+.shop-card.is-selected {
+  border: 2px solid #2b5c2e;
+  background: #fcfdfc;
+}
+
+.shop-avatar {
+  width: 44px;
+  height: 44px;
+  background: #e8f5e9;
+  color: #2b5c2e;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-action-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s ease;
+}
+
+.btn-action-icon:hover {
+  background: #edf2f7;
+}
+
+/* Side Drawer */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 1040;
+}
+
+.side-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  max-width: 450px;
+  height: 100vh;
+  background: #ffffff;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.side-drawer.open {
+  right: 0;
+}
+
+.drawer-body {
+  overflow-y: auto;
+  flex: 1;
+}

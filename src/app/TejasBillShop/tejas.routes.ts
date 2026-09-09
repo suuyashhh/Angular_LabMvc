@@ -30,6 +30,7 @@ export const routes: Routes = [
       { path: 'history', loadComponent: () => import('./pages/history/history.component').then(m => m.HistoryComponent) },
       { path: 'ex-entrytype', loadComponent: () => import('./pages/ex-entrytype/ex-entrytype.component').then(m => m.ExEntrytypeComponent) },
       { path: 'tejas-users', loadComponent: () => import('./pages/Tejas-users/Tejas-users.component').then(m => m.TejasUsersComponent) },
+      { path: 'shops', loadComponent: () => import('./pages/shops/shops.component').then(m => m.ShopsComponent) },
       { path: '**', redirectTo: 'dashboard' }
     ]
   }
