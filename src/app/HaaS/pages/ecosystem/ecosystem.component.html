@@ -1,0 +1,331 @@
+<div class="ecosystem-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🌍 Ecosystem Management</h1>
+      <p class="page-sub">Configure heat demand variables per ecosystem and season, then run the optimizer</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-seed" (click)="seedDefaults()" id="btn-seed-defaults">🔄 Seed Defaults</button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMsg" class="error-banner">⚠️ {{ errorMsg }}</div>
+
+  <!-- Controls Bar -->
+  <div class="controls-bar">
+    <div class="control-group">
+      <label>Season</label>
+      <select [(ngModel)]="selectedSeason" (change)="onSeasonChange()" id="eco-season-select">
+        <option *ngFor="let s of seasons" [value]="s.value">{{ s.icon }} {{ s.label }}</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>🌡️ Outside Temp: <strong>{{ outsideTemp }}°C</strong></label>
+      <input type="range" min="-10" max="40" step="1" [(ngModel)]="outsideTemp" id="eco-temp-slider"/>
+    </div>
+    <div class="control-group">
+      <label>⚡ Override Power (0 = simulate): <strong>{{ powerOverride }} kW</strong></label>
+      <input type="range" min="0" max="2000" step="50" [(ngModel)]="powerOverride" id="eco-power-slider"/>
+    </div>
+    <div class="control-group toggle-group">
+      <label>Force Storage Discharge</label>
+      <label class="toggle">
+        <input type="checkbox" [(ngModel)]="forceDischarge" id="eco-force-discharge"/>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <button class="btn-optimize" (click)="runOptimization()" [disabled]="isOptimizing" id="btn-eco-optimize">
+      <span *ngIf="!isOptimizing">⚡ Optimize & Allocate</span>
+      <span *ngIf="isOptimizing">⏳ Running...</span>
+    </button>
+  </div>
+
+  <!-- Ecosystem Cards -->
+  <div class="eco-grid" *ngIf="!isLoading">
+    <div *ngFor="let d of demands" class="eco-card"
+         [style.border-color]="getEcoMeta(d.ecosystem_TYPE).color + '33'">
+
+      <div class="eco-card-header" [style.background]="getEcoMeta(d.ecosystem_TYPE).color + '18'">
+        <span class="eco-big-icon">{{ getEcoMeta(d.ecosystem_TYPE).icon }}</span>
+        <div>
+          <h3 class="eco-card-title" [style.color]="getEcoMeta(d.ecosystem_TYPE).color">{{ d.ecosystem_NAME }}</h3>
+          <span class="eco-season">{{ d.season_NAME }}</span>
+        </div>
+        <span class="eco-priority-badge">Priority {{ d.priority }}</span>
+      </div>
+
+      <div class="eco-card-body">
+        <!-- Demand Slider -->
+        <div class="field-group">
+          <label class="field-label">Heat Demand</label>
+          <div class="slider-row">
+            <input type="range" min="0" max="800" step="10" [(ngModel)]="d.demand_VALUE_KW"
+                   [id]="'demand-slider-' + d.demand_ID"
+                   [style.accent-color]="getEcoMeta(d.ecosystem_TYPE).color"/>
+            <span class="slider-val">{{ d.demand_VALUE_KW | number:'1.0-0' }} kW</span>
+          </div>
+        </div>
+
+        <!-- Min Temp -->
+        <div class="field-group">
+          <label class="field-label">Min Temp Required</label>
+          <div class="slider-row">
+            <input type="range" min="0" max="100" step="1" [(ngModel)]="d.min_TEMP_REQUIRED"
+                   [id]="'min-temp-' + d.demand_ID"
+                   [style.accent-color]="getEcoMeta(d.ecosystem_TYPE).color"/>
+            <span class="slider-val">{{ d.min_TEMP_REQUIRED }}°C</span>
+          </div>
+        </div>
+
+        <!-- Max Temp -->
+        <div class="field-group">
+          <label class="field-label">Max Temp Accepted</label>
+          <div class="slider-row">
+            <input type="range" min="20" max="200" step="5" [(ngModel)]="d.max_TEMP_ACCEPTED"
+                   [id]="'max-temp-' + d.demand_ID"
+                   [style.accent-color]="getEcoMeta(d.ecosystem_TYPE).color"/>
+            <span class="slider-val">{{ d.max_TEMP_ACCEPTED }}°C</span>
+          </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="field-group">
+          <label class="field-label">Priority (1=Highest)</label>
+          <div class="slider-row">
+            <input type="range" min="1" max="4" step="1" [(ngModel)]="d.priority"
+                   [id]="'priority-' + d.demand_ID"
+                   [style.accent-color]="getEcoMeta(d.ecosystem_TYPE).color"/>
+            <span class="slider-val">{{ d.priority }}</span>
+          </div>
+        </div>
+
+        <!-- Allocation result bar (after optimization) -->
+        <div class="alloc-result" *ngIf="allocation">
+          <div class="alloc-bar-wrap">
+            <div class="alloc-bar-fill"
+                 [style.width.%]="getFillPercent(getAllocatedKW(d.ecosystem_NAME), d.demand_VALUE_KW)"
+                 [style.background]="getEcoMeta(d.ecosystem_TYPE).color">
+            </div>
+          </div>
+          <div class="alloc-numbers">
+            <span [style.color]="getEcoMeta(d.ecosystem_TYPE).color">
+              {{ getAllocatedKW(d.ecosystem_NAME) | number:'1.0-0' }} kW allocated
+            </span>
+            <span class="alloc-pct">
+              ({{ getFillPercent(getAllocatedKW(d.ecosystem_NAME), d.demand_VALUE_KW) | number:'1.0-0' }}%)
+            </span>
+          </div>
+        </div>
+
+        <button class="btn-save"
+                [style.border-color]="getEcoMeta(d.ecosystem_TYPE).color"
+                [style.color]="getEcoMeta(d.ecosystem_TYPE).color"
+                (click)="saveDemand(d)"
+                [id]="'btn-save-' + d.demand_ID">
+          <span *ngIf="!saveSuccess[d.demand_ID]">💾 Save Changes</span>
+          <span *ngIf="saveSuccess[d.demand_ID]" style="color:#4ade80">✓ Saved!</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="demands.length === 0">
+      <div class="empty-icon">📭</div>
+      <p>No demand data found for this season.</p>
+      <button class="btn-optimize" (click)="seedDefaults()">🌱 Seed Default Data</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Loading ecosystem demands...</span>
+  </div>
+
+  <!-- Optimization Result Summary -->
+  <div *ngIf="allocation" class="section-card result-card">
+    <h2 class="section-title">⚡ Optimization Result</h2>
+    <div class="result-grid">
+      <div class="result-stat">
+        <span class="stat-l">Total Supply</span>
+        <span class="stat-v blue">{{ allocation.total_SUPPLY_KW | number:'1.0-0' }} kW</span>
+      </div>
+      <div class="result-stat">
+        <span class="stat-l">Total Demand</span>
+        <span class="stat-v orange">{{ allocation.total_DEMAND_KW | number:'1.0-0' }} kW</span>
+      </div>
+      <div class="result-stat">
+        <span class="stat-l">{{ allocation.is_SURPLUS ? 'Surplus' : 'Deficit' }}</span>
+        <span class="stat-v" [class.green]="allocation.is_SURPLUS" [class.red]="!allocation.is_SURPLUS">
+          {{ allocation.surplus_OR_DEFICIT_KW | number:'1.0-0' }} kW
+        </span>
+      </div>
+      <div class="result-stat">
+        <span class="stat-l">Utilization</span>
+        <span class="stat-v teal">{{ allocation.utilization_PERCENT | number:'1.0-1' }}%</span>
+      </div>
+    </div>
+    <div class="notes-list" *ngIf="allocation.decisionNotes?.length">
+      <div *ngFor="let note of allocation.decisionNotes" class="note-item">{{ note }}</div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.ecosystem-page { display: flex; flex-direction: column; gap: 24px; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.page-title { margin: 0; font-size: 24px; font-weight: 800; color: #e2e8f0; }
+.page-sub   { margin: 4px 0 0; font-size: 13px; color: #64748b; }
+.header-actions { display: flex; gap: 8px; }
+
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  background: rgba(13,26,58,0.8);
+  border: 1px solid rgba(56,189,248,0.1);
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+.control-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+.control-group label { font-size: 12px; color: #64748b; }
+.control-group select, .control-group input[type=range] {
+  background: #0d1a3a;
+  border: 1px solid rgba(56,189,248,0.2);
+  color: #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.toggle-group { flex-direction: row; align-items: center; gap: 12px; }
+.toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle .slider {
+  position: absolute; cursor: pointer;
+  inset: 0; background: #1e3a5f;
+  border-radius: 24px; transition: 0.3s;
+}
+.toggle .slider::before {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; left: 3px; bottom: 3px;
+  background: #64748b; border-radius: 50%; transition: 0.3s;
+}
+.toggle input:checked + .slider { background: rgba(56,189,248,0.3); }
+.toggle input:checked + .slider::before { transform: translateX(20px); background: #38bdf8; }
+
+.eco-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.eco-card {
+  background: rgba(13,26,58,0.8);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.eco-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.eco-big-icon { font-size: 28px; }
+.eco-card-title { margin: 0; font-size: 16px; font-weight: 700; }
+.eco-season { font-size: 11px; color: #64748b; }
+.eco-priority-badge {
+  margin-left: auto;
+  font-size: 11px; font-weight: 700;
+  background: rgba(255,255,255,0.08);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: #94a3b8;
+}
+
+.eco-card-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: 12px; color: #475569; }
+.slider-row { display: flex; align-items: center; gap: 10px; }
+.slider-row input { flex: 1; cursor: pointer; }
+.slider-val { font-size: 13px; font-weight: 700; color: #e2e8f0; min-width: 60px; text-align: right; }
+
+.alloc-result { margin-top: 4px; }
+.alloc-bar-wrap {
+  height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.alloc-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.alloc-numbers { display: flex; gap: 6px; font-size: 13px; font-weight: 600; }
+.alloc-pct { color: #475569; font-weight: 400; }
+
+.btn-save {
+  background: transparent;
+  border: 1px solid;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  align-self: flex-start;
+}
+.btn-save:hover { filter: brightness(1.2); }
+
+.btn-optimize {
+  background: linear-gradient(135deg, #38bdf8, #f97316);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+.btn-optimize:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-seed {
+  background: transparent;
+  border: 1px solid rgba(56,189,248,0.3);
+  color: #38bdf8;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.empty-state {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 60px;
+  color: #64748b;
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.loading-state { display: flex; gap: 12px; align-items: center; justify-content: center; padding: 40px; color: #64748b; }
+.spinner { width: 24px; height: 24px; border: 3px solid rgba(56,189,248,0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.section-card { background: rgba(13,26,58,0.8); border: 1px solid rgba(56,189,248,0.1); border-radius: 16px; padding: 24px; }
+.section-title { margin: 0 0 16px; font-size: 17px; font-weight: 700; color: #e2e8f0; }
+.result-card .result-grid { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 16px; }
+.result-stat { display: flex; flex-direction: column; gap: 4px; }
+.stat-l { font-size: 12px; color: #475569; text-transform: uppercase; }
+.stat-v { font-size: 20px; font-weight: 800; }
+.blue { color: #38bdf8; } .orange { color: #f97316; } .green { color: #4ade80; }
+.red { color: #f87171; } .teal { color: #2dd4bf; }
+
+.notes-list { display: flex; flex-direction: column; gap: 4px; }
+.note-item { font-size: 13px; color: #64748b; padding: 4px 8px; background: rgba(0,0,0,0.2); border-radius: 6px; }
+.error-banner { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 12px 16px; border-radius: 10px; font-size: 14px; }
+</style>

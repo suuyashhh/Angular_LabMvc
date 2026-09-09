@@ -1,0 +1,346 @@
+<div class="storage-log-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🔋 Thermal Storage & Optimization Log</h1>
+      <p class="page-sub">Tank status, charging history, and full decision audit trail</p>
+    </div>
+    <button class="btn-refresh" (click)="loadAll()" id="btn-storage-refresh">↻ Refresh</button>
+  </div>
+
+  <!-- ── Top: Tank Status ─────────────────────────────────────────────────── -->
+  <div class="top-grid">
+    <!-- SVG Gauge -->
+    <div class="section-card gauge-card">
+      <h2 class="section-title">Tank Status</h2>
+      <div class="gauge-wrap" *ngIf="currentStorage; else noStorage">
+        <!-- SVG Circular Gauge -->
+        <svg class="gauge-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#38bdf8"/>
+              <stop offset="100%" style="stop-color:#f97316"/>
+            </linearGradient>
+          </defs>
+          <!-- Background circle -->
+          <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/>
+          <!-- Charge arc -->
+          <circle cx="80" cy="80" r="70"
+                  fill="none"
+                  stroke="url(#gaugeGrad)"
+                  stroke-width="14"
+                  stroke-linecap="round"
+                  stroke-dasharray="{{ gaugeCircumference }}"
+                  stroke-dashoffset="{{ gaugeOffset }}"
+                  transform="rotate(-90, 80, 80)"
+                  style="transition: stroke-dashoffset 0.6s ease"/>
+          <!-- Center text -->
+          <text x="80" y="72" text-anchor="middle" fill="#e2e8f0" font-size="26" font-weight="800" font-family="Inter, sans-serif">
+            {{ chargePercent | number:'1.0-1' }}%
+          </text>
+          <text x="80" y="90" text-anchor="middle" fill="#64748b" font-size="11" font-family="Inter, sans-serif">charged</text>
+          <!-- State label -->
+          <text x="80" y="108" text-anchor="middle" font-size="11" font-weight="700" font-family="Inter, sans-serif"
+                [attr.fill]="currentStorage.state === 1 ? '#4ade80' : currentStorage.state === 2 ? '#fb923c' : '#94a3b8'">
+            {{ currentStorage.state_NAME | uppercase }}
+          </text>
+        </svg>
+      </div>
+      <ng-template #noStorage>
+        <div class="empty-gauge">
+          <span style="font-size:48px">🔋</span>
+          <p>No storage data yet</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Storage Stats -->
+    <div class="section-card stats-card" *ngIf="currentStorage">
+      <h2 class="section-title">📊 Storage Metrics</h2>
+      <div class="stats-list">
+        <div class="stat-row">
+          <span class="stat-l">Total Capacity</span>
+          <span class="stat-v blue">{{ currentStorage.storage_CAPACITY_KWH | number:'1.0-0' }} kWh</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-l">Currently Stored</span>
+          <span class="stat-v orange">{{ currentStorage.current_STORED_HEAT_KWH | number:'1.0-0' }} kWh</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-l">Available Space</span>
+          <span class="stat-v purple">
+            {{ (currentStorage.storage_CAPACITY_KWH - currentStorage.current_STORED_HEAT_KWH) | number:'1.0-0' }} kWh
+          </span>
+        </div>
+        <div class="stat-row" *ngIf="currentStorage.state === 1">
+          <span class="stat-l">Charging Rate</span>
+          <span class="stat-v green">{{ currentStorage.charging_RATE_KW | number:'1.0-1' }} kW</span>
+        </div>
+        <div class="stat-row" *ngIf="currentStorage.state === 2">
+          <span class="stat-l">Discharge Rate</span>
+          <span class="stat-v red">{{ currentStorage.discharging_RATE_KW | number:'1.0-1' }} kW</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-l">Last Updated</span>
+          <span class="stat-v muted">{{ currentStorage.timestamp | date:'dd/MM/yy HH:mm' }}</span>
+        </div>
+      </div>
+
+      <!-- State Badge -->
+      <div class="state-display" [ngClass]="getStateClass(currentStorage.state)">
+        <span class="state-icon">
+          {{ currentStorage.state === 1 ? '⬆️' : currentStorage.state === 2 ? '⬇️' : '⏸️' }}
+        </span>
+        <div>
+          <div class="state-label">{{ currentStorage.state_NAME }}</div>
+          <div class="state-sub">
+            {{ currentStorage.state === 1 ? 'Routing surplus heat to tank' :
+               currentStorage.state === 2 ? 'Releasing stored heat to meet demand' :
+               'Tank holding stored heat' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storage History Mini Chart -->
+    <div class="section-card history-mini-card" *ngIf="storageHistory.length">
+      <h2 class="section-title">📈 Storage Level History</h2>
+      <div class="mini-history">
+        <div *ngFor="let h of storageHistory; let i = index" class="history-entry">
+          <span class="history-time">{{ h.timestamp | date:'HH:mm' }}</span>
+          <div class="history-level-bar">
+            <div class="history-level-fill"
+                 [style.width.%]="h.charge_PERCENTAGE"
+                 [class.fill-charging]="h.state === 1"
+                 [class.fill-discharging]="h.state === 2"
+                 [class.fill-idle]="h.state === 0">
+            </div>
+          </div>
+          <span class="history-pct">{{ h.charge_PERCENTAGE | number:'1.0-0' }}%</span>
+          <span class="history-state-dot"
+                [class.dot-charging]="h.state === 1"
+                [class.dot-discharging]="h.state === 2"
+                [class.dot-idle]="h.state === 0">
+          </span>
+        </div>
+      </div>
+      <div class="mini-legend">
+        <div><span class="mini-dot dot-charging"></span>Charging</div>
+        <div><span class="mini-dot dot-discharging"></span>Discharging</div>
+        <div><span class="mini-dot dot-idle"></span>Idle</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom: Optimization Log ─────────────────────────────────────────── -->
+  <div class="section-card log-card">
+    <div class="log-header">
+      <h2 class="section-title" style="margin:0">📋 Optimization Decision Log</h2>
+      <div class="log-controls">
+        <!-- Filter -->
+        <input class="search-input" [(ngModel)]="logFilter" placeholder="🔍 Filter logs..."
+               id="log-search-input"/>
+        <input type="date" class="date-input" [(ngModel)]="dateFrom" id="log-date-from"/>
+        <input type="date" class="date-input" [(ngModel)]="dateTo" id="log-date-to"/>
+        <button class="btn-filter" (click)="loadLogs()" id="btn-apply-filter">Apply</button>
+      </div>
+    </div>
+
+    <!-- Log Table -->
+    <div class="table-wrap">
+      <table class="log-table" *ngIf="filteredLogs.length > 0">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Action</th>
+            <th>Target</th>
+            <th>Heat Redirected</th>
+            <th>Supply</th>
+            <th>Demand</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of filteredLogs">
+            <td class="td-time">{{ log.timestamp | date:'dd/MM HH:mm:ss' }}</td>
+            <td class="td-action">
+              <span class="action-icon">{{ getActionIcon(log.action) }}</span>
+              <span class="action-text">{{ log.action }}</span>
+            </td>
+            <td>
+              <span class="eco-chip" *ngIf="log.target_ECOSYSTEM">{{ log.target_ECOSYSTEM }}</span>
+            </td>
+            <td class="td-number orange">{{ log.heat_REDIRECTED_KW | number:'1.0-1' }} kW</td>
+            <td class="td-number blue">{{ log.supply_KW | number:'1.0-0' }} kW</td>
+            <td class="td-number purple">{{ log.total_DEMAND_KW | number:'1.0-0' }} kW</td>
+            <td>
+              <span class="status-chip" [ngClass]="getStatusClass(log.status)">{{ log.status }}</span>
+            </td>
+            <td class="td-details">{{ log.details }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty state -->
+      <div *ngIf="filteredLogs.length === 0" class="empty-log">
+        <div style="font-size:48px">📭</div>
+        <p>No optimization logs found.</p>
+        <p style="font-size:13px; color:#475569">Run an optimization from the Dashboard to generate logs.</p>
+      </div>
+    </div>
+
+    <div class="log-footer" *ngIf="filteredLogs.length > 0">
+      Showing {{ filteredLogs.length }} of {{ optimizationLogs.length }} records
+    </div>
+  </div>
+
+</div>
+
+<style>
+.storage-log-page { display: flex; flex-direction: column; gap: 24px; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.page-title { margin: 0; font-size: 24px; font-weight: 800; color: #e2e8f0; }
+.page-sub   { margin: 4px 0 0; font-size: 13px; color: #64748b; }
+
+.btn-refresh {
+  background: transparent;
+  border: 1px solid rgba(56,189,248,0.3);
+  color: #38bdf8;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-refresh:hover { background: rgba(56,189,248,0.08); }
+
+/* ── Top Grid ────────────────────────────────────────────────────────────── */
+.top-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) { .top-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .top-grid { grid-template-columns: 1fr; } }
+
+.section-card { background: rgba(13,26,58,0.8); border: 1px solid rgba(56,189,248,0.1); border-radius: 16px; padding: 20px; }
+.section-title { margin: 0 0 16px; font-size: 16px; font-weight: 700; color: #e2e8f0; }
+
+/* ── SVG Gauge ────────────────────────────────────────────────────────────── */
+.gauge-card { display: flex; flex-direction: column; align-items: center; }
+.gauge-wrap { width: 100%; }
+.gauge-svg { width: 100%; max-width: 180px; }
+.empty-gauge { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; color: #64748b; font-size: 13px; }
+
+/* ── Stats ────────────────────────────────────────────────────────────────── */
+.stats-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.stat-l { font-size: 13px; color: #475569; }
+.stat-v { font-size: 15px; font-weight: 700; }
+.blue { color: #38bdf8; } .orange { color: #f97316; } .purple { color: #a78bfa; }
+.green { color: #4ade80; } .red { color: #f87171; } .muted { color: #64748b; }
+
+.state-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+.state-icon { font-size: 24px; }
+.state-label { font-size: 15px; font-weight: 700; }
+.state-sub { font-size: 11px; opacity: 0.7; }
+.state-idle        { background: rgba(100,116,139,0.1); color: #94a3b8; }
+.state-charging    { background: rgba(34,197,94,0.1);   color: #4ade80; }
+.state-discharging { background: rgba(249,115,22,0.1);  color: #fb923c; }
+
+/* ── History Mini ─────────────────────────────────────────────────────────── */
+.mini-history { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+.history-entry { display: flex; align-items: center; gap: 8px; }
+.history-time { font-size: 10px; color: #475569; min-width: 36px; }
+.history-level-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+.history-level-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.fill-charging    { background: linear-gradient(90deg, #22c55e, #38bdf8); }
+.fill-discharging { background: linear-gradient(90deg, #f97316, #ef4444); }
+.fill-idle        { background: #3b82f6; }
+.history-pct { font-size: 10px; color: #64748b; min-width: 28px; text-align: right; }
+.history-state-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-charging    { background: #22c55e; }
+.dot-discharging { background: #f97316; }
+.dot-idle        { background: #3b82f6; }
+.mini-legend { display: flex; gap: 16px; margin-top: 10px; font-size: 11px; color: #64748b; }
+.mini-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+
+/* ── Log Card ─────────────────────────────────────────────────────────────── */
+.log-card { padding: 0; overflow: hidden; }
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid rgba(56,189,248,0.08);
+}
+.log-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.search-input, .date-input {
+  background: #0d1a3a;
+  border: 1px solid rgba(56,189,248,0.2);
+  color: #e2e8f0;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.search-input { min-width: 180px; }
+.btn-filter {
+  background: rgba(56,189,248,0.1);
+  border: 1px solid rgba(56,189,248,0.3);
+  color: #38bdf8;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.table-wrap { overflow-x: auto; max-height: 460px; overflow-y: auto; }
+.log-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.log-table th {
+  position: sticky; top: 0;
+  background: #0d1a3a;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #475569;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+.log-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #cbd5e1; vertical-align: top; }
+.log-table tr:hover td { background: rgba(56,189,248,0.03); }
+
+.td-time   { color: #64748b; font-size: 12px; white-space: nowrap; }
+.td-action { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.action-icon { font-size: 16px; }
+.action-text { font-size: 12px; color: #94a3b8; font-family: monospace; }
+.td-number { font-weight: 700; white-space: nowrap; }
+.td-details { font-size: 12px; color: #64748b; max-width: 300px; }
+
+.eco-chip {
+  background: rgba(56,189,248,0.1);
+  color: #38bdf8;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.status-chip { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.status-success { background: rgba(34,197,94,0.15); color: #4ade80; }
+.status-partial  { background: rgba(249,115,22,0.15); color: #fb923c; }
+.status-deficit  { background: rgba(239,68,68,0.15);  color: #f87171; }
+
+.empty-log { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 60px; color: #64748b; }
+.log-footer { padding: 12px 20px; font-size: 12px; color: #475569; border-top: 1px solid rgba(255,255,255,0.04); }
+</style>

@@ -1,0 +1,276 @@
+<!-- HaaS Layout Shell -->
+<div class="haas-shell">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+  <aside class="haas-sidebar" [class.open]="menuOpen">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <span class="brand-icon">🔥</span>
+      <div class="brand-text">
+        <span class="brand-title">HaaS</span>
+        <span class="brand-sub">Heat as a Service</span>
+      </div>
+    </div>
+
+    <!-- Live Clock -->
+    <div class="sidebar-clock">
+      <span class="clock-time">{{ currentTime | date:'HH:mm:ss' }}</span>
+      <span class="clock-date">{{ currentTime | date:'dd MMM yyyy' }}</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="['/haas', item.path]"
+        class="nav-item"
+        [class.active]="isActive(item.path)"
+        (click)="menuOpen = false">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+        <span class="nav-indicator" *ngIf="isActive(item.path)"></span>
+      </a>
+    </nav>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <span>Data Center HaaS v1.0</span>
+      <span>Academic Project</span>
+    </div>
+  </aside>
+
+  <!-- ── Mobile Overlay ────────────────────────────────────────────────────── -->
+  <div class="sidebar-overlay" *ngIf="menuOpen" (click)="menuOpen = false"></div>
+
+  <!-- ── Main Content ──────────────────────────────────────────────────────── -->
+  <main class="haas-content">
+    <!-- Topbar -->
+    <header class="haas-topbar">
+      <button class="menu-toggle" (click)="toggleMenu()" id="haas-menu-toggle">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title">
+        <span class="topbar-icon">🏭</span>
+        <span>Data Center Waste Heat Optimization</span>
+      </div>
+      <div class="topbar-badge">
+        <span class="pulse-dot"></span>
+        <span>Live Simulation</span>
+      </div>
+    </header>
+
+    <!-- Page Content (router outlet) -->
+    <div class="haas-page-body">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+
+<style>
+/* ── Shell Layout ─────────────────────────────────────────────────────────── */
+.haas-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #0a0f1e;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #e2e8f0;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+.haas-sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0d1a3a 0%, #0a1628 100%);
+  border-right: 1px solid rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+}
+.brand-icon { font-size: 28px; }
+.brand-text { display: flex; flex-direction: column; }
+.brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #38bdf8, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+.brand-sub { font-size: 10px; color: #64748b; letter-spacing: 0.5px; }
+
+.sidebar-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  background: rgba(56, 189, 248, 0.05);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.08);
+}
+.clock-time { font-size: 22px; font-weight: 700; color: #38bdf8; letter-spacing: 2px; }
+.clock-date { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+.sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+}
+.nav-item:hover { background: rgba(56, 189, 248, 0.08); color: #e2e8f0; }
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(249, 115, 22, 0.1));
+  color: #38bdf8;
+  font-weight: 600;
+}
+.nav-icon { font-size: 18px; width: 24px; text-align: center; }
+.nav-label { flex: 1; }
+.nav-indicator {
+  width: 4px; height: 100%;
+  background: linear-gradient(#38bdf8, #f97316);
+  border-radius: 2px;
+  position: absolute;
+  right: 0; top: 0;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  font-size: 10px;
+  color: #475569;
+  border-top: 1px solid rgba(56, 189, 248, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Overlay (mobile) ────────────────────────────────────────────────────── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 99;
+}
+
+/* ── Main Content ────────────────────────────────────────────────────────── */
+.haas-content {
+  flex: 1;
+  margin-left: 240px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.haas-topbar {
+  height: 56px;
+  background: rgba(13, 26, 58, 0.95);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.menu-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #38bdf8;
+  border-radius: 2px;
+  transition: 0.2s;
+}
+
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e2e8f0;
+  flex: 1;
+}
+.topbar-icon { font-size: 20px; }
+
+.topbar-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse-glow 1.5s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+}
+
+.haas-page-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .haas-sidebar {
+    transform: translateX(-100%);
+  }
+  .haas-sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay {
+    display: block;
+  }
+  .haas-content {
+    margin-left: 0;
+  }
+  .menu-toggle {
+    display: flex;
+  }
+  .haas-page-body {
+    padding: 16px;
+  }
+}
+</style>

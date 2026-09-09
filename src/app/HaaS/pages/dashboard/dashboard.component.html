@@ -1,0 +1,497 @@
+<div class="dashboard">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">📊 HaaS Dashboard</h1>
+      <p class="page-sub">Real-time overview of Data Center waste heat generation & distribution</p>
+    </div>
+    <div class="header-controls">
+      <!-- Season Selector -->
+      <select class="season-select" [(ngModel)]="selectedSeason" (change)="onSeasonChange()" id="dashboard-season">
+        <option *ngFor="let s of seasons" [value]="s.value">{{ s.icon }} {{ s.label }}</option>
+      </select>
+      <!-- Outside Temp -->
+      <div class="temp-control">
+        <label>🌡️ Temp: {{ outsideTemp }}°C</label>
+        <input type="range" min="-10" max="40" step="1" [(ngModel)]="outsideTemp" id="dashboard-temp-slider"/>
+      </div>
+      <!-- Run Optimization -->
+      <button class="btn-optimize" (click)="runOptimization()" [disabled]="isOptimizing" id="btn-run-optimization">
+        <span *ngIf="!isOptimizing">⚡ Run Optimization</span>
+        <span *ngIf="isOptimizing">⏳ Running...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Error Banner ────────────────────────────────────────────────────── -->
+  <div *ngIf="errorMsg" class="error-banner">⚠️ {{ errorMsg }}</div>
+
+  <!-- ── KPI Cards ──────────────────────────────────────────────────────── -->
+  <div class="kpi-grid">
+    <!-- Power Consumption -->
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Power Consumption</span>
+        <span class="kpi-value" *ngIf="metrics">{{ metrics.power_CONSUMPTION_KW | number:'1.0-0' }} kW</span>
+        <span class="kpi-value skeleton" *ngIf="!metrics">—</span>
+        <span class="kpi-sub">IT Load</span>
+      </div>
+    </div>
+
+    <!-- Waste Heat Generated -->
+    <div class="kpi-card kpi-orange">
+      <div class="kpi-icon">🔥</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Waste Heat Generated</span>
+        <span class="kpi-value" *ngIf="metrics">{{ metrics.waste_HEAT_GENERATED_KW | number:'1.0-0' }} kW</span>
+        <span class="kpi-value skeleton" *ngIf="!metrics">—</span>
+        <span class="kpi-sub">Available for distribution</span>
+      </div>
+    </div>
+
+    <!-- PUE -->
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-icon">📐</div>
+      <div class="kpi-body">
+        <span class="kpi-label">PUE</span>
+        <span class="kpi-value" *ngIf="metrics">{{ metrics.pUE | number:'1.2-3' }}</span>
+        <span class="kpi-value skeleton" *ngIf="!metrics">—</span>
+        <span class="kpi-sub">Power Usage Effectiveness</span>
+      </div>
+    </div>
+
+    <!-- Exhaust Temp -->
+    <div class="kpi-card kpi-red">
+      <div class="kpi-icon">🌡️</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Exhaust Temperature</span>
+        <span class="kpi-value" *ngIf="metrics">{{ metrics.temperature_CELSIUS | number:'1.0-1' }}°C</span>
+        <span class="kpi-value skeleton" *ngIf="!metrics">—</span>
+        <span class="kpi-sub">Heat output temperature</span>
+      </div>
+    </div>
+
+    <!-- Total Demand (season) -->
+    <div class="kpi-card kpi-green">
+      <div class="kpi-icon">📋</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Total Demand ({{ getSeasonLabel(selectedSeason) }})</span>
+        <span class="kpi-value">{{ demands | sumDemand }} kW</span>
+        <span class="kpi-sub">Across all ecosystems</span>
+      </div>
+    </div>
+
+    <!-- Utilization -->
+    <div class="kpi-card kpi-teal">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Heat Utilization</span>
+        <span class="kpi-value" *ngIf="allocation">{{ allocation.utilization_PERCENT | number:'1.0-1' }}%</span>
+        <span class="kpi-value" *ngIf="!allocation">—</span>
+        <span class="kpi-sub">After last optimization run</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Optimization Result ─────────────────────────────────────────────── -->
+  <div *ngIf="allocation" class="section-card">
+    <h2 class="section-title">⚡ Last Optimization Result
+      <span class="badge-surplus" *ngIf="allocation.is_SURPLUS">SURPLUS</span>
+      <span class="badge-deficit" *ngIf="!allocation.is_SURPLUS">DEFICIT</span>
+    </h2>
+
+    <!-- Supply vs Demand Bar -->
+    <div class="supply-demand-bar">
+      <div class="bar-label">
+        <span>Supply: <strong>{{ allocation.total_SUPPLY_KW | number:'1.0-0' }} kW</strong></span>
+        <span>Demand: <strong>{{ allocation.total_DEMAND_KW | number:'1.0-0' }} kW</strong></span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill supply-fill"
+             [style.width.%]="allocation.is_SURPLUS ? 100 : (allocation.total_SUPPLY_KW / allocation.total_DEMAND_KW * 100)">
+        </div>
+        <div class="bar-fill demand-fill"
+             [style.width.%]="allocation.is_SURPLUS ? (allocation.total_DEMAND_KW / allocation.total_SUPPLY_KW * 100) : 100"
+             style="opacity:0.35">
+        </div>
+      </div>
+    </div>
+
+    <!-- Ecosystem Allocation Cards -->
+    <div class="eco-alloc-grid">
+      <div class="eco-alloc-card" *ngFor="let eco of ecosystems">
+        <div class="eco-header">
+          <span class="eco-icon">{{ eco.icon }}</span>
+          <span class="eco-name">{{ eco.name }}</span>
+          <span class="eco-priority">P{{ eco.priority }}</span>
+        </div>
+        <div class="eco-bar-track">
+          <div class="eco-bar-fill"
+               [style.width.%]="getAllocatedForEco(eco.name) > 0 ? (getAllocatedForEco(eco.name) / getDemandForEco(eco.name) * 100) : 0"
+               [style.background]="eco.color">
+          </div>
+        </div>
+        <div class="eco-numbers">
+          <span [style.color]="eco.color">{{ getAllocatedForEco(eco.name) | number:'1.0-0' }} kW</span>
+          <span class="eco-demand">/ {{ getDemandForEco(eco.name) | number:'1.0-0' }} kW</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decision Notes -->
+    <div class="decision-notes" *ngIf="allocation.decisionNotes?.length">
+      <h3>📋 Decision Log</h3>
+      <ul>
+        <li *ngFor="let note of allocation.decisionNotes">{{ note }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── Storage Status Card ─────────────────────────────────────────────── -->
+  <div *ngIf="storage" class="section-card storage-card">
+    <h2 class="section-title">🔋 Thermal Storage Status</h2>
+    <div class="storage-body">
+      <div class="storage-gauge">
+        <div class="gauge-track">
+          <div class="gauge-fill" [style.width.%]="storage.charge_PERCENTAGE"
+               [class.gauge-charging]="storage.state === 1"
+               [class.gauge-discharging]="storage.state === 2">
+          </div>
+        </div>
+        <div class="gauge-label">{{ storage.charge_PERCENTAGE | number:'1.0-1' }}% charged</div>
+      </div>
+      <div class="storage-stats">
+        <div class="stat-item">
+          <span class="stat-label">State</span>
+          <span class="stat-value state-badge" [ngClass]="getStorageStateClass()">{{ getStorageStateLabel() }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Stored</span>
+          <span class="stat-value">{{ storage.current_STORED_HEAT_KWH | number:'1.0-0' }} kWh</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Capacity</span>
+          <span class="stat-value">{{ storage.storage_CAPACITY_KWH | number:'1.0-0' }} kWh</span>
+        </div>
+        <div class="stat-item" *ngIf="storage.state === 1">
+          <span class="stat-label">Charging Rate</span>
+          <span class="stat-value">{{ storage.charging_RATE_KW | number:'1.0-1' }} kW</span>
+        </div>
+        <div class="stat-item" *ngIf="storage.state === 2">
+          <span class="stat-label">Discharge Rate</span>
+          <span class="stat-value">{{ storage.discharging_RATE_KW | number:'1.0-1' }} kW</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ecosystem Demand Summary -->
+  <div class="section-card" *ngIf="demands.length">
+    <h2 class="section-title">{{ getSeasonIcon(selectedSeason) }} Season Demand Breakdown — {{ getSeasonLabel(selectedSeason) }}</h2>
+    <div class="demand-table-wrap">
+      <table class="demand-table">
+        <thead>
+          <tr>
+            <th>Ecosystem</th>
+            <th>Priority</th>
+            <th>Demand (kW)</th>
+            <th>Temp Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of demands">
+            <td>
+              <span class="eco-dot" [style.background]="getEcosystemColor(d.ecosystem_NAME)"></span>
+              {{ d.ecosystem_NAME }}
+            </td>
+            <td><span class="priority-badge">P{{ d.priority }}</span></td>
+            <td><strong>{{ d.demand_VALUE_KW | number:'1.0-0' }} kW</strong></td>
+            <td>{{ d.min_TEMP_REQUIRED }}°C – {{ d.max_TEMP_ACCEPTED }}°C</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Pipe for summing demand values -->
+<!-- NOTE: Angular pipes must be declared. We use direct computation via ngFor here.
+     The template uses a simple sum via getter below: -->
+
+<style>
+/* ── Page ──────────────────────────────────────────────────────────────────── */
+.dashboard { display: flex; flex-direction: column; gap: 24px; }
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.page-title { margin: 0; font-size: 24px; font-weight: 800; color: #e2e8f0; }
+.page-sub   { margin: 4px 0 0; font-size: 13px; color: #64748b; }
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.season-select {
+  background: #0d1a3a;
+  border: 1px solid rgba(56,189,248,0.3);
+  color: #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.temp-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+.temp-control input { width: 100px; cursor: pointer; accent-color: #38bdf8; }
+
+.btn-optimize {
+  background: linear-gradient(135deg, #38bdf8, #f97316);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-optimize:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(56,189,248,0.4); }
+.btn-optimize:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.error-banner {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+/* ── KPI Grid ───────────────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.kpi-card {
+  background: rgba(13,26,58,0.8);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: transform 0.2s;
+}
+.kpi-card:hover { transform: translateY(-3px); }
+.kpi-icon { font-size: 32px; flex-shrink: 0; }
+.kpi-body { display: flex; flex-direction: column; gap: 2px; }
+.kpi-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-value { font-size: 22px; font-weight: 800; }
+.kpi-sub   { font-size: 11px; color: #475569; }
+.skeleton  { color: #475569 !important; }
+
+.kpi-blue   .kpi-value { color: #38bdf8; }
+.kpi-orange .kpi-value { color: #f97316; }
+.kpi-purple .kpi-value { color: #a78bfa; }
+.kpi-red    .kpi-value { color: #f87171; }
+.kpi-green  .kpi-value { color: #4ade80; }
+.kpi-teal   .kpi-value { color: #2dd4bf; }
+
+.kpi-blue   { border-color: rgba(56,189,248,0.2); }
+.kpi-orange { border-color: rgba(249,115,22,0.2); }
+.kpi-purple { border-color: rgba(167,139,250,0.2); }
+.kpi-red    { border-color: rgba(248,113,113,0.2); }
+.kpi-green  { border-color: rgba(74,222,128,0.2); }
+.kpi-teal   { border-color: rgba(45,212,191,0.2); }
+
+/* ── Section Card ────────────────────────────────────────────────────────── */
+.section-card {
+  background: rgba(13,26,58,0.8);
+  border: 1px solid rgba(56,189,248,0.1);
+  border-radius: 16px;
+  padding: 24px;
+}
+.section-title {
+  margin: 0 0 20px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Supply/Demand Bar ───────────────────────────────────────────────────── */
+.supply-demand-bar { margin-bottom: 20px; }
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+.bar-track {
+  height: 16px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  position: absolute;
+  top: 0; left: 0;
+  transition: width 0.6s ease;
+}
+.supply-fill  { background: linear-gradient(90deg, #38bdf8, #f97316); }
+.demand-fill  { background: #e2e8f0; }
+
+/* ── Ecosystem Allocation Grid ───────────────────────────────────────────── */
+.eco-alloc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.eco-alloc-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.eco-header { display: flex; align-items: center; gap: 8px; }
+.eco-icon   { font-size: 18px; }
+.eco-name   { flex: 1; font-size: 13px; font-weight: 600; color: #cbd5e1; }
+.eco-priority { font-size: 11px; color: #475569; }
+.eco-bar-track {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.eco-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+  max-width: 100%;
+}
+.eco-numbers { display: flex; align-items: baseline; gap: 4px; font-size: 15px; font-weight: 700; }
+.eco-demand  { font-size: 12px; color: #475569; font-weight: 400; }
+
+/* ── Decision Notes ──────────────────────────────────────────────────────── */
+.decision-notes {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  padding: 14px;
+}
+.decision-notes h3 { margin: 0 0 10px; font-size: 14px; color: #94a3b8; }
+.decision-notes ul { margin: 0; padding-left: 18px; }
+.decision-notes li { font-size: 13px; color: #64748b; line-height: 1.8; }
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+.badge-surplus {
+  font-size: 11px; font-weight: 700;
+  background: rgba(34,197,94,0.15);
+  color: #4ade80;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(34,197,94,0.3);
+}
+.badge-deficit {
+  font-size: 11px; font-weight: 700;
+  background: rgba(239,68,68,0.15);
+  color: #f87171;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+.priority-badge {
+  font-size: 11px;
+  background: rgba(56,189,248,0.1);
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ── Storage Card ────────────────────────────────────────────────────────── */
+.storage-card .storage-body {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.storage-gauge { flex: 1; min-width: 200px; }
+.gauge-track {
+  height: 24px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.6s ease;
+  background: linear-gradient(90deg, #3b82f6, #38bdf8);
+}
+.gauge-fill.gauge-charging    { background: linear-gradient(90deg, #22c55e, #38bdf8); }
+.gauge-fill.gauge-discharging { background: linear-gradient(90deg, #f97316, #ef4444); }
+.gauge-label { font-size: 14px; color: #94a3b8; text-align: center; }
+
+.storage-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.stat-item { display: flex; flex-direction: column; gap: 4px; }
+.stat-label { font-size: 11px; color: #475569; text-transform: uppercase; }
+.stat-value { font-size: 16px; font-weight: 700; color: #e2e8f0; }
+
+.state-badge { padding: 3px 10px; border-radius: 20px; font-size: 13px; }
+.state-idle         { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.state-charging     { background: rgba(34,197,94,0.15); color: #4ade80; }
+.state-discharging  { background: rgba(249,115,22,0.15); color: #fb923c; }
+
+/* ── Demand Table ────────────────────────────────────────────────────────── */
+.demand-table-wrap { overflow-x: auto; }
+.demand-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.demand-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #475569;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.demand-table td {
+  padding: 12px 14px;
+  color: #cbd5e1;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.demand-table tr:hover td { background: rgba(56,189,248,0.04); }
+.eco-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+</style>

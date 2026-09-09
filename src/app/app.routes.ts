@@ -72,6 +72,10 @@ export const routes: Routes = [
    {
     path: 'tejas',
     loadChildren: () => import('./TejasBillShop/tejas.routes').then(m => m.routes)
+  },
+  {
+    path: 'haas',
+    loadChildren: () => import('./HaaS/haas.routes').then(m => m.HAAS_ROUTES)
   }
 ];
 

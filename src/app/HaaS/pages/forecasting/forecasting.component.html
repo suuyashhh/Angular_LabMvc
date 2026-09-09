@@ -1,0 +1,282 @@
+<div class="forecasting-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">📈 Demand Forecasting & Analytics</h1>
+      <p class="page-sub">Hourly heat demand patterns and seasonal comparison charts</p>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="selectedView === 'hourly'"
+              (click)="selectedView = 'hourly'" id="tab-hourly">📊 24h Forecast</button>
+      <button class="tab-btn" [class.active]="selectedView === 'compare'"
+              (click)="selectedView = 'compare'" id="tab-compare">⚖️ Winter vs Summer</button>
+      <button class="tab-btn" [class.active]="selectedView === 'history'"
+              (click)="selectedView = 'history'" id="tab-history">📉 Metrics History</button>
+    </div>
+  </div>
+
+  <!-- ── View: 24h Hourly Forecast ─────────────────────────────────────── -->
+  <div *ngIf="selectedView === 'hourly'" class="section-card">
+    <h2 class="section-title">🕐 24-Hour Demand Forecast (Synthetic Model)</h2>
+    <div class="legend-row">
+      <div class="legend-item"><span class="dot" style="background:#ef4444"></span>District Heating</div>
+      <div class="legend-item"><span class="dot" style="background:#22c55e"></span>Agriculture</div>
+      <div class="legend-item"><span class="dot" style="background:#f97316"></span>Industry</div>
+      <div class="legend-item"><span class="dot" style="background:#3b82f6"></span>Storage</div>
+      <div class="legend-item"><span class="dot" style="background:#38bdf8; border: 2px dashed #38bdf8"></span>Supply</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-y-labels">
+        <span>500</span><span>400</span><span>300</span><span>200</span><span>100</span><span>0</span>
+      </div>
+      <div class="hourly-chart">
+        <div class="chart-bars-scroll">
+          <div *ngFor="let h of hourlyData" class="hour-col">
+            <!-- Stacked bar: District + Agriculture + Industry + Storage -->
+            <div class="stacked-bar">
+              <div class="bar-seg" title="Storage: {{h.storageKW}} kW"
+                   [style.height.%]="getBarPercent(h.storageKW)"
+                   style="background:#3b82f6"></div>
+              <div class="bar-seg" title="Industry: {{h.industryKW}} kW"
+                   [style.height.%]="getBarPercent(h.industryKW)"
+                   style="background:#f97316"></div>
+              <div class="bar-seg" title="Agriculture: {{h.agricultureKW}} kW"
+                   [style.height.%]="getBarPercent(h.agricultureKW)"
+                   style="background:#22c55e"></div>
+              <div class="bar-seg" title="District: {{h.districtKW}} kW"
+                   [style.height.%]="getBarPercent(h.districtKW)"
+                   style="background:#ef4444"></div>
+            </div>
+            <!-- Supply line dot -->
+            <div class="supply-dot" [style.bottom.%]="getBarPercent(h.supplyKW)" title="Supply: {{h.supplyKW}} kW"></div>
+            <span class="hour-label">{{ h.hour % 3 === 0 ? h.label : '' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table: Peak Hours -->
+    <h3 class="sub-title">📍 Key Insights</h3>
+    <div class="insight-grid">
+      <div class="insight-card">
+        <span class="insight-icon">🏘️</span>
+        <span class="insight-label">District Heating</span>
+        <span class="insight-value">Peaks at 07:00 & 18:00</span>
+        <span class="insight-sub">Morning warm-up + evening return</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">🌿</span>
+        <span class="insight-label">Agriculture</span>
+        <span class="insight-value">Stable 60–80% of capacity</span>
+        <span class="insight-sub">Slight midday dip (photosynthesis)</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">🏭</span>
+        <span class="insight-label">Industry</span>
+        <span class="insight-value">~90% constant demand</span>
+        <span class="insight-sub">Brief maintenance window at 02:00</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-icon">🔋</span>
+        <span class="insight-label">Thermal Storage</span>
+        <span class="insight-value">Absorbs off-peak surplus</span>
+        <span class="insight-sub">Charges 00:00–06:00 & 14:00–16:00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── View: Winter vs Summer Comparison ──────────────────────────────── -->
+  <div *ngIf="selectedView === 'compare'" class="section-card">
+    <h2 class="section-title">⚖️ Winter vs Summer — Ecosystem Demand Comparison</h2>
+    <div class="compare-chart">
+      <div *ngFor="let eco of ecosystems" class="compare-row">
+        <div class="compare-eco-label">
+          <span>{{ eco.icon }}</span>
+          <span>{{ eco.name }}</span>
+        </div>
+        <!-- Winter bar -->
+        <div class="compare-bars">
+          <div class="compare-bar-group">
+            <span class="season-label winter-lbl">❄️ Winter</span>
+            <div class="compare-bar-track">
+              <div class="compare-bar-fill winter-fill"
+                   [style.width.%]="getEcoBarHeight(getWinterDemand(eco.type))"
+                   [style.background]="eco.color">
+              </div>
+            </div>
+            <span class="compare-bar-val">{{ getWinterDemand(eco.type) | number:'1.0-0' }} kW</span>
+          </div>
+          <div class="compare-bar-group">
+            <span class="season-label summer-lbl">☀️ Summer</span>
+            <div class="compare-bar-track">
+              <div class="compare-bar-fill summer-fill"
+                   [style.width.%]="getEcoBarHeight(getSummerDemand(eco.type))"
+                   [style.background]="eco.color"
+                   style="opacity:0.5">
+              </div>
+            </div>
+            <span class="compare-bar-val">{{ getSummerDemand(eco.type) | number:'1.0-0' }} kW</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-insight">
+      <h3 class="sub-title">🔍 Key Takeaways</h3>
+      <ul class="insight-list">
+        <li>❄️ <strong>District Heating</strong> demand is <em>9× higher</em> in winter than summer — the primary driver of seasonal heat distribution</li>
+        <li>🌿 <strong>Agriculture</strong> demand decreases in summer due to natural warmth reducing heating requirements</li>
+        <li>🏭 <strong>Industry</strong> demand is constant year-round (metal melting, chemical processes are temperature-insensitive to seasons)</li>
+        <li>🔋 <strong>Thermal Storage</strong> absorbs more in summer when heating demand is low — stores energy for winter discharge</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── View: Metrics History ───────────────────────────────────────────── -->
+  <div *ngIf="selectedView === 'history'" class="section-card">
+    <h2 class="section-title">📉 Recent Data Center Metrics History</h2>
+    <div *ngIf="metricsHistory.length === 0" class="empty-msg">
+      No history data yet. Run an optimization from the Dashboard first.
+    </div>
+    <div class="history-chart" *ngIf="metricsHistory.length > 0">
+      <div *ngFor="let m of metricsHistory; let i = index" class="history-row">
+        <span class="history-ts">{{ m.timestamp | date:'HH:mm' }}</span>
+        <div class="history-bar-wrap">
+          <div class="history-bar power-bar"
+               [style.width.%]="(m.power_CONSUMPTION_KW / getMaxHistory()) * 100"
+               title="Power: {{ m.power_CONSUMPTION_KW }} kW">
+          </div>
+        </div>
+        <div class="history-bar-wrap">
+          <div class="history-bar heat-bar"
+               [style.width.%]="(m.waste_HEAT_GENERATED_KW / getMaxHistory()) * 100"
+               title="Heat: {{ m.waste_HEAT_GENERATED_KW }} kW">
+          </div>
+        </div>
+        <div class="history-stats">
+          <span class="stat-p">⚡ {{ m.power_CONSUMPTION_KW | number:'1.0-0' }} kW</span>
+          <span class="stat-h">🔥 {{ m.waste_HEAT_GENERATED_KW | number:'1.0-0' }} kW</span>
+          <span class="stat-pue">PUE {{ m.pUE | number:'1.2-3' }}</span>
+        </div>
+      </div>
+      <div class="legend-row" style="margin-top:12px">
+        <div class="legend-item"><span class="dot" style="background:#38bdf8"></span>Power Consumption</div>
+        <div class="legend-item"><span class="dot" style="background:#f97316"></span>Waste Heat Generated</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.forecasting-page { display: flex; flex-direction: column; gap: 24px; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+.page-title { margin: 0; font-size: 24px; font-weight: 800; color: #e2e8f0; }
+.page-sub   { margin: 4px 0 0; font-size: 13px; color: #64748b; }
+
+.tab-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab-btn {
+  background: rgba(13,26,58,0.8);
+  border: 1px solid rgba(56,189,248,0.15);
+  color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.tab-btn.active, .tab-btn:hover {
+  background: rgba(56,189,248,0.12);
+  color: #38bdf8;
+  border-color: rgba(56,189,248,0.4);
+}
+
+.section-card { background: rgba(13,26,58,0.8); border: 1px solid rgba(56,189,248,0.1); border-radius: 16px; padding: 24px; }
+.section-title { margin: 0 0 20px; font-size: 17px; font-weight: 700; color: #e2e8f0; }
+.sub-title { font-size: 14px; font-weight: 700; color: #94a3b8; margin: 20px 0 12px; }
+
+/* Legend */
+.legend-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* Hourly Chart */
+.chart-wrap { display: flex; gap: 8px; align-items: flex-end; }
+.chart-y-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  font-size: 10px;
+  color: #475569;
+  min-width: 30px;
+  text-align: right;
+}
+.hourly-chart { flex: 1; overflow: hidden; }
+.chart-bars-scroll { display: flex; gap: 3px; align-items: flex-end; overflow-x: auto; padding-bottom: 4px; }
+.hour-col { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; min-width: 22px; }
+.stacked-bar {
+  width: 16px;
+  height: 200px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+}
+.bar-seg { min-height: 1px; border-radius: 2px; transition: height 0.3s; }
+.supply-dot {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: #38bdf8;
+  border-radius: 50%;
+  border: 1px solid #0d1a3a;
+}
+.hour-label { font-size: 9px; color: #475569; min-height: 14px; }
+
+/* Insights grid */
+.insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.insight-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.insight-icon { font-size: 22px; }
+.insight-label { font-size: 12px; color: #64748b; font-weight: 600; }
+.insight-value { font-size: 14px; color: #e2e8f0; font-weight: 700; }
+.insight-sub { font-size: 11px; color: #475569; }
+
+/* Compare chart */
+.compare-chart { display: flex; flex-direction: column; gap: 20px; }
+.compare-row { display: flex; gap: 16px; align-items: flex-start; }
+.compare-eco-label { display: flex; gap: 6px; align-items: center; font-size: 13px; color: #94a3b8; min-width: 140px; }
+.compare-bars { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.compare-bar-group { display: flex; align-items: center; gap: 8px; }
+.season-label { font-size: 11px; min-width: 70px; color: #64748b; }
+.compare-bar-track { flex: 1; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; }
+.compare-bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+.compare-bar-val { font-size: 12px; color: #94a3b8; min-width: 60px; text-align: right; }
+
+.insight-list { margin: 0; padding-left: 20px; }
+.insight-list li { font-size: 13px; color: #64748b; line-height: 2; }
+
+/* History chart */
+.history-chart { display: flex; flex-direction: column; gap: 6px; }
+.history-row { display: flex; align-items: center; gap: 10px; }
+.history-ts { font-size: 11px; color: #475569; min-width: 40px; }
+.history-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; }
+.history-bar { height: 100%; border-radius: 4px; transition: width 0.4s; }
+.power-bar { background: #38bdf8; }
+.heat-bar  { background: #f97316; }
+.history-stats { display: flex; gap: 8px; font-size: 11px; min-width: 180px; }
+.stat-p { color: #38bdf8; } .stat-h { color: #f97316; } .stat-pue { color: #94a3b8; }
+.empty-msg { color: #475569; font-size: 14px; text-align: center; padding: 40px; }
+</style>
