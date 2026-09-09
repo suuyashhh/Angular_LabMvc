@@ -5,6 +5,7 @@ export interface FoodItem {
   category: string;
   image: string;
   active: boolean;
+  tejasShopesId?: number;
 }
 
 export interface CartItem {
@@ -28,6 +29,8 @@ export interface Bill {
   grandTotal: number;
   createdAt: string;
   updatedAt: string;
+  tejasShopesId?: number;
+  shopName?: string;
 }
 
 export interface PrinterSettings {
@@ -51,9 +54,26 @@ export interface ShopDetails {
   phone: string;
 }
 
+export interface TejasShop {
+  tejaS_SHOPES_ID: number;
+  shoP_NAME: string;
+  shoP_CODE?: string;
+  address?: string;
+  contact?: string;
+  email?: string;
+  gsT_NO?: string;
+  logO_URL?: string;
+  active?: string;
+  createD_AT?: string;
+  updateD_AT?: string;
+  shopName?: string;
+  shopCode?: string;
+}
+
 export interface TopSellingItem {
   name: string;
   image: string;
   sold: number;
   revenue: number;
 }
+

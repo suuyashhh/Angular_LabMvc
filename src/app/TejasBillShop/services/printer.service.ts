@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { PrinterSettings, ShopDetails, Bill, DiscoveredPrinter } from '../models/interfaces';
 import { StorageService } from './storage.service';
+import { TejasShopService } from './tejas-shop.service';
 
 const PRINTER_KEY = 'bc_printer_settings';
 const SHOP_KEY = 'bc_shop_details';
@@ -47,7 +48,10 @@ export class PrinterService {
   private bluetoothCharacteristic: any = null; // BluetoothRemoteGATTCharacteristic
   private usbDevice: any = null; // USBDevice
 
-  constructor(private storage: StorageService) {
+  constructor(
+    private storage: StorageService,
+    @Optional() private shopService?: TejasShopService
+  ) {
     this.load();
     this.tryReconnect();
   }
@@ -72,6 +76,18 @@ export class PrinterService {
   }
 
   getShopDetails(): ShopDetails {
+    const active = this.shopService?.selectedShop;
+    if (active) {
+      return {
+        shopName: active.shoP_NAME || 'TEJAS NASTA CENTER',
+        address: active.address || 'Tanand Phata - Kalambi Miraj',
+        phone: active.contact || '9730532999'
+      };
+    }
+    const saved = this.shopSubject.getValue();
+    if (saved && saved.shopName && saved.shopName !== 'Breakfast Center') {
+      return saved;
+    }
     return {
       shopName: 'TEJAS NASTA CENTER',
       address: 'Tanand Phata - Kalambi Miraj',

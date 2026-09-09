@@ -6,6 +6,7 @@ import { BillingService } from '../../services/billing.service';
 import { PrinterService } from '../../services/printer.service';
 
 import { FormsModule } from '@angular/forms';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 @Component({
   selector: 'app-entries',
@@ -24,7 +25,8 @@ export class EntriesComponent implements OnInit {
 
   constructor(
     private billing: BillingService,
-    private printer: PrinterService
+    private printer: PrinterService,
+    public shopService: TejasShopService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +37,10 @@ export class EntriesComponent implements OnInit {
     const todayStr = `${yyyy}-${mm}-${dd}`;
     this.startDate = todayStr;
     this.endDate = todayStr;
+
+    this.shopService.selectedShop$.subscribe(() => {
+      this.applyFilter();
+    });
 
     this.applyFilter();
   }
