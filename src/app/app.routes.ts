@@ -1,20 +1,28 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
 import { authGuard } from './shared/auth.guard';
-import { LogindairyComponent } from './LoginDairFarm/logindairy/logindairy.component';
 import { dairyAuthGuard } from './shared/dairy-auth.guard';
-import { LoginfarmComponent } from './LoginFarm/loginfarm/loginfarm.component';
 import { farmAuthGuard } from './shared/farm-auth.guard';
 import { parkingAuthGuard } from './shared/parking-auth.guard';
 
 export const routes: Routes = [
 
   { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
-  { path: 'lab', component: LoginComponent },
-
-  { path: 'login', component: LoginComponent },
-  { path: 'dairyfarm', component: LogindairyComponent},
-  { path: 'farm', component: LoginfarmComponent},
+  { 
+    path: 'lab', 
+    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent) 
+  },
+  { 
+    path: 'login', 
+    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent) 
+  },
+  { 
+    path: 'dairyfarm', 
+    loadComponent: () => import('./LoginDairFarm/logindairy/logindairy.component').then(m => m.LogindairyComponent)
+  },
+  { 
+    path: 'farm', 
+    loadComponent: () => import('./LoginFarm/loginfarm/loginfarm.component').then(m => m.LoginfarmComponent)
+  },
 
   {
     path: 'portfolio',

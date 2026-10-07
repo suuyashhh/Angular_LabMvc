@@ -7,8 +7,8 @@ import { Injectable } from '@angular/core';
 })
 export class ApiService {
 
-//baseurl = 'https://localhost:7193/api/';
-  baseurl =  'https://backend.suyashpatil.in/api/';
+baseurl = 'https://localhost:7193/api/';
+  //baseurl =  'https://backend.suyashpatil.in/api/';
   //baseurl = 'https://labmvcapi.bsite.net/api/';
 
   /** Alias for baseurl — used by SmartParking components */
@@ -46,10 +46,12 @@ export class ApiService {
   }
 
   private getComId(): string {
-  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-  return userDetails.coM_ID || '';
-  // return JSON.parse(localStorage.getItem('COM_ID') || '');
-}
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+    return userDetails.coM_ID || '';
+  }
 
 
 get(api: string, params: any = {}) {
@@ -67,7 +69,10 @@ get(api: string, params: any = {}) {
 }
 
 post(api: string, data: any) {
-  const userDetails = JSON.parse(localStorage.getItem('userDetails') || 'null');
+  let userDetails: any = null;
+  if (typeof window !== 'undefined') {
+    userDetails = JSON.parse(localStorage.getItem('userDetails') || 'null');
+  }
   if (userDetails && !this.isSmartParkingApi(api)) {
     data.CRT_BY = userDetails.name || '';
     data.COM_ID = this.getComId();
