@@ -7,6 +7,7 @@ import { AuthService } from '../../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../../services/loader.service';
 import { ImageCompressionService } from '../../../shared/Imagecompression.service';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 interface TejasEntry {
   tejaS_ENTRY_ID: number;
@@ -20,6 +21,7 @@ interface TejasEntry {
   imagE4?: string;
   date: string;
   entryType?: number;
+  tejaS_SHOPES_ID?: number;
 }
 
 @Component({
@@ -98,6 +100,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     public loader: LoaderService,
     private imageCompression: ImageCompressionService,
+    public shopService: TejasShopService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -107,10 +110,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadTejasUserData();
     this.loadEntries();
     this.loadExpenseTypes();
+
+    this.shopService.selectedShop$.subscribe(() => {
+      this.loadEntries();
+      this.loadExpenseTypes();
+    });
   }
 
   loadExpenseTypes() {
-    this.api.get('TejasExpenseType/GetAll').subscribe({
+    this.api.get('TejasExpenseType/GetAll', { shopId: this.shopService.currentShopId }).subscribe({
       next: (res: any) => {
         this.expenseTypes = Array.isArray(res) ? res : [];
       },
@@ -167,7 +175,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.api.get('TejasEntry/GetAllTypesEntrys', {
       userId: this.userId,
       fromDate: todayStr,
-      toDate: todayStr
+      toDate: todayStr,
+      shopId: this.shopService.currentShopId
     }).subscribe({
       next: (res: any) => {
         this.entries = Array.isArray(res) ? res : [];
@@ -377,7 +386,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         image3: imagePaths[2],
         image4: imagePaths[3],
         date: this.formData.date,
-        entryType: this.formData.entryType
+        entryType: this.formData.entryType,
+        tejaS_SHOPES_ID: this.shopService.currentShopId
       };
 
       const result: any = await this.api.post('TejasEntry/Insert', payload).toPromise();
@@ -617,7 +627,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         image3: imagePaths[2],
         image4: imagePaths[3],
         date: this.editFormData.date,
-        entryType: this.editFormData.entryType
+        entryType: this.editFormData.entryType,
+        tejaS_SHOPES_ID: this.selectedEntry.tejaS_SHOPES_ID || this.shopService.currentShopId
       };
 
       const result: any = await this.api.put('TejasEntry/Update', payload).toPromise();

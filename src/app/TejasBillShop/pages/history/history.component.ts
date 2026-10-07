@@ -7,6 +7,7 @@ import { AuthService } from '../../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../../services/loader.service';
 import { ImageCompressionService } from '../../../shared/Imagecompression.service';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 interface TejasEntry {
   tejaS_ENTRY_ID: number;
@@ -20,6 +21,7 @@ interface TejasEntry {
   imagE4?: string;
   date: string;
   entryType?: number;
+  tejaS_SHOPES_ID?: number;
 }
 
 @Component({
@@ -87,6 +89,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     public loader: LoaderService,
     private imageCompression: ImageCompressionService,
+    public shopService: TejasShopService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -96,6 +99,10 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.initDates();
     this.loadTejasUserData();
     this.loadEntries();
+
+    this.shopService.selectedShop$.subscribe(() => {
+      this.loadEntries();
+    });
   }
 
   ngOnDestroy() {
@@ -144,7 +151,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
     this.api.get('TejasEntry/GetAllTypesEntrys', { 
       userId: this.userId,
       fromDate: this.fromDate,
-      toDate: this.toDate
+      toDate: this.toDate,
+      shopId: this.shopService.currentShopId
     }).subscribe({
       next: (res: any) => {
         this.entries = Array.isArray(res) ? res : [];
@@ -456,7 +464,8 @@ export class HistoryComponent implements OnInit, OnDestroy {
         image3: imagePaths[2],
         image4: imagePaths[3],
         date: this.editFormData.date,
-        entryType: this.editFormData.entryType
+        entryType: this.editFormData.entryType,
+        tejas_shopes_id: this.selectedEntry.tejaS_SHOPES_ID || this.shopService.currentShopId
       };
       
       const result: any = await this.api.put('TejasEntry/Update', payload).toPromise();

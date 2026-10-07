@@ -8,6 +8,7 @@ import { finalize } from 'rxjs/operators';
 import { ApiService } from '../../../shared/api.service';
 import { AuthService } from '../../../shared/auth.service';
 import { LoaderService } from '../../../services/loader.service';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,7 @@ export class LoginComponent implements OnInit {
   private toastr = inject(ToastrService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private shopService = inject(TejasShopService);
 
   ngOnInit() {
     if (this.auth.isTejasLoggedIn()) {
@@ -78,15 +80,22 @@ export class LoginComponent implements OnInit {
         next: (res: any) => {
           const rawUser = res?.userDetails || res?.user || res;
           if (rawUser && (rawUser.useR_ID || rawUser.USER_ID || rawUser.userId)) {
+            const shopId = Number(rawUser.tejas_shopes_id || rawUser.tejaS_SHOPES_ID || rawUser.TEJAS_SHOPES_ID || rawUser.shopId || 1);
+            const shopName = rawUser.shop_name || rawUser.shoP_NAME || rawUser.shopName || 'Main Branch';
+
             const userObj = {
               userId: rawUser.useR_ID || rawUser.USER_ID || rawUser.userId,
               name: rawUser.useR_NAME || rawUser.USER_NAME || rawUser.userName,
               username: rawUser.useR_NAME || rawUser.USER_NAME || rawUser.userName,
               role: rawUser.role || 'employee',
-              user_img: rawUser.useR_IMG || rawUser.USER_IMG || rawUser.userImg || rawUser.user_img
+              user_img: rawUser.useR_IMG || rawUser.USER_IMG || rawUser.userImg || rawUser.user_img,
+              tejas_shopes_id: shopId,
+              shop_name: shopName
             };
 
             localStorage.setItem('Tejas_user', JSON.stringify(userObj));
+            this.shopService.selectShopById(shopId);
+
             if (res?.token) {
               localStorage.setItem('Tejas_token', res.token);
             }

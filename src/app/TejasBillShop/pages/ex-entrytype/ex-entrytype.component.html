@@ -2,7 +2,7 @@
   <!-- Page Header -->
   <div class="page-header d-flex flex-column flex-sm-row gap-3 align-items-start align-items-sm-center">
     <div>
-      <span class="page-header-subtitle">MASTER</span>
+      <span class="page-header-subtitle">MASTER &bull; {{ shopService.selectedShop?.shoP_NAME || shopService.selectedShop?.shopName || 'Branch' }}</span>
       <h1 class="page-header-title">Expense Types</h1>
     </div>
     <button (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center justify-content-center gap-2 shadow-sm w-100 w-sm-auto">

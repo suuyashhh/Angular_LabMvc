@@ -1,0 +1,204 @@
+<div class="container-fluid px-3 px-md-4 py-4 pb-5">
+  <!-- Page Header -->
+  <div class="page-header d-flex flex-column flex-sm-row gap-3 align-items-start align-items-sm-center justify-content-between mb-4">
+    <div>
+      <span class="page-header-subtitle">MANAGEMENT</span>
+      <h1 class="page-header-title">Tejas Shops & Branches</h1>
+    </div>
+    <div class="d-flex gap-2 w-100 w-sm-auto">
+      <button *ngIf="isAdmin" (click)="openAddDrawer()" class="btn btn-primary-green d-flex align-items-center justify-content-center gap-2 shadow-sm w-100 w-sm-auto">
+        <i class="bi bi-shop"></i>
+        <span>Add Shop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Active Shop Banner -->
+  <div class="active-shop-banner p-3 p-md-4 rounded-3 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 shadow-sm" *ngIf="shopService.currentShop as currentShop">
+    <div class="d-flex align-items-center gap-3">
+      <div class="shop-badge-icon">
+        <i class="bi bi-buildings-fill text-white fs-4"></i>
+      </div>
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-success">ACTIVE BRANCH</span>
+          <span class="text-muted small">ID: #{{ currentShop.tejaS_SHOPES_ID }}</span>
+        </div>
+        <h3 class="fw-bold mb-0 mt-1">{{ currentShop.shoP_NAME }}</h3>
+        <p class="text-muted mb-0 small" *ngIf="currentShop.address">
+          <i class="bi bi-geo-alt"></i> {{ currentShop.address }}
+        </p>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <span class="text-muted small" *ngIf="currentShop.contact">
+        <i class="bi bi-telephone"></i> {{ currentShop.contact }}
+      </span>
+      <span class="text-muted small" *ngIf="currentShop.gsT_NO">
+        <i class="bi bi-file-text"></i> GST: {{ currentShop.gsT_NO }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="row mb-4">
+    <div class="col-12 col-md-6">
+      <div class="input-group shadow-sm border-0 rounded-3 overflow-hidden">
+        <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" class="form-control border-0 ps-0 py-2.5" placeholder="Search shops by name, code, contact or address..." [(ngModel)]="searchQuery" (input)="filterShops()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Shops Grid -->
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let shop of filteredShops">
+      <div class="shop-card p-4" [class.is-selected]="shop.tejaS_SHOPES_ID === shopService.currentShopId">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="shop-avatar">
+              <i class="bi bi-shop fs-4"></i>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                <h4 class="fw-bold mb-0 text-truncate" style="max-width: 160px;" [title]="shop.shoP_NAME">{{ shop.shoP_NAME }}</h4>
+                <span class="badge" [ngClass]="shop.active === 'N' ? 'bg-danger' : 'bg-success'">
+                  {{ shop.active === 'N' ? 'Inactive' : 'Active' }}
+                </span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">ID: #{{ shop.tejaS_SHOPES_ID }}</span>
+                <span class="badge bg-light text-dark border" *ngIf="shop.shoP_CODE">{{ shop.shoP_CODE }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-1" *ngIf="isAdmin">
+            <button (click)="openEditDrawer(shop)" class="btn btn-sm btn-action-icon" title="Edit">
+              <i class="bi bi-pencil text-secondary"></i>
+            </button>
+            <button (click)="confirmDelete(shop.tejaS_SHOPES_ID)" class="btn btn-sm btn-action-icon" title="Deactivate">
+              <i class="bi bi-power text-danger"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="shop-card-info border-top pt-3 mt-2">
+          <div class="d-flex align-items-start gap-2 text-muted small mb-2" *ngIf="shop.address">
+            <i class="bi bi-geo-alt mt-1"></i>
+            <span>{{ shop.address }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 text-muted small mb-2" *ngIf="shop.contact">
+            <i class="bi bi-telephone"></i>
+            <span>{{ shop.contact }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 text-muted small" *ngIf="shop.gsT_NO">
+            <i class="bi bi-receipt"></i>
+            <span>GST: {{ shop.gsT_NO }}</span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+          <button *ngIf="shop.tejaS_SHOPES_ID !== shopService.currentShopId" (click)="selectAndSwitchShop(shop)" class="btn btn-sm btn-outline-success w-100 rounded-pill py-1.5 font-semibold">
+            <i class="bi bi-check2-circle"></i> Switch to this Shop
+          </button>
+          <div *ngIf="shop.tejaS_SHOPES_ID === shopService.currentShopId" class="w-100 text-center py-1 text-success fw-bold small d-flex align-items-center justify-content-center gap-1">
+            <i class="bi bi-check-circle-fill"></i> Currently Active
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="col-12 text-center py-5" *ngIf="filteredShops.length === 0">
+      <div class="p-5 bg-white rounded-4 shadow-sm border">
+        <i class="bi bi-shop display-4 text-muted mb-3 d-block"></i>
+        <h4 class="fw-bold">No Shops Found</h4>
+        <p class="text-muted">No shops match your criteria or none have been added yet.</p>
+        <button *ngIf="isAdmin" (click)="openAddDrawer()" class="btn btn-primary-green mt-2">
+          <i class="bi bi-plus-circle"></i> Create First Shop
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Drawer -->
+  <div class="drawer-backdrop" *ngIf="isDrawerOpen" (click)="closeDrawer()"></div>
+  <div class="side-drawer shadow-lg" [class.open]="isDrawerOpen">
+    <div class="drawer-header d-flex justify-content-between align-items-center p-4 border-bottom">
+      <div>
+        <h3 class="fw-bold mb-0">{{ editMode ? 'Edit Shop / Branch' : 'Add New Shop' }}</h3>
+        <span class="text-muted small">Configure shop information and branch settings</span>
+      </div>
+      <button class="btn btn-close" (click)="closeDrawer()"></button>
+    </div>
+
+    <div class="drawer-body p-4">
+      <form (ngSubmit)="saveShop()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Shop / Branch Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control py-2" placeholder="e.g. Tejas Sweets - MG Road Branch" [(ngModel)]="formData.shoP_NAME" name="shoP_NAME" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Branch Code</label>
+          <input type="text" class="form-control py-2" placeholder="e.g. TSS02" [(ngModel)]="formData.shoP_CODE" name="shoP_CODE">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Contact / Phone Number</label>
+          <input type="text" class="form-control py-2" placeholder="e.g. 9876543210" [(ngModel)]="formData.contact" name="contact">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email Address</label>
+          <input type="email" class="form-control py-2" placeholder="branch@tejassweets.com" [(ngModel)]="formData.email" name="email">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">GST Number</label>
+          <input type="text" class="form-control py-2" placeholder="e.g. 27AAAAA0000A1Z5" [(ngModel)]="formData.gsT_NO" name="gsT_NO">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Address / Location</label>
+          <textarea class="form-control py-2" rows="3" placeholder="Full shop address..." [(ngModel)]="formData.address" name="address"></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Status</label>
+          <select class="form-select py-2" [(ngModel)]="formData.active" name="active">
+            <option value="Y">Active</option>
+            <option value="N">Inactive</option>
+          </select>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-light w-50 py-2" (click)="closeDrawer()">Cancel</button>
+          <button type="submit" class="btn btn-primary-green w-50 py-2 d-flex align-items-center justify-content-center gap-2" [disabled]="isSaving">
+            <span class="spinner-border spinner-border-sm" *ngIf="isSaving"></span>
+            <span>{{ editMode ? 'Save Changes' : 'Create Shop' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="isDeleteModalOpen" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-body p-4 text-center">
+          <div class="rounded-circle bg-danger-subtle text-danger d-inline-flex p-3 mb-3">
+            <i class="bi bi-exclamation-triangle fs-2"></i>
+          </div>
+          <h4 class="fw-bold mb-2">Deactivate Shop?</h4>
+          <p class="text-muted mb-4">Are you sure you want to deactivate this shop branch? Existing bills and entries will remain preserved.</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-light px-4 py-2" (click)="closeDeleteModal()">Cancel</button>
+            <button type="button" class="btn btn-danger px-4 py-2" (click)="executeDelete()">Deactivate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

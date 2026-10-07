@@ -5,7 +5,7 @@ import { CartItem, Bill, BillItem, FoodItem, TopSellingItem } from '../models/in
 import { StorageService } from './storage.service';
 import { ApiService } from '../../shared/api.service';
 import { LoaderService } from '../../services/loader.service';
-
+import { TejasShopService } from './tejas-shop.service';
 
 @Injectable({ providedIn: 'root' })
 export class BillingService {
@@ -16,9 +16,20 @@ export class BillingService {
   bills$ = this.billsSubject.asObservable();
   private apiUrl: string;
 
-  constructor(private storage: StorageService, private http: HttpClient, private apiService: ApiService, private loader: LoaderService) {
+  constructor(
+    private storage: StorageService,
+    private http: HttpClient,
+    private apiService: ApiService,
+    private loader: LoaderService,
+    private shopService: TejasShopService
+  ) {
     this.apiUrl = this.apiService.baseUrl + 'TejasBilling';
     this.loadBills();
+
+    this.shopService.selectedShop$.subscribe(() => {
+      this.clearCart();
+      this.loadBills();
+    });
   }
 
   // ── Cart ──
@@ -75,19 +86,30 @@ export class BillingService {
 
   // ── Bills ──
 
-  private loadBills(): void {
+  public loadBills(shopId?: number): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const end = new Date(today);
     end.setHours(23, 59, 59, 999);
 
-    this.loader.withLoader(this.http.get<Bill[]>(`${this.apiUrl}?startDate=${today.toISOString()}&endDate=${end.toISOString()}`)).subscribe(bills => {
-      this.billsSubject.next(bills);
+    const sId = shopId !== undefined ? shopId : this.shopService.currentShopId;
+    const url = `${this.apiUrl}?startDate=${today.toISOString()}&endDate=${end.toISOString()}${sId ? `&shopId=${sId}` : ''}`;
+
+    this.loader.withLoader(this.http.get<Bill[]>(url)).subscribe({
+      next: (bills) => {
+        this.billsSubject.next(bills || []);
+      },
+      error: (err) => {
+        console.error('Error loading bills:', err);
+        this.billsSubject.next([]);
+      }
     });
   }
 
-  fetchBillsByDateRange(startDate: string, endDate: string): Observable<Bill[]> {
-    return this.loader.withLoader(this.http.get<Bill[]>(`${this.apiUrl}?startDate=${startDate}&endDate=${endDate}`));
+  fetchBillsByDateRange(startDate: string, endDate: string, shopId?: number): Observable<Bill[]> {
+    const sId = shopId !== undefined ? shopId : this.shopService.currentShopId;
+    const url = `${this.apiUrl}?startDate=${startDate}&endDate=${endDate}${sId ? `&shopId=${sId}` : ''}`;
+    return this.loader.withLoader(this.http.get<Bill[]>(url));
   }
 
   getAllBills(): Bill[] {
@@ -105,11 +127,12 @@ export class BillingService {
       name: c.food.name,
       price: c.food.price,
       quantity: c.quantity,
-      image: '' // Empty string to prevent SQL truncation error if DB column is too small for base64
+      image: '' // Empty string to prevent SQL truncation error
     }));
 
     const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
     const now = new Date().toISOString();
+    const currentShop = this.shopService.currentShop;
 
     const bill: Bill = {
       id: '',
@@ -118,7 +141,9 @@ export class BillingService {
       subtotal,
       grandTotal: subtotal,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      tejasShopesId: this.shopService.currentShopId,
+      shopName: currentShop?.shoP_NAME || ''
     };
 
     const bills = this.getAllBills();
@@ -147,12 +172,15 @@ export class BillingService {
     toSave.subtotal = toSave.items.reduce((s, i) => s + i.price * i.quantity, 0);
     toSave.grandTotal = toSave.subtotal;
     toSave.updatedAt = new Date().toISOString();
+    if (!toSave.tejasShopesId) {
+      toSave.tejasShopesId = this.shopService.currentShopId;
+    }
     
     this.loader.withLoader(this.http.put<Bill>(`${this.apiUrl}/${toSave.id}`, toSave)).subscribe(() => {
-      // Update local object so UI reflects totals/dates if needed
       updated.subtotal = toSave.subtotal;
       updated.grandTotal = toSave.grandTotal;
       updated.updatedAt = toSave.updatedAt;
+      updated.tejasShopesId = toSave.tejasShopesId;
       
       const bills = this.getAllBills().map(b => b.id === updated.id ? updated : b);
       this.billsSubject.next([...bills]);

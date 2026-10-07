@@ -6,6 +6,7 @@ import { BillingService } from '../../services/billing.service';
 import { PrinterService } from '../../services/printer.service';
 
 import { FormsModule } from '@angular/forms';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 @Component({
   selector: 'app-entries',
@@ -24,7 +25,8 @@ export class EntriesComponent implements OnInit {
 
   constructor(
     private billing: BillingService,
-    private printer: PrinterService
+    private printer: PrinterService,
+    public shopService: TejasShopService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +37,10 @@ export class EntriesComponent implements OnInit {
     const todayStr = `${yyyy}-${mm}-${dd}`;
     this.startDate = todayStr;
     this.endDate = todayStr;
+
+    this.shopService.selectedShop$.subscribe(() => {
+      this.applyFilter();
+    });
 
     this.applyFilter();
   }
@@ -85,13 +91,18 @@ export class EntriesComponent implements OnInit {
   }
 
   async reprintBill(bill: Bill): Promise<void> {
-    const result = await this.printer.printBill(bill);
-    if (result === 'not_connected') {
-      this.printMessage = '⚠ Printer is not connected! Go to Printer page to connect.';
-    } else if (result === 'success') {
-      this.printMessage = '✓ Sent to printer!';
-    } else {
-      this.printMessage = '✗ Print failed — try reconnecting';
+    this.printMessage = 'Connecting & Printing...';
+    try {
+      const result = await this.printer.printBill(bill);
+      if (result === 'not_connected') {
+        this.printMessage = '⚠ Bluetooth printer scan cancelled or unavailable';
+      } else if (result === 'success') {
+        this.printMessage = '✓ Sent to printer!';
+      } else {
+        this.printMessage = '✗ Print failed — try again';
+      }
+    } catch (err) {
+      this.printMessage = '✗ Print failed';
     }
     setTimeout(() => this.printMessage = '', 4000);
   }

@@ -119,11 +119,11 @@ export class BillingComponent implements OnInit, OnDestroy {
     try {
       const result = await this.printer.printBill(this.savedBill);
       if (result === 'not_connected') {
-        this.printMessage = '⚠ Printer is not connected! Go to Printer page to connect.';
+        this.printMessage = '⚠ Bluetooth printer scan cancelled or unavailable';
       } else if (result === 'success') {
         this.printMessage = '✓ Sent to printer!';
       } else {
-        this.printMessage = '✗ Print failed — try reconnecting';
+        this.printMessage = '✗ Print failed — try again';
       }
     } catch (err) {
       this.printMessage = '✗ Print failed';

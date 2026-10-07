@@ -1,15 +1,18 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../../shared/api.service';
 import { AuthService } from '../../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../../services/loader.service';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 interface TejasExpenseType {
   eX_ID: number;
   name: string;
+  tejaS_SHOPES_ID?: number;
 }
 
 @Component({
@@ -19,11 +22,12 @@ interface TejasExpenseType {
   templateUrl: './ex-entrytype.component.html',
   styleUrl: './ex-entrytype.component.css'
 })
-export class ExEntrytypeComponent implements OnInit {
+export class ExEntrytypeComponent implements OnInit, OnDestroy {
   expenseTypes: TejasExpenseType[] = [];
   filteredExpenseTypes: TejasExpenseType[] = [];
   searchQuery = '';
   private isBrowser: boolean;
+  private shopSub?: Subscription;
 
   // Selected item for edit/delete
   selectedType: TejasExpenseType | null = null;
@@ -45,6 +49,7 @@ export class ExEntrytypeComponent implements OnInit {
     private auth: AuthService,
     private toastr: ToastrService,
     public loader: LoaderService,
+    public shopService: TejasShopService,
     private router: Router,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
@@ -58,11 +63,19 @@ export class ExEntrytypeComponent implements OnInit {
       return;
     }
     this.loadExpenseTypes();
+
+    this.shopSub = this.shopService.selectedShop$.subscribe(() => {
+      this.loadExpenseTypes();
+    });
+  }
+
+  ngOnDestroy() {
+    this.shopSub?.unsubscribe();
   }
 
   loadExpenseTypes() {
     this.loader.show();
-    this.api.get('TejasExpenseType/GetAll').subscribe({
+    this.api.get('TejasExpenseType/GetAll', { shopId: this.shopService.currentShopId }).subscribe({
       next: (res: any) => {
         const rawTypes = Array.isArray(res) ? res : [];
         this.expenseTypes = rawTypes.map((t: any) => this.normalizeType(t));
@@ -80,7 +93,8 @@ export class ExEntrytypeComponent implements OnInit {
   normalizeType(item: any): TejasExpenseType {
     return {
       eX_ID: item.eX_ID ?? item.ex_ID ?? item.ex_id ?? item.EX_ID ?? item.exId ?? 0,
-      name: item.name ?? item.NAME ?? ''
+      name: item.name ?? item.NAME ?? '',
+      tejaS_SHOPES_ID: item.tejaS_SHOPES_ID ?? item.tejas_shopes_id ?? item.TEJAS_SHOPES_ID ?? null
     };
   }
 
@@ -133,7 +147,8 @@ export class ExEntrytypeComponent implements OnInit {
       // Update
       const payload = {
         EX_ID: this.formData.exId,
-        NAME: this.formData.name.trim()
+        NAME: this.formData.name.trim(),
+        TEJAS_SHOPES_ID: this.selectedType?.tejaS_SHOPES_ID || this.shopService.currentShopId
       };
 
       this.api.put('TejasExpenseType/Update', payload).subscribe({
@@ -156,7 +171,8 @@ export class ExEntrytypeComponent implements OnInit {
     } else {
       // Insert
       const payload = {
-        NAME: this.formData.name.trim()
+        NAME: this.formData.name.trim(),
+        TEJAS_SHOPES_ID: this.shopService.currentShopId
       };
 
       this.api.post('TejasExpenseType/Insert', payload).subscribe({

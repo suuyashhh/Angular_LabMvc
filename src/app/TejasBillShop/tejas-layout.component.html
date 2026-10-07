@@ -1,4 +1,78 @@
 <div class="tejas-layout min-h-screen bg-[#FDF6F0] relative pb-20 font-sans">
+  <!-- TOP HEADER BAR WITH SHOP SELECTOR (SUPERADMIN ONLY) -->
+  <header *ngIf="isSuperAdmin" class="bg-white sticky top-0 z-40 border-b border-[#F0E6DD] px-3 px-md-4 py-2.5 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+      <!-- Brand -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-[#C94A20] text-white flex items-center justify-center font-black text-base md:text-lg shadow-sm flex-shrink-0">
+          T
+        </div>
+        <div>
+          <span class="text-[10px] md:text-xs uppercase tracking-wider font-bold text-[#8B7355] block leading-none">Sagar Sweets</span>
+          <span class="text-xs md:text-[13px] font-bold text-[#2C1810]">POS & Expenses</span>
+        </div>
+      </div>
+
+      <!-- Shop Selector & Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Shop Selector Dropdown (Admin / SuperAdmin) -->
+        <div class="relative" *ngIf="isAdmin || isSuperAdmin; else employeeShopBadge">
+          <button (click)="toggleShopDropdown()" 
+                  type="button" 
+                  class="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 rounded-full bg-[#FFF5EE] border border-[#E8D5C8] hover:border-[#C94A20] text-[#2C1810] text-xs font-semibold transition-all shadow-sm">
+            <i class="bi bi-shop text-[#C94A20]"></i>
+            <span class="max-w-[120px] md:max-w-[200px] truncate">
+              {{ (shopService.selectedShop$ | async)?.shoP_NAME || 'Select Shop' }}
+            </span>
+            <i class="bi bi-chevron-down text-[10px] text-gray-500"></i>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div *ngIf="showShopDropdown" 
+               class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden">
+            <div class="px-3 py-1.5 border-b border-gray-100 flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+              <span>Switch Branch</span>
+              <a routerLink="/tejas/shops" (click)="showShopDropdown = false" class="text-[#C94A20] hover:underline normal-case font-semibold">Manage</a>
+            </div>
+            <div class="max-h-56 overflow-y-auto py-1">
+              <button *ngFor="let s of (shopService.shops$ | async)" 
+                      (click)="selectShop(s)" 
+                      type="button"
+                      class="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#FFF5EE] transition-colors"
+                      [class.bg-[#FFF5EE]]="s.tejaS_SHOPES_ID === shopService.currentShopId"
+                      [class.font-bold]="s.tejaS_SHOPES_ID === shopService.currentShopId">
+                <div class="flex items-center gap-2 truncate">
+                  <i class="bi bi-building text-gray-400" [class.text-[#C94A20]]="s.tejaS_SHOPES_ID === shopService.currentShopId"></i>
+                  <span class="truncate">{{ s.shoP_NAME }}</span>
+                </div>
+                <i *ngIf="s.tejaS_SHOPES_ID === shopService.currentShopId" class="bi bi-check2 text-[#C94A20] font-bold"></i>
+              </button>
+            </div>
+            <div class="border-t border-gray-100 pt-1 px-2">
+              <a routerLink="/tejas/shops" (click)="showShopDropdown = false" class="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs font-semibold text-[#2b5c2e] hover:bg-green-50 transition-colors">
+                <i class="bi bi-gear"></i>
+                <span>Shop Management</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Employee Shop Badge -->
+        <ng-template #employeeShopBadge>
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F5E9] text-[#2B5C2E] text-xs font-semibold border border-[#C8E6C9]">
+            <i class="bi bi-shop"></i>
+            <span class="max-w-[130px] truncate">{{ (shopService.selectedShop$ | async)?.shoP_NAME || 'Main Branch' }}</span>
+          </div>
+        </ng-template>
+
+        <!-- Shops link for Admin / SuperAdmin -->
+        <a *ngIf="isAdmin || isSuperAdmin" routerLink="/tejas/shops" title="Manage Shops" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-[#C94A20] hover:bg-[#FFF5EE] transition-all">
+          <i class="bi bi-buildings"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
   <router-outlet></router-outlet>
   
   <!-- DEFAULT NAVIGATION -->

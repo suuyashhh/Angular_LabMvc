@@ -9,6 +9,7 @@ import { ApiService } from '../../../shared/api.service';
 import { TopSellingItem, FoodItem } from '../../models/interfaces';
 import { FOOD_EMOJI_MAP } from '../../models/mock-data';
 import { FormsModule } from '@angular/forms';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,7 +35,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(private billing: BillingService, private foodService: FoodService, private auth: AuthService, private api: ApiService) {}
+  constructor(
+    private billing: BillingService,
+    private foodService: FoodService,
+    private auth: AuthService,
+    private api: ApiService,
+    public shopService: TejasShopService
+  ) {}
 
   ngOnInit(): void {
     const today = new Date();
@@ -47,8 +54,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.startDate = fmt(today);
     this.endDate = fmt(today);
 
+    let role = '';
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const uStr = localStorage.getItem('Tejas_user') || localStorage.getItem('userDetails');
+        if (uStr) {
+          const u = JSON.parse(uStr);
+          role = (u?.role || u?.ROLE || '').toString().toLowerCase().trim();
+        }
+      } catch {}
+    }
     const user = this.auth.getTejasCredentialsFromCookie();
-    this.isAdmin = user && user.role && user.role.toLowerCase() === 'admin';
+    if (!role && user?.role) {
+      role = (user.role || '').toString().toLowerCase().trim();
+    }
+    this.isAdmin = role === 'admin' || role === 'superadmin';
     this.userImage = user?.user_img || null;
 
     this.subs.push(
@@ -61,6 +81,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (this.dateRangeText === 'Today') {
           this.applyDashboardFilter();
         }
+      }),
+      this.shopService.selectedShop$.subscribe(() => {
+        this.applyDashboardFilter();
       })
     );
 
@@ -100,7 +123,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.api.get('TejasEntry/GetAllTypesEntrys', { 
         userId: tejasUser.userId,
         fromDate: this.startDate,
-        toDate: this.endDate
+        toDate: this.endDate,
+        shopId: this.shopService.currentShopId
       }).subscribe({
         next: (res: any) => {
           const entries = Array.isArray(res) ? res : [];

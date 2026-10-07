@@ -1,11 +1,13 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../../shared/api.service';
 import { AuthService } from '../../../shared/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../../services/loader.service';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 interface TejasUser {
   useR_ID: number;
@@ -14,6 +16,8 @@ interface TejasUser {
   contact: string;
   useR_IMG?: string;
   role?: string;
+  tejaS_SHOPES_ID?: number;
+  shoP_NAME?: string;
 }
 
 @Component({
@@ -23,11 +27,13 @@ interface TejasUser {
   templateUrl: './Tejas-users.component.html',
   styleUrl: './Tejas-users.component.css'
 })
-export class TejasUsersComponent implements OnInit {
+export class TejasUsersComponent implements OnInit, OnDestroy {
   users: TejasUser[] = [];
   filteredUsers: TejasUser[] = [];
   searchQuery = '';
+  selectedShopFilter: number | null = null; // null = all branches
   private isBrowser: boolean;
+  private shopSub?: Subscription;
 
   // Selected user for view/edit/delete
   selectedUser: TejasUser | null = null;
@@ -46,7 +52,8 @@ export class TejasUsersComponent implements OnInit {
     password: '',
     contact: '',
     user_img: '',
-    role: 'employee'
+    role: 'employee',
+    tejas_shopes_id: 1 as number | null
   };
 
   constructor(
@@ -54,6 +61,7 @@ export class TejasUsersComponent implements OnInit {
     private auth: AuthService,
     private toastr: ToastrService,
     public loader: LoaderService,
+    public shopService: TejasShopService,
     private router: Router,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
@@ -66,16 +74,33 @@ export class TejasUsersComponent implements OnInit {
       this.router.navigate(['/tejas/login']);
       return;
     }
+    this.selectedShopFilter = this.shopService.currentShopId;
     this.loadUsers();
+
+    this.shopSub = this.shopService.selectedShop$.subscribe(shop => {
+      if (shop) {
+        this.selectedShopFilter = shop.tejaS_SHOPES_ID;
+        this.loadUsers();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.shopSub?.unsubscribe();
   }
 
   loadUsers() {
     this.loader.show();
-    this.api.get('TejasUser/GetAll').subscribe({
+    const params: any = {};
+    if (this.selectedShopFilter) {
+      params.shopId = this.selectedShopFilter;
+    }
+
+    this.api.get('TejasUser/GetAll', params).subscribe({
       next: (res: any) => {
         const rawUsers = Array.isArray(res) ? res : [];
         this.users = rawUsers.map((u: any) => this.normalizeUser(u));
-        this.filteredUsers = [...this.users];
+        this.applyFilter();
         this.loader.hide();
       },
       error: (err: any) => {
@@ -93,20 +118,31 @@ export class TejasUsersComponent implements OnInit {
       pass: user.pass ?? user.PASS ?? user.Password ?? user.password ?? '',
       contact: user.contact ?? user.CONTACT ?? '',
       useR_IMG: user.useR_IMG ?? user.useR_Img ?? user.useR_img ?? user.USER_IMG ?? user.userImg ?? user.user_img ?? '',
-      role: user.role ?? user.ROLE ?? 'employee'
+      role: user.role ?? user.ROLE ?? 'employee',
+      tejaS_SHOPES_ID: user.tejaS_SHOPES_ID ?? user.tejas_shopes_id ?? user.TEJAS_SHOPES_ID ?? null,
+      shoP_NAME: user.shoP_NAME ?? user.shop_name ?? user.SHOP_NAME ?? user.shopName ?? ''
     };
   }
 
-  searchUsers() {
+  onFilterShopChange() {
+    this.loadUsers();
+  }
+
+  applyFilter() {
     if (!this.searchQuery.trim()) {
       this.filteredUsers = [...this.users];
     } else {
       const query = this.searchQuery.toLowerCase();
       this.filteredUsers = this.users.filter(u => 
         u.useR_NAME.toLowerCase().includes(query) ||
-        u.contact.toLowerCase().includes(query)
+        u.contact.toLowerCase().includes(query) ||
+        (u.shoP_NAME && u.shoP_NAME.toLowerCase().includes(query))
       );
     }
+  }
+
+  searchUsers() {
+    this.applyFilter();
   }
 
   // Drawer Actions
@@ -119,7 +155,8 @@ export class TejasUsersComponent implements OnInit {
       password: '',
       contact: '',
       user_img: '',
-      role: 'employee'
+      role: 'employee',
+      tejas_shopes_id: this.shopService.currentShopId || 1
     };
     this.isDrawerOpen = true;
   }
@@ -134,7 +171,8 @@ export class TejasUsersComponent implements OnInit {
       password: user.pass,
       contact: user.contact,
       user_img: user.useR_IMG || '',
-      role: user.role || 'employee'
+      role: user.role || 'employee',
+      tejas_shopes_id: user.tejaS_SHOPES_ID || this.shopService.currentShopId || 1
     };
     this.isDrawerOpen = true;
   }
@@ -142,7 +180,7 @@ export class TejasUsersComponent implements OnInit {
   closeDrawer() {
     this.isDrawerOpen = false;
     this.selectedUser = null;
-    this.formData = { userId: 0, username: '', password: '', contact: '', user_img: '', role: 'employee' };
+    this.formData = { userId: 0, username: '', password: '', contact: '', user_img: '', role: 'employee', tejas_shopes_id: 1 };
   }
 
   saveUser() {
@@ -168,7 +206,8 @@ export class TejasUsersComponent implements OnInit {
         PASS: this.formData.password.trim(),
         CONTACT: this.formData.contact.trim(),
         USER_IMG: this.formData.user_img,
-        ROLE: this.formData.role
+        ROLE: this.formData.role,
+        TEJAS_SHOPES_ID: this.formData.tejas_shopes_id || this.selectedUser?.tejaS_SHOPES_ID || this.shopService.currentShopId || 1
       };
 
       this.api.put('TejasUser/Update', payload).subscribe({
@@ -194,7 +233,8 @@ export class TejasUsersComponent implements OnInit {
         PASS: this.formData.password.trim(),
         CONTACT: this.formData.contact.trim(),
         USER_IMG: this.formData.user_img,
-        ROLE: this.formData.role
+        ROLE: this.formData.role,
+        TEJAS_SHOPES_ID: this.formData.tejas_shopes_id || this.shopService.currentShopId || 1
       };
 
       this.api.post('TejasUser/Insert', payload).subscribe({
