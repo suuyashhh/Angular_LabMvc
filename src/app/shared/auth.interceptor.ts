@@ -23,7 +23,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   let requestToken = token;
   if (isSmartParkingProtectedRequest) {
-    requestToken = localStorage.getItem('parking_token');
+    requestToken = typeof window !== 'undefined' ? localStorage.getItem('parking_token') : null;
   } else if (isShopRequest && !isShopLoginRequest) {
     requestToken = authService.getTejasToken();
   }
