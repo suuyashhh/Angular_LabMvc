@@ -14,16 +14,18 @@ import localeIn from '@angular/common/locales/en-IN';
 registerLocaleData(localeIn);
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), provideClientHydration(), provideAnimationsAsync(),
+  providers: [
+    provideRouter(routes), 
+    provideClientHydration(), 
+    provideAnimationsAsync(),
     importProvidersFrom(
-      BrowserAnimationsModule,
       ToastrModule.forRoot({
         positionClass: 'toast-top-right',
         preventDuplicates: true,
         timeOut: 2000,
         closeButton: true,
       })
-    ),provideHttpClient(withInterceptors([authInterceptor]), withFetch())
+    ),
+    provideHttpClient(withInterceptors([authInterceptor]), withFetch())
   ]
-
 };

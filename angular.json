@@ -60,10 +60,8 @@
             "scripts": [
               "src/assets/vendor/libs/jquery/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "src/assets/vendor/libs/popper/popper.js",
               "src/assets/vendor/js/helpers.js",
               "src/assets/js/config.js",
-              "src/assets/vendor/js/bootstrap.js",
               "src/assets/vendor/js/menu.js",
               "src/assets/js/main.js",
               "src/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js",
@@ -75,13 +73,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500mb",
-                  "maximumError": "100mb"
+                  "maximumWarning": "3mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "200mb",
-                  "maximumError": "400mb"
+                  "maximumWarning": "50kb",
+                  "maximumError": "100kb"
                 }
               ],
               "outputHashing": "all"
