@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -7,9 +8,8 @@ import { Injectable } from '@angular/core';
 })
 export class ApiService {
 
-baseurl = 'https://localhost:7193/api/';
-  //baseurl =  'https://backend.suyashpatil.in/api/';
-  //baseurl = 'https://labmvcapi.bsite.net/api/';
+  baseurl = environment.baseUrl;
+
 
   /** Alias for baseurl — used by SmartParking components */
   get baseUrl(): string {
