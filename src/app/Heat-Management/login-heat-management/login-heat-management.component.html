@@ -1,0 +1,209 @@
+<div class="heat-login-light-wrapper min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+  
+  <!-- Subtle Ambient Light Background Elements -->
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-200/50 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+  <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-orange-200/50 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-duration: 5s;"></div>
+  <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-red-100/40 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute inset-0 bg-grid-pattern pointer-events-none opacity-40"></div>
+
+  <!-- Main Container Card -->
+  <div class="w-full max-w-md relative z-10 my-8">
+    
+    <!-- Top System Live Badge -->
+    <div class="flex items-center justify-between mb-3 px-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-slate-200/80 shadow-sm text-xs font-semibold text-slate-600 backdrop-blur-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Gateway: <strong class="text-slate-800">Node HMT-01</strong></span>
+      </div>
+      <span class="text-[11px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-full">
+        Thermal v1.4
+      </span>
+    </div>
+
+    <!-- Pristine Light Card -->
+    <div class="bg-white/95 backdrop-blur-xl rounded-3xl border border-orange-100/80 shadow-2xl shadow-orange-950/5 p-7 sm:p-9 text-slate-800 relative overflow-hidden transition-all duration-300">
+      
+      <!-- Top Decorative Ambient Thermal Ribbon -->
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500"></div>
+
+      <!-- Header & Brand Icon -->
+      <div class="text-center mb-6 pt-2">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-50 via-orange-50 to-orange-100 border border-orange-200/70 shadow-inner mb-3.5 relative group">
+          <div class="absolute inset-0 rounded-2xl bg-orange-400/10 blur group-hover:blur-md transition-all"></div>
+          <i class="fa-solid fa-fire-flame-curved text-3xl text-orange-500 transition-transform duration-300 group-hover:scale-110"></i>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+          Heat Management
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+          Thermal Operations & Furnace Monitoring Portal
+        </p>
+      </div>
+
+      <!-- Quick Demo Access Bar -->
+      <div class="mb-6 p-3 rounded-2xl bg-gradient-to-r from-amber-50/80 via-orange-50/60 to-amber-50/80 border border-orange-200/60 text-xs">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <span class="font-bold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt-lightning text-amber-500"></i>
+            Quick Demo Autofill:
+          </span>
+          <span class="text-[10px] text-slate-400 font-medium">1-Click Test</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button 
+            type="button" 
+            (click)="fillDemoCredentials('operator')"
+            class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-orange-50/80 border border-orange-200/80 text-orange-700 font-semibold text-[11px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-user-gear text-[10px]"></i>
+            Operator Demo
+          </button>
+          <button 
+            type="button" 
+            (click)="fillDemoCredentials('admin')"
+            class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-orange-50/80 border border-orange-200/80 text-slate-700 font-semibold text-[11px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-[10px] text-orange-500"></i>
+            Admin Demo
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Message Banner -->
+      <div *ngIf="errorMessage" class="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5 animate-fadeIn">
+        <i class="fa-solid fa-circle-exclamation text-red-500 text-sm flex-shrink-0"></i>
+        <span class="font-medium">{{ errorMessage }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form (ngSubmit)="login()" class="space-y-4" novalidate>
+        
+        <!-- Username Input -->
+        <div>
+          <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Operator ID / Username
+          </label>
+          <div class="relative rounded-xl shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-id-badge text-sm"></i>
+            </div>
+            <input 
+              type="text" 
+              id="username" 
+              name="username"
+              [(ngModel)]="loginData.username"
+              placeholder="e.g. operator.heat@thermal.lab"
+              required
+              autocomplete="username"
+              class="block w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-200"
+            />
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+              Security Key / Password
+            </label>
+            <button 
+              type="button" 
+              (click)="onForgotPassword()"
+              class="text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors">
+              Forgot Key?
+            </button>
+          </div>
+          <div class="relative rounded-xl shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-lock text-sm"></i>
+            </div>
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password" 
+              name="password"
+              [(ngModel)]="loginData.password"
+              placeholder="••••••••••••"
+              required
+              autocomplete="current-password"
+              class="block w-full pl-10 pr-11 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-200"
+            />
+            <button 
+              type="button" 
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors focus:outline-none"
+              title="{{ showPassword ? 'Hide password' : 'Show password' }}">
+              <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me & Security Policy -->
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input 
+              type="checkbox" 
+              name="rememberMe"
+              [(ngModel)]="loginData.rememberMe"
+              class="w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500 focus:ring-offset-0 transition-colors"
+            />
+            <span class="text-xs font-medium text-slate-600">Remember session</span>
+          </label>
+          <span class="text-[11px] text-slate-400 font-medium">256-bit Encrypted</span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button 
+            type="submit" 
+            [disabled]="isLoading"
+            class="w-full relative group overflow-hidden rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 p-0.5 font-bold shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-60 disabled:pointer-events-none disabled:transform-none">
+            
+            <div class="relative w-full py-3.5 px-6 rounded-[14px] bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white flex items-center justify-center gap-2.5 text-sm font-bold tracking-wide">
+              <ng-container *ngIf="!isLoading">
+                <span>Sign In to Dashboard</span>
+                <i class="fa-solid fa-arrow-right text-xs transition-transform duration-200 group-hover:translate-x-1"></i>
+              </ng-container>
+
+              <ng-container *ngIf="isLoading">
+                <i class="fa-solid fa-circle-notch fa-spin text-base"></i>
+                <span>Authenticating Telemetry...</span>
+              </ng-container>
+            </div>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Back Link -->
+      <div class="text-center pt-5">
+        <a routerLink="/portfolio" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-orange-600 transition-colors">
+          <i class="fa-solid fa-arrow-left text-[10px]"></i>
+          <span>Return to Portfolio</span>
+        </a>
+      </div>
+
+      <!-- Feature Tags / Highlights -->
+      <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap justify-center gap-2">
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100/80 text-slate-600 border border-slate-200/60">
+          <i class="fa-solid fa-fire text-amber-500 text-[10px]"></i>
+          Furnace Control
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100/80 text-slate-600 border border-slate-200/60">
+          <i class="fa-solid fa-chart-line text-orange-500 text-[10px]"></i>
+          Real-time Telemetry
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100/80 text-slate-600 border border-slate-200/60">
+          <i class="fa-solid fa-shield-halved text-emerald-500 text-[10px]"></i>
+          ISO 9001 Safe
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Footer note -->
+    <div class="text-center mt-5 text-xs font-medium text-slate-500">
+      &copy; 2026 Thermal Operations Hub &bull; Authorized Personnel Only
+    </div>
+
+  </div>
+</div>
+

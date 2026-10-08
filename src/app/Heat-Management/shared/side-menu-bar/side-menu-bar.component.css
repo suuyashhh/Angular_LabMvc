@@ -1,0 +1,16 @@
+.heat-sidebar {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Industrial Active menu item styling */
+.active-menu-item {
+  background-color: #0f1f38 !important;
+  color: #ffffff !important;
+  border-left-color: #38bdf8 !important;
+  font-weight: 600 !important;
+}
+
+.active-menu-item i {
+  color: #38bdf8 !important;
+}

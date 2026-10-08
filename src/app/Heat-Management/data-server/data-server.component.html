@@ -1,0 +1,392 @@
+<div class="data-server-page space-y-4">
+  
+  <!-- Page Header & Industrial Telemetry Bar -->
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-[#16253c] pb-3">
+    <div>
+      <div class="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>SCADA Gateway &bull; Thermal Harvesting Node 01</span>
+      </div>
+      <h2 class="text-lg sm:text-xl font-bold text-slate-100 tracking-tight mt-0.5">
+        Server Waste–Heat Extraction & Telemetry
+      </h2>
+    </div>
+
+    <!-- Integrated Telemetry Readout Strip -->
+    <div class="flex items-center bg-[#07101e] border border-[#172840] rounded overflow-hidden text-xs font-mono">
+      <!-- Status Cell -->
+      <div class="px-3 py-1.5 border-r border-[#172840] flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full" [ngClass]="heatOutput > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'"></span>
+        <span class="text-slate-400 text-[11px]">STATUS:</span>
+        <span class="font-bold text-[11px]" [ngClass]="heatOutput > 0 ? 'text-emerald-400' : 'text-slate-400'">
+          {{ heatOutput > 0 ? 'ACTIVE' : 'STANDBY' }}
+        </span>
+      </div>
+
+      <!-- Exhaust Temp Cell -->
+      <div class="px-3 py-1.5 border-r border-[#172840] flex items-center gap-1.5">
+        <span class="text-slate-400 text-[11px]">EXHAUST:</span>
+        <span class="text-amber-400 font-bold text-[11px]">{{ temperature }} °C</span>
+      </div>
+
+      <!-- Heat Output Cell -->
+      <div class="px-3 py-1.5 border-r border-[#172840] flex items-center gap-1.5">
+        <span class="text-slate-400 text-[11px]">HEAT OUT:</span>
+        <span class="text-slate-100 font-bold text-[11px]">{{ heatOutput.toFixed(2) }} kW</span>
+      </div>
+
+      <!-- Efficiency Cell -->
+      <div class="px-3 py-1.5 hidden sm:flex items-center gap-1.5">
+        <span class="text-slate-400 text-[11px]">EFFICIENCY:</span>
+        <span class="text-sky-400 font-bold text-[11px]">94.8%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout (Left: 42U Server Rack Visualizer, Right: Simulation Control Console) -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    
+    <!-- LEFT PANEL: 42U Compute Core Rack Schematic (7 columns) -->
+    <div class="lg:col-span-7 bg-[#0a1324] border border-[#182a44] rounded p-4 flex flex-col justify-between min-h-[580px] shadow-sm">
+      
+      <!-- Panel Header Bar -->
+      <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-[#14233a]">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="heatOutput > 0 ? 'bg-orange-500' : 'bg-slate-600'"></span>
+          <span class="text-xs font-bold text-slate-200 tracking-wide uppercase font-mono">
+            RACK-42U // BAY-01 &bull; COMPUTATION CORE & HEAT EXCHANGER
+          </span>
+        </div>
+        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-[#060e1b] border border-[#192b45] text-amber-400">
+          LOAD: {{ heatOutput.toFixed(2) }} kW
+        </span>
+      </div>
+
+      <!-- Center Server Rack Schematic Visualizer -->
+      <div class="relative my-auto py-4 flex flex-col items-center justify-center">
+        
+        <!-- Hydraulic Thermal Flow Pipes (Inlet / Outlet) -->
+        <div class="w-full max-w-[480px] flex items-center justify-between px-4 mb-2 text-[10px] font-mono">
+          <!-- Cold Liquid Inflow Line -->
+          <div class="flex items-center gap-1.5 text-sky-400">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+            <span>COOLANT INLET: 24.0 °C</span>
+            <i class="fa-solid fa-arrow-down text-[9px]"></i>
+          </div>
+
+          <!-- Hot Thermal Outflow Line -->
+          <div class="flex items-center gap-1.5 text-orange-400">
+            <i class="fa-solid fa-arrow-up text-[9px]"></i>
+            <span>EXHAUST HARVEST: {{ temperature }} °C</span>
+            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+          </div>
+        </div>
+
+        <!-- 42U Server Rack Enclosure -->
+        <div class="relative w-full max-w-[480px] bg-[#070e1c] border border-[#192c46] rounded p-3 shadow-inner">
+          
+          <!-- Top Chassis Header / Rail Guides -->
+          <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-[#132238] text-[9px] font-mono text-slate-500">
+            <span>RAIL-L // U42</span>
+            <span class="text-slate-400 tracking-widest font-semibold uppercase">42U MODULAR BLADE CHASSIS</span>
+            <span>RAIL-R // U42</span>
+          </div>
+
+          <!-- Server Blades (5 Blade Units) -->
+          <div class="space-y-1.5">
+            <div *ngFor="let blade of [1, 2, 3, 4, 5]; let i = index" 
+                 class="h-11 rounded-sm bg-[#091426] border border-[#172740] px-2.5 py-1.5 flex items-center justify-between transition-colors">
+              
+              <!-- Left: Unit Label & Status LEDs -->
+              <div class="flex items-center gap-2 z-10 font-mono">
+                <span class="text-[10px] text-slate-400 font-bold">SRV-0{{ blade }}</span>
+                <div class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="heatOutput > 0 ? 'bg-emerald-400' : 'bg-slate-600'"></span>
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="heatOutput > 2.5 ? 'bg-amber-400' : 'bg-slate-700'"></span>
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="heatOutput >= 5 ? 'bg-red-500' : 'bg-slate-700'"></span>
+                </div>
+              </div>
+
+              <!-- Air Intake Grille Pattern -->
+              <div class="hidden sm:flex gap-0.5 opacity-60">
+                <div *ngFor="let v of [1,2,3,4,5,6,7,8]" class="w-1 h-5 bg-[#14233c] rounded-[1px]"></div>
+              </div>
+
+              <!-- Thermal Core Dissipation Heat Exchanger -->
+              <div 
+                class="w-32 sm:w-44 h-7 rounded-sm border border-[#1b2f4d] flex items-center justify-between px-2 transition-all duration-300"
+                [style.background]="heatOutput > 0 
+                  ? 'linear-gradient(90deg, rgba(234, 88, 12, ' + (0.15 + (heatOutput/5)*0.35) + ') 0%, rgba(245, 158, 11, ' + (0.2 + (heatOutput/5)*0.45) + ') 100%)' 
+                  : '#070f1e'">
+                
+                <!-- CPU Core 01 Thermal Block -->
+                <div class="flex items-center gap-1">
+                  <div class="w-3.5 h-3.5 rounded-[1px] border border-[#2a456c] flex items-center justify-center text-[7px] font-mono"
+                       [ngClass]="heatOutput > 0 ? 'bg-orange-950/80 text-orange-300' : 'bg-[#0b162a] text-slate-500'">
+                    C1
+                  </div>
+                  <span class="text-[9px] font-mono text-slate-300">
+                    {{ (38 + (heatOutput/5)*26 + (i*1.2)).toFixed(1) }}°C
+                  </span>
+                </div>
+
+                <!-- Heat Pipe Link -->
+                <div class="w-6 h-0.5" [ngClass]="heatOutput > 0 ? 'bg-amber-500/80' : 'bg-slate-700'"></div>
+
+                <!-- CPU Core 02 Thermal Block -->
+                <div class="flex items-center gap-1">
+                  <div class="w-3.5 h-3.5 rounded-[1px] border border-[#2a456c] flex items-center justify-center text-[7px] font-mono"
+                       [ngClass]="heatOutput > 0 ? 'bg-orange-950/80 text-orange-300' : 'bg-[#0b162a] text-slate-500'">
+                    C2
+                  </div>
+                  <span class="text-[9px] font-mono text-slate-300">
+                    {{ (39 + (heatOutput/5)*28 + (i*0.8)).toFixed(1) }}°C
+                  </span>
+                </div>
+
+              </div>
+
+              <!-- Right: Thermal Strip & Thermistor Reading -->
+              <div class="flex items-center gap-2 font-mono">
+                <span class="text-[10px] text-amber-400 font-bold hidden sm:inline">
+                  {{ (temperature - 2 + i).toFixed(0) }}°C
+                </span>
+                <span class="w-1.5 h-5 rounded-[1px]"
+                      [style.background]="heatOutput > 0 ? '#f97316' : '#22344d'">
+                </span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Intake Cooling Turbines -->
+          <div class="mt-3 pt-2 border-t border-[#132238] flex items-center justify-between px-2 text-[10px] font-mono text-slate-400">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded border border-[#1b2f4e] bg-[#091426] flex items-center justify-center text-slate-400"
+                   [ngClass]="heatOutput > 0 ? 'animate-spin' : ''"
+                   style="animation-duration: 3s;">
+                <i class="fa-solid fa-fan text-[10px]"></i>
+              </div>
+              <span>TURBINE 01: <strong class="text-slate-200">{{ heatOutput > 0 ? '1,850' : '450' }} RPM</strong></span>
+            </div>
+
+            <div class="text-slate-500">
+              AIRFLOW: <strong class="text-slate-300">{{ (heatOutput * 45).toFixed(0) }} CFM</strong>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span>TURBINE 02: <strong class="text-slate-200">{{ heatOutput > 0 ? '1,850' : '450' }} RPM</strong></span>
+              <div class="w-6 h-6 rounded border border-[#1b2f4e] bg-[#091426] flex items-center justify-center text-slate-400"
+                   [ngClass]="heatOutput > 0 ? 'animate-spin' : ''"
+                   style="animation-duration: 3s;">
+                <i class="fa-solid fa-fan text-[10px]"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Bottom Telemetry Metadata Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-[#14233a] text-[10px] font-mono text-slate-400">
+        <div>
+          <span class="text-slate-500">SENSORS:</span>
+          <span class="text-slate-200 ml-1 font-semibold">24/24 ACTIVE</span>
+        </div>
+        <div>
+          <span class="text-slate-500">&Delta;T LIFT:</span>
+          <span class="text-amber-400 ml-1 font-semibold">+{{ (temperature - 24).toFixed(1) }} °C</span>
+        </div>
+        <div>
+          <span class="text-slate-500">HEAT FLUX:</span>
+          <span class="text-slate-200 ml-1 font-semibold">{{ (heatOutput * 0.48).toFixed(2) }} W/cm²</span>
+        </div>
+        <div>
+          <span class="text-slate-500">MASS FLOW:</span>
+          <span class="text-sky-400 ml-1 font-semibold">{{ (0.05 + heatOutput * 0.07).toFixed(2) }} kg/s</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: Simulation Control & Thermal Extraction Console (5 columns) -->
+    <div class="lg:col-span-5 bg-[#0a1324] border border-[#182a44] rounded p-4 space-y-4 shadow-sm">
+      
+      <!-- Console Module Header -->
+      <div class="flex items-center justify-between pb-2.5 border-b border-[#14233a]">
+        <div>
+          <h3 class="text-xs font-bold text-slate-100 uppercase tracking-wide font-mono">
+            Simulation Control Console
+          </h3>
+          <p class="text-[11px] text-slate-400">Waste–Heat Extraction & Energy Modeling</p>
+        </div>
+
+        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#06101e] border border-emerald-500/40 text-emerald-400 uppercase tracking-wider">
+          LIVE
+        </span>
+      </div>
+
+      <!-- Control 1: Heat Output Power Slider -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-300">
+            Heat Output Control
+          </label>
+          <span class="px-2 py-0.5 rounded bg-[#060e1b] border border-[#192b45] text-amber-400 font-mono font-bold text-xs">
+            {{ heatOutput.toFixed(2) }} kW
+          </span>
+        </div>
+
+        <!-- Precision Range Slider -->
+        <div class="py-1">
+          <input 
+            type="range" 
+            min="0" 
+            max="5" 
+            step="0.25"
+            [(ngModel)]="heatOutput"
+            class="w-full h-1.5 bg-[#070e1c] border border-[#192c46] rounded appearance-none cursor-pointer accent-orange-500 focus:outline-none"
+          />
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>0 kW</span>
+            <span>1 kW</span>
+            <span>2.5 kW</span>
+            <span>4 kW</span>
+            <span>5 kW</span>
+          </div>
+        </div>
+
+        <!-- 5 Segmented Preset Buttons -->
+        <div class="grid grid-cols-5 gap-1 pt-1">
+          <button 
+            *ngFor="let preset of powerPresets"
+            type="button"
+            (click)="setPreset(preset.value)"
+            class="py-1.5 px-0.5 rounded text-[10px] font-mono font-semibold transition-colors border text-center truncate"
+            [ngClass]="heatOutput === preset.value 
+              ? 'bg-[#152a48] border-[#294c7a] text-white font-bold' 
+              : 'bg-[#070e1a] border-[#15243a] text-slate-400 hover:text-slate-200 hover:bg-[#0c182a]'">
+            {{ preset.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Telemetry Stat Grid (3 Columns) -->
+      <div class="grid grid-cols-3 gap-2">
+        <div class="p-2.5 rounded bg-[#070e1c] border border-[#15243a] text-center">
+          <div class="text-[10px] font-mono text-slate-400 uppercase mb-0.5">Temperature</div>
+          <div class="text-sm font-mono font-bold text-slate-100">{{ temperature }} °C</div>
+          <div class="text-[9px] text-slate-500 mt-0.5">Exhaust Stream</div>
+        </div>
+
+        <div class="p-2.5 rounded bg-[#070e1c] border border-[#15243a] text-center">
+          <div class="text-[10px] font-mono text-slate-400 uppercase mb-0.5">Heat Output</div>
+          <div class="text-sm font-mono font-bold text-amber-400">{{ heatOutput.toFixed(2) }} kW</div>
+          <div class="text-[9px] text-slate-500 mt-0.5">Thermal Rate</div>
+        </div>
+
+        <div class="p-2.5 rounded bg-[#070e1c] border border-[#15243a] text-center">
+          <div class="text-[10px] font-mono text-slate-400 uppercase mb-0.5">Circuit Status</div>
+          <div class="text-sm font-mono font-bold flex items-center justify-center gap-1"
+               [ngClass]="heatOutput > 0 ? 'text-emerald-400' : 'text-slate-400'">
+            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="heatOutput > 0 ? 'bg-emerald-400' : 'bg-slate-600'"></span>
+            <span>{{ statusText }}</span>
+          </div>
+          <div class="text-[9px] text-slate-500 mt-0.5">Valve Open</div>
+        </div>
+      </div>
+
+      <!-- Control 2: Storage Duration Selector -->
+      <div class="space-y-1.5 pt-1">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-300">Storage Duration</span>
+          <span class="text-[10px] font-mono text-sky-400">Selected: {{ durationSeconds === 5 ? '5 Seconds' : '5 Minutes' }}</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button 
+            type="button"
+            (click)="setDuration(5)"
+            class="p-2 rounded border text-left transition-colors font-mono"
+            [ngClass]="durationSeconds === 5 
+              ? 'bg-[#10233d] border-[#25466e] text-white' 
+              : 'bg-[#070e1c] border-[#15243a] text-slate-400 hover:text-slate-200 hover:bg-[#0c182a]'">
+            <div class="text-xs font-bold">5 Seconds</div>
+            <div class="text-[9px] text-slate-400 mt-0.5">Instantaneous burst</div>
+          </button>
+
+          <button 
+            type="button"
+            (click)="setDuration(300)"
+            class="p-2 rounded border text-left transition-colors font-mono"
+            [ngClass]="durationSeconds === 300 
+              ? 'bg-[#10233d] border-[#25466e] text-white' 
+              : 'bg-[#070e1c] border-[#15243a] text-slate-400 hover:text-slate-200 hover:bg-[#0c182a]'">
+            <div class="text-xs font-bold">5 Minutes</div>
+            <div class="text-[9px] text-slate-400 mt-0.5">Accumulated charge</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Control 3: Thermal Energy Accumulator Box -->
+      <div class="p-3 rounded bg-[#070e1c] border border-[#15243a] space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+            Thermal Energy Stored ({{ durationSeconds === 5 ? '5s' : '5m' }})
+          </div>
+          <span class="text-[10px] font-mono text-slate-500">Q = P &times; t</span>
+        </div>
+
+        <!-- Calculated Readout -->
+        <div class="flex items-baseline justify-between font-mono">
+          <div class="text-lg font-bold text-slate-100">
+            {{ energyKJ }} <span class="text-xs text-slate-400 font-normal">kJ</span>
+          </div>
+          <div class="text-xs font-bold text-sky-400">
+            {{ energyKWh }} <span class="text-[10px] text-slate-400 font-normal">kWh thermal</span>
+          </div>
+        </div>
+
+        <!-- Linear Calibrated Bar -->
+        <div class="w-full bg-[#0b1626] border border-[#15243a] rounded-[2px] h-2 overflow-hidden">
+          <div 
+            class="h-full bg-gradient-to-r from-amber-500 to-sky-400 rounded-[1px] transition-all duration-300"
+            [style.width.%]="energyPercent">
+          </div>
+        </div>
+
+        <!-- Calculation Audit Note -->
+        <div class="p-2 rounded bg-[#050b16] border border-[#111e30] text-[10px] font-mono text-slate-400 space-y-0.5">
+          <div class="text-slate-300 font-semibold">
+            {{ heatOutput.toFixed(2) }} kW &times; {{ durationSeconds }}s = {{ energyKJ }} kJ ({{ energyKWh }} kWh)
+          </div>
+          <div class="text-[9px] text-slate-500">
+            1 kWh = 3,600 kJ &bull; Heat flow routed to Phase Change Thermal Storage.
+          </div>
+        </div>
+      </div>
+
+      <!-- Control 4: Heat Flow Routing Strip -->
+      <div class="p-2.5 rounded bg-[#070e1c] border border-[#15243a] flex items-center justify-between font-mono text-xs">
+        <div class="space-y-0.5">
+          <div class="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>Target: TANK 01 (Primary PCM Buffer)</span>
+          </div>
+          <div class="text-[10px] text-slate-400">
+            Inflow Rate: <span class="text-amber-400 font-semibold">{{ heatOutput.toFixed(2) }} kW</span> &bull; Port Valve #1 OPEN
+          </div>
+        </div>
+
+        <a routerLink="/heatmanagement/thermal-storage" class="px-2 py-1 rounded bg-[#0c1a2d] hover:bg-[#12243d] border border-[#1b3150] text-[10px] font-bold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
+          <span>VIEW TANK</span>
+          <i class="fa-solid fa-arrow-right text-[8px]"></i>
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

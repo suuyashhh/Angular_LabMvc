@@ -1,0 +1,31 @@
+<!-- Standalone Login Route View -->
+<div *ngIf="isLoginPage" class="min-h-screen bg-[#060c16]">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Authenticated Application Layout with Navbar & Sidebar -->
+<div *ngIf="!isLoginPage" class="heat-app-layout h-screen flex flex-col bg-[#060c16] text-slate-200 font-sans overflow-hidden">
+  
+  <!-- Fixed/Top Navbar -->
+  <app-navbar 
+    (toggleSidebar)="toggleSidebar()">
+  </app-navbar>
+
+  <!-- Main Split Layout (Sidebar on Left, Page Content on Right) -->
+  <div class="flex-1 flex overflow-hidden relative">
+    
+    <!-- Left Side Menu Bar -->
+    <app-side-menu-bar 
+      [isCollapsed]="isSidebarCollapsed" 
+      (collapseChange)="isSidebarCollapsed = $event">
+    </app-side-menu-bar>
+
+    <!-- Right Main Route Content -->
+    <main class="flex-1 overflow-y-auto bg-[#060c16] p-3 sm:p-5 lg:p-6 custom-scrollbar">
+      <div class="max-w-[1720px] mx-auto">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+
+  </div>
+</div>
