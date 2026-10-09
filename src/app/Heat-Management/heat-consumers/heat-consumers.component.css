@@ -1,0 +1,62 @@
+/* Heat Consumers Styles */
+.heat-consumers-page {
+  color: #e2e8f0;
+}
+
+/* Filter Tab Buttons */
+.filter-tab-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #050c18;
+  border: 1px solid #142338;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.filter-tab-btn:hover {
+  background: #0d1b2e;
+  color: #f8fafc;
+  border-color: #1e3a60;
+}
+
+.filter-tab-btn.tab-active {
+  background: #09223e;
+  border-color: #0284c7;
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.25);
+}
+
+/* Main Consumer Card */
+.consumer-card-main {
+  background: #060c18;
+  border-color: #142640;
+}
+
+.consumer-card-main:hover {
+  transform: translateY(-2px);
+  border-color: #1e3d66;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.consumer-card-main.card-supplying {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.15);
+}
+
+/* Modals */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #040914;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #14243b;
+  border-radius: 4px;
+}

@@ -33,7 +33,12 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   private checkIsLoginPage(url: string): void {
-    this.isLoginPage = url.includes('/login') && !url.includes('/data-server') && !url.includes('/dashboard');
+    if (!url) {
+      this.isLoginPage = false;
+      return;
+    }
+    const cleanUrl = url.split('?')[0].toLowerCase();
+    this.isLoginPage = cleanUrl.endsWith('/login') || (cleanUrl.includes('/login') && !cleanUrl.includes('/data-server') && !cleanUrl.includes('/dashboard'));
   }
 
   toggleSidebar(): void {

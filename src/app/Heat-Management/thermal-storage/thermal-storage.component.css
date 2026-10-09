@@ -1,0 +1,72 @@
+/* Thermal Storage Matrix Styles */
+.thermal-storage-page {
+  color: #e2e8f0;
+}
+
+/* Manifold stream */
+.manifold-stream.stream-active {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f59e0b, #ef4444, #f59e0b);
+  background-size: 200% 100%;
+  animation: manifoldFlow 1.5s linear infinite;
+}
+
+@keyframes manifoldFlow {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* Tank active card highlight */
+.storage-tank-card:hover {
+  transform: translateY(-2px);
+  border-color: #244672;
+}
+
+.tank-active-charge {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+
+.tank-active-discharge {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+}
+
+/* Liquid states in vessels */
+.liquid-amber {
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 45%, #c2410c 100%);
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.5);
+}
+
+.liquid-emerald {
+  background: linear-gradient(180deg, #10b981 0%, #059669 45%, #047857 100%);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+}
+
+.liquid-stored-state {
+  background: linear-gradient(180deg, #ea580c 0%, #c2410c 60%, #9a3412 100%);
+}
+
+.liquid-standby-state {
+  background: #1e293b;
+}
+
+.bubbles-fx {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 1.5px, transparent 1.5px);
+  background-size: 10px 10px;
+  animation: bubblesUp 1.8s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes bubblesUp {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -30px; }
+}
+
+/* Modal styling */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}

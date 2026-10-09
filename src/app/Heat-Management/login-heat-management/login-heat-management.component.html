@@ -40,7 +40,7 @@
         </div>
 
         <!-- LOGIN FORM -->
-        <form *ngIf="isLoginMode" (ngSubmit)="login()" class="login-form" novalidate>
+        <form *ngIf="isLoginMode" (submit)="$event.preventDefault(); login()" class="login-form" novalidate>
 
           <div class="form-group">
             <label for="username" class="form-label">Work Email / Username</label>
@@ -102,7 +102,7 @@
         </form>
 
         <!-- REGISTER FORM -->
-        <form *ngIf="!isLoginMode" (ngSubmit)="register()" class="login-form" novalidate>
+        <form *ngIf="!isLoginMode" (submit)="$event.preventDefault(); register()" class="login-form" novalidate>
 
           <div class="form-group">
             <label for="regName" class="form-label">Full Name</label>

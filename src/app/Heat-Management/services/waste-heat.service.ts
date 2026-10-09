@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, effect, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 export interface Tank {
@@ -9,15 +9,23 @@ export interface Tank {
   storedEnergyKwh: number;
   fillPercentage: number;
   temperatureC: number;
-  status: 'CHARGING' | 'DISCHARGING' | 'IDLE' | 'FULL' | 'EMPTY';
+  status: 'CHARGING' | 'DISCHARGING' | 'STORED' | 'STANDBY' | 'FULL' | 'EMPTY';
+}
+
+export interface DeliveryLog {
+  timestamp: string;
+  kwh: number;
+  rateKw: number;
+  tankId: number;
 }
 
 export interface Consumer {
   id: string;
   name: string;
   company: string;
+  location: string;
   avatar: string;
-  status: 'RECEIVING' | 'PAUSED' | 'COMPLETED' | 'ACTIVE' | 'IDLE';
+  status: 'RECEIVING' | 'PAUSED' | 'COMPLETED' | 'IDLE';
   activeSourceTankId: number | null;
   preferredTankId: number | 'AUTO';
   autoSource: boolean;
@@ -28,125 +36,134 @@ export interface Consumer {
   contactPerson?: string;
   email?: string;
   tariff?: string;
+  history?: DeliveryLog[];
 }
 
 export type AllocationMode = 'AUTO' | 'MANUAL';
 
-const INITIAL_TANKS: Tank[] = [
+export const INITIAL_TANKS: Tank[] = [
   {
     id: 1,
-    name: 'Buffer Tank 01',
-    type: 'Phase Change Material (PCM)',
-    capacityKwh: 3000,
-    storedEnergyKwh: 2470,
-    fillPercentage: 82.3,
-    temperatureC: 78.5,
+    name: 'Tank 01',
+    type: 'Phase Change Latent Heat (PCM)',
+    capacityKwh: 10.0,
+    storedEnergyKwh: 8.0,
+    fillPercentage: 80.0,
+    temperatureC: 78,
     status: 'CHARGING'
   },
   {
     id: 2,
-    name: 'Buffer Tank 02',
-    type: 'Stratified Pressurized Water',
-    capacityKwh: 3000,
-    storedEnergyKwh: 1920,
-    fillPercentage: 64.0,
-    temperatureC: 62.0,
-    status: 'IDLE'
-  },
-  {
-    id: 3,
-    name: 'Buffer Tank 03',
-    type: 'High-Temp Thermal Oil',
-    capacityKwh: 3000,
-    storedEnergyKwh: 1250,
-    fillPercentage: 41.6,
-    temperatureC: 54.0,
+    name: 'Tank 02',
+    type: 'Pressurized Stratified Buffer',
+    capacityKwh: 20.0,
+    storedEnergyKwh: 14.8,
+    fillPercentage: 74.0,
+    temperatureC: 78,
     status: 'DISCHARGING'
   },
   {
+    id: 3,
+    name: 'Tank 03',
+    type: 'High-Temp Thermal Oil Vessel',
+    capacityKwh: 15.0,
+    storedEnergyKwh: 5.0,
+    fillPercentage: 33.3,
+    temperatureC: 78,
+    status: 'STORED'
+  },
+  {
     id: 4,
-    name: 'Buffer Tank 04',
+    name: 'Tank 04',
     type: 'Latent Heat Matrix Salt',
-    capacityKwh: 3500,
-    storedEnergyKwh: 680,
-    fillPercentage: 19.4,
-    temperatureC: 45.0,
-    status: 'IDLE'
+    capacityKwh: 25.0,
+    storedEnergyKwh: 0.0,
+    fillPercentage: 0.0,
+    temperatureC: 70,
+    status: 'STANDBY'
   }
 ];
 
-const INITIAL_CONSUMERS: Consumer[] = [
+export const INITIAL_CONSUMERS: Consumer[] = [
   {
     id: 'cons-01',
-    name: 'District Loop Alpha',
-    company: 'Metropolitan District Heating',
-    avatar: 'assets/img/avatars/district-1.png',
-    status: 'RECEIVING',
-    activeSourceTankId: 3,
-    preferredTankId: 'AUTO',
-    autoSource: true,
-    deliveryRateKw: 2.4,
-    deliveredEnergyKwh: 1420,
-    requiredEnergyKwh: 2000,
-    progressPercentage: 71.0,
-    contactPerson: 'Marcus Vance (Grid Mgr)',
-    email: 'm.vance@districtheat.city',
-    tariff: '$0.078 / kWh'
-  },
-  {
-    id: 'cons-02',
-    name: 'Absorption Chiller Unit',
-    company: 'ColdFlow Thermal HVAC',
-    avatar: 'assets/img/avatars/chiller-2.png',
+    name: 'ABC Food Processing',
+    company: 'Apex Agro & Foods Ltd.',
+    location: 'Industrial Zone Bay-4',
+    avatar: 'assets/img/avatars/industry-1.png',
     status: 'RECEIVING',
     activeSourceTankId: 2,
     preferredTankId: 2,
     autoSource: true,
-    deliveryRateKw: 1.2,
-    deliveredEnergyKwh: 680,
-    requiredEnergyKwh: 1200,
-    progressPercentage: 56.6,
-    contactPerson: 'Elena Rostova',
-    email: 'elena@coldflow.io',
-    tariff: '$0.065 / kWh'
+    deliveryRateKw: 4.0,
+    deliveredEnergyKwh: 14.11,
+    requiredEnergyKwh: 25.0,
+    progressPercentage: 56.4,
+    contactPerson: 'Vikram Mehta (Chief Plant Mgr)',
+    email: 'v.mehta@apexagro.com',
+    tariff: '$0.078 / kWh',
+    history: []
   },
   {
-    id: 'cons-03',
-    name: 'Factory Sanitation DHW',
-    company: 'CleanLoop Industrial',
-    avatar: 'assets/img/avatars/dhw-3.png',
-    status: 'PAUSED',
+    id: 'cons-02',
+    name: 'XYZ Textile Industry',
+    company: 'Western Spinners & Weavers',
+    location: 'Textile Cluster Phase 2',
+    avatar: 'assets/img/avatars/industry-2.png',
+    status: 'IDLE',
     activeSourceTankId: null,
     preferredTankId: 1,
     autoSource: false,
-    deliveryRateKw: 1.0,
-    deliveredEnergyKwh: 340,
-    requiredEnergyKwh: 800,
-    progressPercentage: 42.5,
-    contactPerson: 'David Chen',
-    email: 'd.chen@cleanloop.com',
-    tariff: '$0.072 / kWh'
+    deliveryRateKw: 2.5,
+    deliveredEnergyKwh: 6.00,
+    requiredEnergyKwh: 30.0,
+    progressPercentage: 20.0,
+    contactPerson: 'Anjali Sharma (Energy Lead)',
+    email: 'asharma@westernspinners.org',
+    tariff: '$0.065 / kWh',
+    history: []
+  },
+  {
+    id: 'cons-03',
+    name: 'Industrial Dryer Unit #4',
+    company: 'Aerodry Systems Corp',
+    location: 'Sector 9 Thermal Hub',
+    avatar: 'assets/img/avatars/industry-3.png',
+    status: 'IDLE',
+    activeSourceTankId: null,
+    preferredTankId: 3,
+    autoSource: true,
+    deliveryRateKw: 3.0,
+    deliveredEnergyKwh: 0.00,
+    requiredEnergyKwh: 18.0,
+    progressPercentage: 0.0,
+    contactPerson: 'Marcus Cole (Facilities)',
+    email: 'mcole@aerodrycorp.com',
+    tariff: '$0.072 / kWh',
+    history: []
   },
   {
     id: 'cons-04',
-    name: 'Greenhouse Soil Heater',
-    company: 'AgriTherm Hydroponics',
-    avatar: 'assets/img/avatars/greenhouse-4.png',
+    name: 'Bio-Chem Refining Lab',
+    company: 'Synthesis Bio-Processors',
+    location: 'Biotech Science Park #12',
+    avatar: 'assets/img/avatars/industry-4.png',
     status: 'COMPLETED',
     activeSourceTankId: null,
-    preferredTankId: 'AUTO',
+    preferredTankId: 2,
     autoSource: true,
-    deliveryRateKw: 0.8,
-    deliveredEnergyKwh: 500,
-    requiredEnergyKwh: 500,
-    progressPercentage: 100,
-    contactPerson: 'Sarah Lin',
-    email: 'sarah@agritherm.org',
-    tariff: '$0.055 / kWh'
+    deliveryRateKw: 2.0,
+    deliveredEnergyKwh: 15.00,
+    requiredEnergyKwh: 15.0,
+    progressPercentage: 100.0,
+    contactPerson: 'Dr. Elena Rostova',
+    email: 'elena@synthesisbio.io',
+    tariff: '$0.085 / kWh',
+    history: []
   }
 ];
 
-const STORAGE_KEY = 'waste_heat_simulation_state_v1';
+const STORAGE_KEY = 'waste_heat_scada_state_v2';
 
 @Injectable({
   providedIn: 'root'
@@ -154,13 +171,13 @@ const STORAGE_KEY = 'waste_heat_simulation_state_v1';
 export class WasteHeatService {
   private platformId = inject(PLATFORM_ID);
 
-  // --- Core Simulation Signals ---
+  // --- Core State Signals ---
   readonly heatOutputKw = signal<number>(1.0);
-  readonly durationSeconds = signal<number>(300);
-  readonly simulationSpeed = signal<number>(1);
+  readonly durationSeconds = signal<number>(300); // 5s or 300s (5 min)
+  readonly simulationSpeed = signal<number>(10); // 1x, 10x, 60x for responsive simulation
   readonly isSimulating = signal<boolean>(true);
 
-  // --- Storage System Signals ---
+  // --- Storage Subsystem Signals ---
   readonly tanks = signal<Tank[]>(INITIAL_TANKS);
   readonly activeChargingTankId = signal<number | null>(1);
   readonly allocationMode = signal<AllocationMode>('AUTO');
@@ -170,35 +187,34 @@ export class WasteHeatService {
   // --- Consumers Signal ---
   readonly consumers = signal<Consumer[]>(INITIAL_CONSUMERS);
 
-  // --- Derived / Computed Values ---
+  // --- Computed SCADA KPIs ---
   readonly temperatureC = computed(() => {
     const kw = this.heatOutputKw();
     if (kw <= 0) return 38;
-    return Math.round(40 + (kw / 5.0) * 55); // 40°C to 95°C
+    // Exactly 70°C at 1.0 kW, 78°C at 2.5 kW, 88°C at 4.0 kW, 95°C at 5.0 kW
+    return Math.round(55 + (kw / 5.0) * 40);
   });
 
-  readonly serverStatus = computed<'ACTIVE' | 'IDLE'>(() => {
-    return this.heatOutputKw() > 0 ? 'ACTIVE' : 'IDLE';
-  });
-
-  readonly heatIntensityRatio = computed(() => {
-    return Math.min(1.0, Math.max(0, this.heatOutputKw() / 5.0));
+  readonly serverStatus = computed<'Active' | 'Idle'>(() => {
+    return this.heatOutputKw() > 0 ? 'Active' : 'Idle';
   });
 
   readonly energyStoredKJ = computed(() => {
+    // Energy (kJ) = Power (kW) * Time (s)
     return parseFloat((this.heatOutputKw() * this.durationSeconds()).toFixed(1));
   });
 
   readonly energyStoredKwh = computed(() => {
-    return (this.energyStoredKJ() / 3600).toFixed(4);
+    // 1 kWh = 3600 kJ
+    return (this.energyStoredKJ() / 3600).toFixed(5);
   });
 
   readonly totalStoredKwh = computed(() => {
-    return Math.round(this.tanks().reduce((sum, t) => sum + t.storedEnergyKwh, 0));
+    return parseFloat(this.tanks().reduce((sum, t) => sum + t.storedEnergyKwh, 0).toFixed(2));
   });
 
   readonly totalCapacityKwh = computed(() => {
-    return Math.round(this.tanks().reduce((sum, t) => sum + t.capacityKwh, 0));
+    return parseFloat(this.tanks().reduce((sum, t) => sum + t.capacityKwh, 0).toFixed(1));
   });
 
   readonly systemLevelPercentage = computed(() => {
@@ -207,36 +223,38 @@ export class WasteHeatService {
     return parseFloat(((this.totalStoredKwh() / cap) * 100).toFixed(1));
   });
 
-  readonly activeSuppliesCount = computed(() => {
-    return this.consumers().filter(c => c.status === 'RECEIVING' || c.status === 'ACTIVE').length;
+  readonly headroomPercentage = computed(() => {
+    return parseFloat((100 - this.systemLevelPercentage()).toFixed(1));
   });
 
-  readonly activeSuppliesKw = computed(() => {
+  readonly avgStorageTemp = computed(() => {
+    const activeTanks = this.tanks().filter(t => t.storedEnergyKwh > 0);
+    if (activeTanks.length === 0) return 70;
+    const sum = activeTanks.reduce((acc, t) => acc + t.temperatureC, 0);
+    return Math.round(sum / activeTanks.length);
+  });
+
+  readonly activeSuppliesCount = computed(() => {
+    return this.consumers().filter(c => c.status === 'RECEIVING').length;
+  });
+
+  readonly totalDeliveryPowerKw = computed(() => {
     return parseFloat(
       this.consumers()
-        .filter(c => c.status === 'RECEIVING' || c.status === 'ACTIVE')
+        .filter(c => c.status === 'RECEIVING')
         .reduce((sum, c) => sum + c.deliveryRateKw, 0)
-        .toFixed(2)
+        .toFixed(1)
     );
   });
 
   readonly totalDeliveredKwh = computed(() => {
-    return Math.round(this.consumers().reduce((sum, c) => sum + c.deliveredEnergyKwh, 0));
+    return parseFloat(this.consumers().reduce((sum, c) => sum + c.deliveredEnergyKwh, 0).toFixed(1));
   });
 
-  readonly activeChargingTankName = computed(() => {
+  readonly activeChargingTank = computed(() => {
     const id = this.activeChargingTankId();
-    if (!id) return 'None (Standby)';
-    const tank = this.tanks().find(t => t.id === id);
-    return tank ? tank.name : `Tank 0${id}`;
-  });
-
-  readonly isAnyTankFull = computed(() => {
-    return this.tanks().some(t => t.fillPercentage >= 99.5);
-  });
-
-  readonly isAnyTankEmpty = computed(() => {
-    return this.tanks().some(t => t.fillPercentage <= 0.5);
+    if (!id) return null;
+    return this.tanks().find(t => t.id === id) || null;
   });
 
   private timerInterval: any = null;
@@ -260,7 +278,7 @@ export class WasteHeatService {
     this.saveToLocalStorage();
   }
 
-  // --- Thermal Storage Actions ---
+  // --- Storage Controls & Configuration ---
   setAllocationMode(mode: AllocationMode): void {
     this.allocationMode.set(mode);
     this.saveToLocalStorage();
@@ -272,17 +290,27 @@ export class WasteHeatService {
   }
 
   setPriorityOrder(order: number[]): void {
-    this.priorityOrder.set(order);
-    this.saveToLocalStorage();
+    // Validate that order has 4 distinct tank ids
+    const valid = Array.from(new Set(order.filter(id => id >= 1 && id <= 4)));
+    if (valid.length === 4) {
+      this.priorityOrder.set(valid);
+      this.saveToLocalStorage();
+    }
   }
 
   updateTankCapacities(capacities: { [tankId: number]: number }): void {
     this.tanks.update(tanks =>
       tanks.map(t => {
-        const newCap = capacities[t.id] ?? t.capacityKwh;
-        const stored = Math.min(t.storedEnergyKwh, newCap);
+        const rawCap = capacities[t.id];
+        const newCap = rawCap !== undefined && rawCap > 0 ? parseFloat(rawCap.toFixed(1)) : t.capacityKwh;
+        const stored = parseFloat(Math.min(t.storedEnergyKwh, newCap).toFixed(2));
         const fill = parseFloat(((stored / newCap) * 100).toFixed(1));
-        return { ...t, capacityKwh: newCap, storedEnergyKwh: stored, fillPercentage: fill };
+        return {
+          ...t,
+          capacityKwh: newCap,
+          storedEnergyKwh: stored,
+          fillPercentage: fill
+        };
       })
     );
     this.saveToLocalStorage();
@@ -297,24 +325,30 @@ export class WasteHeatService {
   }
 
   setSimulationSpeed(speed: number): void {
-    this.simulationSpeed.set(Math.max(1, Math.min(10, speed)));
+    this.simulationSpeed.set(speed);
   }
 
-  // --- Consumer Management Actions ---
+  toggleSimulationPause(): void {
+    this.isSimulating.set(!this.isSimulating());
+  }
+
+  // --- Heat Consumer Actions ---
   toggleSupply(consumerId: string): void {
     const c = this.consumers().find(x => x.id === consumerId);
     if (!c) return;
 
-    if (c.status === 'RECEIVING' || c.status === 'ACTIVE') {
+    if (c.status === 'RECEIVING') {
       this.pauseSupply(consumerId);
     } else if (c.status === 'PAUSED' || c.status === 'IDLE') {
       this.startSupply(consumerId);
     } else if (c.status === 'COMPLETED') {
+      // Restart cycle
       this.updateConsumer(consumerId, {
         deliveredEnergyKwh: 0,
         progressPercentage: 0,
         status: 'RECEIVING'
       });
+      this.startSupply(consumerId);
     }
   }
 
@@ -322,10 +356,13 @@ export class WasteHeatService {
     this.consumers.update(list =>
       list.map(c => {
         if (c.id === consumerId) {
-          if (c.deliveredEnergyKwh >= c.requiredEnergyKwh) {
-            return { ...c, deliveredEnergyKwh: 0, progressPercentage: 0, status: 'RECEIVING' };
-          }
-          return { ...c, status: 'RECEIVING' };
+          // Find source tank
+          const sourceId = this.findAvailableSourceTank(c);
+          return {
+            ...c,
+            status: sourceId !== null ? 'RECEIVING' : 'PAUSED',
+            activeSourceTankId: sourceId
+          };
         }
         return c;
       })
@@ -345,10 +382,6 @@ export class WasteHeatService {
     this.saveToLocalStorage();
   }
 
-  resumeSupply(consumerId: string): void {
-    this.startSupply(consumerId);
-  }
-
   stopSupply(consumerId: string): void {
     this.consumers.update(list =>
       list.map(c => {
@@ -362,7 +395,7 @@ export class WasteHeatService {
   }
 
   setConsumerDeliveryRate(consumerId: string, rateKw: number): void {
-    const clamped = Math.max(0.1, Math.min(10.0, rateKw));
+    const clamped = Math.max(0.1, Math.min(10.0, parseFloat(rateKw.toFixed(1))));
     this.consumers.update(list =>
       list.map(c => (c.id === consumerId ? { ...c, deliveryRateKw: clamped } : c))
     );
@@ -371,35 +404,56 @@ export class WasteHeatService {
 
   setConsumerPreferredTank(consumerId: string, tankId: number | 'AUTO'): void {
     this.consumers.update(list =>
-      list.map(c => (c.id === consumerId ? { ...c, preferredTankId: tankId } : c))
+      list.map(c => {
+        if (c.id === consumerId) {
+          const updated: Consumer = { ...c, preferredTankId: tankId };
+          if (updated.status === 'RECEIVING') {
+            updated.activeSourceTankId = this.findAvailableSourceTank(updated);
+          }
+          return updated;
+        }
+        return c;
+      })
     );
     this.saveToLocalStorage();
   }
 
   toggleConsumerAutoSource(consumerId: string): void {
     this.consumers.update(list =>
-      list.map(c => (c.id === consumerId ? { ...c, autoSource: !c.autoSource } : c))
+      list.map(c => {
+        if (c.id === consumerId) {
+          const updated: Consumer = { ...c, autoSource: !c.autoSource };
+          if (updated.status === 'RECEIVING') {
+            updated.activeSourceTankId = this.findAvailableSourceTank(updated);
+          }
+          return updated;
+        }
+        return c;
+      })
     );
     this.saveToLocalStorage();
   }
 
   addConsumer(data: Partial<Consumer>): void {
+    const newId = `cons-${Date.now().toString().slice(-4)}`;
     const newConsumer: Consumer = {
-      id: `cons-${Date.now().toString().slice(-4)}`,
-      name: data.name || 'New Offtaker',
-      company: data.company || 'Industrial Facility',
-      avatar: data.avatar || 'assets/img/avatars/default.png',
+      id: newId,
+      name: data.name?.trim() || 'New Industrial Facility',
+      company: data.company?.trim() || 'Enterprise Plant',
+      location: data.location?.trim() || 'Industrial Sector 5',
+      avatar: data.avatar || `assets/img/avatars/industry-${(this.consumers().length % 4) + 1}.png`,
       status: 'IDLE',
       activeSourceTankId: null,
       preferredTankId: data.preferredTankId || 'AUTO',
       autoSource: data.autoSource ?? true,
-      deliveryRateKw: data.deliveryRateKw || 1.0,
+      deliveryRateKw: data.deliveryRateKw || 2.5,
       deliveredEnergyKwh: 0,
-      requiredEnergyKwh: data.requiredEnergyKwh || 1000,
+      requiredEnergyKwh: data.requiredEnergyKwh || 20.0,
       progressPercentage: 0,
-      contactPerson: data.contactPerson || '',
-      email: data.email || '',
-      tariff: data.tariff || '$0.070 / kWh'
+      contactPerson: data.contactPerson?.trim() || 'Plant Operations Lead',
+      email: data.email?.trim() || 'ops@industrial.corp',
+      tariff: data.tariff?.trim() || '$0.075 / kWh',
+      history: []
     };
 
     this.consumers.update(list => [newConsumer, ...list]);
@@ -416,6 +470,9 @@ export class WasteHeatService {
               Math.min(100, (updated.deliveredEnergyKwh / updated.requiredEnergyKwh) * 100).toFixed(1)
             );
           }
+          if (updated.status === 'RECEIVING') {
+            updated.activeSourceTankId = this.findAvailableSourceTank(updated);
+          }
           return updated;
         }
         return c;
@@ -429,11 +486,33 @@ export class WasteHeatService {
     this.saveToLocalStorage();
   }
 
-  uploadConsumerImage(consumerId: string, base64: string): void {
-    this.updateConsumer(consumerId, { avatar: base64 });
+  getTank(tankId: number): Tank | undefined {
+    return this.tanks().find(t => t.id === tankId);
   }
 
-  // --- Simulation Engine Loop ---
+  private findAvailableSourceTank(consumer: Consumer): number | null {
+    const currentTanks = this.tanks();
+    if (consumer.preferredTankId !== 'AUTO') {
+      const preferred = currentTanks.find(t => t.id === consumer.preferredTankId);
+      if (preferred && preferred.storedEnergyKwh > 0.1) {
+        return preferred.id;
+      }
+    }
+
+    if (consumer.autoSource || consumer.preferredTankId === 'AUTO') {
+      // Find tank with highest stored energy
+      const available = currentTanks
+        .filter(t => t.storedEnergyKwh > 0.1)
+        .sort((a, b) => b.storedEnergyKwh - a.storedEnergyKwh);
+      if (available.length > 0) {
+        return available[0].id;
+      }
+    }
+
+    return null;
+  }
+
+  // --- Real-Time Simulation Engine Loop ---
   private startSimulationLoop(): void {
     if (this.timerInterval) clearInterval(this.timerInterval);
 
@@ -446,23 +525,23 @@ export class WasteHeatService {
   private simulationTick(): void {
     const speed = this.simulationSpeed();
     const heatKw = this.heatOutputKw();
-    const currentTanks = [...this.tanks()];
-    const currentConsumers = [...this.consumers()];
+    const currentTanks = this.tanks().map(t => ({ ...t }));
+    const currentConsumers = this.consumers().map(c => ({ ...c }));
 
-    // 1. CHARGING STEP (Server -> Active Tank)
+    // 1. CHARGING STEP (Server Heat -> Thermal Storage Tank)
     let chargingTankId: number | null = null;
     if (heatKw > 0) {
       if (this.allocationMode() === 'MANUAL') {
         const manualId = this.manualSelectedTankId();
         const target = currentTanks.find(t => t.id === manualId);
-        if (target && target.storedEnergyKwh < target.capacityKwh) {
+        if (target && target.storedEnergyKwh < target.capacityKwh - 0.01) {
           chargingTankId = target.id;
         }
       } else {
-        // Auto: find first tank in priority order that has space
+        // Automatic Sequential Allocation based on priority order
         for (const tid of this.priorityOrder()) {
           const t = currentTanks.find(x => x.id === tid);
-          if (t && t.storedEnergyKwh < t.capacityKwh - 0.1) {
+          if (t && t.storedEnergyKwh < t.capacityKwh - 0.05) {
             chargingTankId = t.id;
             break;
           }
@@ -471,84 +550,82 @@ export class WasteHeatService {
 
       if (chargingTankId !== null) {
         // Energy in kWh added per second = (kW / 3600) * speed
-        const energyAdded = (heatKw / 3600) * speed * 20; // 20x time compression for visible dynamic feedback
-        const tankIdx = currentTanks.findIndex(t => t.id === chargingTankId);
-        if (tankIdx !== -1) {
-          const t = currentTanks[tankIdx];
-          const newStored = Math.min(t.capacityKwh, t.storedEnergyKwh + energyAdded);
-          const fill = parseFloat(((newStored / t.capacityKwh) * 100).toFixed(1));
-          const temp = Math.round(45 + (fill / 100) * 45);
-          currentTanks[tankIdx] = {
-            ...t,
-            storedEnergyKwh: parseFloat(newStored.toFixed(2)),
-            fillPercentage: fill,
-            temperatureC: temp,
-            status: fill >= 99.8 ? 'FULL' : 'CHARGING'
-          };
+        const energyAdded = (heatKw / 3600) * speed;
+        const targetTank = currentTanks.find(t => t.id === chargingTankId);
+        if (targetTank) {
+          const newStored = Math.min(targetTank.capacityKwh, targetTank.storedEnergyKwh + energyAdded);
+          targetTank.storedEnergyKwh = parseFloat(newStored.toFixed(3));
+          targetTank.fillPercentage = parseFloat(((newStored / targetTank.capacityKwh) * 100).toFixed(1));
+          targetTank.temperatureC = Math.min(95, Math.round(65 + (targetTank.fillPercentage / 100) * 25));
         }
       }
     }
     this.activeChargingTankId.set(chargingTankId);
 
-    // 2. DISCHARGING STEP (Tanks -> Active Consumers)
-    for (let i = 0; i < currentConsumers.length; i++) {
-      const c = currentConsumers[i];
-      if (c.status !== 'RECEIVING' && c.status !== 'ACTIVE') continue;
-
-      // Find appropriate source tank
+    // 2. DISCHARGING STEP (Storage Tanks -> Heat Consumers)
+    const activeConsumers = currentConsumers.filter(c => c.status === 'RECEIVING');
+    for (const c of activeConsumers) {
       let sourceTank: Tank | undefined;
+
+      // Check preferred tank first
       if (c.preferredTankId !== 'AUTO') {
-        sourceTank = currentTanks.find(t => t.id === c.preferredTankId && t.storedEnergyKwh > 0.5);
+        sourceTank = currentTanks.find(t => t.id === c.preferredTankId && t.storedEnergyKwh > 0.05);
       }
 
-      if (!sourceTank && c.autoSource) {
-        // Find tank with highest stored energy
+      // If preferred is dry or autoSource is active, auto select the richest tank
+      if (!sourceTank && (c.autoSource || c.preferredTankId === 'AUTO')) {
         sourceTank = currentTanks
-          .filter(t => t.storedEnergyKwh > 0.5)
+          .filter(t => t.storedEnergyKwh > 0.05)
           .sort((a, b) => b.storedEnergyKwh - a.storedEnergyKwh)[0];
       }
 
       if (sourceTank) {
-        const energyRequired = (c.deliveryRateKw / 3600) * speed * 20;
-        const actualDrawn = Math.min(sourceTank.storedEnergyKwh, energyRequired);
+        c.activeSourceTankId = sourceTank.id;
+        const maxEnergyDrawn = (c.deliveryRateKw / 3600) * speed;
+        const remainingDemand = Math.max(0, c.requiredEnergyKwh - c.deliveredEnergyKwh);
+        const actualDrawn = Math.min(sourceTank.storedEnergyKwh, maxEnergyDrawn, remainingDemand);
 
-        // Deduct from tank
-        const tankIdx = currentTanks.findIndex(t => t.id === sourceTank!.id);
-        if (tankIdx !== -1) {
-          const t = currentTanks[tankIdx];
-          const newStored = Math.max(0, t.storedEnergyKwh - actualDrawn);
-          const fill = parseFloat(((newStored / t.capacityKwh) * 100).toFixed(1));
-          const temp = Math.max(35, Math.round(45 + (fill / 100) * 45));
-          currentTanks[tankIdx] = {
-            ...t,
-            storedEnergyKwh: parseFloat(newStored.toFixed(2)),
-            fillPercentage: fill,
-            temperatureC: temp,
-            status: t.id === chargingTankId ? 'CHARGING' : (fill <= 0.2 ? 'EMPTY' : 'DISCHARGING')
-          };
+        if (actualDrawn > 0) {
+          // Deduct from tank
+          sourceTank.storedEnergyKwh = parseFloat(Math.max(0, sourceTank.storedEnergyKwh - actualDrawn).toFixed(3));
+          sourceTank.fillPercentage = parseFloat(((sourceTank.storedEnergyKwh / sourceTank.capacityKwh) * 100).toFixed(1));
+          sourceTank.temperatureC = Math.max(45, Math.round(50 + (sourceTank.fillPercentage / 100) * 35));
+
+          // Add to consumer
+          c.deliveredEnergyKwh = parseFloat((c.deliveredEnergyKwh + actualDrawn).toFixed(3));
+          c.progressPercentage = parseFloat(Math.min(100, (c.deliveredEnergyKwh / c.requiredEnergyKwh) * 100).toFixed(1));
+
+          if (c.deliveredEnergyKwh >= c.requiredEnergyKwh - 0.01) {
+            c.status = 'COMPLETED';
+            c.activeSourceTankId = null;
+          }
         }
-
-        // Add to consumer
-        const newDelivered = c.deliveredEnergyKwh + actualDrawn;
-        const isComplete = newDelivered >= c.requiredEnergyKwh;
-        const progress = parseFloat(
-          Math.min(100, (newDelivered / c.requiredEnergyKwh) * 100).toFixed(1)
-        );
-
-        currentConsumers[i] = {
-          ...c,
-          deliveredEnergyKwh: parseFloat(newDelivered.toFixed(2)),
-          progressPercentage: progress,
-          activeSourceTankId: isComplete ? null : sourceTank.id,
-          status: isComplete ? 'COMPLETED' : 'RECEIVING'
-        };
       } else {
-        // No energy available
-        currentConsumers[i] = {
-          ...c,
-          activeSourceTankId: null,
-          status: 'PAUSED'
-        };
+        // No energy available in any applicable tank
+        c.activeSourceTankId = null;
+        c.status = 'PAUSED';
+      }
+    }
+
+    // 3. UPDATE TANK STATUS FLAGS ACCORDING TO SYSTEM STATE
+    const dischargingTankIds = new Set(
+      currentConsumers.filter(c => c.status === 'RECEIVING' && c.activeSourceTankId !== null).map(c => c.activeSourceTankId!)
+    );
+
+    for (const t of currentTanks) {
+      const isCharging = t.id === chargingTankId;
+      const isDischarging = dischargingTankIds.has(t.id);
+
+      if (isCharging) {
+        t.status = t.fillPercentage >= 99.8 ? 'FULL' : 'CHARGING';
+      } else if (isDischarging) {
+        t.status = 'DISCHARGING';
+      } else if (t.fillPercentage >= 99.5) {
+        t.status = 'FULL';
+      } else if (t.fillPercentage <= 0.5) {
+        t.status = 'STANDBY';
+      } else {
+        t.status = 'STORED';
       }
     }
 
@@ -584,10 +661,14 @@ export class WasteHeatService {
         if (parsed.heatOutputKw !== undefined) this.heatOutputKw.set(parsed.heatOutputKw);
         if (parsed.durationSeconds !== undefined) this.durationSeconds.set(parsed.durationSeconds);
         if (parsed.allocationMode) this.allocationMode.set(parsed.allocationMode);
-        if (parsed.priorityOrder) this.priorityOrder.set(parsed.priorityOrder);
+        if (parsed.priorityOrder && Array.isArray(parsed.priorityOrder)) this.priorityOrder.set(parsed.priorityOrder);
         if (parsed.manualSelectedTankId) this.manualSelectedTankId.set(parsed.manualSelectedTankId);
-        if (parsed.tanks && Array.isArray(parsed.tanks)) this.tanks.set(parsed.tanks);
-        if (parsed.consumers && Array.isArray(parsed.consumers)) this.consumers.set(parsed.consumers);
+        if (parsed.tanks && Array.isArray(parsed.tanks) && parsed.tanks.length === 4) {
+          this.tanks.set(parsed.tanks);
+        }
+        if (parsed.consumers && Array.isArray(parsed.consumers)) {
+          this.consumers.set(parsed.consumers);
+        }
       }
     } catch (e) {
       console.warn('Failed to load Waste Heat state from localStorage', e);

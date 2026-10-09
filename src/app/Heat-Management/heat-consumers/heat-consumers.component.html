@@ -1,0 +1,453 @@
+<div class="heat-consumers-page space-y-4">
+  
+  <!-- ================= TOP HEADER BAR ================= -->
+  <div class="bg-[#081120] border border-[#14233a] rounded-lg p-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 font-mono text-xs">
+    
+    <!-- Title & System Header -->
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-sm">
+        🏭
+      </div>
+      <div>
+        <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          <span>THERMAL ENERGY DISTRIBUTION</span>
+        </div>
+        <h1 class="text-base font-bold text-slate-100 mt-0.5 tracking-tight">
+          Heat Consumers &bull; Thermal Energy Customers & Controlled Heat Supply
+        </h1>
+      </div>
+    </div>
+
+    <!-- Live SCADA Badges -->
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="px-2.5 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
+        TOTAL STORED: <strong class="text-amber-400">{{ wasteHeat.totalStoredKwh() }} kWh</strong> ({{ wasteHeat.systemLevelPercentage() }}%)
+      </span>
+      <span class="px-2.5 py-1 rounded bg-[#060c18] border border-emerald-500/30 text-emerald-400 font-bold flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full" [ngClass]="wasteHeat.activeSuppliesCount() > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'"></span>
+        ACTIVE SUPPLIES: {{ wasteHeat.activeSuppliesCount() }} Flowing ({{ wasteHeat.totalDeliveryPowerKw() }} kW)
+      </span>
+      <span class="px-2.5 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
+        TOTAL DELIVERED: <strong class="text-cyan-400">{{ wasteHeat.totalDeliveredKwh() }} kWh</strong>
+      </span>
+    </div>
+
+    <!-- Right Controls: Add Consumer, Tanks, Server Links -->
+    <div class="flex items-center gap-2">
+      <button (click)="openAddModal()" 
+              class="px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+        <span>+ +</span> Add Heat Consumer
+      </button>
+
+      <button (click)="navigate('thermal-storage')" class="px-2.5 py-1.5 rounded bg-[#071324] hover:bg-[#0e213b] border border-[#182e4e] text-slate-300 flex items-center gap-1">
+        <span>🛢</span> Tanks
+      </button>
+
+      <button (click)="navigate('data-server')" class="px-2.5 py-1.5 rounded bg-[#071324] hover:bg-[#0e213b] border border-[#182e4e] text-slate-300 flex items-center gap-1">
+        <span>🖥</span> Server
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ================= FILTER TABS & SEARCH BAR ================= -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#081120] border border-[#14233a] rounded-lg p-2.5 font-mono text-xs">
+    
+    <div class="flex items-center gap-2">
+      <span class="text-slate-400 uppercase tracking-wider font-bold">REGISTERED HEAT CONSUMERS</span>
+      <span class="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-bold">
+        {{ wasteHeat.consumers().length }} Customers
+      </span>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="flex items-center gap-1.5 flex-wrap">
+      <button (click)="activeFilter = 'ALL'" 
+              class="filter-tab-btn" 
+              [class.tab-active]="activeFilter === 'ALL'">
+        All Consumers ({{ wasteHeat.consumers().length }})
+      </button>
+
+      <button (click)="activeFilter = 'RECEIVING'" 
+              class="filter-tab-btn" 
+              [class.tab-active]="activeFilter === 'RECEIVING'">
+        Receiving Supply ({{ receivingCount }})
+      </button>
+
+      <button (click)="activeFilter = 'STANDBY'" 
+              class="filter-tab-btn" 
+              [class.tab-active]="activeFilter === 'STANDBY'">
+        Active / Standby ({{ standbyCount }})
+      </button>
+
+      <button (click)="activeFilter = 'COMPLETED'" 
+              class="filter-tab-btn" 
+              [class.tab-active]="activeFilter === 'COMPLETED'">
+        Completed ({{ completedCount }})
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ================= CONSUMERS 3-COLUMN RESPONSIVE GRID ================= -->
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    
+    <div *ngFor="let c of filteredConsumers" 
+         class="consumer-card-main rounded-xl p-4 bg-[#060c18] border-2 flex flex-col justify-between transition-all duration-300 relative"
+         [class.card-supplying]="c.status === 'RECEIVING'"
+         [class.border-[#142640]]="c.status !== 'RECEIVING'">
+      
+      <div>
+        <!-- Card Header with Company & Actions -->
+        <div class="flex items-start justify-between gap-2">
+          
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-[#0a1628] border border-[#182f50] flex items-center justify-center text-xl overflow-hidden flex-shrink-0">
+              <span *ngIf="!c.avatar || c.avatar.includes('default')">🏭</span>
+              <span *ngIf="c.avatar && !c.avatar.includes('default')">🏢</span>
+            </div>
+            <div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">{{ c.company }}</div>
+              <div class="text-sm font-bold text-slate-100 leading-tight mt-0.5">{{ c.name }}</div>
+              <div class="text-[10px] font-mono text-slate-500 flex items-center gap-1 mt-0.5">
+                <span>📍</span> <span>{{ c.location }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Header Buttons: Edit, Delete, Status Badge -->
+          <div class="flex items-center gap-1.5 flex-wrap justify-end">
+            <button (click)="openEditModal(c)" 
+                    class="p-1 rounded bg-[#0b182b] hover:bg-[#12243d] border border-[#1c3558] text-slate-300 text-xs hover:text-cyan-300"
+                    title="Edit Consumer Details">
+              ✏ Edit
+            </button>
+            <button (click)="openDeleteModal(c)" 
+                    class="p-1 rounded bg-[#200c0c] hover:bg-[#301212] border border-red-500/40 text-red-400 text-xs"
+                    title="Delete Consumer">
+              🗑
+            </button>
+
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider"
+                  [ngClass]="{
+                    'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40': c.status === 'RECEIVING',
+                    'bg-[#0a1628] text-slate-400 border border-slate-700': c.status === 'IDLE',
+                    'bg-amber-500/20 text-amber-400 border border-amber-500/40': c.status === 'PAUSED',
+                    'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40': c.status === 'COMPLETED'
+                  }">
+              {{ c.status === 'RECEIVING' ? '● SUPPLYING' : (c.status === 'COMPLETED' ? 'COMPLETED' : 'SUPPLY OFF') }}
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Allocated Storage Tank Box -->
+        <div class="allocated-tank-box mt-3.5 p-2.5 rounded-lg bg-[#040914] border border-[#14253c] flex items-center justify-between font-mono text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-cyan-400 text-sm">🛢</span>
+            <div>
+              <div class="text-[9px] text-slate-500 uppercase font-bold">
+                {{ c.status === 'RECEIVING' ? 'ACTIVELY SUPPLYING FROM STORAGE TANK:' : 'ALLOCATED STORAGE TANK (SUPPLY OFF):' }}
+              </div>
+              <div class="text-slate-200 font-bold mt-0.5">
+                <span [class.text-emerald-400]="c.status === 'RECEIVING'">
+                  {{ c.activeSourceTankId ? getTankName(c.activeSourceTankId) : (c.preferredTankId === 'AUTO' ? 'Auto Sequential' : getTankName(c.preferredTankId)) }}
+                </span>
+                <span class="text-slate-400 text-[10px] font-normal ml-1">
+                  ({{ getTankAvailable(c.activeSourceTankId || c.preferredTankId) }})
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auto-Switch Badge Toggle -->
+          <button (click)="toggleAutoSource(c)"
+                  class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border transition-all"
+                  [ngClass]="c.autoSource ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50' : 'bg-[#081324] text-slate-500 border-slate-700'">
+            AUTO-SWITCH
+          </button>
+        </div>
+
+        <!-- Metric Readout Grid (4 stats) -->
+        <div class="grid grid-cols-4 gap-2 mt-3 font-mono text-center">
+          <div class="p-2 rounded bg-[#040812] border border-[#101e33]">
+            <div class="text-[9px] text-slate-500 uppercase">HEAT CONSUMED</div>
+            <div class="text-xs font-bold text-cyan-400 mt-0.5">{{ c.deliveredEnergyKwh }} kWh</div>
+          </div>
+          <div class="p-2 rounded bg-[#040812] border border-[#101e33]">
+            <div class="text-[9px] text-slate-500 uppercase">TARGET DEMAND</div>
+            <div class="text-xs font-bold text-slate-200 mt-0.5">{{ c.requiredEnergyKwh }} kWh</div>
+          </div>
+          <div class="p-2 rounded bg-[#040812] border border-[#101e33]">
+            <div class="text-[9px] text-slate-500 uppercase">SUPPLY RATE</div>
+            <div class="text-xs font-bold mt-0.5" [ngClass]="c.status === 'RECEIVING' ? 'text-amber-400' : 'text-slate-500'">
+              {{ c.status === 'RECEIVING' ? c.deliveryRateKw + ' kW' : '0 kW' }}
+            </div>
+          </div>
+          <div class="p-2 rounded bg-[#040812] border border-[#101e33]">
+            <div class="text-[9px] text-slate-500 uppercase">REMAINING</div>
+            <div class="text-xs font-bold text-slate-200 mt-0.5">
+              {{ (c.requiredEnergyKwh - c.deliveredEnergyKwh) > 0 ? (c.requiredEnergyKwh - c.deliveredEnergyKwh).toFixed(1) : '0.0' }} kWh
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Progress Bar -->
+        <div class="mt-3 font-mono text-[10px]">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span>Delivery Progress</span>
+            <span class="font-bold text-amber-400">{{ c.progressPercentage }}%</span>
+          </div>
+          <div class="w-full bg-[#030812] h-2 rounded-full overflow-hidden border border-[#12233a]">
+            <div class="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-400 transition-all duration-500"
+                 [style.width.%]="c.progressPercentage"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Row: Supply Toggle, Edit, Controls & Telemetry -->
+      <div class="mt-4 pt-3 border-t border-[#12233a] flex items-center justify-between gap-2 font-mono">
+        
+        <!-- Primary Action Toggle Button -->
+        <button (click)="toggleSupply(c)" 
+                class="flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow"
+                [ngClass]="{
+                  'bg-emerald-950 text-emerald-300 border border-emerald-500/60 hover:bg-emerald-900': c.status === 'RECEIVING',
+                  'bg-blue-950 text-cyan-300 border border-cyan-500/50 hover:bg-blue-900': c.status === 'IDLE' || c.status === 'PAUSED',
+                  'bg-[#0e1828] text-slate-300 border border-slate-600 hover:bg-[#14233a]': c.status === 'COMPLETED'
+                }">
+          <span *ngIf="c.status === 'RECEIVING'">● SUPPLY ON - Click to Turn OFF</span>
+          <span *ngIf="c.status === 'IDLE' || c.status === 'PAUSED'">▶ SUPPLY OFF - Click to Turn ON</span>
+          <span *ngIf="c.status === 'COMPLETED'">🔄 RESTART CYCLE</span>
+        </button>
+
+        <!-- Edit Button -->
+        <button (click)="openEditModal(c)" 
+                class="p-2 rounded-lg bg-[#081324] hover:bg-[#0e213b] border border-[#182d49] text-slate-300 text-xs">
+          ✏ Edit
+        </button>
+
+        <!-- Controls & Telemetry Button -->
+        <button (click)="openTelemetryModal(c)" 
+                class="p-2 px-2.5 rounded-lg bg-[#081324] hover:bg-[#0e213b] border border-[#182d49] text-cyan-400 text-xs font-bold flex items-center gap-1">
+          <span>Controls & Telemetry</span> &rarr;
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= ADD / EDIT CONSUMER MODAL ================= -->
+  <div *ngIf="showAddEditModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+    <div class="modal-window w-full max-w-lg bg-[#081120] border border-[#1e3b62] rounded-xl p-5 shadow-2xl space-y-4 font-mono max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex items-center justify-between border-b border-[#142640] pb-3">
+        <div class="flex items-center gap-2 text-cyan-400">
+          <span>🏭</span>
+          <h3 class="text-base font-bold text-slate-100">
+            {{ isEditing ? 'Edit Heat Consumer' : 'Register New Heat Consumer' }}
+          </h3>
+        </div>
+        <button (click)="closeAddEditModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <div *ngIf="formError" class="p-2 rounded bg-red-950/80 border border-red-500/50 text-red-300 text-xs">
+        {{ formError }}
+      </div>
+
+      <div class="space-y-3 text-xs">
+        
+        <!-- Name & Company -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 block mb-1">Facility Name *</label>
+            <input type="text" [(ngModel)]="consumerForm.name" placeholder="e.g. Apex Greenhouse Unit"
+                   class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Company Entity *</label>
+            <input type="text" [(ngModel)]="consumerForm.company" placeholder="e.g. AgroFoods Ltd."
+                   class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400" />
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label class="text-slate-400 block mb-1">Location & Loop Channel</label>
+          <input type="text" [(ngModel)]="consumerForm.location" placeholder="e.g. Industrial Park Bay-4"
+                 class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400" />
+        </div>
+
+        <!-- Target Demand & Delivery Rate -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 block mb-1">Target Demand (kWh) *</label>
+            <input type="number" min="1" max="1000" step="1" [(ngModel)]="consumerForm.requiredEnergyKwh"
+                   class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-cyan-400 font-bold focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Max Delivery Rate (kW)</label>
+            <input type="number" min="0.1" max="10" step="0.1" [(ngModel)]="consumerForm.deliveryRateKw"
+                   class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-amber-400 font-bold focus:outline-none focus:border-cyan-400" />
+          </div>
+        </div>
+
+        <!-- Preferred Tank & Auto-Switch -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 block mb-1">Preferred Source Tank</label>
+            <select [(ngModel)]="consumerForm.preferredTankId" 
+                    class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400">
+              <option value="AUTO">Automatic (Optimal Energy)</option>
+              <option *ngFor="let tank of wasteHeat.tanks()" [value]="tank.id">
+                {{ tank.name }} ({{ tank.storedEnergyKwh }} kWh available)
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Automatic Fallback</label>
+            <label class="flex items-center gap-2 p-2 rounded bg-[#050c18] border border-[#182e4e] cursor-pointer">
+              <input type="checkbox" [(ngModel)]="consumerForm.autoSource" class="accent-cyan-500 w-4 h-4" />
+              <span class="text-slate-200">Auto-switch when depleted</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Contact Person & Email -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-slate-400 block mb-1">Contact Lead</label>
+            <input type="text" [(ngModel)]="consumerForm.contactPerson" placeholder="Name & Role"
+                   class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Email Dispatch</label>
+            <input type="email" [(ngModel)]="consumerForm.email" placeholder="contact@company.com"
+                   class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400" />
+          </div>
+        </div>
+
+        <!-- Tariff -->
+        <div>
+          <label class="text-slate-400 block mb-1">Commercial Tariff Rate</label>
+          <input type="text" [(ngModel)]="consumerForm.tariff" placeholder="e.g. $0.078 / kWh"
+                 class="w-full p-2 rounded bg-[#050c18] border border-[#182e4e] text-slate-100 focus:outline-none focus:border-cyan-400" />
+        </div>
+
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#142640]">
+        <button (click)="closeAddEditModal()" class="px-4 py-2 rounded bg-[#091526] hover:bg-[#0e213a] text-slate-300 text-xs">
+          Cancel
+        </button>
+        <button (click)="saveConsumer()" class="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow">
+          {{ isEditing ? 'Save Changes' : 'Create Consumer' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= CONTROLS & TELEMETRY MODAL ================= -->
+  <div *ngIf="showTelemetryModal && selectedConsumer" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+    <div class="modal-window w-full max-w-lg bg-[#081120] border border-cyan-500/40 rounded-xl p-5 shadow-2xl space-y-4 font-mono">
+      
+      <div class="flex items-center justify-between border-b border-[#142640] pb-3">
+        <div>
+          <div class="text-[10px] text-cyan-400 font-bold uppercase">LIVE TELEMETRY & CONTROLS</div>
+          <h3 class="text-base font-bold text-slate-100">{{ selectedConsumer.name }}</h3>
+        </div>
+        <button (click)="closeTelemetryModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <!-- Quick Delivery Rate Slider -->
+      <div class="p-3.5 rounded-lg bg-[#050c18] border border-[#14253c] space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-300 font-bold">DISCHARGE RATE CONTROL:</span>
+          <span class="text-amber-400 font-bold text-sm">{{ selectedConsumer.deliveryRateKw }} kW</span>
+        </div>
+        <input type="range" min="0.5" max="8.0" step="0.5" 
+               [ngModel]="selectedConsumer.deliveryRateKw"
+               (ngModelChange)="setDeliveryRate(selectedConsumer, $event)"
+               class="w-full accent-amber-500 cursor-pointer" />
+      </div>
+
+      <!-- Live Performance Stats -->
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div class="p-3 rounded bg-[#050c18] border border-[#14253c]">
+          <div class="text-slate-400 text-[10px]">ENERGY DELIVERED</div>
+          <div class="text-base font-bold text-cyan-400 mt-0.5">{{ selectedConsumer.deliveredEnergyKwh }} kWh</div>
+          <div class="text-[10px] text-slate-500 mt-1">Target: {{ selectedConsumer.requiredEnergyKwh }} kWh</div>
+        </div>
+
+        <div class="p-3 rounded bg-[#050c18] border border-[#14253c]">
+          <div class="text-slate-400 text-[10px]">SOURCE TANK STATUS</div>
+          <div class="text-base font-bold text-emerald-400 mt-0.5">
+            {{ selectedConsumer.activeSourceTankId ? getTankName(selectedConsumer.activeSourceTankId) : 'None (Idle)' }}
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1">Auto-Fallback: {{ selectedConsumer.autoSource ? 'Enabled' : 'Disabled' }}</div>
+        </div>
+      </div>
+
+      <!-- Contact & Billing Info -->
+      <div class="p-3 rounded bg-[#050c18] border border-[#14253c] text-xs space-y-1">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Account Lead:</span>
+          <span class="text-slate-200 font-bold">{{ selectedConsumer.contactPerson || 'N/A' }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Email:</span>
+          <span class="text-slate-200">{{ selectedConsumer.email || 'N/A' }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Contract Tariff:</span>
+          <span class="text-amber-400 font-bold">{{ selectedConsumer.tariff || '$0.075 / kWh' }}</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#142640]">
+        <button (click)="toggleSupply(selectedConsumer)"
+                class="px-4 py-2 rounded text-xs font-bold"
+                [ngClass]="selectedConsumer.status === 'RECEIVING' ? 'bg-amber-600 hover:bg-amber-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'">
+          {{ selectedConsumer.status === 'RECEIVING' ? 'Pause Supply' : 'Start Supply' }}
+        </button>
+        <button (click)="closeTelemetryModal()" class="px-4 py-2 rounded bg-[#091526] hover:bg-[#0e213a] text-slate-300 text-xs">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= DELETE CONFIRMATION MODAL ================= -->
+  <div *ngIf="showDeleteModal && consumerToDelete" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+    <div class="modal-window w-full max-w-sm bg-[#081120] border border-red-500/40 rounded-xl p-5 shadow-2xl space-y-4 font-mono text-center">
+      
+      <div class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-2xl mx-auto">
+        🗑
+      </div>
+
+      <div>
+        <h3 class="text-base font-bold text-slate-100">Remove Heat Consumer?</h3>
+        <p class="text-xs text-slate-400 font-sans mt-1">
+          Are you sure you want to remove <strong>{{ consumerToDelete.name }}</strong> ({{ consumerToDelete.company }}) from the thermal distribution network?
+        </p>
+      </div>
+
+      <div class="flex items-center justify-center gap-2 pt-2">
+        <button (click)="closeDeleteModal()" class="px-4 py-2 rounded bg-[#091526] hover:bg-[#0e213a] text-slate-300 text-xs">
+          Cancel
+        </button>
+        <button (click)="confirmDelete()" class="px-4 py-2 rounded bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow">
+          Confirm Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

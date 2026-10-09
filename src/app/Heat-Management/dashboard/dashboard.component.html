@@ -1,90 +1,466 @@
-<div class="dashboard-page">
-
-  <!-- Header -->
-  <div class="page-header">
-    <div class="header-text">
-      <div class="eyebrow">
-        <span class="live-dot"></span>
-        <span>SCADA Facility Operations Control &bull; Zone A</span>
+<div class="scada-dashboard space-y-5">
+  
+  <!-- ================= TOP KPI METRIC CARDS ================= -->
+  <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+    
+    <!-- 1. SERVER HEAT PRODUCTION -->
+    <div class="kpi-card" [class.active-glow]="wasteHeat.heatOutputKw() > 0">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="kpi-label">SERVER HEAT PRODUCTION</div>
+          <div class="kpi-value text-amber-400">
+            {{ wasteHeat.heatOutputKw().toFixed(1) }} <span class="unit">kW</span>
+          </div>
+        </div>
+        <div class="kpi-icon-box bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+          </svg>
+        </div>
       </div>
-      <h2 class="page-title">Thermal Telemetry &amp; Operations Center</h2>
+      <div class="flex items-center gap-1.5 mt-2">
+        <button *ngFor="let p of [0, 1, 3, 5]" 
+                (click)="setHeatPreset(p)"
+                [class.preset-active]="wasteHeat.heatOutputKw() === p"
+                class="kpi-preset-btn">
+          {{ p }} kW
+        </button>
+      </div>
     </div>
 
-    <div class="header-actions">
-      <span class="gateway-chip">
-        Gateway: <strong>NORMAL</strong>
-      </span>
-      <a routerLink="/heatmanagement/data-server" class="primary-link">
-        <i class="fa-solid fa-server"></i>
-        <span>Data Server SCADA</span>
-      </a>
+    <!-- 2. SERVER EXHAUST TEMP -->
+    <div class="kpi-card">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="kpi-label">SERVER EXHAUST TEMP</div>
+          <div class="kpi-value text-orange-400">
+            {{ wasteHeat.temperatureC() }} <span class="unit">°C</span>
+          </div>
+        </div>
+        <div class="kpi-icon-box bg-orange-500/10 text-orange-400 border border-orange-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-subtext text-slate-400 flex items-center gap-1 mt-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+        <span>Thermal Outflow Channel</span>
+      </div>
+    </div>
+
+    <!-- 3. STORAGE AVG. TEMP -->
+    <div class="kpi-card">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="kpi-label">STORAGE AVG. TEMP</div>
+          <div class="kpi-value text-cyan-400">
+            {{ wasteHeat.avgStorageTemp() }} <span class="unit">°C</span>
+          </div>
+        </div>
+        <div class="kpi-icon-box bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-subtext text-slate-400 flex items-center gap-1 mt-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+        <span>4 Industrial Vessels</span>
+      </div>
+    </div>
+
+    <!-- 4. TOTAL STORED ENERGY -->
+    <div class="kpi-card">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="kpi-label">TOTAL STORED ENERGY</div>
+          <div class="kpi-value text-emerald-400">
+            {{ wasteHeat.totalStoredKwh() }} <span class="unit">kWh</span>
+          </div>
+        </div>
+        <div class="kpi-icon-box bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-subtext text-slate-400 flex items-center gap-1 mt-2">
+        <span>of {{ wasteHeat.totalCapacityKwh() }} kWh Capacity</span>
+      </div>
+    </div>
+
+    <!-- 5. TOTAL STORAGE LEVEL GAUGE -->
+    <div class="kpi-card">
+      <div class="flex items-center justify-between gap-2">
+        <div class="gauge-wrapper relative w-12 h-12 flex-shrink-0">
+          <svg class="w-12 h-12 -rotate-90" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="#16263d" stroke-width="3.5" />
+            <circle cx="22" cy="22" r="18" fill="none" stroke="#00f0ff" stroke-width="3.5"
+                    stroke-dasharray="113.1"
+                    [attr.stroke-dashoffset]="gaugeDashOffset"
+                    stroke-linecap="round"
+                    class="transition-all duration-700 ease-out" />
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-cyan-300">
+            {{ wasteHeat.systemLevelPercentage() | number:'1.0-0' }}%
+          </div>
+        </div>
+        <div>
+          <div class="kpi-label leading-tight">TOTAL STORAGE LEVEL</div>
+          <div class="text-[11px] font-mono text-slate-400 mt-1">
+            {{ wasteHeat.headroomPercentage() | number:'1.0-0' }}% Headroom
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. ACTIVE HEAT DISTRIBUTION -->
+    <div class="kpi-card">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="kpi-label">ACTIVE HEAT DISTRIBUTION</div>
+          <div class="kpi-value text-purple-400">
+            {{ wasteHeat.activeSuppliesCount() }} <span class="unit text-xs">Supplies</span>
+          </div>
+        </div>
+        <div class="kpi-icon-box bg-purple-500/10 text-purple-400 border border-purple-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-subtext text-emerald-400 flex items-center gap-1 mt-2 font-mono">
+        <span>⚡ {{ wasteHeat.totalDeliveryPowerKw() }} kW Flowing</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= SECTION HEADER TABS ================= -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center text-xs font-mono tracking-wider text-slate-400 border-b border-[#142338] pb-2">
+    <div class="md:col-span-3 flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></span>
+      <span class="font-bold text-slate-200">1. DATA SERVER</span>
+      <span class="text-[11px] text-slate-500 hidden sm:inline">Waste Heat Production Source</span>
+    </div>
+    <div class="md:col-span-6 flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+      <span class="font-bold text-slate-200">2. THERMAL CONTAINERS (TANKS 01–04)</span>
+      <span class="text-[11px] text-slate-500 hidden sm:inline">Thermal Energy Storage Vessels</span>
+    </div>
+    <div class="md:col-span-3 flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+      <span class="font-bold text-slate-200">3. HEAT CONSUMERS</span>
+      <span class="text-[11px] text-slate-500 hidden sm:inline">Live Energy Distribution & Supply</span>
     </div>
   </div>
 
-  <!-- Stat cards -->
-  <div class="stat-grid">
-    <div
-      *ngFor="let stat of stats; let i = index"
-      class="stat-card"
-      [style.--i]="i"
-      [ngClass]="'tone-' + stat.color">
-
-      <div class="stat-top">
-        <span class="stat-title">{{ stat.title }}</span>
-        <div class="stat-icon">
-          <i class="fa-solid {{ stat.icon }}"></i>
-        </div>
+  <!-- ================= MAIN SYSTEM FLOW VISUALIZATION ================= -->
+  <div class="system-flow-container grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+    
+    <!-- LEFT: 1. DATA SERVER VISUALIZATION (Col span 3) -->
+    <div class="lg:col-span-3 flex flex-col justify-between scada-panel p-4 relative">
+      <div class="flex items-center justify-between mb-3">
+        <span class="scada-badge" [class.badge-producing]="wasteHeat.heatOutputKw() > 0">
+          <span class="w-1.5 h-1.5 rounded-full animate-ping bg-amber-400"></span>
+          {{ wasteHeat.heatOutputKw() > 0 ? 'PRODUCING HEAT' : 'SERVER IDLE' }}
+        </span>
+        <button (click)="navigate('data-server')" class="text-[11px] text-amber-400/80 hover:text-amber-300 flex items-center gap-1 font-mono">
+          Control &rarr;
+        </button>
       </div>
 
-      <div class="stat-body">
-        <div class="stat-value">{{ stat.value }}</div>
-        <div class="stat-change">
-          <i class="fa-solid fa-arrow-trend-up"></i>
-          <span>{{ stat.change }}</span>
+      <!-- Server Rack Illustration -->
+      <div class="server-rack-box flex flex-col items-center justify-center my-auto p-4 rounded-lg bg-[#040914] border border-[#142642] relative overflow-hidden">
+        
+        <!-- Glowing Ambient Heat Wave behind server -->
+        <div class="heat-radiance-glow" [style.opacity]="wasteHeat.heatOutputKw() / 5.0"></div>
+
+        <!-- 42U Server Rack Chassis -->
+        <div class="server-chassis w-40 sm:w-44">
+          <!-- Top vent bar -->
+          <div class="h-2 bg-[#1b2b46] rounded-t flex justify-center items-center gap-1">
+            <span class="w-1 h-1 rounded-full bg-red-400"></span>
+            <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+            <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+          </div>
+
+          <!-- Server Blade Units (6 slots) -->
+          <div class="server-slots space-y-1.5 p-2 bg-[#091222] border-x border-[#1a2d4b]">
+            <div *ngFor="let slot of [1, 2, 3, 4, 5, 6]" 
+                 class="server-blade flex items-center justify-between px-2 py-1 bg-[#050c18] border border-[#15253d] rounded">
+              <!-- Drive LEDs -->
+              <div class="flex items-center gap-1">
+                <span class="w-1 h-2 rounded-[1px] bg-cyan-400 animate-pulse"></span>
+                <span class="w-1 h-2 rounded-[1px] bg-slate-600"></span>
+                <span class="w-1 h-2 rounded-[1px] bg-amber-400"></span>
+              </div>
+              <!-- Glowing Grille Pattern -->
+              <div class="heat-grille flex gap-0.5" [class.grille-hot]="wasteHeat.heatOutputKw() > 0">
+                <span class="w-1.5 h-1.5 rounded-[1px]"></span>
+                <span class="w-1.5 h-1.5 rounded-[1px]"></span>
+                <span class="w-1.5 h-1.5 rounded-[1px]"></span>
+                <span class="w-1.5 h-1.5 rounded-[1px]"></span>
+                <span class="w-1.5 h-1.5 rounded-[1px]"></span>
+              </div>
+              <!-- Status dot -->
+              <span class="w-1.5 h-1.5 rounded-full" 
+                    [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-amber-400 shadow-[0_0_4px_#f59e0b]' : 'bg-slate-600'"></span>
+            </div>
+          </div>
+
+          <!-- Bottom Fans Unit -->
+          <div class="h-8 bg-[#07101e] border border-[#1a2d4b] rounded-b flex items-center justify-around px-3">
+            <div class="fan-icon" [class.fan-spin]="wasteHeat.heatOutputKw() > 0">
+              <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" stroke-width="2" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18M5.636 5.636l12.728 12.728M5.636 18.364L18.364 5.636" />
+              </svg>
+            </div>
+            <div class="fan-icon" [class.fan-spin]="wasteHeat.heatOutputKw() > 0">
+              <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" stroke-width="2" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18M5.636 5.636l12.728 12.728M5.636 18.364L18.364 5.636" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Server Exhaust Footer Readout -->
+      <div class="mt-3 p-2.5 rounded bg-[#070f1d] border border-[#14233a] text-center font-mono">
+        <div class="text-[10px] text-slate-400 uppercase tracking-wider">THERMAL EXHAUST</div>
+        <div class="text-base font-bold text-amber-400 mt-0.5">
+          {{ wasteHeat.heatOutputKw().toFixed(1) }} kW <span class="text-slate-400 text-xs font-normal">&#64; {{ wasteHeat.temperatureC() }} °C</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Furnace table -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="panel-title">
-        <span class="panel-dot"></span>
-        <h3>Active Furnace &amp; Thermal Processing Units</h3>
+    <!-- CENTER: 2. THERMAL CONTAINERS TANKS 01–04 (Col span 6) -->
+    <div class="lg:col-span-6 scada-panel p-4 flex flex-col justify-between relative overflow-hidden">
+      
+      <!-- Top Distribution Manifold Pipe -->
+      <div class="manifold-header-pipe relative mb-3">
+        <div class="pipe-bar h-2.5 rounded bg-[#101e33] border border-[#1c3558] relative overflow-hidden">
+          <div class="hot-fluid-flow" [class.flow-active]="wasteHeat.heatOutputKw() > 0"></div>
+        </div>
+        
+        <!-- Pipe Flow Badge from Server -->
+        <div class="absolute -top-3.5 left-2 bg-[#091424] border border-amber-500/40 text-amber-400 px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 shadow-lg">
+          <span>HOT SUPPLY</span>
+          <span>{{ wasteHeat.heatOutputKw().toFixed(1) }} kW ({{ wasteHeat.temperatureC() }}°C)</span>
+        </div>
+
+        <!-- Manifold Nozzle Injectors above each tank -->
+        <div class="grid grid-cols-4 px-3 sm:px-6">
+          <div *ngFor="let tank of wasteHeat.tanks()" class="flex flex-col items-center">
+            <div class="w-2 h-3 bg-[#182942] border-x border-b border-[#233f66]"></div>
+            <!-- Dynamic Charging Drop/Jet when this tank is charging -->
+            <div *ngIf="wasteHeat.activeChargingTankId() === tank.id && wasteHeat.heatOutputKw() > 0" 
+                 class="liquid-jet-stream w-1.5 h-6 bg-gradient-to-b from-amber-400 to-orange-500 animate-pulse shadow-[0_0_8px_#f59e0b]"></div>
+          </div>
+        </div>
       </div>
-      <span class="refresh-chip">Auto-refresh: 5s &bull; 5 channels online</span>
-    </div>
 
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Channel ID</th>
-            <th>Unit Description</th>
-            <th>Core Temp</th>
-            <th>Set Point</th>
-            <th>Power Load</th>
-            <th class="right">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let unit of furnaceUnits">
-            <td class="cell-id">{{ unit.id }}</td>
-            <td class="cell-name">{{ unit.name }}</td>
-            <td class="cell-temp">{{ unit.temp }}</td>
-            <td class="cell-muted">{{ unit.target }}</td>
-            <td>{{ unit.power }}</td>
-            <td class="right">
-              <span class="badge" [ngClass]="'badge-' + unit.state">
-                <span class="badge-dot"></span>
-                {{ unit.status }}
+      <!-- 4 Thermal Storage Vessel Containers -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 my-auto">
+        
+        <div *ngFor="let tank of wasteHeat.tanks()" 
+             class="tank-vessel-card"
+             [class.tank-charging-border]="tank.status === 'CHARGING'"
+             [class.tank-discharging-border]="tank.status === 'DISCHARGING'">
+          
+          <!-- Tank Vessel Visual -->
+          <div class="tank-body-container relative h-48 sm:h-52 rounded-2xl bg-[#060c18] border border-[#162740] overflow-hidden flex flex-col justify-end p-1">
+            
+            <!-- Grid Stratification markings -->
+            <div class="absolute inset-0 pointer-events-none flex flex-col justify-between p-2 z-10 opacity-30">
+              <div class="border-b border-dashed border-slate-400 w-full"></div>
+              <div class="border-b border-dashed border-slate-400 w-full"></div>
+              <div class="border-b border-dashed border-slate-400 w-full"></div>
+            </div>
+
+            <!-- Liquid Level Column -->
+            <div class="liquid-column rounded-xl transition-all duration-700 ease-out relative overflow-hidden"
+                 [style.height.%]="tank.fillPercentage"
+                 [ngClass]="{
+                   'liquid-charging': tank.status === 'CHARGING',
+                   'liquid-discharging': tank.status === 'DISCHARGING',
+                   'liquid-stored': tank.status === 'STORED',
+                   'liquid-standby': tank.status === 'STANDBY'
+                 }">
+              
+              <!-- Liquid Surface Wave / Meniscus Glow -->
+              <div class="liquid-surface-glow absolute top-0 inset-x-0 h-2 bg-white/30 blur-[1px]"></div>
+              
+              <!-- Bubble particles animation when active -->
+              <div *ngIf="tank.status === 'CHARGING' || tank.status === 'DISCHARGING'" class="bubbles-overlay"></div>
+            </div>
+
+            <!-- Level percentage overlay in vessel -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
+              <span class="text-xs font-mono font-bold text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                {{ tank.fillPercentage | number:'1.0-0' }}%
               </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+
+          <!-- Tank Footer Metadata -->
+          <div class="tank-meta-box mt-2 p-2 rounded bg-[#060e1b] border border-[#142338] text-center font-mono">
+            <div class="flex items-center justify-between text-[11px] font-bold">
+              <span class="text-slate-200">{{ tank.name }}</span>
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider"
+                    [ngClass]="{
+                      'bg-amber-500/20 text-amber-400 border border-amber-500/40': tank.status === 'CHARGING',
+                      'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40': tank.status === 'DISCHARGING',
+                      'bg-sky-500/20 text-sky-400 border border-sky-500/40': tank.status === 'STORED',
+                      'bg-slate-800 text-slate-400': tank.status === 'STANDBY'
+                    }">
+                {{ tank.status }}
+              </span>
+            </div>
+
+            <div class="text-[10px] text-slate-400 mt-1 flex justify-between">
+              <span>STORED:</span>
+              <span class="text-slate-200 font-bold">{{ tank.storedEnergyKwh }} / {{ tank.capacityKwh }} kWh</span>
+            </div>
+
+            <div class="text-[10px] text-slate-400 mt-0.5 flex justify-between">
+              <span>STATUS:</span>
+              <span class="text-slate-300">{{ tank.fillPercentage }}% &bull; {{ tank.temperatureC }}°C</span>
+            </div>
+
+            <!-- Discharging customer indicator -->
+            <div *ngIf="tank.status === 'DISCHARGING'" 
+                 class="mt-1.5 py-0.5 px-1 bg-emerald-950/60 border border-emerald-500/40 rounded text-[9px] text-emerald-400 font-bold flex items-center justify-center gap-1 animate-pulse">
+              <span>⚡ Supplying Customer(s)</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Bottom Ground Collector Rail -->
+      <div class="mt-3 flex items-center justify-between pt-2 border-t border-[#13233a] font-mono text-[11px]">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">Total System Energy:</span>
+          <span class="text-emerald-400 font-bold">{{ wasteHeat.totalStoredKwh() }} / {{ wasteHeat.totalCapacityKwh() }} kWh</span>
+        </div>
+        <button (click)="navigate('thermal-storage')" class="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-bold">
+          Storage Matrix &rarr;
+        </button>
+      </div>
+
     </div>
+
+    <!-- RIGHT: 3. HEAT CONSUMERS (Col span 3) -->
+    <div class="lg:col-span-3 scada-panel p-4 flex flex-col justify-between">
+      
+      <!-- Panel Header -->
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">THERMAL CONSUMERS</span>
+        <button (click)="navigate('heat-consumers')" class="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-bold">
+          Manage All ({{ wasteHeat.consumers().length }}) &rarr;
+        </button>
+      </div>
+
+      <!-- Delivery Pipe Indicator from Storage to Consumers -->
+      <div class="delivery-pipe-banner mb-3 p-1.5 rounded bg-[#071324] border border-[#162f4e] flex items-center justify-between text-[10px] font-mono">
+        <span class="text-slate-400 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full" [class.bg-emerald-400]="wasteHeat.activeSuppliesCount() > 0" [class.bg-slate-600]="wasteHeat.activeSuppliesCount() === 0"></span>
+          DELIVERY PIPE
+        </span>
+        <span class="text-emerald-400 font-bold">{{ wasteHeat.totalDeliveryPowerKw() }} kW Active</span>
+      </div>
+
+      <!-- Consumers List -->
+      <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-0.5">
+        
+        <div *ngFor="let c of wasteHeat.consumers()" 
+             class="consumer-card p-3 rounded-lg bg-[#060c18] border transition-all duration-300"
+             [class.consumer-supplying-border]="c.status === 'RECEIVING'"
+             [class.border-[#14233a]]="c.status !== 'RECEIVING'">
+          
+          <!-- Consumer Header -->
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded bg-[#0e1b2e] border border-[#1b3152] flex items-center justify-center text-amber-400 text-xs font-bold">
+                🏭
+              </div>
+              <div>
+                <div class="text-xs font-bold text-slate-100">{{ c.name }}</div>
+                <div class="text-[10px] text-slate-400">{{ c.company }}</div>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase"
+                  [ngClass]="{
+                    'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30': c.status === 'RECEIVING',
+                    'bg-slate-800 text-slate-400 border border-slate-700': c.status === 'IDLE',
+                    'bg-amber-500/20 text-amber-400 border border-amber-500/30': c.status === 'PAUSED',
+                    'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30': c.status === 'COMPLETED'
+                  }">
+              {{ c.status === 'RECEIVING' ? '● SUPPLYING' : (c.status === 'COMPLETED' ? 'COMPLETED' : 'SUPPLY OFF') }}
+            </span>
+          </div>
+
+          <!-- Supplied By Line -->
+          <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+            <span *ngIf="c.status === 'RECEIVING'" class="text-cyan-300 flex items-center gap-1">
+              ⚡ SUPPLIED BY: <strong>{{ getTankName(c.activeSourceTankId) }}</strong> ({{ c.deliveryRateKw }} kW Flowing)
+            </span>
+            <span *ngIf="c.status !== 'RECEIVING'" class="text-slate-500">
+              ⚡ ALLOCATED TANK: {{ c.preferredTankId === 'AUTO' ? 'Auto-Switch' : getTankName(c.preferredTankId) }} (Supply OFF)
+            </span>
+          </div>
+
+          <!-- Progress and Stats -->
+          <div class="grid grid-cols-3 gap-1 mt-2 text-[10px] font-mono">
+            <div>
+              <span class="text-slate-500">CONSUMED:</span>
+              <div class="text-slate-200 font-bold">{{ c.deliveredEnergyKwh }} kWh</div>
+            </div>
+            <div>
+              <span class="text-slate-500">TARGET:</span>
+              <div class="text-slate-200 font-bold">{{ c.requiredEnergyKwh }} kWh</div>
+            </div>
+            <div>
+              <span class="text-slate-500">PROGRESS:</span>
+              <div class="text-amber-400 font-bold">{{ c.progressPercentage }}%</div>
+            </div>
+          </div>
+
+          <!-- Mini Progress Bar -->
+          <div class="w-full bg-[#08111f] h-1.5 rounded-full overflow-hidden mt-2 border border-[#132338]">
+            <div class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500" 
+                 [style.width.%]="c.progressPercentage"></div>
+          </div>
+
+          <!-- Action Toggle Button -->
+          <div class="mt-2.5 pt-2 border-t border-[#13233a]">
+            <button (click)="toggleConsumerSupply(c)" 
+                    class="w-full py-1.5 px-3 rounded text-[11px] font-mono font-bold flex items-center justify-center gap-1.5 transition-all shadow"
+                    [ngClass]="{
+                      'bg-emerald-950 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-900': c.status === 'RECEIVING',
+                      'bg-[#0b1b2d] text-cyan-400 border border-cyan-500/40 hover:bg-[#102742]': c.status === 'IDLE' || c.status === 'PAUSED',
+                      'bg-[#121c2b] text-slate-300 border border-slate-600 hover:bg-[#1a273b]': c.status === 'COMPLETED'
+                    }">
+              <span *ngIf="c.status === 'RECEIVING'">● SUPPLY ON - Click to Turn OFF</span>
+              <span *ngIf="c.status === 'IDLE' || c.status === 'PAUSED'">▶ SUPPLY OFF - Click to Turn ON</span>
+              <span *ngIf="c.status === 'COMPLETED'">🔄 COMPLETED - Click to Restart</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
 </div>
