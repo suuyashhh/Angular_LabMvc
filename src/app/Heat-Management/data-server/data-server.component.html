@@ -1,10 +1,10 @@
-<div class="data-server-page space-y-4 font-sans text-slate-900">
+<div class="data-server-page space-y-2.5 font-sans text-slate-900">
   
-  <!-- ================= TOP HEADER BAR (CLEAN WHITE THEME) ================= -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-slate-200 rounded-xl p-3 sm:px-5 shadow-sm">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 shrink-0 shadow-inner">
-        <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <!-- ================= TOP HEADER BAR (COMPACT WHITE THEME) ================= -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-white border border-slate-200 rounded-xl p-2 sm:px-4 shadow-sm">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 shrink-0 shadow-inner">
+        <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <rect x="2" y="2" width="20" height="8" rx="2" stroke-width="2"/>
           <rect x="2" y="14" width="20" height="8" rx="2" stroke-width="2"/>
           <circle cx="6" cy="6" r="1" fill="currentColor"/>
@@ -12,59 +12,59 @@
         </svg>
       </div>
       <div>
-        <div class="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-orange-600">
-          <span class="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]"></span>
+        <div class="flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-widest text-orange-600">
+          <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_6px_#f97316]"></span>
           <span>INDUSTRIAL SCADA &bull; ENTERPRISE RACK NODE 42</span>
         </div>
-        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight mt-0.5">
+        <h1 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-tight">
           Server Waste-Heat Extraction & Telemetry
         </h1>
       </div>
     </div>
 
     <!-- Right Header Badges -->
-    <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
-      <span class="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 flex items-center gap-1.5 font-bold">
+    <div class="flex flex-wrap items-center gap-1.5 font-mono text-xs">
+      <span class="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 flex items-center gap-1 font-bold text-[11px]">
         <span class="w-2 h-2 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-orange-500 animate-ping shadow-[0_0_6px_#f97316]' : 'bg-slate-400'"></span>
-        STATUS: {{ wasteHeat.heatOutputKw() > 0 ? 'Heat Extraction Active' : 'Idle Standby' }}
+        STATUS: {{ wasteHeat.heatOutputKw() > 0 ? 'Extraction Active' : 'Idle Standby' }}
       </span>
-      <span class="px-3 py-1.5 rounded-lg bg-orange-50/70 border border-orange-200 text-orange-950 flex items-center gap-1 font-bold">
-        <span class="text-orange-700 font-mono text-[11px]">EXHAUST:</span> <span>{{ wasteHeat.temperatureC() }}°C</span>
+      <span class="px-2.5 py-1 rounded-lg bg-orange-50/70 border border-orange-200 text-orange-950 flex items-center gap-1 font-bold text-[11px]">
+        <span class="text-orange-700 font-mono text-[10px]">EXHAUST:</span> <span>{{ wasteHeat.temperatureC() }}°C</span>
       </span>
-      <span class="px-3 py-1.5 rounded-lg bg-amber-50/80 border border-amber-200 text-amber-950 flex items-center gap-1 font-bold">
-        <span class="text-amber-700 font-mono text-[11px]">HEAT OUT:</span> <span>{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</span>
+      <span class="px-2.5 py-1 rounded-lg bg-amber-50/80 border border-amber-200 text-amber-950 flex items-center gap-1 font-bold text-[11px]">
+        <span class="text-amber-700 font-mono text-[10px]">HEAT OUT:</span> <span>{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</span>
       </span>
     </div>
   </div>
 
   <!-- ================= MAIN TWO-COLUMN WORKSPACE ================= -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-stretch">
     
     <!-- LEFT: 42U Compute Core Visualizer (Col span 7) -->
-    <div class="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden shadow-sm"
+    <div class="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-between relative overflow-hidden shadow-sm"
          [style.--heat-intensity]="visualHeatRatio"
          [style.--fan-duration]="fanSpeedSeconds > 0 ? fanSpeedSeconds + 's' : '0s'"
          [style.--particle-duration]="particleSpeedSeconds > 0 ? particleSpeedSeconds + 's' : '0s'">
       
-      <!-- Subtle Grid Dots Overlay for Industrial Drawing Look -->
+      <!-- Subtle Grid Dots Overlay -->
       <div class="absolute inset-0 pointer-events-none opacity-40"
-           style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px;"></div>
+           style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;"></div>
 
       <!-- Sub-header -->
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3 z-20 relative">
-        <div class="flex items-center gap-2 font-mono text-xs text-slate-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316] animate-pulse"></span>
-          <span class="font-bold">42U Compute Core &bull; Multi-Wave Heat Dissipation Stage</span>
+      <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 z-20 relative">
+        <div class="flex items-center gap-1.5 font-mono text-xs text-slate-700">
+          <span class="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_6px_#f97316] animate-pulse"></span>
+          <span class="font-bold text-[11px]">42U Compute Core &bull; Heat Dissipation Stage</span>
         </div>
-        <span class="font-mono text-xs px-2.5 py-1 rounded-md bg-orange-50 border border-orange-200 text-orange-700 font-bold">
+        <span class="font-mono text-[10px] px-2 py-0.5 rounded-md bg-orange-50 border border-orange-200 text-orange-700 font-bold">
           Load: {{ wasteHeat.heatOutputKw().toFixed(2) }} kW
         </span>
       </div>
 
       <!-- CENTER ANIMATED STAGE (Server Rack & Lateral Heat Dissipation) -->
-      <div class="scada-visualizer-canvas relative my-4 flex items-center justify-center min-h-[420px] sm:min-h-[460px] overflow-hidden select-none">
+      <div class="scada-visualizer-canvas relative my-1.5 flex items-center justify-center min-h-[300px] sm:min-h-[330px] overflow-hidden select-none">
         
-        <!-- 1. Ambient Radial Heat Haze (Atmosphere) -->
+        <!-- 1. Ambient Radial Heat Haze -->
         <div class="ambient-heat-haze" [class.haze-active]="wasteHeat.heatOutputKw() > 0"></div>
 
         <!-- 2. Lateral SVG Heat Dissipation Arcs & Particle Streams -->
@@ -72,7 +72,6 @@
              viewBox="0 0 700 450" 
              preserveAspectRatio="xMidYMid meet">
           <defs>
-            <!-- Gradient for Left Trails -->
             <linearGradient id="heatGradLeft" x1="100%" y1="50%" x2="0%" y2="50%">
               <stop offset="0%" stop-color="#ff5500" stop-opacity="0.95" />
               <stop offset="40%" stop-color="#f97316" stop-opacity="0.8" />
@@ -80,7 +79,6 @@
               <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
             </linearGradient>
 
-            <!-- Gradient for Right Trails -->
             <linearGradient id="heatGradRight" x1="0%" y1="50%" x2="100%" y2="50%">
               <stop offset="0%" stop-color="#ff5500" stop-opacity="0.95" />
               <stop offset="40%" stop-color="#f97316" stop-opacity="0.8" />
@@ -88,14 +86,12 @@
               <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
             </linearGradient>
 
-            <!-- Vertical Plume Gradient -->
             <linearGradient id="plumeGrad" x1="50%" y1="100%" x2="50%" y2="0%">
               <stop offset="0%" stop-color="#f97316" stop-opacity="0.85" />
               <stop offset="60%" stop-color="#fbbf24" stop-opacity="0.5" />
               <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
             </linearGradient>
 
-            <!-- Filter for glowing heat trails -->
             <filter id="heatGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="3.5" result="blur" />
               <feMerge>
@@ -112,37 +108,26 @@
             <path d="M 385,90 Q 405,45 390,15" fill="none" stroke="url(#plumeGrad)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="8 4" filter="url(#heatGlowFilter)" />
           </g>
 
-          <!-- 5-TIER LEFT SIDE CURVED HEAT TRAILS (MORE WAVES THROWN AT 1KW) -->
+          <!-- 5-TIER LEFT SIDE CURVED HEAT TRAILS -->
           <g class="heat-trail-group left-trails" [class.trails-active]="wasteHeat.heatOutputKw() > 0">
-            <!-- 1. High Flaring Plume Arc -->
             <path d="M 230,110 Q 150,70 35,45" fill="none" stroke="url(#heatGradLeft)" stroke-width="3.5" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-left-1" />
-            <!-- 2. Upper Mid Arc -->
             <path d="M 225,160 Q 140,130 25,115" fill="none" stroke="url(#heatGradLeft)" stroke-width="4" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-left-2" />
-            <!-- 3. Direct Core Lateral Jet -->
             <path d="M 220,210 Q 130,200 15,190" fill="none" stroke="url(#heatGradLeft)" stroke-width="4.5" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-left-3" />
-            <!-- 4. Lower Mid Arc -->
             <path d="M 225,260 Q 145,280 30,295" fill="none" stroke="url(#heatGradLeft)" stroke-width="4" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-left-4" />
-            <!-- 5. Bottom Vent Flow Arc -->
             <path d="M 230,310 Q 155,340 50,365" fill="none" stroke="url(#heatGradLeft)" stroke-width="3.5" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-left-5" />
           </g>
 
-          <!-- 5-TIER RIGHT SIDE CURVED HEAT TRAILS (MORE WAVES THROWN AT 1KW) -->
+          <!-- 5-TIER RIGHT SIDE CURVED HEAT TRAILS -->
           <g class="heat-trail-group right-trails" [class.trails-active]="wasteHeat.heatOutputKw() > 0">
-            <!-- 1. High Flaring Plume Arc -->
             <path d="M 470,110 Q 550,70 665,45" fill="none" stroke="url(#heatGradRight)" stroke-width="3.5" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-right-1" />
-            <!-- 2. Upper Mid Arc -->
             <path d="M 475,160 Q 560,130 675,115" fill="none" stroke="url(#heatGradRight)" stroke-width="4" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-right-2" />
-            <!-- 3. Direct Core Lateral Jet -->
             <path d="M 480,210 Q 570,200 685,190" fill="none" stroke="url(#heatGradRight)" stroke-width="4.5" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-right-3" />
-            <!-- 4. Lower Mid Arc -->
             <path d="M 475,260 Q 555,280 670,295" fill="none" stroke="url(#heatGradRight)" stroke-width="4" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-right-4" />
-            <!-- 5. Bottom Vent Flow Arc -->
             <path d="M 470,310 Q 545,340 650,365" fill="none" stroke="url(#heatGradRight)" stroke-width="3.5" stroke-linecap="round" filter="url(#heatGlowFilter)" class="heat-path path-right-5" />
           </g>
 
-          <!-- 12 FLOATING HEAT SPARKS & PARTICLES -->
+          <!-- FLOATING HEAT SPARKS -->
           <g *ngIf="wasteHeat.heatOutputKw() > 0" class="heat-sparks-layer">
-            <!-- Left Sparks -->
             <circle class="spark spark-l1" r="3.5" fill="#f59e0b" />
             <circle class="spark spark-l2" r="3" fill="#f97316" />
             <circle class="spark spark-l3" r="4" fill="#ef4444" />
@@ -150,7 +135,6 @@
             <circle class="spark spark-l5" r="3" fill="#ea580c" />
             <circle class="spark spark-l6" r="3.2" fill="#f97316" />
 
-            <!-- Right Sparks -->
             <circle class="spark spark-r1" r="3.5" fill="#f59e0b" />
             <circle class="spark spark-r2" r="3" fill="#f97316" />
             <circle class="spark spark-r3" r="4" fill="#ef4444" />
@@ -160,96 +144,76 @@
           </g>
         </svg>
 
-        <!-- 3. CENTRAL 42U SERVER CHASSIS (ENTERPRISE PLATINUM CHASSIS) -->
+        <!-- 3. CENTRAL 42U SERVER CHASSIS (COMPACT SIZED) -->
         <div class="server-chassis-wrapper relative z-10">
           
-          <!-- Outer Chassis Frame -->
-          <div class="server-chassis w-[285px] sm:w-[320px] bg-[#0f172a] border-2 border-slate-600 rounded-2xl p-2.5 shadow-2xl relative">
+          <div class="server-chassis w-[240px] sm:w-[260px] bg-[#0f172a] border-2 border-slate-600 rounded-xl p-2 shadow-xl relative">
             
-            <!-- Left Side Rail LED Beacons (6 lights) -->
-            <div class="side-rack-rail rail-left absolute -left-2.5 inset-y-6 flex flex-col justify-between items-center py-2">
+            <!-- Side Rail LEDs -->
+            <div class="side-rack-rail rail-left absolute -left-2 inset-y-4 flex flex-col justify-between items-center py-1">
               <span *ngFor="let i of [1,2,3,4,5,6]" 
                     class="rail-beacon" 
                     [class.beacon-active]="wasteHeat.heatOutputKw() > 0"
                     [style.animation-delay]="(i * 0.18) + 's'"></span>
             </div>
 
-            <!-- Right Side Rail LED Beacons (6 lights) -->
-            <div class="side-rack-rail rail-right absolute -right-2.5 inset-y-6 flex flex-col justify-between items-center py-2">
+            <div class="side-rack-rail rail-right absolute -right-2 inset-y-4 flex flex-col justify-between items-center py-1">
               <span *ngFor="let i of [1,2,3,4,5,6]" 
                     class="rail-beacon" 
                     [class.beacon-active]="wasteHeat.heatOutputKw() > 0"
                     [style.animation-delay]="(i * 0.22) + 's'"></span>
             </div>
 
-            <!-- Top Vent Channel (9 pill slits) -->
-            <div class="chassis-top-grille h-4.5 bg-[#0b1120] rounded-t-lg border border-slate-700 flex items-center justify-center gap-1.5 px-3 mb-2">
+            <!-- Top Vent Channel -->
+            <div class="chassis-top-grille h-3.5 bg-[#0b1120] rounded-t-md border border-slate-700 flex items-center justify-center gap-1 px-2 mb-1.5">
               <span *ngFor="let slit of [1,2,3,4,5,6,7,8,9]" 
-                    class="top-slit w-3.5 h-1.5 rounded-full bg-slate-700"
+                    class="top-slit w-2.5 h-1 rounded-full bg-slate-700"
                     [class.slit-hot]="wasteHeat.heatOutputKw() > 0"></span>
             </div>
 
             <!-- 5 Modular Compute Server Blades -->
-            <div class="blade-stack space-y-1.5">
+            <div class="blade-stack space-y-1">
               <div *ngFor="let bay of [1, 2, 3, 4, 5]" 
-                   class="blade-unit p-1.5 rounded-lg bg-[#070d19] border flex items-center justify-between transition-all duration-300 relative overflow-hidden"
+                   class="blade-unit p-1 rounded-md bg-[#070d19] border flex items-center justify-between transition-all duration-300 relative overflow-hidden"
                    [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'blade-hot-border' : 'border-slate-800'">
                 
-                <!-- Left Perforation Vent Grilles & Micro LEDs -->
-                <div class="blade-left-grille flex items-center gap-1.5 pl-1">
+                <div class="blade-left-grille flex items-center gap-1 pl-0.5">
                   <div class="flex gap-0.5">
                     <div class="flex flex-col gap-0.5">
-                      <span *ngFor="let v of [1,2,3,4]" class="w-1 h-1 rounded-[1px] bg-slate-700"></span>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                      <span *ngFor="let v of [1,2,3,4]" class="w-1 h-1 rounded-[1px] bg-slate-700"></span>
+                      <span *ngFor="let v of [1,2,3]" class="w-0.5 h-0.5 rounded-[0.5px] bg-slate-700"></span>
                     </div>
                   </div>
-                  <!-- Activity LEDs -->
-                  <div class="flex flex-col gap-1">
+                  <div class="flex flex-col gap-0.5">
                     <span class="w-1 h-1 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-cyan-400 animate-pulse' : 'bg-slate-700'"></span>
                     <span class="w-1 h-1 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-emerald-400' : 'bg-slate-700'"></span>
                   </div>
                 </div>
 
-                <!-- Center Thermal Dissipation Chamber (Radiant Core) -->
-                <div class="thermal-core-chamber flex-1 mx-2.5 h-6.5 sm:h-7 rounded-md bg-[#02050c] border border-slate-800 relative overflow-hidden flex items-center justify-center">
-                  <!-- Deep Heat Core Gradient Layer -->
+                <div class="thermal-core-chamber flex-1 mx-2 h-5 rounded bg-[#02050c] border border-slate-800 relative overflow-hidden flex items-center justify-center">
                   <div class="core-heat-fire absolute inset-0"
                        [class.fire-pulse]="wasteHeat.heatOutputKw() > 0"></div>
                   
-                  <!-- Hot Meniscus Highlight -->
-                  <div class="core-hot-spark absolute inset-0"></div>
-
-                  <!-- Core Spec Label -->
-                  <span class="core-spec-tag text-[9px] font-mono text-white z-10 tracking-wider pointer-events-none drop-shadow flex items-center gap-1 font-bold">
+                  <span class="core-spec-tag text-[8px] font-mono text-white z-10 tracking-wider pointer-events-none drop-shadow flex items-center gap-1 font-bold">
                     {{ wasteHeat.heatOutputKw() > 0 ? (wasteHeat.temperatureC() - (bay * 2)) + '°C' : 'IDLE 24°C' }}
                   </span>
                 </div>
 
-                <!-- Right Activity Status Dot -->
-                <div class="blade-right-status pr-1 flex items-center gap-1">
-                  <span class="text-[8px] font-mono text-slate-400 font-bold">B0{{ bay }}</span>
-                  <div class="flex flex-col gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full" 
-                          [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-amber-400 shadow-[0_0_6px_#f59e0b]' : 'bg-slate-700'"></span>
-                    <span class="w-1.5 h-1.5 rounded-full" 
-                          [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-cyan-400' : 'bg-slate-800'"></span>
-                  </div>
+                <div class="blade-right-status pr-0.5 flex items-center gap-0.5">
+                  <span class="text-[7px] font-mono text-slate-400 font-bold">B0{{ bay }}</span>
+                  <span class="w-1.5 h-1.5 rounded-full" 
+                        [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-amber-400 shadow-[0_0_4px_#f59e0b]' : 'bg-slate-700'"></span>
                 </div>
 
               </div>
             </div>
 
-            <!-- Bottom Turbine / Cooling Stage (Dual Metallic Fans) -->
-            <div class="chassis-bottom-turbines mt-2 p-2 bg-[#080e1c] border border-slate-800 rounded-b-lg flex items-center justify-around relative">
+            <!-- Bottom Turbine / Cooling Stage -->
+            <div class="chassis-bottom-turbines mt-1.5 p-1.5 bg-[#080e1c] border border-slate-800 rounded-b-md flex items-center justify-around relative">
               
-              <!-- Turbine Left -->
-              <div class="turbine-container flex items-center gap-1.5">
-                <div class="turbine-housing relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#02050c] border-2 border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
+              <div class="turbine-container flex items-center gap-1">
+                <div class="turbine-housing relative w-7 h-7 rounded-full bg-[#02050c] border-2 border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
                   <div class="turbine-backlight" [class.backlight-on]="wasteHeat.heatOutputKw() > 0"></div>
-                  
-                  <svg class="turbine-propeller w-7 h-7 sm:w-8 sm:h-8" 
+                  <svg class="turbine-propeller w-5 h-5" 
                        [class.propeller-spinning]="wasteHeat.heatOutputKw() > 0"
                        viewBox="0 0 24 24">
                     <path d="M12,12 C12,6 15,3 17,4 C19,5 18,9 12,12 Z" fill="#94a3b8" />
@@ -261,24 +225,14 @@
                 </div>
               </div>
 
-              <!-- Center Grille -->
-              <div class="flex flex-col items-center gap-0.5">
-                <div class="flex gap-1">
-                  <span class="w-1 h-1 rounded-full bg-slate-700"></span>
-                  <span class="w-1 h-1 rounded-full bg-slate-700"></span>
-                  <span class="w-1 h-1 rounded-full bg-slate-700"></span>
-                </div>
-                <span class="text-[8px] font-mono text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                  CFM HIGH-FLOW
-                </span>
-              </div>
+              <span class="text-[7px] font-mono text-slate-400 font-bold uppercase tracking-widest">
+                CFM HIGH-FLOW
+              </span>
 
-              <!-- Turbine Right -->
-              <div class="turbine-container flex items-center gap-1.5">
-                <div class="turbine-housing relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#02050c] border-2 border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
+              <div class="turbine-container flex items-center gap-1">
+                <div class="turbine-housing relative w-7 h-7 rounded-full bg-[#02050c] border-2 border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
                   <div class="turbine-backlight" [class.backlight-on]="wasteHeat.heatOutputKw() > 0"></div>
-                  
-                  <svg class="turbine-propeller w-7 h-7 sm:w-8 sm:h-8" 
+                  <svg class="turbine-propeller w-5 h-5" 
                        [class.propeller-spinning]="wasteHeat.heatOutputKw() > 0"
                        viewBox="0 0 24 24">
                     <path d="M12,12 C12,6 15,3 17,4 C19,5 18,9 12,12 Z" fill="#94a3b8" />
@@ -294,65 +248,63 @@
 
           </div>
 
-          <!-- Floor Thermal Reflection Underneath Rack -->
           <div class="floor-heat-reflection" [style.opacity]="visualHeatRatio"></div>
-
         </div>
 
       </div>
 
-      <!-- Telemetry Specs Footer (Clean White Theme) -->
-      <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 font-mono text-[11px] z-20 relative">
-        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-          <span class="text-slate-500 block text-[10px]">COOLANT INTAKE:</span>
-          <span class="text-blue-600 font-bold">24.5 °C &#64; 18 LPM</span>
+      <!-- Telemetry Specs Footer -->
+      <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-100 font-mono text-[10px] z-20 relative text-center">
+        <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-200">
+          <span class="text-slate-500 block text-[9px]">COOLANT INTAKE:</span>
+          <span class="text-blue-600 font-bold">24.5 °C</span>
         </div>
-        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-          <span class="text-slate-500 block text-[10px]">EXHAUST ENTHALPY:</span>
+        <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-200">
+          <span class="text-slate-500 block text-[9px]">EXHAUST ENTHALPY:</span>
           <span class="text-orange-600 font-bold">{{ (wasteHeat.heatOutputKw() * 1.4).toFixed(2) }} kJ/kg</span>
         </div>
-        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-          <span class="text-slate-500 block text-[10px]">EXTRACTION EFFICIENCY:</span>
+        <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-200">
+          <span class="text-slate-500 block text-[9px]">EFFICIENCY:</span>
           <span class="text-emerald-600 font-bold">96.8 %</span>
         </div>
       </div>
 
     </div>
 
-    <!-- RIGHT: Simulation Control Panel (Col span 5 - Clean White Theme) -->
-    <div class="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-sm">
+    <!-- RIGHT: Simulation Control Panel (Col span 5) -->
+    <div class="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-3 sm:p-3.5 flex flex-col justify-between space-y-2.5 shadow-sm">
       
       <!-- Panel Header -->
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-md bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
           </div>
           <div>
-            <div class="text-sm font-bold text-slate-900">Simulation Control</div>
-            <div class="text-[10px] text-slate-500 font-mono">Waste-Heat Extraction Module</div>
+            <div class="text-xs font-bold text-slate-900 leading-tight">Simulation Control</div>
+            <div class="text-[9px] text-slate-500 font-mono">Heat Extraction Module</div>
           </div>
         </div>
 
-        <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5">
+        <span class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700 text-[9px] font-mono font-bold uppercase tracking-wider flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-          LIVE CONTROLS
+          LIVE
         </span>
       </div>
 
       <!-- 1. Heat Output Slider & Presets -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="text-xs font-mono font-bold text-slate-800 uppercase">Heat Output Control</label>
-          <span class="text-sm font-mono font-bold px-2.5 py-0.5 rounded-md bg-orange-50 border border-orange-300 text-orange-700 shadow-sm">
+      <div class="space-y-1">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <label class="text-[10px] font-bold text-slate-800 uppercase">Heat Output Control</label>
+          <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-50 border border-orange-300 text-orange-700">
             {{ wasteHeat.heatOutputKw().toFixed(2) }} kW
           </span>
         </div>
 
         <!-- Range Slider -->
-        <div class="py-2">
+        <div class="py-1">
           <input type="range" 
                  min="0" 
                  max="5" 
@@ -360,7 +312,7 @@
                  [ngModel]="wasteHeat.heatOutputKw()" 
                  (ngModelChange)="setHeatOutput($event)" 
                  class="scada-range-slider w-full cursor-pointer accent-orange-500" />
-          <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1 font-semibold">
+          <div class="flex justify-between text-[9px] font-mono text-slate-500 mt-0.5 font-semibold">
             <span>0 kW</span>
             <span>1 kW</span>
             <span>2.5 kW</span>
@@ -370,10 +322,10 @@
         </div>
 
         <!-- Preset Buttons Row -->
-        <div class="grid grid-cols-5 gap-1.5 pt-1">
+        <div class="grid grid-cols-5 gap-1 pt-0.5">
           <button *ngFor="let p of powerPresets" 
                   (click)="setHeatOutput(p.value)" 
-                  class="preset-pill py-2 px-1 rounded-lg text-center text-[10px] font-mono font-bold transition-all cursor-pointer"
+                  class="preset-pill py-1 px-0.5 rounded text-center text-[9px] font-mono font-bold transition-all cursor-pointer"
                   [class.pill-active]="wasteHeat.heatOutputKw() === p.value">
             {{ p.label }}
           </button>
@@ -381,120 +333,99 @@
       </div>
 
       <!-- 2. Three Mini Stat KPI Cards -->
-      <div class="grid grid-cols-3 gap-2">
-        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
-          <div class="text-[10px] font-mono text-slate-500 font-semibold">Temperature</div>
-          <div class="text-base font-mono font-bold text-orange-600 mt-0.5">{{ wasteHeat.temperatureC() }} °C</div>
+      <div class="grid grid-cols-3 gap-1.5">
+        <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-center">
+          <div class="text-[9px] font-mono text-slate-500 font-semibold">Temp</div>
+          <div class="text-xs sm:text-sm font-mono font-bold text-orange-600 mt-0.5">{{ wasteHeat.temperatureC() }} °C</div>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
-          <div class="text-[10px] font-mono text-slate-500 font-semibold">Heat Output</div>
-          <div class="text-base font-mono font-bold text-amber-600 mt-0.5">{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</div>
+        <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-center">
+          <div class="text-[9px] font-mono text-slate-500 font-semibold">Heat Out</div>
+          <div class="text-xs sm:text-sm font-mono font-bold text-amber-600 mt-0.5">{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</div>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
-          <div class="text-[10px] font-mono text-slate-500 font-semibold">Status</div>
-          <div class="text-base font-mono font-bold mt-0.5" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'text-emerald-600' : 'text-slate-400'">
+        <div class="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-center">
+          <div class="text-[9px] font-mono text-slate-500 font-semibold">Status</div>
+          <div class="text-xs sm:text-sm font-mono font-bold mt-0.5" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'text-emerald-600' : 'text-slate-400'">
             {{ wasteHeat.serverStatus() }}
           </div>
         </div>
       </div>
 
       <!-- 3. Storage Duration Selector -->
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between text-xs font-mono">
+      <div class="space-y-1">
+        <div class="flex items-center justify-between text-[11px] font-mono">
           <span class="font-bold text-slate-800">Storage Duration</span>
-          <span class="text-orange-600 text-[11px] font-bold">Active: {{ wasteHeat.durationSeconds() === 5 ? '5 Seconds' : '5 Minutes' }}</span>
+          <span class="text-orange-600 text-[10px] font-bold">{{ wasteHeat.durationSeconds() === 5 ? '5s Burst' : '5m Charge' }}</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-1.5">
           <button (click)="setDuration(5)" 
-                  class="duration-btn p-2.5 rounded-xl border text-left font-mono transition-all cursor-pointer"
+                  class="duration-btn p-1.5 rounded-lg border text-left font-mono transition-all cursor-pointer"
                   [class.duration-active]="wasteHeat.durationSeconds() === 5">
-            <div class="text-xs font-bold text-slate-900">5 Seconds</div>
-            <div class="text-[10px] text-slate-500">Instantaneous burst</div>
+            <div class="text-[11px] font-bold text-slate-900">5 Seconds</div>
+            <div class="text-[9px] text-slate-500">Burst extraction</div>
           </button>
 
           <button (click)="setDuration(300)" 
-                  class="duration-btn p-2.5 rounded-xl border text-left font-mono transition-all cursor-pointer"
+                  class="duration-btn p-1.5 rounded-lg border text-left font-mono transition-all cursor-pointer"
                   [class.duration-active]="wasteHeat.durationSeconds() === 300">
-            <div class="text-xs font-bold text-slate-900">5 Minutes</div>
-            <div class="text-[10px] text-slate-500">Accumulated charge</div>
+            <div class="text-[11px] font-bold text-slate-900">5 Minutes</div>
+            <div class="text-[9px] text-slate-500">Accumulated charge</div>
           </button>
         </div>
       </div>
 
       <!-- 4. Thermal Energy Stored Readout -->
-      <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 shadow-sm">
+      <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 shadow-xs">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded bg-amber-100 text-amber-700 flex items-center justify-center text-xs">⚡</div>
-            <span class="text-xs font-mono font-bold text-slate-800">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded bg-amber-100 text-amber-700 flex items-center justify-center text-[10px]">⚡</div>
+            <span class="text-[11px] font-mono font-bold text-slate-800">
               Thermal Energy Stored
             </span>
           </div>
-          <span class="text-[10px] font-mono text-slate-500 font-semibold">for {{ wasteHeat.durationSeconds() === 5 ? '5 Seconds' : '5 Minutes' }} extraction</span>
+          <span class="text-[9px] font-mono text-slate-500 font-semibold">{{ wasteHeat.durationSeconds() === 5 ? '5s' : '5m' }} basis</span>
         </div>
 
-        <div class="text-center py-1">
-          <span class="text-xl sm:text-2xl font-mono font-extrabold text-orange-600 tracking-tight">
+        <div class="text-center py-0.5">
+          <span class="text-base sm:text-lg font-mono font-extrabold text-orange-600 tracking-tight">
             {{ wasteHeat.energyStoredKJ() }} kJ
           </span>
-          <span class="text-slate-400 font-mono text-sm mx-2">=</span>
-          <span class="text-base sm:text-lg font-mono font-bold text-blue-600">
+          <span class="text-slate-400 font-mono text-xs mx-1">=</span>
+          <span class="text-sm sm:text-base font-mono font-bold text-blue-600">
             {{ wasteHeat.energyStoredKwh() }} kWh
           </span>
-          <span class="text-xs text-slate-500 font-mono"> thermal</span>
         </div>
 
         <!-- Energy Progress Bar -->
-        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden border border-slate-300">
+        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden border border-slate-300">
           <div class="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 transition-all duration-500 shadow-sm" 
                [style.width.%]="energyPercent"></div>
-        </div>
-
-        <div class="p-2 rounded-lg bg-white border border-slate-200 text-[10px] font-mono text-slate-600 text-center leading-relaxed">
-          <span class="text-slate-800 font-bold">
-            {{ wasteHeat.heatOutputKw().toFixed(2) }} kW &bull; {{ wasteHeat.durationSeconds() }}s = {{ wasteHeat.energyStoredKJ() }} kJ ({{ wasteHeat.energyStoredKwh() }} kWh)
-          </span><br>
-          <span class="text-slate-500">Energy stored depends on heat output power and storage duration.</span>
         </div>
       </div>
 
       <!-- 5. Heat Flow Target Banner -->
-      <div class="p-3.5 rounded-xl bg-orange-50/70 border border-orange-200 flex items-center justify-between shadow-sm">
+      <div class="p-2 rounded-xl bg-orange-50/70 border border-orange-200 flex items-center justify-between shadow-xs">
         <div class="font-mono text-xs">
-          <div class="text-slate-600 text-[10px] flex items-center gap-1">
-            <span>Heat Flow</span>
-            <span>&rarr;</span>
-            <span class="text-orange-700 font-bold">Thermal Storage</span>
+          <div class="text-slate-600 text-[9px] flex items-center gap-1">
+            <span>Heat Flow &rarr; <strong class="text-orange-700">Thermal Storage</strong></span>
           </div>
-          <div class="text-orange-900 font-bold mt-0.5 flex items-center gap-1.5">
-            <span>Target:</span>
-            <span class="px-2 py-0.5 rounded-md bg-white text-orange-600 font-extrabold border border-orange-300 shadow-xs">
+          <div class="text-orange-900 font-bold mt-0.5 flex items-center gap-1">
+            <span class="text-[10px]">Target:</span>
+            <span class="px-1.5 py-0.2 rounded bg-white text-orange-600 font-extrabold border border-orange-300 text-[10px]">
               {{ wasteHeat.activeChargingTank() ? wasteHeat.activeChargingTank()?.name : 'TANK 01' }}
             </span>
-            <span class="text-xs font-bold text-amber-700">{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</span>
+            <span class="text-[10px] font-bold text-amber-700 ml-1">{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</span>
           </div>
         </div>
 
         <button (click)="navigateToStorage()" 
-                class="py-2 px-3.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-mono font-bold transition-all shadow-md flex items-center gap-1 cursor-pointer active:scale-95">
+                class="py-1 px-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-[11px] font-mono font-bold transition-all shadow-xs flex items-center gap-0.5 cursor-pointer">
           <span>View</span> &rarr;
         </button>
       </div>
 
     </div>
 
-  </div>
-
-  <!-- Operational Footer Note -->
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3.5 bg-white border border-slate-200 rounded-xl text-xs font-mono text-slate-600 shadow-sm">
-    <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-      <span>SCADA Loop active. Waste-heat enthalpy recovered at <strong class="text-emerald-700 font-bold">96.8% efficiency</strong>, reducing data center PUE from 1.58 to 1.12.</span>
-    </div>
-    <div class="text-[11px] text-slate-500 font-bold">
-      IEC 60870-5-104 / MODBUS-TCP READY
-    </div>
   </div>
 
 </div>
