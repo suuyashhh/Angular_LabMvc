@@ -23,6 +23,22 @@ export class DataServerComponent {
     { label: '5 kW', value: 5.0 }
   ];
 
+  get heatRatio(): number {
+    return Math.min(1, Math.max(0, this.wasteHeat.heatOutputKw() / 5.0));
+  }
+
+  get fanSpeedSeconds(): number {
+    const ratio = this.heatRatio;
+    if (ratio <= 0) return 0;
+    return parseFloat((1.8 - ratio * 1.35).toFixed(2));
+  }
+
+  get particleSpeedSeconds(): number {
+    const ratio = this.heatRatio;
+    if (ratio <= 0) return 0;
+    return parseFloat((2.8 - ratio * 1.9).toFixed(2));
+  }
+
   setHeatOutput(val: number): void {
     this.wasteHeat.setHeatOutput(val);
   }
@@ -32,9 +48,11 @@ export class DataServerComponent {
   }
 
   get energyPercent(): number {
-    // Max capacity in 5 mins at 5kW is 1500 kJ
     const maxKJ = 5.0 * 300;
-    return Math.min(100, Math.max(5, (this.wasteHeat.energyStoredKJ() / maxKJ) * 100));
+    return Math.min(
+      100,
+      Math.max(5, (this.wasteHeat.energyStoredKJ() / maxKJ) * 100)
+    );
   }
 
   navigateToStorage(): void {

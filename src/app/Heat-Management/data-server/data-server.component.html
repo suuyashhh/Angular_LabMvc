@@ -31,105 +31,277 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
     
     <!-- LEFT: 42U Compute Core Visualizer (Col span 7) -->
-    <div class="lg:col-span-7 bg-[#081120] border border-[#14233a] rounded-lg p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden">
+    <div class="lg:col-span-7 bg-[#081120] border border-[#14233a] rounded-lg p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden"
+         [style.--heat-intensity]="heatRatio"
+         [style.--fan-duration]="fanSpeedSeconds > 0 ? fanSpeedSeconds + 's' : '0s'"
+         [style.--particle-duration]="particleSpeedSeconds > 0 ? particleSpeedSeconds + 's' : '0s'">
       
       <!-- Sub-header -->
-      <div class="flex items-center justify-between border-b border-[#132338] pb-3">
+      <div class="flex items-center justify-between border-b border-[#132338] pb-3 z-20 relative">
         <div class="flex items-center gap-2 font-mono text-xs text-slate-300">
-          <span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_#ef4444]"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></span>
           <span class="font-bold">42U Compute Core &bull; Lateral Heat Dissipation Stage</span>
         </div>
-        <span class="font-mono text-xs px-2 py-0.5 rounded bg-[#091526] border border-[#162945] text-amber-400 font-bold">
+        <span class="font-mono text-xs px-2.5 py-1 rounded bg-[#091526] border border-[#162945] text-amber-400 font-bold">
           Simulated Load: {{ wasteHeat.heatOutputKw().toFixed(2) }} kW
         </span>
       </div>
 
-      <!-- Center Server Rack Display -->
-      <div class="relative my-6 flex items-center justify-center min-h-[320px]">
+      <!-- CENTER ANIMATED STAGE (Server Rack & Lateral Heat Dissipation) -->
+      <div class="scada-visualizer-canvas relative my-6 flex items-center justify-center min-h-[380px] sm:min-h-[420px] overflow-hidden select-none">
         
-        <!-- Glowing Atmospheric Dispersion Particles/Rays -->
-        <div class="lateral-heat-waves absolute inset-0 pointer-events-none" 
-             [style.opacity]="wasteHeat.heatOutputKw() / 5.0">
-          <div class="heat-arc-left"></div>
-          <div class="heat-arc-right"></div>
-        </div>
+        <!-- 1. Ambient Radial Heat Haze (Atmosphere) -->
+        <div class="ambient-heat-haze" [class.haze-active]="wasteHeat.heatOutputKw() > 0"></div>
 
-        <!-- High Fidelity 42U Server Rack Graphic -->
-        <div class="server-rack-main w-64 sm:w-72 bg-[#050b16] border-2 border-[#1c3354] rounded-xl shadow-2xl p-3 relative z-10">
+        <!-- 2. Lateral SVG Heat Dissipation Arcs & Particle Streams -->
+        <svg class="lateral-heat-svg absolute inset-0 w-full h-full pointer-events-none z-0" 
+             viewBox="0 0 700 450" 
+             preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <!-- Gradient for Left Trails -->
+            <linearGradient id="heatGradLeft" x1="100%" y1="50%" x2="0%" y2="50%">
+              <stop offset="0%" stop-color="#ff7700" stop-opacity="0.85" />
+              <stop offset="50%" stop-color="#ff3300" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#cc1100" stop-opacity="0" />
+            </linearGradient>
+
+            <!-- Gradient for Right Trails -->
+            <linearGradient id="heatGradRight" x1="0%" y1="50%" x2="100%" y2="50%">
+              <stop offset="0%" stop-color="#ff7700" stop-opacity="0.85" />
+              <stop offset="50%" stop-color="#ff3300" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#cc1100" stop-opacity="0" />
+            </linearGradient>
+
+            <!-- Filter for glowing heat trails -->
+            <filter id="heatGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- LEFT SIDE CURVED HEAT TRAILS -->
+          <g class="heat-trail-group left-trails" [class.trails-active]="wasteHeat.heatOutputKw() > 0">
+            <!-- Trail Top Left -->
+            <path d="M 230,135 Q 160,105 70,80" 
+                  fill="none" 
+                  stroke="url(#heatGradLeft)" 
+                  stroke-width="3" 
+                  stroke-linecap="round"
+                  filter="url(#heatGlowFilter)"
+                  class="heat-path path-left-1" />
+            
+            <!-- Trail Mid Left -->
+            <path d="M 220,205 Q 140,195 50,185" 
+                  fill="none" 
+                  stroke="url(#heatGradLeft)" 
+                  stroke-width="3.5" 
+                  stroke-linecap="round"
+                  filter="url(#heatGlowFilter)"
+                  class="heat-path path-left-2" />
+
+            <!-- Trail Low Left -->
+            <path d="M 230,275 Q 160,290 80,315" 
+                  fill="none" 
+                  stroke="url(#heatGradLeft)" 
+                  stroke-width="3" 
+                  stroke-linecap="round"
+                  filter="url(#heatGlowFilter)"
+                  class="heat-path path-left-3" />
+          </g>
+
+          <!-- RIGHT SIDE CURVED HEAT TRAILS -->
+          <g class="heat-trail-group right-trails" [class.trails-active]="wasteHeat.heatOutputKw() > 0">
+            <!-- Trail Top Right -->
+            <path d="M 470,135 Q 540,105 630,80" 
+                  fill="none" 
+                  stroke="url(#heatGradRight)" 
+                  stroke-width="3" 
+                  stroke-linecap="round"
+                  filter="url(#heatGlowFilter)"
+                  class="heat-path path-right-1" />
+
+            <!-- Trail Mid Right -->
+            <path d="M 480,205 Q 560,195 650,185" 
+                  fill="none" 
+                  stroke="url(#heatGradRight)" 
+                  stroke-width="3.5" 
+                  stroke-linecap="round"
+                  filter="url(#heatGlowFilter)"
+                  class="heat-path path-right-2" />
+
+            <!-- Trail Low Right -->
+            <path d="M 470,275 Q 540,290 620,315" 
+                  fill="none" 
+                  stroke="url(#heatGradRight)" 
+                  stroke-width="3" 
+                  stroke-linecap="round"
+                  filter="url(#heatGlowFilter)"
+                  class="heat-path path-right-3" />
+          </g>
+
+          <!-- FLOATING HEAT PARTICLES (Left and Right) -->
+          <g *ngIf="wasteHeat.heatOutputKw() > 0" class="heat-sparks-layer">
+            <!-- Left Sparks -->
+            <circle class="spark spark-l1" r="3" fill="#ffb703" />
+            <circle class="spark spark-l2" r="2.5" fill="#ff7700" />
+            <circle class="spark spark-l3" r="3.5" fill="#ff4500" />
+            <circle class="spark spark-l4" r="2" fill="#ffdd00" />
+            <circle class="spark spark-l5" r="2.5" fill="#ff6600" />
+
+            <!-- Right Sparks -->
+            <circle class="spark spark-r1" r="3" fill="#ffb703" />
+            <circle class="spark spark-r2" r="2.5" fill="#ff7700" />
+            <circle class="spark spark-r3" r="3.5" fill="#ff4500" />
+            <circle class="spark spark-r4" r="2" fill="#ffdd00" />
+            <circle class="spark spark-r5" r="2.5" fill="#ff6600" />
+          </g>
+        </svg>
+
+        <!-- 3. CENTRAL 42U SERVER CHASSIS -->
+        <div class="server-chassis-wrapper relative z-10">
           
-          <!-- Top Exhaust Port -->
-          <div class="h-4 bg-[#0a1527] rounded-t border border-[#162740] flex items-center justify-between px-3 mb-2">
-            <div class="flex gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <!-- Outer Chassis Frame -->
+          <div class="server-chassis w-[280px] sm:w-[310px] bg-[#070d17] border-2 border-[#1a2d48] rounded-2xl p-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.9)] relative">
+            
+            <!-- Left Side Rail LED Beacons (6 lights) -->
+            <div class="side-rack-rail rail-left absolute -left-2.5 inset-y-6 flex flex-col justify-between items-center py-2">
+              <span *ngFor="let i of [1,2,3,4,5,6]" 
+                    class="rail-beacon" 
+                    [class.beacon-active]="wasteHeat.heatOutputKw() > 0"
+                    [style.animation-delay]="(i * 0.2) + 's'"></span>
             </div>
-            <span class="text-[9px] font-mono text-slate-400">RACK #42-HEAT-EX</span>
-          </div>
 
-          <!-- 5 Modular Compute Blade Drawers -->
-          <div class="space-y-2">
-            <div *ngFor="let bay of [1, 2, 3, 4, 5]" 
-                 class="server-bay p-2 rounded bg-[#070e1c] border border-[#152742] transition-all duration-300"
-                 [class.bay-active]="wasteHeat.heatOutputKw() > 0">
-              
-              <div class="flex items-center justify-between">
-                <!-- Blade Drive Caddies -->
-                <div class="flex items-center gap-1">
-                  <div class="w-1.5 h-5 bg-[#0e1f36] rounded-[1px] border border-cyan-500/30"></div>
-                  <div class="w-1.5 h-5 bg-[#0e1f36] rounded-[1px] border border-cyan-500/30"></div>
-                  <div class="w-1.5 h-5 bg-[#0e1f36] rounded-[1px] border border-cyan-500/30"></div>
-                  <div class="w-1.5 h-5 bg-[#0e1f36] rounded-[1px] border border-cyan-500/30"></div>
+            <!-- Right Side Rail LED Beacons (6 lights) -->
+            <div class="side-rack-rail rail-right absolute -right-2.5 inset-y-6 flex flex-col justify-between items-center py-2">
+              <span *ngFor="let i of [1,2,3,4,5,6]" 
+                    class="rail-beacon" 
+                    [class.beacon-active]="wasteHeat.heatOutputKw() > 0"
+                    [style.animation-delay]="(i * 0.25) + 's'"></span>
+            </div>
+
+            <!-- Top Vent Channel (9 pill slits) -->
+            <div class="chassis-top-grille h-4 bg-[#050912] rounded-t-lg border border-[#132238] flex items-center justify-center gap-1.5 px-3 mb-2">
+              <span *ngFor="let slit of [1,2,3,4,5,6,7,8,9]" 
+                    class="top-slit w-3.5 h-1.5 rounded-full bg-[#111c2e]"
+                    [class.slit-hot]="wasteHeat.heatOutputKw() > 0"></span>
+            </div>
+
+            <!-- 5 Modular Compute Server Blades -->
+            <div class="blade-stack space-y-1.5">
+              <div *ngFor="let bay of [1, 2, 3, 4, 5]" 
+                   class="blade-unit p-1.5 rounded-lg bg-[#050b16] border border-[#13243c] flex items-center justify-between transition-all duration-300 relative overflow-hidden"
+                   [class.blade-hot-border]="wasteHeat.heatOutputKw() > 0">
+                
+                <!-- Left Perforation Vent Grilles & Micro LEDs -->
+                <div class="blade-left-grille flex items-center gap-1.5 pl-1">
+                  <!-- Two columns of vertical pill slots -->
+                  <div class="flex gap-0.5">
+                    <div class="flex flex-col gap-0.5">
+                      <span *ngFor="let v of [1,2,3,4]" class="w-1 h-1 rounded-[1px] bg-[#142338]"></span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                      <span *ngFor="let v of [1,2,3,4]" class="w-1 h-1 rounded-[1px] bg-[#142338]"></span>
+                    </div>
+                  </div>
+                  <!-- Activity LEDs -->
+                  <div class="flex flex-col gap-1">
+                    <span class="w-1 h-1 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-cyan-400 animate-pulse' : 'bg-slate-700'"></span>
+                    <span class="w-1 h-1 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-emerald-400' : 'bg-slate-700'"></span>
+                  </div>
                 </div>
 
-                <!-- Glowing Thermal Core Window -->
-                <div class="thermal-core-window flex-1 mx-3 h-5 rounded bg-[#03070f] border border-[#142338] flex items-center justify-center overflow-hidden relative">
-                  <div class="core-glow-heat w-full h-full" 
-                       [style.opacity]="wasteHeat.heatOutputKw() / 5.0"
-                       [ngClass]="{'animate-pulse': wasteHeat.heatOutputKw() > 0}"></div>
-                  <span class="text-[9px] font-mono text-slate-400 z-10 tracking-widest">
-                    CORE {{ bay }}: {{ wasteHeat.heatOutputKw() > 0 ? (wasteHeat.temperatureC() - (bay * 2)) + '°C' : '38°C' }}
+                <!-- Center Thermal Dissipation Chamber (Radiant Core) -->
+                <div class="thermal-core-chamber flex-1 mx-2.5 h-6 sm:h-7 rounded-md bg-[#02050c] border border-[#132238] relative overflow-hidden flex items-center justify-center">
+                  <!-- Deep Heat Core Gradient Layer -->
+                  <div class="core-heat-fire absolute inset-0"
+                       [class.fire-pulse]="wasteHeat.heatOutputKw() > 0"></div>
+                  
+                  <!-- Hot Meniscus Highlight -->
+                  <div class="core-hot-spark absolute inset-0"></div>
+
+                  <!-- Core Spec Label (subtle) -->
+                  <span class="core-spec-tag text-[8px] font-mono text-white/70 z-10 tracking-widest pointer-events-none drop-shadow">
+                    {{ wasteHeat.heatOutputKw() > 0 ? (wasteHeat.temperatureC() - (bay * 2)) + '°C' : '' }}
                   </span>
                 </div>
 
-                <!-- Activity Status Lights -->
-                <div class="flex flex-col gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-amber-400 shadow-[0_0_4px_#f59e0b]' : 'bg-slate-600'"></span>
-                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-cyan-400' : 'bg-slate-700'"></span>
+                <!-- Right Activity Status Dot -->
+                <div class="blade-right-status pr-1 flex flex-col gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full" 
+                        [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-amber-400 shadow-[0_0_6px_#f59e0b]' : 'bg-slate-700'"></span>
+                  <span class="w-1.5 h-1.5 rounded-full" 
+                        [ngClass]="wasteHeat.heatOutputKw() > 0 ? 'bg-cyan-400' : 'bg-slate-800'"></span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Bottom Turbine / Cooling Stage (Dual Metallic Fans) -->
+            <div class="chassis-bottom-turbines mt-2 p-2 bg-[#040813] border border-[#13243a] rounded-b-lg flex items-center justify-around relative">
+              
+              <!-- Turbine Left -->
+              <div class="turbine-container flex items-center gap-1.5">
+                <div class="turbine-housing relative w-9 h-9 rounded-full bg-[#02050c] border-2 border-[#1c3250] flex items-center justify-center overflow-hidden shadow-inner">
+                  <!-- Ambient Backlight -->
+                  <div class="turbine-backlight" [class.backlight-on]="wasteHeat.heatOutputKw() > 0"></div>
+                  
+                  <!-- Rotating 4-Blade Impeller SVG -->
+                  <svg class="turbine-propeller w-7 h-7" 
+                       [class.propeller-spinning]="wasteHeat.heatOutputKw() > 0"
+                       viewBox="0 0 24 24">
+                    <!-- 4 Aerodynamic Fan Blades -->
+                    <path d="M12,12 C12,6 15,3 17,4 C19,5 18,9 12,12 Z" fill="#94a3b8" />
+                    <path d="M12,12 C18,12 21,15 20,17 C19,19 15,18 12,12 Z" fill="#64748b" />
+                    <path d="M12,12 C12,18 9,21 7,20 C5,19 6,15 12,12 Z" fill="#94a3b8" />
+                    <path d="M12,12 C6,12 3,9 4,7 C5,5 9,6 12,12 Z" fill="#64748b" />
+                    <!-- Center Metallic Hub -->
+                    <circle cx="12" cy="12" r="2.5" fill="#cbd5e1" stroke="#334155" stroke-width="0.8" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Center Chassis Grille Dots -->
+              <div class="flex gap-1">
+                <span class="w-1 h-1 rounded-full bg-[#1e2f47]"></span>
+                <span class="w-1 h-1 rounded-full bg-[#1e2f47]"></span>
+                <span class="w-1 h-1 rounded-full bg-[#1e2f47]"></span>
+              </div>
+
+              <!-- Turbine Right -->
+              <div class="turbine-container flex items-center gap-1.5">
+                <div class="turbine-housing relative w-9 h-9 rounded-full bg-[#02050c] border-2 border-[#1c3250] flex items-center justify-center overflow-hidden shadow-inner">
+                  <!-- Ambient Backlight -->
+                  <div class="turbine-backlight" [class.backlight-on]="wasteHeat.heatOutputKw() > 0"></div>
+                  
+                  <!-- Rotating 4-Blade Impeller SVG -->
+                  <svg class="turbine-propeller w-7 h-7" 
+                       [class.propeller-spinning]="wasteHeat.heatOutputKw() > 0"
+                       viewBox="0 0 24 24">
+                    <path d="M12,12 C12,6 15,3 17,4 C19,5 18,9 12,12 Z" fill="#94a3b8" />
+                    <path d="M12,12 C18,12 21,15 20,17 C19,19 15,18 12,12 Z" fill="#64748b" />
+                    <path d="M12,12 C12,18 9,21 7,20 C5,19 6,15 12,12 Z" fill="#94a3b8" />
+                    <path d="M12,12 C6,12 3,9 4,7 C5,5 9,6 12,12 Z" fill="#64748b" />
+                    <circle cx="12" cy="12" r="2.5" fill="#cbd5e1" stroke="#334155" stroke-width="0.8" />
+                  </svg>
                 </div>
               </div>
 
             </div>
+
           </div>
 
-          <!-- Bottom Dual High-CFM Turbines -->
-          <div class="mt-3 p-2 bg-[#081222] border border-[#172c47] rounded-b flex items-center justify-around">
-            <div class="flex items-center gap-2">
-              <div class="fan-box" [class.fan-spin]="wasteHeat.heatOutputKw() > 0">
-                <svg class="w-7 h-7 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="9" stroke-width="2" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18M5.636 5.636l12.728 12.728M5.636 18.364L18.364 5.636" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-mono text-slate-400">TURBINE A</span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <div class="fan-box" [class.fan-spin]="wasteHeat.heatOutputKw() > 0">
-                <svg class="w-7 h-7 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="9" stroke-width="2" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18M5.636 5.636l12.728 12.728M5.636 18.364L18.364 5.636" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-mono text-slate-400">TURBINE B</span>
-            </div>
-          </div>
+          <!-- Floor Thermal Reflection Underneath Rack -->
+          <div class="floor-heat-reflection" [style.opacity]="heatRatio"></div>
 
         </div>
 
       </div>
 
       <!-- Telemetry Specs Footer -->
-      <div class="grid grid-cols-3 gap-2 pt-3 border-t border-[#132338] font-mono text-[11px]">
+      <div class="grid grid-cols-3 gap-2 pt-3 border-t border-[#132338] font-mono text-[11px] z-20 relative">
         <div class="p-2 rounded bg-[#060c18] border border-[#132338]">
           <span class="text-slate-500 block text-[10px]">COOLANT INTAKE:</span>
           <span class="text-cyan-400 font-bold">24.5 °C &#64; 18 LPM</span>
