@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, OnDestroy, Output, Inject, PLATFORM_ID, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../../shared/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,16 +16,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
   currentTime: string = '';
   isOnline = true;
   isDarkMode = true;
+  currentUser: any = null;
   private timeInterval: any;
 
   constructor(
     private router: Router,
+    private auth: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.auth.getWasteHeatUser();
     this.updateTime();
     if (isPlatformBrowser(this.platformId)) {
       this.ngZone.runOutsideAngular(() => {
@@ -40,6 +44,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
     }
+  }
+
+  get userInitials(): string {
+    const name = this.currentUser?.user_name || this.currentUser?.email || 'OP';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  get userDisplayName(): string {
+    return this.currentUser?.user_name || this.currentUser?.email || 'Operator';
   }
 
   private updateTime(): void {
@@ -65,6 +82,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.router.navigate(['/heatmanagement/login']);
+    this.auth.wasteHeatLogout();
   }
 }

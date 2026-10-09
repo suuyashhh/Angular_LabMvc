@@ -41,8 +41,8 @@
       class="operator-btn"
       (click)="logout()"
       title="Sign Out / Operator Control">
-      <span class="operator-avatar">OP</span>
-      <span class="operator-id">OP-8820</span>
+      <span class="operator-avatar">{{ userInitials }}</span>
+      <span class="operator-id">{{ userDisplayName }}</span>
       <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
     </button>
 

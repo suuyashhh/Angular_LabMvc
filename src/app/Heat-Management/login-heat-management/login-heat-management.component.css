@@ -72,18 +72,69 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Card inner margin: more space at the TOP (and comfortable sides) */
 .login-card {
   width: 100%;
   min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 34px 28px 22px;           /* top | sides | bottom */
+  justify-content: flex-start;
+  padding: 24px 26px 20px;           /* top | sides | bottom */
   box-sizing: border-box;
   border-radius: 14px;
   background: linear-gradient(160deg, #ffffff 0%, #ffffff 55%, #eef1f6 100%);
   box-shadow: 0 24px 60px rgba(8, 16, 36, 0.35), 0 2px 8px rgba(8, 16, 36, 0.12);
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.login-card::-webkit-scrollbar {
+  width: 4px;
+}
+.login-card::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Demo chips */
+.demo-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.demo-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.demo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.demo-chip:hover {
+  background: #ffedd5;
+  border-color: #fdba74;
+  color: #c2410c;
+}
+.demo-chip.admin:hover {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #4338ca;
 }
 
 /* Brand */
@@ -276,8 +327,25 @@
   font-weight: 500;
   color: var(--muted);
 }
-.signup-link { margin-left: 4px; color: var(--navy); font-weight: 700; text-decoration: none; }
-.signup-link:hover { color: var(--orange); text-decoration: underline; }
+.signup-link,
+.signup-link-btn {
+  margin-left: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.signup-link:hover,
+.signup-link-btn:hover {
+  color: var(--orange);
+  text-decoration: underline;
+}
 
 .card-footer { margin-top: 8px; text-align: center; }
 .back-link {

@@ -657,4 +657,79 @@ clearFarmUserDetailsCookie(): void {
     this.router.navigate(['/notes/login']);
   }
 
+  // ===== Waste Heat Management Auth Methods =====
+
+  isWasteHeatLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const user = this.getWasteHeatUser();
+    return !!user && typeof user === 'object' && (!!user.user_id || !!user.user_name || !!user.email || !!user.contact);
+  }
+
+  setWasteHeatCredentials(value: any, days: number = 30): void {
+    try {
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('wast_heat_user', JSON.stringify(value));
+        localStorage.setItem('waste_heat_user', JSON.stringify(value));
+      }
+      const json = JSON.stringify(value);
+      const encoded = encodeURIComponent(json);
+      const expires = new Date();
+      expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `wasteHeatCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+    } catch (e) {
+      console.error('Failed to set waste heat credentials', e);
+    }
+  }
+
+  getWasteHeatUser(): any | null {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const userStr = localStorage.getItem('wast_heat_user') || localStorage.getItem('waste_heat_user');
+        if (userStr) {
+          return JSON.parse(userStr);
+        }
+      } catch (err) {
+        console.warn('Failed to parse waste heat user from localStorage', err);
+      }
+    }
+    try {
+      const cookies = typeof document !== 'undefined' && document.cookie ? document.cookie.split('; ') : [];
+      for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'wasteHeatCredentials' && value) {
+          const decoded = decodeURIComponent(value);
+          return JSON.parse(decoded);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to read waste heat cookie', e);
+    }
+    return null;
+  }
+
+  clearWasteHeatCredentials(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('wast_heat_user');
+      localStorage.removeItem('waste_heat_user');
+    }
+    if (typeof document !== 'undefined') {
+      document.cookie = 'wasteHeatCredentials=; path=/; max-age=0';
+    }
+  }
+
+  wasteHeatLogout(): void {
+    try {
+      this.clearWasteHeatCredentials();
+      try {
+        this.toaster.success('Logged out from Waste Heat Management', 'Logout');
+      } catch (e) {
+        console.warn('toaster unavailable', e);
+      }
+      this.router.navigate(['/heatmanagement/login']);
+    } catch (err) {
+      console.error('wasteHeatLogout error', err);
+      this.router.navigate(['/heatmanagement/login']);
+    }
+  }
+
 }
