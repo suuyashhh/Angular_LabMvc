@@ -23,8 +23,16 @@ export class DataServerComponent {
     { label: '5 kW', value: 5.0 }
   ];
 
+  // Mathematical heat ratio (0 to 1)
   get heatRatio(): number {
     return Math.min(1, Math.max(0, this.wasteHeat.heatOutputKw() / 5.0));
+  }
+
+  // Boosted visual wave factor: provides strong, visible heat wave projection even at 1 kW
+  get visualHeatRatio(): number {
+    if (this.wasteHeat.heatOutputKw() <= 0) return 0;
+    // At 1 kW (ratio 0.20), intensity is boosted to 0.58 so heat waves are actively thrown
+    return Math.min(1, 0.48 + (this.heatRatio * 0.52));
   }
 
   get fanSpeedSeconds(): number {

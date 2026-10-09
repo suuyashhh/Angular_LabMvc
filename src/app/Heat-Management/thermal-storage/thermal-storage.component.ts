@@ -19,7 +19,7 @@ export class ThermalStorageComponent {
   showCapacityModal = false;
   showResetModal = false;
 
-  // Temp form models for capacity modal
+  // Form models for capacity modal
   tankCapacities: { [key: number]: number } = {
     1: 10,
     2: 20,
@@ -78,7 +78,6 @@ export class ThermalStorageComponent {
   }
 
   saveCapacities(): void {
-    // Validate
     for (let i = 1; i <= 4; i++) {
       const val = Number(this.tankCapacities[i]);
       if (isNaN(val) || val < 1 || val > 200) {

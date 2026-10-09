@@ -1,46 +1,52 @@
-<div class="thermal-storage-page space-y-4">
+<div class="thermal-storage-page space-y-4 font-sans text-slate-900">
   
-  <!-- ================= TOP SCADA TELEMETRY BAR ================= -->
-  <div class="bg-[#081120] border border-[#14233a] rounded-lg p-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 font-mono text-xs">
+  <!-- ================= TOP SCADA TELEMETRY BAR (WHITE THEME) ================= -->
+  <div class="bg-white border border-slate-200 rounded-xl p-3 sm:px-4 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 font-mono text-xs shadow-sm">
     
     <!-- Title & System Name -->
     <div>
-      <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+      <div class="text-[10px] font-bold text-orange-600 uppercase tracking-widest flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]"></span>
         <span>SCADA LIVE ACCUMULATOR MATRIX</span>
       </div>
-      <h1 class="text-base font-bold text-slate-100 mt-0.5 tracking-tight">
+      <h1 class="text-base font-bold text-slate-900 mt-0.5 tracking-tight">
         Thermal Storage System
       </h1>
     </div>
 
     <!-- Live Telemetry Badges -->
     <div class="flex flex-wrap items-center gap-2">
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
-        HEAT INPUT: <strong class="text-amber-400">{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</strong>
+      <span class="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700">
+        HEAT INPUT: <strong class="text-amber-600">{{ wasteHeat.heatOutputKw().toFixed(2) }} kW</strong>
       </span>
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
-        TEMPERATURE: <strong class="text-orange-400">{{ wasteHeat.temperatureC() }} °C</strong>
+      <span class="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700">
+        TEMPERATURE: <strong class="text-orange-600">{{ wasteHeat.temperatureC() }} °C</strong>
       </span>
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300 flex items-center gap-1">
+      <span class="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1">
         <span>DURATION:</span>
-        <button (click)="setDuration(5)" [class.text-cyan-400]="wasteHeat.durationSeconds() === 5" class="hover:underline font-bold">5s</button>
-        <span class="text-slate-600">|</span>
-        <button (click)="setDuration(300)" [class.text-cyan-400]="wasteHeat.durationSeconds() === 300" class="hover:underline font-bold">5m</button>
+        <button (click)="setDuration(5)" 
+                [class.text-orange-600]="wasteHeat.durationSeconds() === 5" 
+                [class.underline]="wasteHeat.durationSeconds() === 5"
+                class="hover:underline font-bold cursor-pointer">5s</button>
+        <span class="text-slate-300">|</span>
+        <button (click)="setDuration(300)" 
+                [class.text-orange-600]="wasteHeat.durationSeconds() === 300" 
+                [class.underline]="wasteHeat.durationSeconds() === 300"
+                class="hover:underline font-bold cursor-pointer">5m</button>
       </span>
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-cyan-500/30 text-cyan-300 font-bold">
+      <span class="px-2.5 py-1 rounded-md bg-orange-50 border border-orange-200 text-orange-800 font-bold">
         ENERGY: {{ wasteHeat.energyStoredKJ() }} kJ ({{ wasteHeat.energyStoredKwh() }} kWh)
       </span>
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
-        CAPACITY: <strong class="text-cyan-400">{{ wasteHeat.totalCapacityKwh() }} kWh</strong>
+      <span class="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700">
+        CAPACITY: <strong class="text-blue-600">{{ wasteHeat.totalCapacityKwh() }} kWh</strong>
       </span>
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
-        STORED: <strong class="text-emerald-400">{{ wasteHeat.totalStoredKwh() }} kWh</strong>
+      <span class="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700">
+        STORED: <strong class="text-emerald-600">{{ wasteHeat.totalStoredKwh() }} kWh</strong>
       </span>
-      <span class="px-2 py-1 rounded bg-[#060c18] border border-[#142338] text-slate-300">
-        SYS LEVEL: <strong class="text-cyan-400">{{ wasteHeat.systemLevelPercentage() }}%</strong>
+      <span class="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700">
+        SYS LEVEL: <strong class="text-blue-600">{{ wasteHeat.systemLevelPercentage() }}%</strong>
       </span>
-      <span class="px-2 py-1 rounded bg-[#091e14] border border-emerald-500/40 text-emerald-400 font-bold flex items-center gap-1">
+      <span class="px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold flex items-center gap-1">
         <span>ACTIVE TANK:</span>
         <span>{{ wasteHeat.activeChargingTank() ? wasteHeat.activeChargingTank()?.name : 'STANDBY' }}</span>
       </span>
@@ -50,101 +56,104 @@
     <div class="flex flex-wrap items-center gap-2">
       <!-- Capacity Button -->
       <button (click)="openCapacityModal()" 
-              class="px-2.5 py-1 rounded bg-[#0c1b2e] hover:bg-[#122844] border border-cyan-500/40 text-cyan-300 font-bold flex items-center gap-1 transition-all">
-        <span>⚙</span> Capacity
+              class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs">
+        <span class="text-blue-600">⚙</span> Capacity
       </button>
 
       <!-- Reset Button -->
       <button (click)="openResetModal()" 
-              class="px-2.5 py-1 rounded bg-[#200c0c] hover:bg-[#301212] border border-red-500/40 text-red-400 font-bold flex items-center gap-1 transition-all">
+              class="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs">
         <span>🔄</span> Reset
       </button>
 
       <!-- Speed Selector -->
-      <div class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#060c18] border border-[#152742]">
-        <span class="text-slate-400 text-[10px]">SPEED:</span>
+      <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-slate-500 text-[10px]">SPEED:</span>
         <button *ngFor="let s of [1, 10, 60]" 
                 (click)="setSpeed(s)"
-                [class.text-amber-400]="wasteHeat.simulationSpeed() === s"
+                [class.text-orange-600]="wasteHeat.simulationSpeed() === s"
                 [class.font-extrabold]="wasteHeat.simulationSpeed() === s"
-                class="px-1 text-[11px] text-slate-400 hover:text-white">
+                class="px-1 text-[11px] text-slate-500 hover:text-slate-900 cursor-pointer">
           {{ s }}x
         </button>
       </div>
 
       <!-- Route Links -->
-      <button (click)="navigate('data-server')" class="px-2.5 py-1 rounded bg-[#071324] hover:bg-[#0e213b] border border-[#182e4e] text-slate-300">
+      <button (click)="navigate('data-server')" class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold flex items-center gap-1 cursor-pointer">
         &larr; Server
       </button>
-      <button (click)="navigate('heat-consumers')" class="px-2.5 py-1 rounded bg-[#071324] hover:bg-[#0e213b] border border-[#182e4e] text-slate-300">
+      <button (click)="navigate('heat-consumers')" class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold flex items-center gap-1 cursor-pointer">
         Consumers &rarr;
       </button>
     </div>
 
   </div>
 
-  <!-- ================= ALLOCATION MODE & PRIORITY ROUTE BAR ================= -->
-  <div class="bg-[#081120] border border-[#14233a] rounded-lg p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 font-mono text-xs">
+  <!-- ================= ALLOCATION MODE & PRIORITY ROUTE BAR (WHITE THEME) ================= -->
+  <div class="bg-white border border-slate-200 rounded-xl p-3 sm:px-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 font-mono text-xs shadow-sm">
     
     <!-- Mode Toggle Buttons -->
-    <div class="flex items-center gap-2">
-      <span class="text-slate-400 font-bold">STORAGE ALLOCATION:</span>
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-slate-500 font-bold">STORAGE ALLOCATION:</span>
       <button (click)="setAllocationMode('AUTO')" 
-              class="px-3 py-1 rounded text-xs font-bold transition-all flex items-center gap-1.5"
-              [ngClass]="wasteHeat.allocationMode() === 'AUTO' ? 'bg-cyan-950 border border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.3)]' : 'bg-[#060c18] border border-[#142338] text-slate-400 hover:text-white'">
-        <span class="w-2 h-2 rounded-full" [ngClass]="wasteHeat.allocationMode() === 'AUTO' ? 'bg-cyan-400' : 'bg-slate-600'"></span>
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border"
+              [ngClass]="wasteHeat.allocationMode() === 'AUTO' ? 'bg-blue-50 border-blue-400 text-blue-800 shadow-xs' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'">
+        <span class="w-2 h-2 rounded-full" [ngClass]="wasteHeat.allocationMode() === 'AUTO' ? 'bg-blue-600' : 'bg-slate-400'"></span>
         AUTOMATIC SEQUENTIAL MODE
       </button>
 
       <button (click)="setAllocationMode('MANUAL')" 
-              class="px-3 py-1 rounded text-xs font-bold transition-all flex items-center gap-1.5"
-              [ngClass]="wasteHeat.allocationMode() === 'MANUAL' ? 'bg-amber-950 border border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]' : 'bg-[#060c18] border border-[#142338] text-slate-400 hover:text-white'">
-        <span class="w-2 h-2 rounded-full" [ngClass]="wasteHeat.allocationMode() === 'MANUAL' ? 'bg-amber-400' : 'bg-slate-600'"></span>
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border"
+              [ngClass]="wasteHeat.allocationMode() === 'MANUAL' ? 'bg-amber-50 border-amber-400 text-amber-800 shadow-xs' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'">
+        <span class="w-2 h-2 rounded-full" [ngClass]="wasteHeat.allocationMode() === 'MANUAL' ? 'bg-amber-500' : 'bg-slate-400'"></span>
         MANUAL SELECTION MODE
       </button>
     </div>
 
     <!-- Priority Route Chain (Interactive) -->
     <div class="flex items-center gap-2 flex-wrap">
-      <span class="text-slate-400">Priority Route:</span>
-      <div class="flex items-center gap-1">
+      <span class="text-slate-500">Priority Route:</span>
+      <div class="flex items-center gap-1.5">
         <ng-container *ngFor="let tankId of wasteHeat.priorityOrder(); let i = index">
-          <div class="priority-pill px-2.5 py-1 rounded bg-[#091526] border text-xs flex items-center gap-1.5"
-               [class.border-amber-500]="wasteHeat.activeChargingTankId() === tankId"
-               [class.text-amber-400]="wasteHeat.activeChargingTankId() === tankId"
-               [class.border-[#182b46]]="wasteHeat.activeChargingTankId() !== tankId"
-               [class.text-slate-300]="wasteHeat.activeChargingTankId() !== tankId">
+          <div class="priority-pill px-2.5 py-1 rounded-md border text-xs flex items-center gap-1.5 transition-all"
+               [class.border-orange-400]="wasteHeat.activeChargingTankId() === tankId"
+               [class.text-orange-800]="wasteHeat.activeChargingTankId() === tankId"
+               [class.bg-orange-50]="wasteHeat.activeChargingTankId() === tankId"
+               [class.font-bold]="wasteHeat.activeChargingTankId() === tankId"
+               [class.border-slate-200]="wasteHeat.activeChargingTankId() !== tankId"
+               [class.bg-slate-50]="wasteHeat.activeChargingTankId() !== tankId"
+               [class.text-slate-700]="wasteHeat.activeChargingTankId() !== tankId">
             <span>Tank {{ tankId }} ({{ getTank(tankId)?.fillPercentage }}%)</span>
             
-            <!-- Shifter arrows for reordering priority -->
-            <div *ngIf="wasteHeat.allocationMode() === 'AUTO'" class="flex flex-col text-[8px] text-slate-500 pl-1 border-l border-slate-700">
-              <button *ngIf="i > 0" (click)="movePriorityLeft(i)" class="hover:text-cyan-400 leading-none">&lsaquo;</button>
-              <button *ngIf="i < 3" (click)="movePriorityRight(i)" class="hover:text-cyan-400 leading-none">&rsaquo;</button>
+            <!-- Shifter arrows for reordering priority in AUTO mode -->
+            <div *ngIf="wasteHeat.allocationMode() === 'AUTO'" class="flex flex-col text-[8px] text-slate-400 pl-1 border-l border-slate-300">
+              <button *ngIf="i > 0" (click)="movePriorityLeft(i)" class="hover:text-orange-600 leading-none cursor-pointer">&lsaquo;</button>
+              <button *ngIf="i < 3" (click)="movePriorityRight(i)" class="hover:text-orange-600 leading-none cursor-pointer">&rsaquo;</button>
             </div>
           </div>
-          <span *ngIf="i < 3" class="text-slate-500 font-bold">&rarr;</span>
+          <span *ngIf="i < 3" class="text-slate-400 font-bold">&rarr;</span>
         </ng-container>
       </div>
     </div>
 
   </div>
 
-  <!-- ================= 4 LARGE STORAGE VESSELS CONTAINER ================= -->
-  <div class="bg-[#081120] border border-[#14233a] rounded-lg p-4 sm:p-6 relative overflow-hidden">
+  <!-- ================= 4 LARGE STORAGE VESSELS CONTAINER (WHITE THEME) ================= -->
+  <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 relative overflow-hidden shadow-sm">
     
     <!-- Top Header Distribution Manifold Pipe -->
     <div class="manifold-pipe-system relative mb-6">
-      <div class="h-3.5 rounded bg-[#0f1e33] border border-[#1d385e] relative overflow-hidden">
+      <div class="h-4 rounded-full bg-slate-200 border border-slate-300 relative overflow-hidden shadow-inner">
         <div class="manifold-stream" [class.stream-active]="wasteHeat.heatOutputKw() > 0"></div>
       </div>
 
       <!-- Injector Nozzles for 4 Tanks -->
       <div class="grid grid-cols-4 px-6 sm:px-12">
         <div *ngFor="let tank of wasteHeat.tanks()" class="flex flex-col items-center">
-          <div class="w-3 h-4 bg-[#1a2d48] border-x border-b border-[#25426c]"></div>
+          <div class="w-3.5 h-4 bg-slate-300 border-x border-b border-slate-400 rounded-b"></div>
           <!-- Liquid jet entering tank if active charging -->
           <div *ngIf="wasteHeat.activeChargingTankId() === tank.id && wasteHeat.heatOutputKw() > 0"
-               class="w-2 h-10 bg-gradient-to-b from-amber-400 to-orange-500 animate-pulse shadow-[0_0_12px_#f59e0b] z-20"></div>
+               class="w-2.5 h-10 bg-gradient-to-b from-amber-400 via-orange-500 to-red-500 animate-pulse shadow-[0_0_12px_#f59e0b] z-20 rounded-full"></div>
         </div>
       </div>
     </div>
@@ -153,45 +162,45 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
       <div *ngFor="let tank of wasteHeat.tanks()" 
-           class="storage-tank-card rounded-xl p-3 bg-[#050b16] border-2 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+           class="storage-tank-card rounded-2xl p-3.5 bg-slate-50 border-2 transition-all duration-300 flex flex-col justify-between cursor-pointer"
            [class.tank-active-charge]="tank.status === 'CHARGING'"
            [class.tank-active-discharge]="tank.status === 'DISCHARGING'"
-           [class.border-[#182e4e]]="tank.status !== 'CHARGING' && tank.status !== 'DISCHARGING'"
+           [class.border-slate-200]="tank.status !== 'CHARGING' && tank.status !== 'DISCHARGING'"
            (click)="wasteHeat.allocationMode() === 'MANUAL' ? selectManualTank(tank.id) : null">
         
         <!-- Tank Top Header -->
-        <div class="flex items-center justify-between font-mono pb-2 border-b border-[#122238]">
+        <div class="flex items-center justify-between font-mono pb-2.5 border-b border-slate-200">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full"
                   [ngClass]="{
-                    'bg-amber-400 shadow-[0_0_8px_#f59e0b]': tank.status === 'CHARGING',
-                    'bg-emerald-400 shadow-[0_0_8px_#10b981]': tank.status === 'DISCHARGING',
-                    'bg-sky-400': tank.status === 'STORED',
-                    'bg-slate-600': tank.status === 'STANDBY'
+                    'bg-orange-500 shadow-[0_0_8px_#f97316] animate-pulse': tank.status === 'CHARGING',
+                    'bg-emerald-500 shadow-[0_0_8px_#10b981]': tank.status === 'DISCHARGING',
+                    'bg-blue-500': tank.status === 'STORED',
+                    'bg-slate-400': tank.status === 'STANDBY'
                   }"></span>
-            <span class="text-xs font-bold text-slate-100 uppercase">{{ tank.name }}</span>
+            <span class="text-xs font-bold text-slate-900 uppercase">{{ tank.name }}</span>
           </div>
 
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase"
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase border"
                 [ngClass]="{
-                  'bg-amber-500/20 text-amber-400 border border-amber-500/40': tank.status === 'CHARGING',
-                  'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40': tank.status === 'DISCHARGING',
-                  'bg-sky-500/20 text-sky-400 border border-sky-500/40': tank.status === 'STORED',
-                  'bg-slate-800 text-slate-400': tank.status === 'STANDBY'
+                  'bg-orange-100 text-orange-800 border-orange-300': tank.status === 'CHARGING',
+                  'bg-emerald-100 text-emerald-800 border-emerald-300': tank.status === 'DISCHARGING',
+                  'bg-blue-100 text-blue-800 border-blue-300': tank.status === 'STORED',
+                  'bg-slate-200 text-slate-600 border-slate-300': tank.status === 'STANDBY'
                 }">
             {{ tank.status }}
           </span>
         </div>
 
         <!-- Tank Physical Vessel Column -->
-        <div class="tank-column-body my-3 h-56 rounded-2xl bg-[#03070f] border border-[#142640] relative overflow-hidden flex flex-col justify-end p-1.5">
+        <div class="tank-column-body my-3 h-60 rounded-2xl bg-slate-900 border-2 border-slate-700 relative overflow-hidden flex flex-col justify-end p-2 shadow-inner">
           
-          <!-- Stratification depth lines -->
-          <div class="absolute inset-0 pointer-events-none flex flex-col justify-between p-3 z-10 opacity-30">
-            <div class="border-b border-dashed border-slate-400 w-full"><span class="text-[8px] font-mono text-slate-400">100%</span></div>
-            <div class="border-b border-dashed border-slate-400 w-full"><span class="text-[8px] font-mono text-slate-400">75%</span></div>
-            <div class="border-b border-dashed border-slate-400 w-full"><span class="text-[8px] font-mono text-slate-400">50%</span></div>
-            <div class="border-b border-dashed border-slate-400 w-full"><span class="text-[8px] font-mono text-slate-400">25%</span></div>
+          <!-- Stratification depth marks -->
+          <div class="absolute inset-0 pointer-events-none flex flex-col justify-between p-3 z-10 opacity-40">
+            <div class="border-b border-dashed border-slate-500 w-full flex justify-end"><span class="text-[8px] font-mono text-slate-400">100%</span></div>
+            <div class="border-b border-dashed border-slate-500 w-full flex justify-end"><span class="text-[8px] font-mono text-slate-400">75%</span></div>
+            <div class="border-b border-dashed border-slate-500 w-full flex justify-end"><span class="text-[8px] font-mono text-slate-400">50%</span></div>
+            <div class="border-b border-dashed border-slate-500 w-full flex justify-end"><span class="text-[8px] font-mono text-slate-400">25%</span></div>
           </div>
 
           <!-- Liquid Column with Height = fillPercentage% -->
@@ -205,7 +214,7 @@
                }">
             
             <!-- Surface wave / Meniscus -->
-            <div class="absolute top-0 inset-x-0 h-2.5 bg-white/40 blur-[1px]"></div>
+            <div class="absolute top-0 inset-x-0 h-2 bg-white/50 blur-[0.5px]"></div>
             
             <!-- Bubbles Effect when Active -->
             <div *ngIf="tank.status === 'CHARGING' || tank.status === 'DISCHARGING'" class="bubbles-fx"></div>
@@ -213,10 +222,10 @@
 
           <!-- Center Large Fill Readout -->
           <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
-            <span class="text-sm font-mono font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+            <span class="text-base font-mono font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
               {{ tank.fillPercentage | number:'1.1-1' }}%
             </span>
-            <span class="text-[10px] font-mono text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+            <span class="text-[11px] font-mono text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
               {{ tank.storedEnergyKwh }} kWh
             </span>
           </div>
@@ -224,39 +233,39 @@
         </div>
 
         <!-- Tank Telemetry & Capacity Meta -->
-        <div class="space-y-2 pt-2 border-t border-[#122238] font-mono text-xs">
+        <div class="space-y-1.5 pt-2 border-t border-slate-200 font-mono text-xs">
           
           <div class="flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">Stored:</span>
-            <span class="text-slate-100 font-bold">{{ tank.storedEnergyKwh }} kWh</span>
+            <span class="text-slate-500">Stored:</span>
+            <span class="text-slate-900 font-bold">{{ tank.storedEnergyKwh }} kWh</span>
           </div>
 
           <div class="flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">Capacity:</span>
-            <span class="text-cyan-400 font-bold">{{ tank.capacityKwh }} kWh</span>
+            <span class="text-slate-500">Capacity:</span>
+            <span class="text-blue-600 font-bold">{{ tank.capacityKwh }} kWh</span>
           </div>
 
           <div class="flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">Level:</span>
-            <span class="text-amber-400 font-bold">{{ tank.fillPercentage }}%</span>
+            <span class="text-slate-500">Level:</span>
+            <span class="text-amber-700 font-bold">{{ tank.fillPercentage }}%</span>
           </div>
 
           <div class="flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">Temp:</span>
-            <span class="text-orange-400 font-bold">{{ tank.temperatureC }} °C</span>
+            <span class="text-slate-500">Temp:</span>
+            <span class="text-orange-600 font-bold">{{ tank.temperatureC }} °C</span>
           </div>
 
           <!-- Progress Bar -->
-          <div class="w-full bg-[#030812] h-2 rounded-full overflow-hidden border border-[#122238] mt-1">
-            <div class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500"
+          <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden border border-slate-300 mt-1">
+            <div class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-500"
                  [style.width.%]="tank.fillPercentage"></div>
           </div>
 
           <!-- Manual selection mode helper button -->
-          <div *ngIf="wasteHeat.allocationMode() === 'MANUAL'" class="pt-1">
+          <div *ngIf="wasteHeat.allocationMode() === 'MANUAL'" class="pt-1.5">
             <button (click)="selectManualTank(tank.id); $event.stopPropagation()"
-                    class="w-full py-1 rounded text-[10px] font-bold uppercase transition-all"
-                    [ngClass]="wasteHeat.manualSelectedTankId() === tank.id ? 'bg-amber-500 text-black shadow-[0_0_8px_#f59e0b]' : 'bg-[#0d1c30] text-slate-300 hover:bg-[#142844]'">
+                    class="w-full py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer"
+                    [ngClass]="wasteHeat.manualSelectedTankId() === tank.id ? 'bg-orange-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'">
               {{ wasteHeat.manualSelectedTankId() === tank.id ? '✓ TARGET CHARGE TANK' : 'SELECT AS TARGET' }}
             </button>
           </div>
@@ -269,31 +278,31 @@
 
   </div>
 
-  <!-- ================= CAPACITY CONFIGURATION MODAL ================= -->
-  <div *ngIf="showCapacityModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-    <div class="modal-window w-full max-w-md bg-[#081120] border border-[#1e3b62] rounded-xl p-5 shadow-2xl space-y-4 font-mono">
+  <!-- ================= CAPACITY CONFIGURATION MODAL (WHITE THEME) ================= -->
+  <div *ngIf="showCapacityModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
+    <div class="modal-window w-full max-w-md bg-white border border-slate-200 rounded-2xl p-5 shadow-2xl space-y-4 font-mono">
       
-      <div class="flex items-center justify-between border-b border-[#142640] pb-3">
-        <div class="flex items-center gap-2 text-cyan-400">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 text-orange-600 font-bold">
           <span>⚙</span>
-          <h3 class="text-base font-bold text-slate-100">Configure Tank Capacities</h3>
+          <h3 class="text-base text-slate-900">Configure Tank Capacities</h3>
         </div>
-        <button (click)="closeCapacityModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+        <button (click)="closeCapacityModal()" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">&times;</button>
       </div>
 
-      <p class="text-xs text-slate-400 font-sans">
+      <p class="text-xs text-slate-500 font-sans">
         Set individual thermal energy storage capacities (in kWh) for each vessel in the accumulator matrix.
       </p>
 
-      <div *ngIf="capacityError" class="p-2 rounded bg-red-950/80 border border-red-500/50 text-red-300 text-xs">
+      <div *ngIf="capacityError" class="p-2.5 rounded-lg bg-red-50 border border-red-300 text-red-700 text-xs font-semibold">
         {{ capacityError }}
       </div>
 
-      <div class="space-y-3">
-        <div *ngFor="let tank of wasteHeat.tanks()" class="flex items-center justify-between gap-3 p-2.5 rounded bg-[#050c18] border border-[#14253c]">
+      <div class="space-y-2.5">
+        <div *ngFor="let tank of wasteHeat.tanks()" class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
           <div>
-            <div class="text-xs font-bold text-slate-200">{{ tank.name }}</div>
-            <div class="text-[10px] text-slate-400">{{ tank.type }}</div>
+            <div class="text-xs font-bold text-slate-900">{{ tank.name }}</div>
+            <div class="text-[10px] text-slate-500">{{ tank.type }}</div>
           </div>
           <div class="flex items-center gap-1.5">
             <input type="number" 
@@ -301,17 +310,17 @@
                    max="200" 
                    step="0.5" 
                    [(ngModel)]="tankCapacities[tank.id]" 
-                   class="w-20 px-2 py-1 rounded bg-[#081324] border border-[#1e3b62] text-right text-cyan-400 font-bold focus:outline-none focus:border-cyan-400" />
-            <span class="text-xs text-slate-400">kWh</span>
+                   class="w-20 px-2.5 py-1 rounded-md bg-white border border-slate-300 text-right text-orange-600 font-bold focus:outline-none focus:border-orange-500 shadow-xs" />
+            <span class="text-xs text-slate-500">kWh</span>
           </div>
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#142640]">
-        <button (click)="closeCapacityModal()" class="px-4 py-2 rounded bg-[#091526] hover:bg-[#0e213a] text-slate-300 text-xs">
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+        <button (click)="closeCapacityModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">
           Cancel
         </button>
-        <button (click)="saveCapacities()" class="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow">
+        <button (click)="saveCapacities()" class="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-sm cursor-pointer">
           Apply & Save Capacities
         </button>
       </div>
@@ -319,26 +328,26 @@
     </div>
   </div>
 
-  <!-- ================= RESET STORAGE CONFIRMATION MODAL ================= -->
-  <div *ngIf="showResetModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-    <div class="modal-window w-full max-w-sm bg-[#081120] border border-red-500/40 rounded-xl p-5 shadow-2xl space-y-4 font-mono text-center">
+  <!-- ================= RESET STORAGE CONFIRMATION MODAL (WHITE THEME) ================= -->
+  <div *ngIf="showResetModal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
+    <div class="modal-window w-full max-w-sm bg-white border border-red-200 rounded-2xl p-5 shadow-2xl space-y-4 font-mono text-center">
       
-      <div class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-2xl mx-auto">
+      <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-2xl mx-auto shadow-inner">
         ⚠
       </div>
 
       <div>
-        <h3 class="text-base font-bold text-slate-100">Reset Thermal Storage?</h3>
-        <p class="text-xs text-slate-400 font-sans mt-1">
-          This will restore all 4 storage tanks, heat generator controls, and consumer balances to initial factory demonstration states.
+        <h3 class="text-base font-bold text-slate-900">Reset Thermal Storage?</h3>
+        <p class="text-xs text-slate-500 font-sans mt-1 leading-relaxed">
+          This will restore all 4 storage vessels and simulation controls to initial demonstration states.
         </p>
       </div>
 
       <div class="flex items-center justify-center gap-2 pt-2">
-        <button (click)="closeResetModal()" class="px-4 py-2 rounded bg-[#091526] hover:bg-[#0e213a] text-slate-300 text-xs">
+        <button (click)="closeResetModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">
           Cancel
         </button>
-        <button (click)="confirmReset()" class="px-4 py-2 rounded bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow">
+        <button (click)="confirmReset()" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-sm cursor-pointer">
           Confirm Reset
         </button>
       </div>
