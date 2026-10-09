@@ -1,72 +1,49 @@
-<header class="heat-navbar h-[52px] bg-[#091222] border-b border-[#18283f] text-slate-200 px-3 sm:px-5 flex items-center justify-between sticky top-0 z-50 select-none">
-  
-  <!-- Left Brand & Navigation Toggle -->
-  <div class="flex items-center gap-3">
-    <!-- Hamburger Button -->
-    <button 
-      type="button" 
+<header class="heat-navbar">
+
+  <!-- Left: menu toggle + brand -->
+  <div class="nav-left">
+    <button
+      type="button"
+      class="icon-btn"
       (click)="onToggleMenu()"
       aria-label="Toggle Side Menu"
-      class="w-7 h-7 rounded bg-[#0e1b30] hover:bg-[#152744] border border-[#1e3352] text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none">
-      <i class="fa-solid fa-bars text-xs"></i>
+      title="Toggle Menu">
+      <i class="fa-solid fa-bars"></i>
     </button>
 
-    <!-- Industrial SCADA Brand Mark -->
-    <div class="w-7 h-7 rounded bg-[#132239] border border-[#22395d] text-orange-400 flex items-center justify-center flex-shrink-0">
-      <i class="fa-solid fa-fire-flame-curved text-xs"></i>
+    <div class="brand-mark" aria-hidden="true">
+      <i class="fa-solid fa-fire-flame-curved"></i>
     </div>
 
-    <!-- Title & System Node Label -->
-    <div class="flex items-center gap-2.5">
-      <h1 class="text-xs sm:text-sm font-bold tracking-wide text-slate-100 uppercase m-0 whitespace-nowrap">
-        Waste Heat Management System
-      </h1>
-      <span class="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-[#060e1a] border border-[#182942]">
-        SCADA-HMI v3.2
-      </span>
+    <div class="brand-text">
+      <h1 class="brand-title">Waste Heat Management System</h1>
+      <span class="version-chip">SCADA-HMI v3.2</span>
     </div>
   </div>
 
-  <!-- Right Actions & Live Status -->
-  <div class="flex items-center gap-2.5 sm:gap-3.5">
-    
-    <!-- System Status Online Indicator -->
-    <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-[#060e1a] border border-[#182942] text-xs font-mono">
-      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span class="text-emerald-400 font-bold text-[11px] tracking-wider">SYSTEM ONLINE</span>
-      <span class="hidden sm:inline text-slate-600">|</span>
-      <span class="hidden sm:inline text-slate-400 text-[10px]">GATEWAY 01</span>
+  <!-- Right: status, time, operator -->
+  <div class="nav-right">
+
+    <div class="chip status-chip">
+      <span class="pulse-dot"></span>
+      <span class="status-text">SYSTEM ONLINE</span>
+      <span class="chip-divider"></span>
+      <span class="chip-sub">GATEWAY 01</span>
     </div>
 
-    <!-- Live Date and Time -->
-    <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#060e1a] border border-[#182942] text-[11px] font-mono text-slate-400">
-      <i class="fa-regular fa-clock text-slate-500 text-[10px]"></i>
+    <div class="chip time-chip">
+      <i class="fa-regular fa-clock"></i>
       <span>{{ currentTime }}</span>
     </div>
 
-    <!-- Dark Mode Toggle Button -->
-    <button 
+    <button
       type="button"
-      (click)="toggleTheme()"
-      title="Toggle Theme"
-      class="px-2.5 py-1 rounded bg-[#0e1b30] hover:bg-[#152744] border border-[#1e3352] text-slate-300 hover:text-white text-[11px] font-mono flex items-center gap-1.5 transition-colors focus:outline-none">
-      <i class="fa-solid fa-moon text-[10px] text-sky-400"></i>
-      <span class="hidden sm:inline font-semibold">DARK</span>
-    </button>
-
-    <!-- User Profile / Operator Session -->
-    <button 
-      type="button"
+      class="operator-btn"
       (click)="logout()"
-      title="Sign Out / Operator Control"
-      class="flex items-center gap-2 px-2 py-1 rounded bg-[#0e1b30] hover:bg-[#162744] border border-[#1e3352] text-slate-300 hover:text-white transition-colors focus:outline-none group">
-      <div class="w-5 h-5 rounded bg-orange-600/20 border border-orange-500/40 text-orange-400 flex items-center justify-center text-[9px] font-mono font-bold">
-        OP
-      </div>
-      <span class="hidden sm:inline text-[11px] font-mono font-semibold text-slate-300 group-hover:text-white">
-        OP-8820
-      </span>
-      <i class="fa-solid fa-arrow-right-from-bracket text-[10px] text-slate-500 group-hover:text-red-400 ml-0.5"></i>
+      title="Sign Out / Operator Control">
+      <span class="operator-avatar">OP</span>
+      <span class="operator-id">OP-8820</span>
+      <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
     </button>
 
   </div>

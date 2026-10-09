@@ -1,99 +1,83 @@
-<div class="dashboard-page space-y-4 font-sans">
-  
-  <!-- Operations Header Bar -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#16253c] pb-3">
-    <div>
-      <div class="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<div class="dashboard-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-text">
+      <div class="eyebrow">
+        <span class="live-dot"></span>
         <span>SCADA Facility Operations Control &bull; Zone A</span>
       </div>
-      <h2 class="text-lg sm:text-xl font-bold text-slate-100 tracking-tight mt-0.5">
-        Thermal Telemetry & Operations Center
-      </h2>
+      <h2 class="page-title">Thermal Telemetry &amp; Operations Center</h2>
     </div>
-    
-    <div class="flex items-center gap-2 font-mono">
-      <span class="px-2.5 py-1 rounded bg-[#07101e] border border-[#172840] text-[11px] text-slate-300">
-        GATEWAY: <strong class="text-emerald-400">NORMAL</strong>
+
+    <div class="header-actions">
+      <span class="gateway-chip">
+        Gateway: <strong>NORMAL</strong>
       </span>
-      <a routerLink="/heatmanagement/data-server" class="px-3 py-1 rounded bg-[#10233d] hover:bg-[#183257] border border-[#1e3d67] text-[11px] font-bold text-sky-400 hover:text-sky-300 transition flex items-center gap-1.5">
-        <i class="fa-solid fa-server text-[10px]"></i>
-        <span>DATA SERVER SCADA</span>
+      <a routerLink="/heatmanagement/data-server" class="primary-link">
+        <i class="fa-solid fa-server"></i>
+        <span>Data Server SCADA</span>
       </a>
     </div>
   </div>
 
-  <!-- Key Telemetry Stat Grid (4 Metrics) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-    <div *ngFor="let stat of stats" class="bg-[#0a1324] border border-[#182a44] rounded p-3.5 flex flex-col justify-between">
-      <div class="flex items-center justify-between font-mono">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ stat.title }}</span>
-        <div class="w-6 h-6 rounded bg-[#070e1c] border border-[#15233a] flex items-center justify-center text-xs"
-             [ngClass]="{
-               'text-orange-400': stat.color === 'orange',
-               'text-red-400': stat.color === 'red',
-               'text-amber-400': stat.color === 'amber',
-               'text-emerald-400': stat.color === 'emerald'
-             }">
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div
+      *ngFor="let stat of stats; let i = index"
+      class="stat-card"
+      [style.--i]="i"
+      [ngClass]="'tone-' + stat.color">
+
+      <div class="stat-top">
+        <span class="stat-title">{{ stat.title }}</span>
+        <div class="stat-icon">
           <i class="fa-solid {{ stat.icon }}"></i>
         </div>
       </div>
-      <div class="mt-2 font-mono">
-        <div class="text-xl font-bold text-slate-100 tracking-tight">{{ stat.value }}</div>
-        <div class="text-[10px] text-emerald-400 mt-0.5 flex items-center gap-1">
-          <i class="fa-solid fa-arrow-trend-up text-[8px]"></i>
+
+      <div class="stat-body">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-change">
+          <i class="fa-solid fa-arrow-trend-up"></i>
           <span>{{ stat.change }}</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Active Furnaces SCADA Table Panel -->
-  <div class="bg-[#0a1324] border border-[#182a44] rounded overflow-hidden">
-    <div class="p-3 border-b border-[#14233a] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-      <div class="flex items-center gap-2 font-mono">
-        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-        <h3 class="text-xs font-bold text-slate-100 uppercase tracking-wide">
-          Active Furnace & Thermal Processing Units
-        </h3>
+  <!-- Furnace table -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">
+        <span class="panel-dot"></span>
+        <h3>Active Furnace &amp; Thermal Processing Units</h3>
       </div>
-      <span class="text-[10px] font-mono text-slate-400 bg-[#070e1c] px-2 py-0.5 rounded border border-[#15233a]">
-        AUTO-REFRESH: 5S &bull; 5 CHANNELS ONLINE
-      </span>
+      <span class="refresh-chip">Auto-refresh: 5s &bull; 5 channels online</span>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse text-xs font-mono">
+    <div class="table-wrap">
+      <table class="data-table">
         <thead>
-          <tr class="border-b border-[#14233a] bg-[#070e1c] text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            <th class="py-2.5 px-4">Channel ID</th>
-            <th class="py-2.5 px-4 font-sans">Unit Description</th>
-            <th class="py-2.5 px-4">Core Temp</th>
-            <th class="py-2.5 px-4">Set Point</th>
-            <th class="py-2.5 px-4">Power Load</th>
-            <th class="py-2.5 px-4 text-right">Status</th>
+          <tr>
+            <th>Channel ID</th>
+            <th>Unit Description</th>
+            <th>Core Temp</th>
+            <th>Set Point</th>
+            <th>Power Load</th>
+            <th class="right">Status</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[#14233a] text-slate-300">
-          <tr *ngFor="let unit of furnaceUnits" class="hover:bg-[#0c182c] transition-colors">
-            <td class="py-2.5 px-4 font-bold text-amber-400">{{ unit.id }}</td>
-            <td class="py-2.5 px-4 font-sans font-medium text-slate-200">{{ unit.name }}</td>
-            <td class="py-2.5 px-4">
-              <span class="font-bold text-slate-100">{{ unit.temp }}</span>
-            </td>
-            <td class="py-2.5 px-4 text-slate-400">{{ unit.target }}</td>
-            <td class="py-2.5 px-4 text-slate-300">{{ unit.power }}</td>
-            <td class="py-2.5 px-4 text-right">
-              <span *ngIf="unit.state === 'normal'" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#061814] text-emerald-400 border border-emerald-500/30">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                {{ unit.status }}
-              </span>
-              <span *ngIf="unit.state === 'cooling'" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#071526] text-sky-400 border border-sky-500/30">
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                {{ unit.status }}
-              </span>
-              <span *ngIf="unit.state === 'standby'" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#0f141f] text-slate-400 border border-slate-600/30">
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+        <tbody>
+          <tr *ngFor="let unit of furnaceUnits">
+            <td class="cell-id">{{ unit.id }}</td>
+            <td class="cell-name">{{ unit.name }}</td>
+            <td class="cell-temp">{{ unit.temp }}</td>
+            <td class="cell-muted">{{ unit.target }}</td>
+            <td>{{ unit.power }}</td>
+            <td class="right">
+              <span class="badge" [ngClass]="'badge-' + unit.state">
+                <span class="badge-dot"></span>
                 {{ unit.status }}
               </span>
             </td>

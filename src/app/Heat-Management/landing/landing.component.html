@@ -1,5 +1,5 @@
 <!-- Standalone Login Route View -->
-<div *ngIf="isLoginPage" class="min-h-screen bg-[#060c16]">
+<div *ngIf="isLoginPage" class="min-h-screen w-full">
   <router-outlet></router-outlet>
 </div>
 
@@ -17,7 +17,7 @@
     <!-- Left Side Menu Bar -->
     <app-side-menu-bar 
       [isCollapsed]="isSidebarCollapsed" 
-      (collapseChange)="isSidebarCollapsed = $event">
+      (toggleCollapse)="toggleSidebar()">
     </app-side-menu-bar>
 
     <!-- Right Main Route Content -->

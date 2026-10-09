@@ -1,60 +1,81 @@
-<aside 
-  class="heat-sidebar bg-[#070e1a] border-r border-[#152338] flex flex-col transition-all duration-200 select-none"
-  [ngClass]="isCollapsed ? 'w-14' : 'w-56'">
+<aside
+  class="left-sidebar"
+  [class.collapsed]="isCollapsed"
+  aria-label="Admin Navigation Sidebar">
 
-  <!-- Top Menu Bar Header with Toggle -->
-  <div class="h-10 flex items-center px-3 border-b border-[#152338]" [ngClass]="isCollapsed ? 'justify-center' : 'justify-between'">
-    <span *ngIf="!isCollapsed" class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500">
-      Navigation
-    </span>
-
-    <button 
+  <div class="sidebar-top-row">
+    <span class="sidebar-top-title" *ngIf="!isCollapsed">MENU</span>
+    <button
       type="button"
-      (click)="toggleCollapse()"
-      [title]="isCollapsed ? 'Expand Navigation' : 'Collapse Navigation'"
-      class="w-6 h-6 rounded bg-[#0b1626] hover:bg-[#12233c] border border-[#1b2b42] text-slate-400 hover:text-slate-200 flex items-center justify-center transition-colors focus:outline-none">
-      <i class="fa-solid text-[10px]" [ngClass]="isCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+      class="sidebar-toggle-action-btn"
+      (click)="onToggle()"
+      [title]="isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
+      aria-label="Toggle Sidebar Navigation">
+      <svg class="chevron" [class.flipped]="isCollapsed" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
     </button>
   </div>
 
-  <!-- Menu Navigation Links -->
-  <nav class="flex-1 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
-    <a 
-      *ngFor="let item of menuItems"
+  <nav class="nav-menu">
+    <a
+      *ngFor="let item of navItems; let i = index"
       [routerLink]="item.route"
-      routerLinkActive="active-menu-item"
-      [routerLinkActiveOptions]="{ exact: false }"
-      [title]="isCollapsed ? item.label : ''"
-      class="menu-link group flex items-center gap-3 px-3.5 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-[#0b1628] border-l-2 border-transparent transition-colors font-medium text-xs"
-      [ngClass]="isCollapsed ? 'justify-center px-0 py-3' : ''">
-      
-      <!-- Icon -->
-      <div class="w-4 h-4 flex items-center justify-center flex-shrink-0 text-xs text-slate-400 group-hover:text-slate-200">
-        <i [class]="item.icon"></i>
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+      (click)="onNavClick()"
+      class="nav-link"
+      [attr.data-icon]="item.icon"
+      [style.--i]="i"
+      [attr.aria-label]="item.label">
+
+      <div class="nav-icon-box">
+        <!-- Home (Dashboard) -->
+        <svg *ngIf="item.icon === 'home'" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+
+        <!-- Server (Data Server) -->
+        <svg *ngIf="item.icon === 'server'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        </svg>
+
+        <!-- Thermal Storage / Tank -->
+        <svg *ngIf="item.icon === 'cylinder'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="4" width="14" height="17" rx="3"></rect>
+          <line x1="10" y1="2" x2="14" y2="2"></line>
+          <line x1="9" y1="10" x2="15" y2="10"></line>
+          <line x1="9" y1="14" x2="15" y2="14"></line>
+        </svg>
+
+        <!-- Heat Consumers / Industrial Offtaker -->
+        <svg *ngIf="item.icon === 'consumer'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4H2z"></path>
+          <path d="M17 18h1"></path>
+          <path d="M12 18h1"></path>
+          <path d="M7 18h1"></path>
+        </svg>
+
+        <!-- Reports / Analytics -->
+        <svg *ngIf="item.icon === 'reports'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+
+        <!-- Settings Gear -->
+        <svg *ngIf="item.icon === 'settings'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
       </div>
 
-      <!-- Label text (hidden when collapsed) -->
-      <span *ngIf="!isCollapsed" class="tracking-wide whitespace-nowrap text-xs">
-        {{ item.label }}
-      </span>
+      <!-- Label (expanded) -->
+      <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+
+      <!-- Tooltip (collapsed, on hover) -->
+      <span class="nav-tooltip" *ngIf="isCollapsed">{{ item.label }}</span>
     </a>
   </nav>
-
-  <!-- Sidebar Footer Note / Status -->
-  <div class="p-2.5 border-t border-[#152338]" *ngIf="!isCollapsed">
-    <div class="p-2 rounded bg-[#050c17] border border-[#14233a] text-[10px] font-mono text-slate-400 space-y-0.5">
-      <div class="flex items-center justify-between">
-        <span class="text-slate-500">GATEWAY</span>
-        <span class="text-emerald-400 font-semibold flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          CONNECTED
-        </span>
-      </div>
-      <div class="flex items-center justify-between text-slate-500 text-[9px]">
-        <span>PROTOCOL</span>
-        <span>IEC 61850</span>
-      </div>
-    </div>
-  </div>
-
 </aside>
