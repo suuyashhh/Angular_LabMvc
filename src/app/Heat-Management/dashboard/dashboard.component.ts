@@ -21,6 +21,26 @@ export class DashboardComponent {
     return circumference - (percentage / 100) * circumference;
   }
 
+  get activeChargingTank(): Tank | null {
+    return this.wasteHeat.activeChargingTank();
+  }
+
+  get activeDischargingTanks(): Tank[] {
+    return this.wasteHeat.tanks().filter(t => t.status === 'DISCHARGING');
+  }
+
+  get activeSupplyingConsumers(): Consumer[] {
+    return this.wasteHeat.consumers().filter(c => c.status === 'RECEIVING');
+  }
+
+  getConsumersSuppliedByTank(tankId: number): Consumer[] {
+    return this.wasteHeat.consumers().filter(c => c.status === 'RECEIVING' && c.activeSourceTankId === tankId);
+  }
+
+  isTankSupplyingAnyConsumer(tankId: number): boolean {
+    return this.getConsumersSuppliedByTank(tankId).length > 0;
+  }
+
   setHeatPreset(kw: number): void {
     this.wasteHeat.setHeatOutput(kw);
   }

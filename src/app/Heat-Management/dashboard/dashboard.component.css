@@ -1,133 +1,95 @@
-/* SCADA Dashboard Container */
+/* ==========================================================================
+   SCADA DASHBOARD & SYNOPTIC PIPELINE FLOW (COMPACT NON-SCROLLABLE FIT)
+   ========================================================================== */
+
 .scada-dashboard {
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
-/* Top KPI Cards */
+/* 1. Top KPI Cards */
 .kpi-card {
-  background: #081120;
-  border: 1px solid #14243b;
-  border-radius: 8px;
-  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   transition: all 0.25s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .kpi-card:hover {
-  border-color: #1e3a60;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.kpi-card.active-glow {
-  border-color: rgba(245, 158, 11, 0.4);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
+.kpi-card.active-glow-amber {
+  border-color: #fdba74;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.15);
+}
+
+.kpi-card.active-glow-emerald {
+  border-color: #86efac;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
 }
 
 .kpi-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: #64748b;
   text-transform: uppercase;
+  line-height: 1.1;
 }
 
 .kpi-value {
-  font-size: 20px;
   font-weight: 800;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  margin-top: 2px;
+  margin-top: 1px;
+  line-height: 1.2;
 }
 
 .kpi-value .unit {
-  font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .kpi-icon-box {
-  width: 32px;
-  height: 32px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.kpi-subtext {
-  font-size: 10px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  flex-shrink: 0;
 }
 
 .kpi-preset-btn {
-  font-size: 10px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-weight: 600;
-  padding: 2px 6px;
+  font-weight: 700;
   border-radius: 4px;
-  background: #050c18;
-  border: 1px solid #142338;
-  color: #94a3b8;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .kpi-preset-btn:hover {
-  background: #0f1f35;
-  color: #f8fafc;
-  border-color: #244169;
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
 }
 
 .kpi-preset-btn.preset-active {
-  background: #78350f;
-  color: #fde68a;
-  border-color: #d97706;
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fdba74;
 }
 
-/* SCADA Panels */
-.scada-panel {
-  background: #081120;
-  border: 1px solid #14243b;
-  border-radius: 10px;
-}
-
-.scada-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: #0c182b;
-  border: 1px solid #1a2f4c;
-  color: #94a3b8;
-}
-
-.scada-badge.badge-producing {
-  background: #2a1408;
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #fbbf24;
-}
-
-/* Server visual styles */
+/* 2. Server Fan & Ambient Radiance */
 .heat-radiance-glow {
   position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(245, 158, 11, 0.25) 0%, rgba(220, 38, 38, 0.08) 45%, transparent 70%);
+  inset: -10px;
+  background: radial-gradient(circle at center, rgba(249, 115, 22, 0.18) 0%, rgba(220, 38, 38, 0.04) 50%, transparent 70%);
   pointer-events: none;
   transition: opacity 0.5s ease;
-}
-
-.heat-grille span {
-  background: #1e293b;
-  transition: background 0.3s;
-}
-
-.grille-hot span {
-  background: #f59e0b;
-  box-shadow: 0 0 4px #f59e0b;
 }
 
 .fan-spin {
@@ -139,84 +101,123 @@
   to { transform: rotate(360deg); }
 }
 
-/* Top Hot Supply Pipe */
-.hot-fluid-flow.flow-active {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #f59e0b, #ef4444, #f59e0b);
-  background-size: 200% 100%;
-  animation: fluidFlow 1.5s linear infinite;
+/* 3. S-Curve Animated Pipeline Streams */
+.pipe-base-glow-orange-light {
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.35));
 }
 
-@keyframes fluidFlow {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+.pipe-base-glow-emerald-light {
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.35));
 }
 
-/* Tank Vessel Cards */
-.tank-vessel-card {
-  transition: transform 0.2s ease;
+.animate-flow-fast {
+  animation: dashFlow 1.2s linear infinite;
 }
 
-.tank-vessel-card:hover {
-  transform: translateY(-2px);
+@keyframes dashFlow {
+  from { stroke-dashoffset: 22; }
+  to { stroke-dashoffset: 0; }
 }
 
-.tank-charging-border {
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+/* 4. Tank Vessel Capsule Cards */
+.tank-chassis-card {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.2s ease;
 }
 
-.tank-discharging-border {
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+.tank-chassis-card:hover {
+  border-color: #cbd5e1;
 }
 
-.liquid-charging {
-  background: linear-gradient(180deg, #f97316 0%, #ea580c 40%, #c2410c 100%);
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+.neon-charging-glow-light {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.3) !important;
+  background-color: rgba(255, 247, 237, 0.6) !important;
 }
 
-.liquid-discharging {
-  background: linear-gradient(180deg, #10b981 0%, #059669 40%, #047857 100%);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+.neon-discharging-glow-light {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3) !important;
+  background-color: rgba(240, 253, 244, 0.6) !important;
 }
 
-.liquid-stored {
+.neon-idle-border-light {
+  border-color: #e2e8f0;
+}
+
+/* 5. Fluid States */
+.liquid-charging-neon {
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 45%, #c2410c 100%);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
+}
+
+.liquid-discharging-neon {
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 35%, #059669 70%, #047857 100%);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+}
+
+.liquid-stored-neon {
   background: linear-gradient(180deg, #ea580c 0%, #c2410c 60%, #9a3412 100%);
 }
 
-.liquid-standby {
-  background: #1e293b;
+.liquid-standby-neon {
+  background: #334155;
 }
 
-.bubbles-overlay {
+.bubbles-fx-dark {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 1px, transparent 1px);
-  background-size: 8px 8px;
-  animation: bubblesUp 2s linear infinite;
-  opacity: 0.6;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.7) 1px, transparent 1px);
+  background-size: 6px 6px;
+  animation: bubblesUp 1.8s linear infinite;
+  opacity: 0.65;
 }
 
 @keyframes bubblesUp {
   0% { background-position: 0 0; }
-  100% { background-position: 0 -24px; }
+  100% { background-position: 0 -18px; }
 }
 
-/* Consumers card border */
-.consumer-supplying-border {
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+/* 6. Active Charging Jet Drop */
+.active-charging-jet {
+  animation: dropPulse 0.8s ease-in-out infinite alternate;
 }
 
+@keyframes dropPulse {
+  0% { height: 10px; opacity: 0.6; }
+  100% { height: 20px; opacity: 1; }
+}
+
+/* 7. Consumers Card Active State */
+.consumer-card-supplying-light {
+  border-color: #10b981 !important;
+  background-color: rgba(240, 253, 244, 0.6) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* 8. Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #040914;
+  background: #f1f5f9;
+  border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #14243b;
+  background: #cbd5e1;
   border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 9. Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .fan-spin,
+  .animate-flow-fast,
+  .bubbles-fx-dark,
+  .active-charging-jet {
+    animation: none !important;
+  }
 }
