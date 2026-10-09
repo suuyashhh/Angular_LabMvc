@@ -22,7 +22,7 @@
       *ngFor="let item of navItems; let i = index"
       [routerLink]="item.route"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+      [routerLinkActiveOptions]="{ exact: false }"
       (click)="onNavClick()"
       class="nav-link"
       [attr.data-icon]="item.icon"

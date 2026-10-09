@@ -30,37 +30,37 @@ export class SideMenuBarComponent {
       id: 'dashboard',
       label: 'Dashboard',
       icon: 'home',
-      route: '/dashboard'
+      route: '/heatmanagement/dashboard'
     },
     {
       id: 'data-server',
       label: 'Data Server',
       icon: 'server',
-      route: '/data-server'
+      route: '/heatmanagement/data-server'
     },
     {
       id: 'thermal-storage',
       label: 'Thermal Storage',
       icon: 'cylinder',
-      route: '/thermal-storage'
+      route: '/heatmanagement/thermal-storage'
     },
     {
       id: 'heat-consumers',
       label: 'Heat Consumers',
       icon: 'consumer',
-      route: '/heat-consumers'
+      route: '/heatmanagement/heat-consumers'
     },
     {
       id: 'reports',
       label: 'Reports',
       icon: 'reports',
-      route: '/reports'
+      route: '/heatmanagement/reports'
     },
     {
       id: 'settings',
       label: 'Settings',
       icon: 'settings',
-      route: '/settings'
+      route: '/heatmanagement/settings'
     }
   ];
 
