@@ -1,5 +1,7 @@
 import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface Tank {
   id: number;
@@ -170,6 +172,8 @@ const STORAGE_KEY = 'waste_heat_scada_state_v2';
 })
 export class WasteHeatService {
   private platformId = inject(PLATFORM_ID);
+  private http = inject(HttpClient);
+  private apiBaseUrl = environment.baseUrl;
 
   // --- Core State Signals ---
   readonly heatOutputKw = signal<number>(1.0);
@@ -186,6 +190,15 @@ export class WasteHeatService {
 
   // --- Consumers Signal ---
   readonly consumers = signal<Consumer[]>(INITIAL_CONSUMERS);
+
+  // --- Database Persistence State ---
+  readonly isLoadingFromDb = signal<boolean>(false);
+  readonly dbLoadError = signal<string | null>(null);
+  private _dbInitialized = false;
+  private _lastSavedStateHash: string = '';
+  private _autoSaveInterval: any = null;
+  private _isSaving = false;
+  private _pendingImmediateSave = false;
 
   // --- Computed SCADA KPIs ---
   readonly temperatureC = computed(() => {
@@ -261,9 +274,212 @@ export class WasteHeatService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this.loadFromLocalStorage();
-      this.startSimulationLoop();
+      this.initializeFromDatabase();
     }
+  }
+
+  // ==========================================
+  // DATABASE INITIALIZATION (replaces localStorage load)
+  // ==========================================
+
+  /**
+   * Called once on service construction in the browser.
+   * Fetches the latest simulation state from the database.
+   * If the database is empty, uses INITIAL defaults and saves them.
+   * Falls back to localStorage if the API is unreachable.
+   */
+  private initializeFromDatabase(): void {
+    if (this._dbInitialized) return;
+    this._dbInitialized = true;
+    this.isLoadingFromDb.set(true);
+    this.dbLoadError.set(null);
+
+    this.http.get<any>(`${this.apiBaseUrl}WastHeatSimulation/GetState`).subscribe({
+      next: (state) => {
+        if (state && state.tanks_json) {
+          this.applyDatabaseState(state);
+          console.log('[WasteHeat] ✅ State restored from database');
+        } else {
+          // Database is empty (204 NoContent returned as null body)
+          // Initialize with defaults and save initial state to DB
+          console.log('[WasteHeat] 📋 No saved state found, initializing with defaults');
+          this.saveToDatabase(true);
+        }
+        this.isLoadingFromDb.set(false);
+        this.startSimulationLoop();
+        this.startAutoSaveTimer();
+      },
+      error: (err) => {
+        console.warn('[WasteHeat] ⚠️ API unreachable, falling back to localStorage', err);
+        this.dbLoadError.set('API unreachable. Using local data.');
+        this.loadFromLocalStorage();
+        this.isLoadingFromDb.set(false);
+        this.startSimulationLoop();
+        this.startAutoSaveTimer();
+      }
+    });
+  }
+
+  /**
+   * Apply the database state snapshot to all Angular signals.
+   */
+  private applyDatabaseState(state: any): void {
+    try {
+      if (state.heat_output_kw !== undefined) this.heatOutputKw.set(state.heat_output_kw);
+      if (state.duration_seconds !== undefined) this.durationSeconds.set(state.duration_seconds);
+      if (state.allocation_mode) this.allocationMode.set(state.allocation_mode as AllocationMode);
+      if (state.simulation_speed !== undefined) this.simulationSpeed.set(state.simulation_speed);
+      if (state.is_simulating !== undefined) this.isSimulating.set(state.is_simulating);
+      if (state.manual_selected_tank_id !== undefined) this.manualSelectedTankId.set(state.manual_selected_tank_id);
+
+      // Parse priority_order from comma-separated string
+      if (state.priority_order) {
+        const order = state.priority_order.split(',').map((s: string) => parseInt(s.trim(), 10)).filter((n: number) => !isNaN(n));
+        if (order.length === 4) {
+          this.priorityOrder.set(order);
+        }
+      }
+
+      // Parse tanks from JSON
+      if (state.tanks_json) {
+        const tanks = typeof state.tanks_json === 'string' ? JSON.parse(state.tanks_json) : state.tanks_json;
+        if (Array.isArray(tanks) && tanks.length > 0) {
+          this.tanks.set(tanks);
+        }
+      }
+
+      // Parse consumers from JSON
+      if (state.consumers_json) {
+        const consumers = typeof state.consumers_json === 'string' ? JSON.parse(state.consumers_json) : state.consumers_json;
+        if (Array.isArray(consumers) && consumers.length > 0) {
+          this.consumers.set(consumers);
+        }
+      }
+
+      // Resolve charging state from loaded data
+      this.resolveChargingState();
+
+      // Snapshot the current hash so the first auto-save interval doesn't fire unnecessarily
+      this._lastSavedStateHash = this.computeStateHash();
+    } catch (e) {
+      console.error('[WasteHeat] Failed to apply database state', e);
+    }
+  }
+
+  // ==========================================
+  // DATABASE PERSISTENCE (auto-save every 10s)
+  // ==========================================
+
+  /**
+   * Start the 10-second auto-save interval.
+   * Only saves if the state hash has changed since the last save.
+   */
+  private startAutoSaveTimer(): void {
+    if (this._autoSaveInterval) clearInterval(this._autoSaveInterval);
+
+    this._autoSaveInterval = setInterval(() => {
+      this.saveIfChanged();
+    }, 10000); // every 10 seconds
+  }
+
+  /**
+   * Compute a lightweight hash of the current simulation state
+   * for change detection without deep comparison.
+   */
+  private computeStateHash(): string {
+    try {
+      const stateObj = {
+        h: this.heatOutputKw(),
+        d: this.durationSeconds(),
+        a: this.allocationMode(),
+        p: this.priorityOrder().join(','),
+        m: this.manualSelectedTankId(),
+        ac: this.activeChargingTankId(),
+        sp: this.simulationSpeed(),
+        is: this.isSimulating(),
+        t: this.tanks().map(t => `${t.id}:${t.storedEnergyKwh.toFixed(2)}:${t.capacityKwh}:${t.status}`).join('|'),
+        c: this.consumers().map(c => `${c.id}:${c.status}:${c.deliveredEnergyKwh.toFixed(2)}:${c.deliveryRateKw}:${c.preferredTankId}:${c.activeSourceTankId}`).join('|')
+      };
+      return JSON.stringify(stateObj);
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Only save to DB if state has actually changed.
+   * Prevents overlapping save requests.
+   */
+  private saveIfChanged(): void {
+    if (this._isSaving) return;
+
+    const currentHash = this.computeStateHash();
+    if (currentHash === this._lastSavedStateHash) return;
+
+    this.saveToDatabase(false);
+  }
+
+  /**
+   * Immediately trigger a save for important manual changes
+   * (e.g., user selects a tank, toggles supply, changes allocation mode).
+   * Debounces if already saving to prevent overlapping requests.
+   */
+  private saveImmediately(): void {
+    if (this._isSaving) {
+      // Mark as pending, will execute after current save completes
+      this._pendingImmediateSave = true;
+      return;
+    }
+    this.saveToDatabase(false);
+  }
+
+  /**
+   * Send current simulation snapshot to the database via POST API.
+   * Also saves to localStorage as fallback.
+   */
+  private saveToDatabase(isInitialSave: boolean): void {
+    this._isSaving = true;
+
+    const payload = {
+      heat_output_kw: this.heatOutputKw(),
+      duration_seconds: this.durationSeconds(),
+      allocation_mode: this.allocationMode(),
+      priority_order: this.priorityOrder().join(','),
+      manual_selected_tank_id: this.manualSelectedTankId(),
+      active_charging_tank_id: this.activeChargingTankId(),
+      simulation_speed: this.simulationSpeed(),
+      is_simulating: this.isSimulating(),
+      tanks_json: JSON.stringify(this.tanks()),
+      consumers_json: JSON.stringify(this.consumers())
+    };
+
+    this.http.post<any>(`${this.apiBaseUrl}WastHeatSimulation/SaveState`, payload).subscribe({
+      next: () => {
+        this._lastSavedStateHash = this.computeStateHash();
+        this._isSaving = false;
+
+        if (isInitialSave) {
+          console.log('[WasteHeat] ✅ Initial defaults saved to database');
+        }
+
+        // If a save was requested while we were busy, execute it now
+        if (this._pendingImmediateSave) {
+          this._pendingImmediateSave = false;
+          const newHash = this.computeStateHash();
+          if (newHash !== this._lastSavedStateHash) {
+            this.saveToDatabase(false);
+          }
+        }
+      },
+      error: (err) => {
+        console.warn('[WasteHeat] ⚠️ Failed to save to database, data preserved in localStorage', err);
+        this._isSaving = false;
+        this._pendingImmediateSave = false;
+      }
+    });
+
+    // Always keep localStorage in sync as a backup
+    this.saveToLocalStorage();
   }
 
   // --- Data Server Actions ---
@@ -271,11 +487,13 @@ export class WasteHeatService {
     const clamped = Math.max(0, Math.min(5.0, Number(kw) || 0));
     this.heatOutputKw.set(clamped);
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   setDuration(seconds: number): void {
     this.durationSeconds.set(seconds);
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   // --- Storage Controls & Configuration ---
@@ -283,6 +501,7 @@ export class WasteHeatService {
     this.allocationMode.set(mode);
     this.resolveChargingState();
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   selectManualTank(tankId: number): void {
@@ -310,6 +529,7 @@ export class WasteHeatService {
     this.updateTankStatusesImmediately(tankId);
 
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   private updateTankStatusesImmediately(chargingId: number | null): void {
@@ -379,6 +599,7 @@ export class WasteHeatService {
         this.resolveChargingState();
       }
       this.saveToLocalStorage();
+      this.saveImmediately();
     }
   }
 
@@ -399,6 +620,7 @@ export class WasteHeatService {
     );
     this.resolveChargingState();
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   resetStorage(): void {
@@ -412,6 +634,7 @@ export class WasteHeatService {
     this.priorityOrder.set([1, 2, 3, 4]);
     this.resolveChargingState();
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   setSimulationSpeed(speed: number): void {
@@ -458,6 +681,7 @@ export class WasteHeatService {
       })
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   pauseSupply(consumerId: string): void {
@@ -470,6 +694,7 @@ export class WasteHeatService {
       })
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   stopSupply(consumerId: string): void {
@@ -482,6 +707,7 @@ export class WasteHeatService {
       })
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   setConsumerDeliveryRate(consumerId: string, rateKw: number): void {
@@ -490,6 +716,7 @@ export class WasteHeatService {
       list.map(c => (c.id === consumerId ? { ...c, deliveryRateKw: clamped } : c))
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   setConsumerPreferredTank(consumerId: string, tankId: number | 'AUTO'): void {
@@ -506,6 +733,7 @@ export class WasteHeatService {
       })
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   toggleConsumerAutoSource(consumerId: string): void {
@@ -522,6 +750,7 @@ export class WasteHeatService {
       })
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   addConsumer(data: Partial<Consumer>): void {
@@ -548,6 +777,7 @@ export class WasteHeatService {
 
     this.consumers.update(list => [newConsumer, ...list]);
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   updateConsumer(consumerId: string, data: Partial<Consumer>): void {
@@ -569,11 +799,13 @@ export class WasteHeatService {
       })
     );
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   deleteConsumer(consumerId: string): void {
     this.consumers.update(list => list.filter(c => c.id !== consumerId));
     this.saveToLocalStorage();
+    this.saveImmediately();
   }
 
   getTank(tankId: number): Tank | undefined {
@@ -723,7 +955,7 @@ export class WasteHeatService {
     this.consumers.set(currentConsumers);
   }
 
-  // --- Persistence ---
+  // --- Persistence (localStorage as fallback) ---
   private saveToLocalStorage(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     try {
