@@ -281,12 +281,93 @@ export class WasteHeatService {
   // --- Storage Controls & Configuration ---
   setAllocationMode(mode: AllocationMode): void {
     this.allocationMode.set(mode);
+    this.resolveChargingState();
     this.saveToLocalStorage();
   }
 
   selectManualTank(tankId: number): void {
+    const target = this.tanks().find(t => t.id === tankId);
+    if (!target) return;
+
+    // Do not allow charging a tank that has reached maximum capacity
+    if (target.fillPercentage >= 99.8 || target.storedEnergyKwh >= target.capacityKwh - 0.01) {
+      return;
+    }
+
+    // Switch to manual mode automatically
+    this.allocationMode.set('MANUAL');
     this.manualSelectedTankId.set(tankId);
+
+    // If heat output is zero, ensure positive heat output (1.0 kW) so heat begins storing
+    if (this.heatOutputKw() <= 0) {
+      this.heatOutputKw.set(1.0);
+    }
+
+    // Set active charging tank destination
+    this.activeChargingTankId.set(tankId);
+
+    // Update tank status flags immediately without waiting for next simulation tick
+    this.updateTankStatusesImmediately(tankId);
+
     this.saveToLocalStorage();
+  }
+
+  private updateTankStatusesImmediately(chargingId: number | null): void {
+    const dischargingTankIds = new Set(
+      this.consumers()
+        .filter(c => c.status === 'RECEIVING' && c.activeSourceTankId !== null)
+        .map(c => c.activeSourceTankId!)
+    );
+
+    this.tanks.update(tanks =>
+      tanks.map(t => {
+        const isCharging = t.id === chargingId;
+        const isDischarging = dischargingTankIds.has(t.id);
+
+        let newStatus: Tank['status'];
+        if (isCharging) {
+          newStatus = t.fillPercentage >= 99.8 ? 'FULL' : 'CHARGING';
+        } else if (isDischarging) {
+          newStatus = 'DISCHARGING';
+        } else if (t.fillPercentage >= 99.5) {
+          newStatus = 'FULL';
+        } else if (t.fillPercentage <= 0.5) {
+          newStatus = 'STANDBY';
+        } else {
+          newStatus = 'STORED';
+        }
+
+        return { ...t, status: newStatus };
+      })
+    );
+  }
+
+  private resolveChargingState(): void {
+    const heatKw = this.heatOutputKw();
+    const currentTanks = this.tanks();
+    let chargingTankId: number | null = null;
+
+    if (heatKw > 0) {
+      if (this.allocationMode() === 'MANUAL') {
+        const manualId = this.manualSelectedTankId();
+        const target = currentTanks.find(t => t.id === manualId);
+        if (target && target.storedEnergyKwh < target.capacityKwh - 0.01) {
+          chargingTankId = target.id;
+        }
+      } else {
+        // Automatic Sequential Allocation based on priority order
+        for (const tid of this.priorityOrder()) {
+          const t = currentTanks.find(x => x.id === tid);
+          if (t && t.storedEnergyKwh < t.capacityKwh - 0.05) {
+            chargingTankId = t.id;
+            break;
+          }
+        }
+      }
+    }
+
+    this.activeChargingTankId.set(chargingTankId);
+    this.updateTankStatusesImmediately(chargingTankId);
   }
 
   setPriorityOrder(order: number[]): void {
@@ -294,6 +375,9 @@ export class WasteHeatService {
     const valid = Array.from(new Set(order.filter(id => id >= 1 && id <= 4)));
     if (valid.length === 4) {
       this.priorityOrder.set(valid);
+      if (this.allocationMode() === 'AUTO') {
+        this.resolveChargingState();
+      }
       this.saveToLocalStorage();
     }
   }
@@ -313,6 +397,7 @@ export class WasteHeatService {
         };
       })
     );
+    this.resolveChargingState();
     this.saveToLocalStorage();
   }
 
@@ -321,6 +406,11 @@ export class WasteHeatService {
     this.consumers.set(INITIAL_CONSUMERS.map(c => ({ ...c })));
     this.heatOutputKw.set(1.0);
     this.durationSeconds.set(300);
+    this.allocationMode.set('AUTO');
+    this.manualSelectedTankId.set(1);
+    this.activeChargingTankId.set(1);
+    this.priorityOrder.set([1, 2, 3, 4]);
+    this.resolveChargingState();
     this.saveToLocalStorage();
   }
 
@@ -643,6 +733,7 @@ export class WasteHeatService {
         allocationMode: this.allocationMode(),
         priorityOrder: this.priorityOrder(),
         manualSelectedTankId: this.manualSelectedTankId(),
+        activeChargingTankId: this.activeChargingTankId(),
         tanks: this.tanks(),
         consumers: this.consumers()
       };
@@ -669,6 +760,9 @@ export class WasteHeatService {
         if (parsed.consumers && Array.isArray(parsed.consumers)) {
           this.consumers.set(parsed.consumers);
         }
+
+        // Accurately resolve and restore activeChargingTankId and tank status flags
+        this.resolveChargingState();
       }
     } catch (e) {
       console.warn('Failed to load Waste Heat state from localStorage', e);
