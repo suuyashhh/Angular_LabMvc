@@ -166,7 +166,7 @@
            [class.tank-active-charge]="tank.status === 'CHARGING'"
            [class.tank-active-discharge]="tank.status === 'DISCHARGING'"
            [class.border-slate-200]="tank.status !== 'CHARGING' && tank.status !== 'DISCHARGING'"
-           (click)="wasteHeat.allocationMode() === 'MANUAL' ? selectManualTank(tank.id) : null">
+           (click)="tank.fillPercentage < 99.8 ? selectTankToStore(tank.id) : null">
         
         <!-- Tank Top Header -->
         <div class="flex items-center justify-between font-mono pb-2.5 border-b border-slate-200">
@@ -261,12 +261,38 @@
                  [style.width.%]="tank.fillPercentage"></div>
           </div>
 
-          <!-- Manual selection mode helper button -->
-          <div *ngIf="wasteHeat.allocationMode() === 'MANUAL'" class="pt-1.5">
-            <button (click)="selectManualTank(tank.id); $event.stopPropagation()"
-                    class="w-full py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer"
-                    [ngClass]="wasteHeat.manualSelectedTankId() === tank.id ? 'bg-orange-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'">
-              {{ wasteHeat.manualSelectedTankId() === tank.id ? '✓ TARGET CHARGE TANK' : 'SELECT AS TARGET' }}
+          <!-- Tank Storage Destination Action Button (Down button for storing in this tank) -->
+          <div class="pt-2">
+            <!-- State 1: Currently Actively Storing Heat in this tank -->
+            <button *ngIf="wasteHeat.activeChargingTankId() === tank.id"
+                    (click)="selectTankToStore(tank.id); $event.stopPropagation()"
+                    id="btn-storing-tank-{{tank.id}}"
+                    title="Tank {{ tank.name }} is actively storing heat"
+                    class="w-full py-2 px-3 rounded-xl text-xs font-bold font-mono uppercase transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/30 border border-orange-400 cursor-default">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+              <span>⚡ Actively Storing</span>
+            </button>
+
+            <!-- State 2: Tank is Full -->
+            <button *ngIf="wasteHeat.activeChargingTankId() !== tank.id && tank.fillPercentage >= 99.8"
+                    disabled
+                    id="btn-full-tank-{{tank.id}}"
+                    title="Tank {{ tank.name }} is at maximum capacity"
+                    class="w-full py-2 px-3 rounded-xl text-xs font-bold font-mono uppercase bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed flex items-center justify-center gap-1.5 opacity-80">
+              <span>🔒 Full ({{ tank.fillPercentage | number:'1.0-0' }}%)</span>
+            </button>
+
+            <!-- State 3: Available to Store Heat -->
+            <button *ngIf="wasteHeat.activeChargingTankId() !== tank.id && tank.fillPercentage < 99.8"
+                    (click)="selectTankToStore(tank.id); $event.stopPropagation()"
+                    id="btn-store-tank-{{tank.id}}"
+                    title="Store incoming heat into {{ tank.name }}"
+                    class="group w-full py-2 px-3 rounded-xl text-xs font-bold font-mono uppercase transition-all duration-200 flex items-center justify-center gap-1.5 bg-white hover:bg-orange-500 text-slate-700 hover:text-white border-2 border-slate-200 hover:border-orange-500 shadow-xs hover:shadow-md hover:shadow-orange-500/20 active:scale-[0.98] cursor-pointer">
+              <span class="text-orange-500 group-hover:text-white transition-colors text-sm">⚡</span>
+              <span>Store in {{ tank.name }}</span>
             </button>
           </div>
 

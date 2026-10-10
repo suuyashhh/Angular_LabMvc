@@ -36,6 +36,10 @@ export class ThermalStorageComponent {
     this.wasteHeat.selectManualTank(tankId);
   }
 
+  selectTankToStore(tankId: number): void {
+    this.wasteHeat.selectManualTank(tankId);
+  }
+
   setSpeed(speed: number): void {
     this.wasteHeat.setSimulationSpeed(speed);
   }
