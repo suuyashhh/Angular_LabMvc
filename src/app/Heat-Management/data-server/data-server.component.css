@@ -1,0 +1,447 @@
+/* ==========================================================================
+   DATA SERVER SCADA PAGE & DYNAMIC ANIMATED HEAT VISUALIZER (WHITE THEME)
+   ========================================================================== */
+
+.data-server-page {
+  color: #0f172a;
+}
+
+/* ==========================================================================
+   1. VISUALIZER STAGE & AMBIENT HEAT HAZE
+   ========================================================================== */
+
+.scada-visualizer-canvas {
+  perspective: 1000px;
+}
+
+/* Ambient Radial Heat Haze behind the server rack - High contrast vibrant glow on white */
+.ambient-heat-haze {
+  position: absolute;
+  top: 2%;
+  bottom: 2%;
+  left: 6%;
+  right: 6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 115, 0, calc(0.55 * var(--heat-intensity, 0.6))) 0%,
+    rgba(249, 115, 22, calc(0.35 * var(--heat-intensity, 0.6))) 35%,
+    rgba(239, 68, 68, calc(0.2 * var(--heat-intensity, 0.6))) 60%,
+    transparent 80%
+  );
+  filter: blur(32px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.ambient-heat-haze.haze-active {
+  opacity: 1;
+  animation: hazeBreath 3s ease-in-out infinite alternate;
+}
+
+@keyframes hazeBreath {
+  0% {
+    transform: scale(0.96);
+    filter: blur(26px);
+  }
+  100% {
+    transform: scale(1.12);
+    filter: blur(38px);
+  }
+}
+
+/* ==========================================================================
+   2. LATERAL HEAT DISSIPATION TRAILS (5-TIER ARCS & RISING PLUMES)
+   ========================================================================== */
+
+.lateral-heat-svg {
+  transition: opacity 0.4s ease;
+}
+
+.heat-trail-group {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.heat-trail-group.trails-active {
+  opacity: var(--heat-intensity, 0.65);
+}
+
+.heat-path {
+  stroke-dasharray: 12 6;
+  animation: trailFlow var(--particle-duration, 1.8s) linear infinite;
+  filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.75));
+}
+
+.left-trails .heat-path {
+  animation-direction: reverse;
+}
+
+@keyframes trailFlow {
+  from {
+    stroke-dashoffset: 72;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Vertical Exhaust Wave Undulation */
+.heat-wave-plume {
+  animation: plumeWave 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes plumeWave {
+  0% {
+    transform: translateY(0px) scale(0.98);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(-8px) scale(1.04);
+    opacity: 1;
+  }
+}
+
+/* Individual Arc Staggering */
+.path-left-1, .path-right-1 {
+  animation-duration: calc(var(--particle-duration, 1.8s) * 0.85);
+}
+.path-left-2, .path-right-2 {
+  animation-duration: calc(var(--particle-duration, 1.8s) * 0.95);
+}
+.path-left-3, .path-right-3 {
+  animation-duration: var(--particle-duration, 1.8s);
+}
+.path-left-4, .path-right-4 {
+  animation-duration: calc(var(--particle-duration, 1.8s) * 1.1);
+}
+.path-left-5, .path-right-5 {
+  animation-duration: calc(var(--particle-duration, 1.8s) * 1.25);
+}
+
+/* ==========================================================================
+   3. DRIFTING HEAT SPARKS & PARTICLES
+   ========================================================================== */
+
+.heat-sparks-layer {
+  opacity: calc(var(--heat-intensity, 0.65) * 1.3);
+  filter: drop-shadow(0 0 8px #f97316);
+}
+
+.spark {
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-out;
+}
+
+/* Left Particle Trajectories */
+.spark-l1 {
+  animation: sparkMoveL1 var(--particle-duration, 2s) infinite;
+}
+.spark-l2 {
+  animation: sparkMoveL2 calc(var(--particle-duration, 2s) * 1.2) 0.3s infinite;
+}
+.spark-l3 {
+  animation: sparkMoveL3 calc(var(--particle-duration, 2s) * 0.8) 0.6s infinite;
+}
+.spark-l4 {
+  animation: sparkMoveL1 calc(var(--particle-duration, 2s) * 1.05) 0.9s infinite;
+}
+.spark-l5 {
+  animation: sparkMoveL2 calc(var(--particle-duration, 2s) * 0.9) 0.15s infinite;
+}
+.spark-l6 {
+  animation: sparkMoveL3 calc(var(--particle-duration, 2s) * 1.15) 0.45s infinite;
+}
+
+@keyframes sparkMoveL1 {
+  0% { cx: 230px; cy: 110px; opacity: 0; r: 2.5px; }
+  20% { opacity: 1; r: 4.5px; }
+  80% { opacity: 0.85; }
+  100% { cx: 35px; cy: 45px; opacity: 0; r: 1.5px; }
+}
+
+@keyframes sparkMoveL2 {
+  0% { cx: 225px; cy: 160px; opacity: 0; r: 2.5px; }
+  25% { opacity: 1; r: 4px; }
+  80% { opacity: 0.8; }
+  100% { cx: 25px; cy: 115px; opacity: 0; r: 1.5px; }
+}
+
+@keyframes sparkMoveL3 {
+  0% { cx: 220px; cy: 210px; opacity: 0; r: 2.5px; }
+  20% { opacity: 1; r: 5px; }
+  80% { opacity: 0.85; }
+  100% { cx: 15px; cy: 190px; opacity: 0; r: 1.5px; }
+}
+
+/* Right Particle Trajectories */
+.spark-r1 {
+  animation: sparkMoveR1 var(--particle-duration, 2s) infinite;
+}
+.spark-r2 {
+  animation: sparkMoveR2 calc(var(--particle-duration, 2s) * 1.2) 0.25s infinite;
+}
+.spark-r3 {
+  animation: sparkMoveR3 calc(var(--particle-duration, 2s) * 0.8) 0.55s infinite;
+}
+.spark-r4 {
+  animation: sparkMoveR1 calc(var(--particle-duration, 2s) * 1.05) 0.85s infinite;
+}
+.spark-r5 {
+  animation: sparkMoveR2 calc(var(--particle-duration, 2s) * 0.9) 0.4s infinite;
+}
+.spark-r6 {
+  animation: sparkMoveR3 calc(var(--particle-duration, 2s) * 1.15) 0.65s infinite;
+}
+
+@keyframes sparkMoveR1 {
+  0% { cx: 470px; cy: 110px; opacity: 0; r: 2.5px; }
+  20% { opacity: 1; r: 4.5px; }
+  80% { opacity: 0.85; }
+  100% { cx: 665px; cy: 45px; opacity: 0; r: 1.5px; }
+}
+
+@keyframes sparkMoveR2 {
+  0% { cx: 475px; cy: 160px; opacity: 0; r: 2.5px; }
+  25% { opacity: 1; r: 4px; }
+  80% { opacity: 0.8; }
+  100% { cx: 675px; cy: 115px; opacity: 0; r: 1.5px; }
+}
+
+@keyframes sparkMoveR3 {
+  0% { cx: 480px; cy: 210px; opacity: 0; r: 2.5px; }
+  20% { opacity: 1; r: 5px; }
+  80% { opacity: 0.85; }
+  100% { cx: 685px; cy: 190px; opacity: 0; r: 1.5px; }
+}
+
+/* ==========================================================================
+   4. CENTRAL 42U SERVER RACK CHASSIS (ENTERPRISE PLATINUM CHASSIS)
+   ========================================================================== */
+
+.server-chassis {
+  box-shadow: 
+    0 20px 45px -10px rgba(15, 23, 42, 0.22),
+    0 0 calc(35px * var(--heat-intensity, 0.6)) rgba(249, 115, 22, 0.45);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* Side Rail Beacons */
+.side-rack-rail {
+  width: 10px;
+}
+
+.rail-beacon {
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: #cbd5e1;
+  transition: all 0.3s ease;
+}
+
+.rail-beacon.beacon-active {
+  background: #f97316;
+  box-shadow: 0 0 8px #ea580c;
+  animation: beaconBlink 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes beaconBlink {
+  0% { opacity: 0.6; background: #ea580c; }
+  50% { opacity: 1; background: #f59e0b; }
+  100% { opacity: 0.8; background: #dc2626; }
+}
+
+/* Top Grille Pill Slits */
+.top-slit {
+  transition: all 0.4s ease;
+}
+
+.top-slit.slit-hot {
+  background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
+}
+
+/* Server Blade Units */
+.blade-unit {
+  transition: all 0.3s ease;
+}
+
+.blade-unit.blade-hot-border {
+  border-color: rgba(245, 158, 11, calc(0.45 + 0.45 * var(--heat-intensity, 0.6)));
+  box-shadow: 0 2px 8px -2px rgba(245, 158, 11, 0.2);
+}
+
+/* Center Thermal Core Chamber */
+.thermal-core-chamber {
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.85);
+}
+
+.core-heat-fire {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 100, var(--heat-intensity, 0.6)) 0%,
+    rgba(255, 115, 0, calc(0.95 * var(--heat-intensity, 0.6))) 45%,
+    rgba(220, 38, 38, calc(0.85 * var(--heat-intensity, 0.6))) 75%,
+    rgba(15, 23, 42, 0.95) 100%
+  );
+  opacity: var(--heat-intensity, 0.6);
+  transition: opacity 0.4s ease;
+}
+
+.core-heat-fire.fire-pulse {
+  animation: corePulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes corePulse {
+  0% {
+    filter: brightness(0.95) drop-shadow(0 0 6px rgba(255, 100, 0, 0.5));
+    transform: scale(0.98);
+  }
+  100% {
+    filter: brightness(1.3) drop-shadow(0 0 14px rgba(255, 140, 0, 0.9));
+    transform: scale(1.02);
+  }
+}
+
+.core-hot-spark {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, calc(0.3 * var(--heat-intensity, 0.6))) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   5. BOTTOM DUAL HIGH-CFM TURBINES / FANS
+   ========================================================================== */
+
+.turbine-backlight {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(245, 158, 11, calc(0.85 * var(--heat-intensity, 0.6))) 0%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.turbine-backlight.backlight-on {
+  opacity: 1;
+}
+
+.turbine-propeller {
+  transform-origin: center center;
+  transition: filter 0.3s ease;
+}
+
+.turbine-propeller.propeller-spinning {
+  animation: turbineRotation var(--fan-duration, 1s) linear infinite;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.7));
+}
+
+@keyframes turbineRotation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Floor Heat Reflection */
+.floor-heat-reflection {
+  position: absolute;
+  bottom: -22px;
+  left: 12%;
+  right: 12%;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 115, 0, 0.6) 0%,
+    rgba(239, 68, 68, 0.25) 50%,
+    transparent 80%
+  );
+  filter: blur(10px);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* ==========================================================================
+   6. SIMULATION CONTROLS & RANGE SLIDER (WHITE THEME)
+   ========================================================================== */
+
+.scada-range-slider {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 6px;
+}
+
+.scada-range-slider::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  background: #f97316;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.8), 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.scada-range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.preset-pill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.preset-pill:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.preset-pill.pill-active {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #f97316;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.35);
+}
+
+.duration-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.duration-btn:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.duration-btn.duration-active {
+  background: #f0fdf4;
+  border-color: #059669;
+  box-shadow: 0 0 10px rgba(5, 150, 105, 0.2);
+}
+
+/* ==========================================================================
+   7. ACCESSIBILITY / PREFERS REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-heat-haze.haze-active,
+  .heat-path,
+  .spark,
+  .core-heat-fire.fire-pulse,
+  .turbine-propeller.propeller-spinning,
+  .rail-beacon.beacon-active,
+  .heat-wave-plume {
+    animation: none !important;
+  }
+}

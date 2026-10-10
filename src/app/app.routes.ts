@@ -6,7 +6,7 @@ import { parkingAuthGuard } from './shared/parking-auth.guard';
 
 export const routes: Routes = [
 
-  { path: '', redirectTo: 'portfolio', pathMatch: 'full' },
+  { path: '', redirectTo: 'heatmanagement', pathMatch: 'full' },
   { 
     path: 'lab', 
     loadComponent: () => import('./login/login.component').then(m => m.LoginComponent) 
@@ -22,6 +22,11 @@ export const routes: Routes = [
   { 
     path: 'farm', 
     loadComponent: () => import('./LoginFarm/loginfarm/loginfarm.component').then(m => m.LoginfarmComponent)
+  },
+  { 
+    path: 'heatmanagement', 
+    loadComponent: () => import('./Heat-Management/landing/landing.component').then(m => m.LandingComponent),
+    loadChildren: () => import('./Heat-Management/Heat-Management.routes').then(m => m.HEAT_MANAGEMENT_ROUTES)
   },
 
   {

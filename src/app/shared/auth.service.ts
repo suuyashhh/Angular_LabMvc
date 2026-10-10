@@ -657,4 +657,123 @@ clearFarmUserDetailsCookie(): void {
     this.router.navigate(['/notes/login']);
   }
 
+  // ===== Waste Heat Management Auth Methods =====
+
+  isWasteHeatLoggedIn(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const user = this.getWasteHeatUser();
+    return !!user;
+  }
+
+  setWasteHeatCredentials(value: any, days: number = 30): void {
+    try {
+      if (isPlatformBrowser(this.platformId)) {
+        const valStr = typeof value === 'string' ? value : JSON.stringify(value);
+        localStorage.setItem('wast_heat_user', valStr);
+        localStorage.setItem('waste_heat_user', valStr);
+        localStorage.setItem('wast-heat-user', valStr);
+        localStorage.setItem('wast-heat', valStr);
+        localStorage.setItem('waste_heat', valStr);
+      }
+      const json = typeof value === 'string' ? value : JSON.stringify(value);
+      const encoded = encodeURIComponent(json);
+      const expires = new Date();
+      expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `wasteHeatCredentials=${encoded}; path=/; expires=${expires.toUTCString()};`;
+    } catch (e) {
+      console.error('Failed to set waste heat credentials', e);
+    }
+  }
+
+  getWasteHeatUser(): any | null {
+    if (isPlatformBrowser(this.platformId)) {
+      const candidateKeys = [
+        'wast_heat_user',
+        'waste_heat_user',
+        'wast-heat-user',
+        'wast-heat',
+        'waste-heat',
+        'wast_heat',
+        'waste_heat',
+        'wastHeatUser',
+        'wasteHeatUser',
+        'wasteHeatCredentials',
+        'wastHeatCredentials'
+      ];
+
+      for (const key of candidateKeys) {
+        try {
+          const val = localStorage.getItem(key);
+          if (val && val !== 'null' && val !== 'undefined' && val !== '""') {
+            try {
+              const parsed = JSON.parse(val);
+              if (parsed) return parsed;
+            } catch {
+              return { user_name: val, email: val };
+            }
+          }
+        } catch (err) {
+          console.warn(`Error reading localStorage key ${key}`, err);
+        }
+      }
+    }
+
+    try {
+      const cookies = typeof document !== 'undefined' && document.cookie ? document.cookie.split('; ') : [];
+      for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if ((name === 'wasteHeatCredentials' || name === 'wastHeatCredentials' || name === 'wast_heat_user') && value) {
+          try {
+            const decoded = decodeURIComponent(value);
+            return JSON.parse(decoded);
+          } catch {
+            return { user_name: value };
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to read waste heat cookie', e);
+    }
+    return null;
+  }
+
+  clearWasteHeatCredentials(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      const candidateKeys = [
+        'wast_heat_user',
+        'waste_heat_user',
+        'wast-heat-user',
+        'wast-heat',
+        'waste-heat',
+        'wast_heat',
+        'waste_heat',
+        'wastHeatUser',
+        'wasteHeatUser',
+        'wasteHeatCredentials',
+        'wastHeatCredentials'
+      ];
+      candidateKeys.forEach(k => localStorage.removeItem(k));
+    }
+    if (typeof document !== 'undefined') {
+      document.cookie = 'wasteHeatCredentials=; path=/; max-age=0';
+      document.cookie = 'wastHeatCredentials=; path=/; max-age=0';
+      document.cookie = 'wast_heat_user=; path=/; max-age=0';
+    }
+  }
+
+  wasteHeatLogout(): void {
+    try {
+      this.clearWasteHeatCredentials();
+      try {
+        this.toaster.success('Logged out from Waste Heat Management', 'Logout');
+      } catch (e) {
+        console.warn('toaster unavailable', e);
+      }
+      this.router.navigate(['/heatmanagement/login']);
+    } catch (err) {
+      console.error('wasteHeatLogout error', err);
+      this.router.navigate(['/heatmanagement/login']);
+    }
+  }
+
 }

@@ -26,22 +26,84 @@ export class TejasShopService {
     this.loadShops();
   }
 
+  public getShopIdFromStorage(): number | null {
+    if (typeof localStorage === 'undefined') return null;
+
+    try {
+      // 1. Direct saved shop object or raw ID
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const id = Number(parsed?.tejaS_SHOPES_ID ?? parsed?.TEJAS_SHOPES_ID ?? parsed?.tejas_shopes_id ?? parsed?.tejasShopesId ?? parsed?.shopId ?? parsed?.shop_id ?? parsed?.id);
+          if (id && !isNaN(id) && id > 0) return id;
+        } catch {
+          const num = Number(saved);
+          if (!isNaN(num) && num > 0) return num;
+        }
+      }
+
+      // 2. Direct keys in localStorage
+      const directKeys = ['tejas_shopes_id', 'TEJAS_SHOPES_ID', 'tejaS_SHOPES_ID', 'tejasShopesId', 'shopId', 'shop_id', 'tejas_shop_id', 'selected_shop_id'];
+      for (const k of directKeys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          const num = Number(val);
+          if (!isNaN(num) && num > 0) return num;
+        }
+      }
+
+      // 3. User objects in localStorage
+      const userKeys = ['Tejas_user', 'userDetails', 'user', 'currentUser'];
+      for (const k of userKeys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          try {
+            const user = JSON.parse(val);
+            const id = Number(user?.tejas_shopes_id ?? user?.tejaS_SHOPES_ID ?? user?.TEJAS_SHOPES_ID ?? user?.tejasShopesId ?? user?.shopId ?? user?.shop_id);
+            if (id && !isNaN(id) && id > 0) return id;
+          } catch {}
+        }
+      }
+
+      // 4. Check cookies
+      if (typeof document !== 'undefined' && document.cookie) {
+        const cookies = document.cookie.split('; ');
+        for (const c of cookies) {
+          const [name, value] = c.split('=');
+          if (name === 'TejasCredentials' && value) {
+            try {
+              const user = JSON.parse(decodeURIComponent(value));
+              const id = Number(user?.tejas_shopes_id ?? user?.tejaS_SHOPES_ID ?? user?.TEJAS_SHOPES_ID ?? user?.shopId);
+              if (id && !isNaN(id) && id > 0) return id;
+            } catch {}
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error reading shop id from storage:', e);
+    }
+    return null;
+  }
+
   public get currentShopId(): number {
     const selected = this.selectedShopSubject.getValue();
-    if (selected && selected.tejaS_SHOPES_ID) {
-      return Number(selected.tejaS_SHOPES_ID);
+    const selectedId = Number(selected?.tejaS_SHOPES_ID ?? (selected as any)?.TEJAS_SHOPES_ID ?? (selected as any)?.tejas_shopes_id ?? (selected as any)?.shopId);
+    if (selectedId && !isNaN(selectedId) && selectedId > 0) {
+      return selectedId;
     }
-    // Fallback: check stored user
-    const userStr = typeof localStorage !== 'undefined' ? localStorage.getItem('Tejas_user') : null;
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        if (user.tejas_shopes_id || user.tejasShopesId) {
-          return Number(user.tejas_shopes_id || user.tejasShopesId);
-        }
-      } catch {}
+
+    const fromStorage = this.getShopIdFromStorage();
+    if (fromStorage && !isNaN(fromStorage) && fromStorage > 0) {
+      return fromStorage;
     }
-    return 1; // Default main branch
+
+    const loadedShops = this.shopsSubject.getValue();
+    if (loadedShops && loadedShops.length > 0 && loadedShops[0].tejaS_SHOPES_ID) {
+      return loadedShops[0].tejaS_SHOPES_ID;
+    }
+
+    return 0;
   }
 
   public get currentShop(): TejasShop | null {
@@ -82,24 +144,33 @@ export class TejasShopService {
     try {
       const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        this.selectedShopSubject.next(parsed);
-        return;
+        try {
+          const parsed = JSON.parse(saved);
+          const normalized = this.normalizeShop(parsed);
+          if (normalized.tejaS_SHOPES_ID > 0) {
+            this.selectedShopSubject.next(normalized);
+            return;
+          }
+        } catch {}
       }
 
-      // Check user details
-      const userStr = localStorage.getItem('Tejas_user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        if (user.tejas_shopes_id || user.tejasShopesId) {
-          const shopId = Number(user.tejas_shopes_id || user.tejasShopesId);
-          const defaultShop: TejasShop = {
-            tejaS_SHOPES_ID: shopId,
-            shoP_NAME: user.shop_name || user.shopName || 'Main Branch',
-            active: 'Y'
-          };
-          this.selectedShopSubject.next(defaultShop);
+      const shopId = this.getShopIdFromStorage();
+      if (shopId && shopId > 0) {
+        // Check if user object has a shop name
+        let shopName = `Branch #${shopId}`;
+        const uStr = localStorage.getItem('Tejas_user') || localStorage.getItem('userDetails');
+        if (uStr) {
+          try {
+            const u = JSON.parse(uStr);
+            shopName = u.shop_name || u.shoP_NAME || u.shopName || shopName;
+          } catch {}
         }
+        const defaultShop: TejasShop = {
+          tejaS_SHOPES_ID: shopId,
+          shoP_NAME: shopName,
+          active: 'Y'
+        };
+        this.selectedShopSubject.next(defaultShop);
       }
     } catch (e) {
       console.error('Error initializing selected shop', e);
@@ -116,12 +187,14 @@ export class TejasShopService {
 
           // If no selected shop yet or selected shop is not in list, pick the first active one or matching
           const current = this.selectedShopSubject.getValue();
-          if (!current && list.length > 0) {
-            this.selectShop(list[0]);
-          } else if (current && list.length > 0) {
-            const match = list.find(s => s.tejaS_SHOPES_ID === current.tejaS_SHOPES_ID);
+          const targetId = current?.tejaS_SHOPES_ID || this.currentShopId;
+
+          if (list.length > 0) {
+            const match = list.find(s => s.tejaS_SHOPES_ID === targetId);
             if (match) {
               this.selectedShopSubject.next(match);
+            } else if (!current) {
+              this.selectShop(list[0]);
             }
           }
         },
@@ -133,9 +206,12 @@ export class TejasShopService {
   }
 
   public selectShop(shop: TejasShop): void {
-    this.selectedShopSubject.next(shop);
+    const normalized = this.normalizeShop(shop);
+    this.selectedShopSubject.next(normalized);
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(shop));
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(normalized));
+      localStorage.setItem('tejas_shopes_id', normalized.tejaS_SHOPES_ID.toString());
+      localStorage.setItem('shopId', normalized.tejaS_SHOPES_ID.toString());
     }
   }
 
@@ -147,7 +223,7 @@ export class TejasShopService {
     } else {
       const fallback: TejasShop = {
         tejaS_SHOPES_ID: shopId,
-        shoP_NAME: `Shop #${shopId}`,
+        shoP_NAME: `Branch #${shopId}`,
         active: 'Y'
       };
       this.selectShop(fallback);

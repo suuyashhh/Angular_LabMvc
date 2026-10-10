@@ -30,9 +30,15 @@ export class FoodService {
     const sId = shopId !== undefined ? shopId : this.shopService.currentShopId;
     const url = sId ? `${this.apiUrl}?shopId=${sId}` : this.apiUrl;
 
-    this.loader.withLoader(this.http.get<FoodItem[]>(url)).subscribe({
+    this.loader.withLoader(this.http.get<any[]>(url)).subscribe({
       next: (items) => {
-        this.itemsSubject.next(items || []);
+        const normalized = (items || []).map((f: any) => ({
+          ...f,
+          tejasShopesId: f.tejasShopesId ?? f.tejaS_SHOPES_ID ?? f.TEJAS_SHOPES_ID ?? sId,
+          tejaS_SHOPES_ID: f.tejaS_SHOPES_ID ?? f.TEJAS_SHOPES_ID ?? f.tejasShopesId ?? sId,
+          TEJAS_SHOPES_ID: f.TEJAS_SHOPES_ID ?? f.tejaS_SHOPES_ID ?? f.tejasShopesId ?? sId
+        }));
+        this.itemsSubject.next(normalized);
       },
       error: (err) => {
         console.error('Error loading foods:', err);
@@ -54,13 +60,16 @@ export class FoodService {
   }
 
   add(item: Omit<FoodItem, 'id'>): FoodItem {
+    const sId = item.tejasShopesId || this.shopService.currentShopId || 1;
     const newItem: FoodItem = {
       ...item,
       id: '',
-      tejasShopesId: item.tejasShopesId || this.shopService.currentShopId
+      tejasShopesId: sId,
+      tejaS_SHOPES_ID: sId,
+      TEJAS_SHOPES_ID: sId
     };
     
-    this.loader.withLoader(this.http.post<FoodItem>(this.apiUrl, newItem)).subscribe(savedItem => {
+    this.loader.withLoader(this.http.post<FoodItem>(`${this.apiUrl}?shopId=${sId}`, newItem)).subscribe(savedItem => {
       const items = this.getAll();
       items.push(savedItem);
       this.itemsSubject.next([...items]);
@@ -70,10 +79,12 @@ export class FoodService {
   }
 
   update(updated: FoodItem): void {
-    if (!updated.tejasShopesId) {
-      updated.tejasShopesId = this.shopService.currentShopId;
-    }
-    this.loader.withLoader(this.http.put<FoodItem>(`${this.apiUrl}/${updated.id}`, updated)).subscribe(() => {
+    const sId = updated.tejasShopesId || updated.tejaS_SHOPES_ID || updated.TEJAS_SHOPES_ID || this.shopService.currentShopId || 1;
+    updated.tejasShopesId = sId;
+    updated.tejaS_SHOPES_ID = sId;
+    updated.TEJAS_SHOPES_ID = sId;
+    
+    this.loader.withLoader(this.http.put<FoodItem>(`${this.apiUrl}/${updated.id}?shopId=${sId}`, updated)).subscribe(() => {
       const items = this.getAll().map(f => f.id === updated.id ? updated : f);
       this.itemsSubject.next([...items]);
     });

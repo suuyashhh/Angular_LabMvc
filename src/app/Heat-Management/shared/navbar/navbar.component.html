@@ -1,0 +1,50 @@
+<header class="heat-navbar">
+
+  <!-- Left: menu toggle + brand -->
+  <div class="nav-left">
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="onToggleMenu()"
+      aria-label="Toggle Side Menu"
+      title="Toggle Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="brand-mark" aria-hidden="true">
+      <i class="fa-solid fa-fire-flame-curved"></i>
+    </div>
+
+    <div class="brand-text">
+      <h1 class="brand-title">Waste Heat Management System</h1>
+      <span class="version-chip">SCADA-HMI v3.2</span>
+    </div>
+  </div>
+
+  <!-- Right: status, time, operator -->
+  <div class="nav-right">
+
+    <div class="chip status-chip">
+      <span class="pulse-dot"></span>
+      <span class="status-text">SYSTEM ONLINE</span>
+      <span class="chip-divider"></span>
+      <span class="chip-sub">GATEWAY 01</span>
+    </div>
+
+    <div class="chip time-chip">
+      <i class="fa-regular fa-clock"></i>
+      <span>{{ currentTime }}</span>
+    </div>
+
+    <button
+      type="button"
+      class="operator-btn"
+      (click)="logout()"
+      title="Sign Out / Operator Control">
+      <span class="operator-avatar">{{ userInitials }}</span>
+      <span class="operator-id">{{ userDisplayName }}</span>
+      <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
+    </button>
+
+  </div>
+</header>

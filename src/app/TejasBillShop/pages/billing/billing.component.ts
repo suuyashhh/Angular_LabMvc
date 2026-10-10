@@ -6,6 +6,7 @@ import { FOOD_EMOJI_MAP } from '../../models/mock-data';
 import { FoodService } from '../../services/food.service';
 import { BillingService } from '../../services/billing.service';
 import { PrinterService } from '../../services/printer.service';
+import { TejasShopService } from '../../services/tejas-shop.service';
 
 @Component({
   selector: 'app-billing',
@@ -35,8 +36,17 @@ export class BillingComponent implements OnInit, OnDestroy {
   constructor(
     private foodService: FoodService,
     private billing: BillingService,
-    private printer: PrinterService
+    private printer: PrinterService,
+    public shopService: TejasShopService
   ) {}
+
+  get currentShop() {
+    return this.shopService.currentShop;
+  }
+
+  get currentShopId(): number {
+    return this.shopService.currentShopId;
+  }
 
   ngOnInit(): void {
     this.subs.push(
