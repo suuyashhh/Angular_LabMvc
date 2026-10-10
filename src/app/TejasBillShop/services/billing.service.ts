@@ -129,8 +129,31 @@ export class BillingService {
     return this.billsSubject.getValue();
   }
 
+  private getLocalIsoString(date: Date = new Date()): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const min = pad(date.getMinutes());
+    const ss = pad(date.getSeconds());
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}`;
+  }
+
   getBillById(id: string): Bill | undefined {
     return this.getAllBills().find(b => b.id === id);
+  }
+
+  fetchBillById(id: string): Observable<Bill> {
+    const sId = this.shopService.currentShopId;
+    return this.loader.withLoader(this.http.get<any>(`${this.apiUrl}/${id}`)).pipe(
+      map((b: any) => ({
+        ...b,
+        tejasShopesId: b.tejasShopesId ?? b.tejaS_SHOPES_ID ?? b.TEJAS_SHOPES_ID ?? sId,
+        tejaS_SHOPES_ID: b.tejaS_SHOPES_ID ?? b.TEJAS_SHOPES_ID ?? b.tejasShopesId ?? sId,
+        TEJAS_SHOPES_ID: b.TEJAS_SHOPES_ID ?? b.tejaS_SHOPES_ID ?? b.tejasShopesId ?? sId
+      }))
+    );
   }
 
   saveBill(): Promise<Bill> {
@@ -144,7 +167,7 @@ export class BillingService {
     }));
 
     const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-    const now = new Date().toISOString();
+    const now = this.getLocalIsoString();
     const currentShop = this.shopService.currentShop;
     const shopId = this.shopService.currentShopId;
 
@@ -195,7 +218,7 @@ export class BillingService {
     
     toSave.subtotal = toSave.items.reduce((s: number, i: any) => s + i.price * i.quantity, 0);
     toSave.grandTotal = toSave.subtotal;
-    toSave.updatedAt = new Date().toISOString();
+    toSave.updatedAt = this.getLocalIsoString();
     
     const shopId = toSave.tejasShopesId || toSave.tejaS_SHOPES_ID || toSave.TEJAS_SHOPES_ID || this.shopService.currentShopId;
     toSave.tejasShopesId = shopId;
@@ -207,7 +230,8 @@ export class BillingService {
       next: (res: any) => {
         updated.subtotal = toSave.subtotal;
         updated.grandTotal = toSave.grandTotal;
-        updated.updatedAt = toSave.updatedAt;
+        updated.updatedAt = res?.updatedAt || toSave.updatedAt;
+        updated.createdAt = res?.createdAt || toSave.createdAt;
         updated.tejasShopesId = shopId;
         updated.tejaS_SHOPES_ID = shopId;
         updated.TEJAS_SHOPES_ID = shopId;
