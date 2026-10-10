@@ -24,6 +24,9 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   printMessage = '';
 
   billDateTime: string = '';
+  isEditMode = false;
+  showDeleteModal = false;
+  isDeleting = false;
 
   // Add Items sheet state
   allFoods: FoodItem[] = [];
@@ -66,6 +69,9 @@ export class BillDetailComponent implements OnInit, OnDestroy {
 
     // Load food items for the "Add Items" sheet
     this.subs.push(
+      this.route.queryParams.subscribe(params => {
+        this.isEditMode = params['edit'] === 'true' || params['edit'] === true;
+      }),
       this.foodService.items$.subscribe(items => {
         this.allFoods = items.filter(f => f.active);
         this.categories = this.foodService.getCategories();
@@ -107,7 +113,7 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   }
 
   changeQty(index: number, delta: number): void {
-    if (!this.bill) return;
+    if (!this.bill || !this.isEditMode) return;
     this.bill.items[index].quantity += delta;
     if (this.bill.items[index].quantity <= 0) {
       this.bill.items.splice(index, 1);
@@ -135,6 +141,7 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   }
 
   onDateTimeChange(val: string): void {
+    if (!this.isEditMode) return;
     this.billDateTime = val;
     if (this.bill && val) {
       this.bill.createdAt = val.length === 16 ? `${val}:00` : val;
@@ -142,7 +149,7 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   }
 
   updateBill(): void {
-    if (!this.bill) return;
+    if (!this.bill || !this.isEditMode) return;
     if (this.billDateTime) {
       this.bill.createdAt = this.billDateTime.length === 16 ? `${this.billDateTime}:00` : this.billDateTime;
     }
@@ -150,12 +157,26 @@ export class BillDetailComponent implements OnInit, OnDestroy {
     this.showUpdated = true;
   }
 
-  deleteBill(): void {
+  openDeleteModal(): void {
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.isDeleting = false;
+  }
+
+  confirmDelete(): void {
     if (!this.bill) return;
-    if (confirm('Delete this bill?')) {
-      this.billing.deleteBill(this.bill.id);
-      this.router.navigate(['/tejas/entries']);
-    }
+    this.isDeleting = true;
+    this.billing.deleteBill(this.bill.id);
+    this.showDeleteModal = false;
+    this.isDeleting = false;
+    this.router.navigate(['/tejas/entries']);
+  }
+
+  deleteBill(): void {
+    this.openDeleteModal();
   }
 
   goBack(): void {
@@ -183,6 +204,7 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   // ── Add Items Sheet ──
 
   openAddItemsSheet(): void {
+    if (!this.isEditMode) return;
     this.searchQuery = '';
     this.selectedCategory = 'All';
     this.filterAvailableItems();
@@ -223,7 +245,7 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   }
 
   addItemToBill(food: FoodItem): void {
-    if (!this.bill) return;
+    if (!this.bill || !this.isEditMode) return;
 
     // Check if already exists (shouldn't, but safety)
     const existing = this.bill.items.find(i => i.foodId === food.id);
