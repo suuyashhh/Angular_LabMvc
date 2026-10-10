@@ -1,0 +1,192 @@
+<div class="login-page">
+  <div class="login-shell">
+
+    <!-- RIGHT: Login card -->
+    <section class="card-side">
+      <div class="login-card">
+
+        <!-- Logo -->
+        <div class="brand">
+          <div class="brand-logo">
+            <img
+              src="assets/img/Heat-Management/logo.png"
+              alt=""
+              (error)="$any($event.target).style.display = 'none'" />
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">THERMO-RECOVER</span>
+            <span class="brand-sub">Waste Heat Management System</span>
+          </div>
+        </div>
+
+        <h1 class="card-title">{{ isLoginMode ? 'Welcome back!' : 'Create an Account' }}</h1>
+        <p class="card-subtitle">{{ isLoginMode ? 'Please enter your credentials to access telemetry.' : 'Register as an operator or system manager.' }}</p>
+
+        <!-- Quick Demo Switcher (Login Mode only) -->
+        <div *ngIf="isLoginMode" class="demo-chips">
+          <span class="demo-label">Quick Demo:</span>
+          <button type="button" class="demo-chip" (click)="fillDemoCredentials('operator')">
+            <i class="fa-solid fa-user-gear"></i> Operator
+          </button>
+          <button type="button" class="demo-chip admin" (click)="fillDemoCredentials('admin')">
+            <i class="fa-solid fa-shield-halved"></i> Admin
+          </button>
+        </div>
+
+        <!-- Error Banner -->
+        <div *ngIf="errorMessage" class="error-banner" role="alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form *ngIf="isLoginMode" (submit)="$event.preventDefault(); login()" class="login-form" novalidate>
+
+          <div class="form-group">
+            <label for="username" class="form-label">Work Email / Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="loginData.username"
+              placeholder="e.g. operator.heat@thermal.lab"
+              required
+              autocomplete="username"
+              class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="password" class="form-label">Password</label>
+              <button type="button" class="forgot-link" (click)="onForgotPassword()">
+                Forgot password?
+              </button>
+            </div>
+            <div class="input-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                [(ngModel)]="loginData.password"
+                placeholder="Enter password"
+                required
+                autocomplete="current-password"
+                class="form-input has-toggle" />
+              <button
+                type="button"
+                class="password-toggle-btn"
+                (click)="togglePasswordVisibility()"
+                [title]="showPassword ? 'Hide password' : 'Show password'"
+                aria-label="Toggle password visibility">
+                <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              name="rememberMe"
+              [(ngModel)]="loginData.rememberMe"
+              class="custom-checkbox" />
+            <span>Remember for 30 days</span>
+          </label>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Sign in to System</span>
+            <span *ngIf="isLoading" class="btn-loading">
+              <i class="fa-solid fa-circle-notch fa-spin"></i>
+              Authenticating...
+            </span>
+          </button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form *ngIf="!isLoginMode" (submit)="$event.preventDefault(); register()" class="login-form" novalidate>
+
+          <div class="form-group">
+            <label for="regName" class="form-label">Full Name</label>
+            <input
+              type="text"
+              id="regName"
+              name="user_name"
+              [(ngModel)]="loginData.user_name"
+              placeholder="e.g. John Doe"
+              required
+              class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail" class="form-label">Work Email</label>
+            <input
+              type="email"
+              id="regEmail"
+              name="email"
+              [(ngModel)]="loginData.email"
+              placeholder="e.g. john@thermal.lab"
+              required
+              class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label for="regContact" class="form-label">Contact / Phone</label>
+            <input
+              type="text"
+              id="regContact"
+              name="contact"
+              [(ngModel)]="loginData.contact"
+              placeholder="e.g. 9876543210"
+              class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword" class="form-label">Password</label>
+            <div class="input-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="regPassword"
+                name="password"
+                [(ngModel)]="loginData.password"
+                placeholder="Choose secure password"
+                required
+                class="form-input has-toggle" />
+              <button
+                type="button"
+                class="password-toggle-btn"
+                (click)="togglePasswordVisibility()"
+                [title]="showPassword ? 'Hide password' : 'Show password'"
+                aria-label="Toggle password visibility">
+                <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Create Account</span>
+            <span *ngIf="isLoading" class="btn-loading">
+              <i class="fa-solid fa-circle-notch fa-spin"></i>
+              Creating Account...
+            </span>
+          </button>
+        </form>
+
+        <p class="signup-row">
+          <span *ngIf="isLoginMode">Don't have an account?</span>
+          <span *ngIf="!isLoginMode">Already registered?</span>
+          <button type="button" class="signup-link-btn" (click)="toggleMode()">
+            {{ isLoginMode ? 'Sign up' : 'Sign in' }}
+          </button>
+        </p>
+
+        <div class="card-footer">
+          <a routerLink="/portfolio" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Return to Portfolio</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</div>

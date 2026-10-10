@@ -1,0 +1,98 @@
+/* ==========================================================================
+   HEAT CONSUMERS SCADA DISTRIBUTION & CONTROLS (CLEAN WHITE THEME)
+   ========================================================================== */
+
+.heat-consumers-page {
+  color: #0f172a;
+}
+
+/* 1. Filter Tab Buttons */
+.filter-tab-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.filter-tab-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.filter-tab-btn.tab-active {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+  box-shadow: 0 1px 3px rgba(249, 115, 22, 0.12);
+}
+
+/* 2. Main Consumer Card */
+.consumer-card-main {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.consumer-card-main:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.consumer-card-main.card-supplying {
+  border-color: #10b981 !important;
+  background-color: rgba(240, 253, 244, 0.45) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* 3. Clean Modal Backdrop & Window Animation */
+.modal-backdrop {
+  backdrop-filter: blur(5px);
+}
+
+.modal-window {
+  animation: modalEnter 0.2s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 4. Custom Scrollbar for Form Window */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 5. Accessibility / Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .consumer-card-main,
+  .modal-window {
+    animation: none !important;
+    transition: none !important;
+  }
+}

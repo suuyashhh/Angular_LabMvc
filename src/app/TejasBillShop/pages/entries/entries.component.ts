@@ -74,7 +74,9 @@ export class EntriesComponent implements OnInit {
   }
 
   formatDate(iso: string): string {
+    if (!iso) return '';
     const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
     return d.toLocaleDateString('en-IN', {
       day: '2-digit', month: 'short', year: 'numeric'
     }) + ', ' + d.toLocaleTimeString('en-IN', {

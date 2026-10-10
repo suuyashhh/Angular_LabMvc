@@ -23,6 +23,8 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   isPrinterConnected = false;
   printMessage = '';
 
+  billDateTime: string = '';
+
   // Add Items sheet state
   allFoods: FoodItem[] = [];
   filteredAvailableItems: FoodItem[] = [];
@@ -42,11 +44,23 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.bill = this.billing.getBillById(id) || null;
-      if (this.bill) {
+      const existing = this.billing.getBillById(id);
+      if (existing) {
         // Deep clone so edits don't mutate until save
-        this.bill = JSON.parse(JSON.stringify(this.bill));
+        this.bill = JSON.parse(JSON.stringify(existing));
+        this.syncDateTime();
         this.recalc();
+      } else {
+        this.billing.fetchBillById(id).subscribe({
+          next: (b) => {
+            if (b) {
+              this.bill = JSON.parse(JSON.stringify(b));
+              this.syncDateTime();
+              this.recalc();
+            }
+          },
+          error: (err) => console.error('Error fetching bill:', err)
+        });
       }
     }
 
@@ -78,7 +92,9 @@ export class BillDetailComponent implements OnInit, OnDestroy {
   }
 
   formatDate(iso: string): string {
+    if (!iso) return '';
     const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
     return d.toLocaleDateString('en-IN', {
       day: '2-digit', month: 'short', year: 'numeric'
     }) + ', ' + d.toLocaleTimeString('en-IN', {
@@ -105,8 +121,31 @@ export class BillDetailComponent implements OnInit, OnDestroy {
     this.bill.grandTotal = this.bill.subtotal;
   }
 
+  private syncDateTime(): void {
+    if (!this.bill?.createdAt) return;
+    const d = new Date(this.bill.createdAt);
+    if (isNaN(d.getTime())) return;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const mm = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const min = pad(d.getMinutes());
+    this.billDateTime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  }
+
+  onDateTimeChange(val: string): void {
+    this.billDateTime = val;
+    if (this.bill && val) {
+      this.bill.createdAt = val.length === 16 ? `${val}:00` : val;
+    }
+  }
+
   updateBill(): void {
     if (!this.bill) return;
+    if (this.billDateTime) {
+      this.bill.createdAt = this.billDateTime.length === 16 ? `${this.billDateTime}:00` : this.billDateTime;
+    }
     this.billing.updateBill(this.bill);
     this.showUpdated = true;
   }

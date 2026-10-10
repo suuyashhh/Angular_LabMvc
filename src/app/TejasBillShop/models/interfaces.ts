@@ -6,6 +6,9 @@ export interface FoodItem {
   image: string;
   active: boolean;
   tejasShopesId?: number;
+  tejaS_SHOPES_ID?: number;
+  TEJAS_SHOPES_ID?: number;
+  shopId?: number;
 }
 
 export interface CartItem {
@@ -30,6 +33,9 @@ export interface Bill {
   createdAt: string;
   updatedAt: string;
   tejasShopesId?: number;
+  tejaS_SHOPES_ID?: number;
+  TEJAS_SHOPES_ID?: number;
+  shopId?: number;
   shopName?: string;
 }
 

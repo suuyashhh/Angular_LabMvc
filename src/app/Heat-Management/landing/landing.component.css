@@ -1,0 +1,24 @@
+.heat-app-layout {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
+  background-color: #060c16;
+}
+
+/* Industrial dark scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #060c16;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #17263b;
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #253a57;
+}
